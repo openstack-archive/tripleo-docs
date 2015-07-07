@@ -72,5 +72,10 @@ steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
+.. admonition:: SSL
+   :class: ssl
+
+   Step that should only be run when deploying with SSL OpenStack endpoints
+
 Any such steps should *not* be run if the target environment does not match
 the section marking.

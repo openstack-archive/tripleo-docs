@@ -1,0 +1,129 @@
+/* CUSTOM CSS OVERRIDES GO HERE */
+/* ============================ */
+
+/* remove backgrounds */
+#admonition_selector {
+  background: none !important;
+  color: black !important;
+}
+
+/* admonition selector */
+#admonition_selector {
+  border-top: 0 none !important;
+}
+
+#admonition_selector .title {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.trigger {
+  color: rgba(0, 0, 0, 0.7) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.trigger:hover {
+  color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* NOTES, ADMONITTIONS AND TAGS */
+.admonition {
+  font-size: 85%; /* match code size */
+  background: rgb(240, 240, 240);
+  color: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5em 1em 0.75em 1em;
+  margin-bottom: 24px;
+}
+
+.admonition p {
+  font-size: inherit;
+}
+
+.admonition p.last {
+  margin-bottom: 0;
+}
+
+.admonition p.first.admonition-title {
+  display: inline;
+  background: none;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* notes */
+.rst-content .note {
+  background: rgb(240, 240, 240);
+}
+
+/* tags */
+.rhel {background: #fee;}
+.portal {background-color: #ded;}
+.satellite {background-color: #dee;}
+.centos {background: #fef;}
+.baremetal {background: #eef;}
+.virtual {background: #efe;}
+.ceph {background: #eff;}
+
+/* admonition selector */
+#admonition_selector {
+  color: white;
+  font-size: 85%;
+  line-height: 1.4;
+  background: #2980b9;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.trigger {
+  display: block;
+  font-size: 110%;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 2.5;
+  position: relative;
+  cursor: pointer;
+  padding: 0 1.618em;
+}
+
+.trigger:after {
+  content: '▾';
+  display: block;
+  font-family: FontAwesome;
+  font-size: 70%;
+  position: absolute;
+  right: 1.618em;
+  top: 6px;
+}
+
+.trigger:hover {
+  color: white;
+}
+
+.content {
+  display: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5em 1.618em;
+}
+
+.displayed .trigger:after {
+  content: '▴';
+}
+
+#admonition_selector .title {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+#admonition_selector ul {
+  margin-bottom: 0.75em;
+}
+
+#admonition_selector ul li {
+  display: block;
+}
+
+#admonition_selector label {
+  display: inline;
+  color: inherit;
+  text-decoration: underline dotted;
+}

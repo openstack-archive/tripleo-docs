@@ -115,7 +115,7 @@ Preparing the Virtual Environment (Automated)
        sudo yum install -y https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
 
        # Enable RDO Trunk
-       sudo curl http://trunk.rdoproject.org/centos7/38/1c/381cac9139096bfef49952f3fd67e19451160b61_4bc2d731/delorean.repo -O /etc/yum.repos.d/delorean.repo
+       sudo curl http://trunk.rdoproject.org/centos7/38/1c/381cac9139096bfef49952f3fd67e19451160b61_4bc2d731/delorean.repo -o /etc/yum.repos.d/delorean.repo
 
    The above Delorean repository is updated after a successful CI run. The following repo can be used instead if the newest packages are needed before a CI run has passed.
 

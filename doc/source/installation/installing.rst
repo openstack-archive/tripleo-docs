@@ -58,13 +58,13 @@ Installing the Undercloud
      sudo yum install -y https://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm
 
      # Enable RDO Trunk
-     sudo curl http://trunk.rdoproject.org/centos7/38/1c/381cac9139096bfef49952f3fd67e19451160b61_4bc2d731/delorean.repo -O /etc/yum.repos.d/delorean.repo
+     sudo curl http://trunk.rdoproject.org/centos7/38/1c/381cac9139096bfef49952f3fd67e19451160b61_4bc2d731/delorean.repo -o /etc/yum.repos.d/delorean.repo
 
   The above Delorean repository is updated after a successful CI run. The following repo can be used instead if the newest packages are needed before a CI run has passed.
 
   ::
 
-   sudo curl -o /etc/yum.repos.d/rdo-management-trunk.repo http://trunk-mgt.rdoproject.org/centos-kilo/current/delorean-rdo-management.repo
+     sudo curl -o /etc/yum.repos.d/delorean.repo http://trunk.rdoproject.org/centos7/current/delorean.repo
 
 
 #. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::

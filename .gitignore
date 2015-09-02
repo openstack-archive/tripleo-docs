@@ -1,0 +1,13 @@
+*.swp
+*~
+*.qcow2
+
+.DS_Store
+
+*.egg
+*.egg-info
+*.pyc
+
+.tox
+doc/build
+build

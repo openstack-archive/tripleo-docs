@@ -138,11 +138,14 @@ of the elements within diskimage-builder and tripleo-image-elements.
 
 **How to contribute**
 
-Submit patches to gerrithub https://review.gerrithub.io/#/q/project:rdo-management/instack
+Submit your changes via OpenStack Gerrit (see
+`OpenStack Developer's Guide
+<http://docs.openstack.org/infra/manual/developers.html>`_).
 
 **Useful links**
 
-* Bugs: https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Community&component=instack
+* Git repository: https://git.openstack.org/cgit/openstack/instack
+* Bugs: https://launchpad.net/tripleo
 
 instack-undercloud
 ^^^^^^^^^^^^^^^^^^
@@ -151,11 +154,14 @@ instack.
 
 **How to contribute**
 
-Submit patches to gerrithub https://review.gerrithub.io/#/q/project:rdo-management/instack-undercloud
+Submit your changes via OpenStack Gerrit (see
+`OpenStack Developer's Guide
+<http://docs.openstack.org/infra/manual/developers.html>`_).
 
 **Useful links**
 
-* Bugs: https://bugzilla.redhat.com/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&classification=Community&component=instack-undercloud
+* Git repository: https://git.openstack.org/cgit/openstack/instack-undercloud
+* Bugs: https://launchpad.net/tripleo
 
 tripleo-incubator
 ^^^^^^^^^^^^^^^^^
@@ -171,6 +177,7 @@ Submit your changes via OpenStack Gerrit (see
 
 * Documentation: http://docs.openstack.org/developer/tripleo-incubator/index.html
 * Git repository: https://git.openstack.org/cgit/openstack/tripleo-incubator
+* Bugs: https://launchpad.net/tripleo
 
 
 Node Management

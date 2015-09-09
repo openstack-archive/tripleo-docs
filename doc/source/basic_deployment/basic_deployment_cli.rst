@@ -358,6 +358,9 @@ tests to pass, based on the default floating pool name set in nova.conf. You
 can confirm that the network was created with::
 
     neutron net-list
+
+Sample output of the command::
+
     +--------------------------------------+-------------+-------------------------------------------------------+
     | id                                   | name        | subnets                                               |
     +--------------------------------------+-------------+-------------------------------------------------------+
@@ -376,18 +379,34 @@ and VLAN id based on the environment::
 
 Validate the Overcloud
 ^^^^^^^^^^^^^^^^^^^^^^
-To verify the Overcloud by running Tempest::
+Source the ``overcloudrc`` file::
 
-    openstack overcloud validate --overcloud-auth-url $OS_AUTH_URL \
-                                 --overcloud-admin-password $OS_PASSWORD
+    source ~/overcloudrc
+
+Create a directory for Tempest (eg. naming it ``tempest``)::
+
+    mkdir ~/tempest
+    cd ~/tempest
+
+Tempest expects the tests it discovers to be in the current working directory.
+Set it up accordingly::
+
+    /usr/share/openstack-tempest-liberty/tools/configure-tempest-directory
+
+The ``~/tempest-deployer-input.conf`` file was created during deployment and
+contains deployment specific settings. Use that file to configure
+Tempest::
+
+    tools/config_tempest.py --deployer-input ~/tempest-deployer-input.conf \
+                            --debug --create \
+                            identity.uri $OS_AUTH_URL \
+                            identity.admin_password $OS_PASSWORD
+
+Run Tempest::
+
+    tools/run-tests.sh
 
 .. note:: The full Tempest test suite might take hours to run on a single CPU.
-
-To run only a part of the Tempest test suite (eg. tests with ``smoke`` tag)::
-
-    openstack overcloud validate --overcloud-auth-url $OS_AUTH_URL \
-                                 --overcloud-admin-password $OS_PASSWORD \
-                                 --tempest-args smoke
 
 
 Redeploy the Overcloud

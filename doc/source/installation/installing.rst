@@ -71,6 +71,10 @@ Installing the Undercloud
 
         cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
+  For the moment, git checkouts of the puppet modules must be used. Export the
+  following environment variable::
+
+    export DIB_INSTALLTYPE_puppet_modules=source
 
   Install the undercloud::
 

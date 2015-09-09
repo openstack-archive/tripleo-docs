@@ -134,6 +134,11 @@ non-root user that was used to install the undercloud.
 
       export DELOREAN_TRUNK_MGT_REPO="http://trunk.rdoproject.org/centos7/current/"
 
+  For the moment, git checkouts of the puppet modules must be used. Export the
+  following environment variable::
+
+    export DIB_INSTALLTYPE_puppet_modules=source
+
   ::
 
    openstack overcloud image build --all

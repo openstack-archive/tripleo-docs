@@ -12,7 +12,6 @@ In this chapter you will find advanced deployment of various |project| areas.
    Additional node configuration <extra_config>
    Deploying with Heat Templates <template_deploy>
    Network Isolation <network_isolation>
-   Managing Tuskar Plans and Roles <managing_plans_and_roles>
    Deploying Manila <deploy_manila>
    Configuring Cinder with a NetApp Backend <cinder_netapp>
 

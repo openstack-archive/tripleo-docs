@@ -65,6 +65,7 @@
 .baremetal {background: #eef;}
 .virtual {background: #efe;}
 .ceph {background: #eff;}
+.source {background: #bbb;}
 
 /* admonition selector */
 #admonition_selector {

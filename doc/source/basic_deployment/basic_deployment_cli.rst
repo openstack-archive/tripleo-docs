@@ -134,10 +134,13 @@ non-root user that was used to install the undercloud.
 
       export DELOREAN_TRUNK_MGT_REPO="http://trunk.rdoproject.org/centos7/current/"
 
-  For the moment, git checkouts of the puppet modules must be used. Export the
-  following environment variable::
+  .. admonition:: Source
+     :class: source
 
-    export DIB_INSTALLTYPE_puppet_modules=source
+     Git checkouts of the puppet modules can be used instead of packages. Export the
+     following environment variable::
+
+       export DIB_INSTALLTYPE_puppet_modules=source
 
   ::
 

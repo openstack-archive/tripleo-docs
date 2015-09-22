@@ -61,5 +61,11 @@ steps are marked as follows:
 
    Step that should only be run when deploying Ceph for use by the Overcloud
 
+.. admonition:: Source
+   :class: source
+
+   Step that should only be run when choosing to use some components directly
+   from their git source code repositories instead of packages.
+
 Any such steps should *not* be run if the target environment does not match
 the section marking.

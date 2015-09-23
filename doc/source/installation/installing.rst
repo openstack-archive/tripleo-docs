@@ -59,7 +59,7 @@ Installing the Undercloud
   "include" directive breaks the numbering.
 3. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 
-    sudo yum install -y python-rdomanager-oscplugin
+    sudo yum install -y python-tripleoclient
 
 
 #. Run the script to install the undercloud:

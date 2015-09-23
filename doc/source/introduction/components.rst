@@ -443,24 +443,24 @@ command with consistent syntax and behaviour.
 * Blueprints: https://blueprints.launchpad.net/python-openstackclient
 * Human interface guide: http://docs.openstack.org/developer/python-openstackclient/humaninterfaceguide.html
 
-python-rdomanager-oscplugin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The python-rdomanager-oscplugin is a CLI tool embedded into
+python-tripleoclient
+^^^^^^^^^^^^^^^^^^^^
+The python-tripleoclient is a CLI tool embedded into
 python-openstackclient. It provides functions related to instack
 installation and initial configuration like node discovery, overcloud image
 building and uploading, etc.
 
 **How to contribute**
 
-* python-rdomanager-oscplugin uses `tox <https://tox.readthedocs.org/en/latest/>`_
+* python-tripleoclient uses `tox <https://tox.readthedocs.org/en/latest/>`_
   to manage the development environment, see `documentation
-  <https://github.com/rdo-management/python-rdomanager-oscplugin/blob/master/CONTRIBUTING.rst>`_
+  <http://git.openstack.org/cgit/openstack/python-tripleoclient/tree/CONTRIBUTING.rst>`_
   for details. Submit your changes via
-  `Gerrithub <https://review.gerrithub.io/#/q/project:rdo-management/python-rdomanager-oscplugin>`_.
+  `Gerrit <https://review.openstack.org/#/q/project:openstack/python-tripleoclient,n,z>`_.
 
 **Useful links**
 
-* Project: https://github.com/rdo-management/python-rdomanager-oscplugin
+* Project: https://git.openstack.org/cgit/openstack/python-tripleoclient
 
 ..
     <GLOBAL_LINKS>

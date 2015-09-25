@@ -187,17 +187,11 @@ The |project| CLI has options to support more advanced role matching.
 
 Continuing with the example with only a control and compute profile:
 
-* Get the Tuskar plan name
-
-  ::
-
-    openstack management plan list
-
 * Deploy the overcloud
 
   ::
 
-    openstack overcloud deploy --control-flavor control --compute-flavor compute --plan <Name or UUID from above>
+    openstack overcloud deploy --control-flavor control --compute-flavor compute --templates
 
 
 Use the flavors to scale

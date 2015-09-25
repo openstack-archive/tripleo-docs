@@ -649,7 +649,7 @@ instance, to deploy VXLAN mode, the deployment command might be::
 
     openstack overcloud deploy -e /home/stack/network-environment.yaml \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
-    --plan openstack --ntp-server pool.ntp.org --neutron-network-type vxlan \
+    --templates --ntp-server pool.ntp.org --neutron-network-type vxlan \
     --neutron-tunnel-types vxlan
 
 To deploy with VLAN mode, you should specify the range of VLANs that will be
@@ -657,7 +657,7 @@ used for tenant networks::
 
     openstack overcloud deploy -e /home/stack/network-environment.yaml \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
-    --plan openstack --ntp-server pool.ntp.org --neutron-network-type vlan \
+    --templates --ntp-server pool.ntp.org --neutron-network-type vlan \
     --neutron-bridge-mappings datacentre:br-ex \
     --neutron-network-vlan-ranges datacentre:30:100 \
     --neutron-disable-tunneling

@@ -15,6 +15,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    Network Isolation <network_isolation>
    Deploying Manila <deploy_manila>
    Configuring Cinder with a NetApp Backend <cinder_netapp>
+   tripleo.sh <tripleo.sh>
 
 
 .. <MOVE THESE UNDER TOCTREE WHEN READY, KEEP LOGICAL WORKFLOW ORDER>

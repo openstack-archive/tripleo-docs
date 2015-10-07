@@ -52,12 +52,20 @@ Installing the Undercloud
          sudo yum install -y yum-utils
          sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
-.. include:: ../repositories.txt
+  Enable epel::
 
+    sudo yum -y install epel-release
+
+.. include:: ../repositories.txt
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
-3. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
+
+3. Install the yum-plugin-priorities package so that the Delorean repository takes precedence over the main RDO repositories::
+
+     sudo yum -y install yum-plugin-priorities
+
+#. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 
     sudo yum install -y python-tripleoclient
 

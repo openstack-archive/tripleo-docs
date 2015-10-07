@@ -42,13 +42,13 @@ Get Images
 
            deploy-ramdisk-ironic.initramfs
            deploy-ramdisk-ironic.kernel
-           discovery-ramdisk.initramfs
-           discovery-ramdisk.kernel
+           ironic-python-agent.initramfs
+           ironic-python-agent.kernel
            overcloud-full.initrd
            overcloud-full.qcow2
            overcloud-full.vmlinuz
 
-Images must be built prior to doing a deployment. A discovery ramdisk,
+Images must be built prior to doing a deployment. An IPA ramdisk,
 deployment ramdisk, and openstack-full image can all be built using
 instack-undercloud.
 
@@ -79,6 +79,11 @@ non-root user that was used to install the undercloud.
 
           export NODE_DIST=rhel7
 
+#. Use undercloud delorean repos to build the overcloud images:
+
+    ::
+
+        export DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean.repo /etc/yum.repos.d/delorean-deps.repo"
 
 #. Build the required images:
 
@@ -127,13 +132,6 @@ non-root user that was used to install the undercloud.
             # rhel-7-server-openstack-6.0-rpms
             export REG_ACTIVATION_KEY="[activation key]"
 
-  .. note ::
-    By default, images are built with the latest delorean repository which has passed CI. If you need to manually test packages before CI has passed, you can use:
-
-    ::
-
-      export DELOREAN_TRUNK_MGT_REPO="http://trunk.rdoproject.org/centos7/current/"
-
   .. admonition:: Source
      :class: source
 
@@ -150,7 +148,7 @@ non-root user that was used to install the undercloud.
   .. note::
     This script will build **overcloud-full** images (\*.qcow2, \*.initrd,
     \*.vmlinuz), **deploy-ramdisk-ironic** images (\*.initramfs, \*.kernel),
-    **discovery-ramdisk** images (\*.initramfs, \*.kernel) and **testing**
+    **ironic-python-agent** images (\*.initramfs, \*.kernel) and **testing**
     fedora-user.qcow2 (which is always Fedora based).
 
 

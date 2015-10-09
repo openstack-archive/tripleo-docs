@@ -4,8 +4,9 @@ Node customization and Third-Party Integration
 It is possible to enable additional configuration during one of the
 following deployment phases:
 
-* firstboot - run once config (performed by cloud-init)
-* post-deploy - run after the services have been deployed and configured
+* firstboot - run once config (performed on each node by cloud-init)
+* per-node - run after the node is initially created but before services are deployed and configured (e.g by puppet)
+* post-deploy - run after the services have been deployed and configured (e.g by puppet)
 
 .. note::
 
@@ -102,17 +103,93 @@ SSH keys by accessing the nova metadata server, see
 /usr/share/openstack-tripleo-heat-templates/firstboot/userdata_example.yaml
 on the undercloud node or the tripleo-heat-templates_ repo.
 
-.. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates/blob/mgt-master/firstboot/userdata_example.yaml
+.. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates
+
+Per-node extra configuration
+----------------------------
+
+This configuration happens after after any "firstboot" configuration is applied,
+but before any Post-Deploy configuration takes place.
+
+Typically these interfaces are suitable for preparing each node for service
+deployment, such as registering nodes with a content repository, or creating
+additional data to be consumed by the post-deploy phase.  They may also be suitable
+integration points for additional third-party services, drivers or plugins.
+
+
+.. note::
+   If you only need to provide some additional data to the existing service
+   configuration, see :ref:`node_config` as this may provide a simpler solution.
+
+.. note::
+    Note, the per-node interface only enable *individual* nodes to be configured,
+    if cluster-wide configuration is required, the Post-Deploy interfaces should be
+    used instead.
+
+The following interfaces are available:
+
+  * `OS::TripleO::ControllerExtraConfigPre`: Controller node additional configuration
+  * `OS::TripleO::ComputeExtraConfigPre`: Compute node additional configuration
+  * `OS::TripleO::CephStorageExtraConfigPre` : CephStorage node additional configuration
+  * `OS::TripleO::NodeExtraConfig`: additional configuration applied to all nodes (all roles).
+
+Below is an example of a per-node configuration template that shows additional node configuration
+via standard heat SoftwareConfig_ resources::
+
+    mkdir -p extraconfig/per-node
+    cat > extraconfig/per-node/example.yaml << EOF
+
+    heat_template_version: 2014-10-16
+
+    parameters:
+      server:
+        description: ID of the controller node to apply this config to
+        type: string
+
+    resources:
+      NodeConfig:
+        type: OS::Heat::SoftwareConfig
+        properties:
+          group: script
+          config: |
+            #!/bin/sh
+            echo "Node configured" > /root/per-node
+
+      NodeDeployment:
+        type: OS::Heat::SoftwareDeployment
+          properties:
+            config: {get_resource: NodeConfig}
+            server: {get_param: server}
+    outputs:
+      deploy_stdout:
+        description: Deployment reference, used to trigger post-deploy on changes
+        value: {get_attr: [NodeDeployment, deploy_stdout]}
+
+    EOF
+
+The "server" parameter must be specified in all per-node ExtraConfig templates,
+this is the server to apply the configuration to, and is provided by the parent
+template.  Optionally additional implementation specific parameters may also be
+provided by parameter_defaults, see below for more details.
+
+Any resources may be defined in the template, but the outputs must define a "deploy_stdout"
+value, which is an identifier used to detect if the configuration applied has changed,
+hence when any post-deploy actions (such as re-applying puppet manifests on update)
+may need to be performed.
+
+For a more complete example showing how to apply a personalized map of per-node configuration
+to each node, see /usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml
+or the tripleo-heat-templates_ repo.
+
+.. _SoftwareConfig: http://docs.openstack.org/developer/heat/template_guide/software_deployment.html
+
 
 Post-Deploy extra configuration
 -------------------------------
 
 Post-deploy additional configuration is possible via the
-`OS::TripleO::NodeExtraConfigPost` interface - this allows a heat template
-to be specified which performs additional configuration using standard
-heat SoftwareConfig_ resources.
-
-.. _SoftwareConfig: http://docs.openstack.org/developer/heat/template_guide/software_deployment.html
+`OS::TripleO::NodeExtraConfigPost` interface, which is applied after any
+per-node configuration has completed.
 
 .. note::
 

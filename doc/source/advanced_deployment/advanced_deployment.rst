@@ -9,7 +9,8 @@ In this chapter you will find advanced deployment of various |project| areas.
    Advanced Profile Matching <profile_matching>
    Ready-State (BIOS, RAID) <ready_state>
    Automated Health Check <automated_health_check>
-   Additional node configuration <extra_config>
+   Modifying default node configuration <node_config>
+   Node customization & third-party integration <extra_config>
    Deploying with Heat Templates <template_deploy>
    Network Isolation <network_isolation>
    Deploying Manila <deploy_manila>

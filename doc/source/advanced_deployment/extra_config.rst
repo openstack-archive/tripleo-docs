@@ -192,40 +192,46 @@ Making configuration changes
 ----------------------------
 
 If you want to make a configuration change, either prior to initial deployment,
-or subsequently via an update, you can update hiera data files which
-are used for passing configuration values to Puppet. [#]_ Hiera data files
-are part of heat templates and are located in `puppet/hieradata` directory.
-You can find a file for each of roles (controller, compute,...) in this
-directory, so different configuration can be set for different roles. Put
-your configuration changes into the file which corresponds to the role
-of nodes you want to change. For example to set reserved host memory on
-all compute nodes::
+or subsequently via an update, you can pass additional data to puppet via hiera
+data, using either the global "ExtraConfig" parameter, or one of the role-specific
+parameters, e.g using `NovaComputeExtraConfig` to set the reserved_host_memory
+value for compute nodes::
 
-   echo "nova::compute::reserved_host_memory: some_value" >> puppet/hieradata/compute.yaml
 
-And then update your overcloud::
+    cat > compute_params.yaml << EOF
+    parameters:
+        NovaComputeExtraConfig:
+          nova::compute::reserved_host_memory: some_value
+    EOF
 
-   openstack overcloud deploy --templates "custom templates dir"
+   openstack overcloud deploy -e compute_params.yaml
+
+The parameters available are:
+
+  * `ExtraConfig`: Apply the data to all nodes, e.g all roles
+  * `NovaComputeExtraConfig`: Apply the data only to Compute nodes
+  * `controllerExtraConfig`: Apply the data only to Controller nodes *(note the inconsistent capitalization...)*
+  * `BlockStorageExtraConfig`: Apply the data only to BlockStorage nodes
+  * `ObjectStorageExtraConfig`: Apply the data only to ObjectStorage nodes
+  * `CephStorageExtraConfig`: Apply the data only to CephStorage nodes
+
+.. note::
+
+    Passing data via the ExtraConfig parameters will override any statically
+    defined values in the Hiera data files included as part of tripleo-heat-templates,
+    e.g those located in `puppet/hieradata` directory.
 
 .. note::
 
    If you set a configuration of a puppet class which is not being included
-   yet, make sure you include it in any of `puppet/manifests` file. For example
-   if you want to change CPU allocation ratio update controller hieradata::
+   yet, make sure you include it in the ExtraConfig definition, for example
+   if you want to change CPU allocation ratio::
 
-      echo "nova::scheduler::filter::cpu_allocation_ratio: '11.0'" >> puppet/hieradata/controller.yaml
+       parameters:
+         NovaComputeExtraConfig:
+           'nova::scheduler::filter::cpu_allocation_ratio': '11.0'
+           compute_classes:
+           - '::nova::scheduler::filter'
 
-   And include `nova::scheduler::filter` class in `puppet/manifests/overcloud_controller_pacemaker.pp`.
-
-.. note::
-
-   It's best to copy default heat templates to a custom location before making
-   any changes. See :ref:`custom-template-location`.
-
-.. rubric:: Footnotes
-
-.. [#]  Note that this is a temporary workaround, and a `future version`_ is
-   expected to provide interfaces that enable specifying extra hieradata
-   without modifying any templates.
-
-.. _future version: https://bugzilla.redhat.com/show_bug.cgi?id=1243971
+    The compute_classes data is included via the hiera_include in the
+    overcloud_compute.pp puppet manifest.

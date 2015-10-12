@@ -315,6 +315,12 @@ configured for the virtual environment.  To customize this, see the output of::
 
   openstack overcloud deploy --templates
 
+.. admonition:: Virtual
+   :class: virtual
+
+   When deploying the Compute node in a virtual machine, add `--libvirt-type
+   qemu` or launching instances on the deployed overcloud will fail.
+
 .. note::
 
    To deploy the overcloud with network isolation, bonds, and/or custom

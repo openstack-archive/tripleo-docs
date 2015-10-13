@@ -8,11 +8,11 @@ Enable running benchmarks during discovery
 ------------------------------------------
 
 By default, the benchmark tests do not run during the discovery process.
-You can enable this feature by setting *discovery_runbench = true* in the
+You can enable this feature by setting *inspection_runbench = true* in the
 **undercloud.conf** file prior to installing the undercloud.
 
 If you want to enable this feature after installing the undercloud, you can set
-*discovery_runbench = true* in **undercloud.conf**, and re-run
+*inspection_runbench = true* in **undercloud.conf**, and re-run
 ``openstack undercloud install``
 
 Analyze the collected benchmark data

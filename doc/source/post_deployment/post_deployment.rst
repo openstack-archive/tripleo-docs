@@ -13,3 +13,4 @@ In this chapter you will find advanced management of various |project| areas.
    Replacing a Failed Controller Node <replace_controller>
    Import/Export of VM Snapshots <vm_snapshot>
    Updating Packages on Overcloud Nodes <package_update>
+   Backing up and Restoring the Undercloud <backup_restore_undercloud>

@@ -385,39 +385,6 @@ for Puppet-enabled images.
 
 User Interfaces
 ---------------
-tuskar-ui
-^^^^^^^^^
-Tuskar-UI provides a GUI to install and manage OpenStack. It is implemented as
-a plugin to Horizon.
-
-**How to contribute**
-
-* See `upstream documentation <http://tuskar-ui.readthedocs.org/en/latest/install.html>`_
-  for instuctions on how to set up a development environment. Submit your
-  changes via OpenStack Gerrit (see `OpenStack Developer's Guide`_).
-
-**Useful links**
-
-* Upstream Project: https://git.openstack.org/cgit/openstack/tuskar-ui
-* Documentation: http://tuskar-ui.readthedocs.org
-* Bugs: https://bugs.launchpad.net/tuskar-ui
-* Blueprints: https://blueprints.launchpad.net/tuskar-ui
-
-tuskar-ui-extras
-^^^^^^^^^^^^^^^^
-Tuskar-UI extras provides GUI enhancements for Tuskar-UI. It is implemented as
-a plugin to Horizon.
-
-**How to contribute**
-
-* See `upstream documentation <http://tuskar-ui-extras.readthedocs.org/en/latest/install.html#development-install-instructions>`_
-  for instuctions on how to set up a development environment. Submit your
-  changes via `Gerrithub <https://review.gerrithub.io/#/q/project:rdo-management/tuskar-ui-extras>`_.
-
-**Useful links**
-
-* Project: https://github.com/rdo-management/tuskar-ui-extras
-* Documentation: http://tuskar-ui-extras.readthedocs.org
 
 python-openstackclient
 ^^^^^^^^^^^^^^^^^^^^^^

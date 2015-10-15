@@ -322,6 +322,14 @@ configured for the virtual environment.  To customize this, see the output of::
    qemu` or launching instances on the deployed overcloud will fail.
 
 .. note::
+   To deploy an overcloud with multiple controllers and achieve HA
+   you must provision at least 3 controller nodes, specify an NTP
+   server and enable Pacemaker as cluster resource manager. To do
+   so add the following arguments to the deploy command::
+
+    --control-scale 3 -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml --ntp-server pool.ntp.org
+
+.. note::
 
    To deploy the overcloud with network isolation, bonds, and/or custom
    network interface configurations, instead follow the workflow here to

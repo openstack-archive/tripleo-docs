@@ -39,7 +39,7 @@ Installing the Undercloud
       example, if the system is named *myhost.mydomain*, /etc/hosts should have
       an entry like::
 
-         127.0.0.1   myhost.mydomain
+         127.0.0.1   myhost.mydomain myhost
 
 
 #. Enable needed repositories:

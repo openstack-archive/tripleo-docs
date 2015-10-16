@@ -273,19 +273,15 @@ configured for the virtual environment.  To customize this, see the output of::
 .. admonition:: Ceph
   :class: ceph
 
-  When deploying Ceph it is necessary to use the regular Heat templates
-  instead of Tuskar, to specify the number of Ceph OSD nodes to be
-  deployed and to provide some additional parameters to enable usage
-  of Ceph for Glance, Cinder, Nova or all.
-  Make a copy of the file ``/usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml``
-  and edit it as appropriate, then pass the following additional arguments::
+  When deploying Ceph it is necessary to specify the number of Ceph OSD nodes
+  to be deployed and to provide some additional parameters to enable usage
+  of Ceph for Glance, Cinder, Nova or all of them. To do so, use the
+  following arguments when deploying::
 
-      --ceph-storage-scale <number of nodes> --templates -e /path/to/customized/storage-environment.yaml
-
-  to the deploy command below.
+      --ceph-storage-scale <number of nodes> --templates -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
 
   By default when Ceph is enabled the Cinder LVM back-end is disabled. This
-  behavior may be changed by also passing::
+  behavior may be changed passing::
 
       --cinder-lvm
 

@@ -208,7 +208,7 @@ The sequence of events is pictured below:
 
 .. image:: ../_images/discovery_diagram.png
 
-* The user, via the GUI, the command-line tools, or through direct API calls,
+* The user, via the command-line tools, or through direct API calls,
   registers the power management credentials for a node with Ironic.
 * The user then instructs Ironic to reboot the node.
 * Because the node is new, and not already fully registered, there are no
@@ -386,17 +386,14 @@ Managing the Deployment
 -----------------------
 
 After the overcloud deployment is completed, it will be possible to monitor,
-scale it out or perform basic maintenance operations via GUI or CLI.
+scale it out or perform basic maintenance operations via the CLI.
 
 
 Monitoring the Overcloud
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 When the overcloud is deployed, Ceilometer can be configured to track a set of
-OS metrics for each node (system load, CPU utilization, swap usage etc.) These
-metrics are graphed in the GUI, both for individual nodes, and for groups
-of nodes, such as the collection of nodes which are all delivering a particular
-role.
+OS metrics for each node (system load, CPU utilization, swap usage etc.)
 
 Additionally, Ironic exports IPMI metrics for nodes, which can also be stored in
 Ceilometer. This enables checks on hardware state such as fan operation/failure

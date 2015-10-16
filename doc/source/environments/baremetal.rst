@@ -1,12 +1,12 @@
 Baremetal Environment
-=====================
+-----------------------------------
 
 |project| can be used in an all baremetal environment. One machine will be
 used for Undercloud, the others will be used for your Overcloud.
 
 
 Minimum System Requirements
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To deploy a minimal TripleO cloud with |project| you need the following baremetal
 machines:
 
@@ -36,7 +36,7 @@ TripleO is supporting only the following operating systems:
 
 
 Preparing the Baremetal Environment
------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Networking
 ^^^^^^^^^^
@@ -122,7 +122,7 @@ Setting Up The Undercloud Machine
 .. _Red Hat Satellite User Guide: https://access.redhat.com/documentation/en-US/Red_Hat_Satellite/
 
 Configuration Files
--------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 instackenv.json
 ^^^^^^^^^^^^^^^
@@ -200,7 +200,7 @@ For example::
     }
 
 Ironic Drivers
---------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ironic drivers provide various level of support for different hardware.
 The most up-to-date information about Ironic drivers is at

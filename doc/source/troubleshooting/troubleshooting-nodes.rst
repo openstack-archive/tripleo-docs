@@ -1,8 +1,8 @@
 Troubleshooting Node Management Failures
-========================================
+-----------------------------------
 
 Where Are the Logs?
--------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some logs are stored in *journald*, but most are stored as text files in
 ``/var/log``.  Ironic and ironic-discoverd logs are stored in journald. Note
@@ -21,7 +21,7 @@ node if it was detected (only for bare metal).
 .. _node_registration_problems:
 
 Node Registration Problems
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Any problems with node data registered into Ironic can be fixed using the
 Ironic CLI.
@@ -46,7 +46,7 @@ A Wrong IPMI address can be fixed with the following command::
 .. _introspection_problems:
 
 Hardware Introspection Problems
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Discovery hangs and times out
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

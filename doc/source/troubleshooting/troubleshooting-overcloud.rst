@@ -1,12 +1,12 @@
 Troubleshooting a Failed Overcloud Deployment
-=============================================
+-----------------------------------
 
 If an Overcloud deployment has failed, the OpenStack clients and service log
 files can be used to troubleshoot the failed deployment. The following commands
 are all run on the Undercloud and assume a stackrc file has been sourced.
 
 Identifying Failed Component
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In most cases, Heat will show the failed overcloud stack when a deployment
 has failed::
@@ -82,7 +82,7 @@ in the resulting table.
   console (e.g. iDRAC for DELL) for bare metal machines.
 
 Debugging Using Heat
-~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Identifying the failed Heat resource
 
@@ -229,7 +229,7 @@ Debugging Using Heat
     $ sudo sosreport --all-logs
 
 No Valid Host Found Error
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Sometimes ``/var/log/nova/nova-conductor.log`` contains the following error::
 

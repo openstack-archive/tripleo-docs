@@ -1,5 +1,5 @@
 Virtual Environment
-===================
+-----------------------------------
 
 |project| can be used in a virtual environment using virtual machines instead
 of actual baremetal. However, one baremetal machine is still
@@ -7,7 +7,7 @@ needed to act as the host for the virtual machines.
 
 
 Minimum System Requirements
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 By default, this setup creates 3 virtual machines:
 
 * 1 Undercloud
@@ -47,7 +47,7 @@ The baremetal machine must meet the following minimum system requirements:
 .. _preparing_virtual_environment:
 
 Preparing the Virtual Environment (Automated)
----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Install RHEL 7.1 Server x86_64 or CentOS 7 x86_64 on your host machine.
 

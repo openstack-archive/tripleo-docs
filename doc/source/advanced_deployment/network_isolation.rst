@@ -716,7 +716,7 @@ Example::
                     -
                       ip_netmask: {get_param: InternalApiIpSubnet}
 
-Assinging OpenStack Services to Isolated Networks
+Assigning OpenStack Services to Isolated Networks
 -------------------------------------------------
 Each OpenStack service is assigned to a network using a default mapping. The
 service will be bound to the host IP within the named network on each host.

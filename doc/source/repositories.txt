@@ -21,3 +21,20 @@
    ::
 
      sudo curl -o /etc/yum.repos.d/delorean-deps.repo http://trunk.rdoproject.org/centos7/delorean-deps.repo
+
+   .. admonition:: Stable Branch
+      :class: stable
+
+      *Skip all repos mentioned above, other than epel-release which is still required.*
+
+      Enable latest RDO Stable Delorean repository for all packages
+
+      ::
+
+         sudo curl -o /etc/yum.repos.d/delorean-liberty.repo https://trunk.rdoproject.org/centos7-liberty/current/delorean.repo
+
+      Enable the Delorean Deps repository
+
+      ::
+
+         sudo curl -o /etc/yum.repos.d/delorean-deps-liberty.repo http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo

@@ -87,6 +87,14 @@ non-root user that was used to install the undercloud.
         export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7/current-tripleo/"
         export DELOREAN_REPO_FILE="delorean.repo"
 
+   .. admonition:: Stable Branch
+      :class: stable
+
+      ::
+
+          export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
+
+
 #. Build the required images:
 
 

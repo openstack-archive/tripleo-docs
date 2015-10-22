@@ -66,5 +66,11 @@ steps are marked as follows:
    Step that should only be run when choosing to use some components directly
    from their git source code repositories instead of packages.
 
+.. admonition:: Stable Branch
+   :class: stable
+
+   Step that should only be run when choosing to use components from their
+   stable branches rather than using packages/source based on current master.
+
 Any such steps should *not* be run if the target environment does not match
 the section marking.

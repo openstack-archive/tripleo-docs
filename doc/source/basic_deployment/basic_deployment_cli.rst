@@ -79,11 +79,13 @@ non-root user that was used to install the undercloud.
 
           export NODE_DIST=rhel7
 
-#. Use undercloud delorean repos to build the overcloud images:
+#. Install the current-passed-ci delorean repo and deps repo into the overcloud images:
 
     ::
 
-        export DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean.repo /etc/yum.repos.d/delorean-deps.repo"
+        export USE_DELOREAN_TRUNK=1
+        export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7/current-tripleo/"
+        export DELOREAN_REPO_FILE="delorean.repo"
 
 #. Build the required images:
 

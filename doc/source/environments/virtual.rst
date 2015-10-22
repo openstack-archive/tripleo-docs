@@ -200,28 +200,28 @@ Preparing the Virtual Environment (Automated)
          export REG_ACTIVATION_KEY="[activation key]"
 
 
-   .. admonition:: Ceph
-      :class: ceph
+  .. admonition:: Ceph
+     :class: ceph
 
-      To use Ceph you will need at least one additional virtual machine to be
-      provisioned as a Ceph OSD; set the ``NODE_COUNT`` variable to 3, from a
-      default of 2, so that the overcloud will have exactly one more::
+     To use Ceph you will need at least one additional virtual machine to be
+     provisioned as a Ceph OSD; set the ``NODE_COUNT`` variable to 3, from a
+     default of 2, so that the overcloud will have exactly one more::
 
-          export NODE_COUNT=3
+         export NODE_COUNT=3
 
-   .. note::
-      The ``TESTENV_ARGS`` environment variable can be used to customize the
-      virtual environment configuration.  For example, it could be used to
-      enable additional networks as follows::
+  .. note::
+     The ``TESTENV_ARGS`` environment variable can be used to customize the
+     virtual environment configuration.  For example, it could be used to
+     enable additional networks as follows::
 
-          export TESTENV_ARGS="--baremetal-bridge-names 'brbm brbm1 brbm2'"
+         export TESTENV_ARGS="--baremetal-bridge-names 'brbm brbm1 brbm2'"
 
-   ::
+  ::
 
-      instack-virt-setup
+     instack-virt-setup
 
-   If the script encounters problems, see
-   :doc:`../troubleshooting/troubleshooting-virt-setup`.
+  If the script encounters problems, see
+  :doc:`../troubleshooting/troubleshooting-virt-setup`.
 
 When the script has completed successfully it will output the IP address of the
 instack vm that has now been installed with a base OS.

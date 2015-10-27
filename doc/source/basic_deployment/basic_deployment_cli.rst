@@ -333,6 +333,17 @@ configured for the virtual environment.  To customize this, see the output of::
    network interface configurations, instead follow the workflow here to
    deploy: :doc:`../advanced_deployment/network_isolation`
 
+.. note::
+
+   Previous versions of the client had many parameters defaulted. Some of these
+   parameters are now pulling defaults directly from the Heat templates. In
+   order to override these parameters, one should use an environment file to
+   specify these overrides, via 'parameter_defaults'.
+
+   The parameters that controlled these parameters will be deprecated in the
+   client, and eventually removed in favor of using environment files.
+
+
 Post-Deployment
 ---------------
 

@@ -216,9 +216,32 @@ Preparing the Virtual Environment (Automated)
 
          export TESTENV_ARGS="--baremetal-bridge-names 'brbm brbm1 brbm2'"
 
+  .. _there:
+  .. note::
+     The ``LIBVIRT_VOL_POOL`` and ``LIBVIRT_VOL_POOL_TARGET`` environment
+     variables govern the name and location respectively for the storage
+     pool used by libvirt. The defaults are the 'default' pool with
+     target ``/var/lib/libvirt/images/``. These variables are useful if your
+     current partitioning scheme results in insufficient space for running
+     any useful number of vms (see the `Minimum Requirements`_)::
+
+         # you can check the space available to the default location like
+         df -h  /var/lib/libvirt/images
+
+         # If you wish to specify an alternative pool name:
+         export LIBVIRT_VOL_POOL=tripleo
+         # If you want to specify an alternative target
+         export LIBVIRT_VOL_POOL_TARGET=/home/vm_storage_pool
+
+     If you don't have a 'default' pool defined at all, setting the target
+     is sufficient as the default will be created with your specified
+     target (and directories created as necessary). It isn't possible to
+     change the target for an existing volume pool with this method, so if
+     you already have a 'default' pool and cannot remove it, you should also
+     specify a new pool name to be created.
   ::
 
-     instack-virt-setup
+    instack-virt-setup
 
   If the script encounters problems, see
   :doc:`../troubleshooting/troubleshooting-virt-setup`.
@@ -240,11 +263,13 @@ Continue with :doc:`../installation/installing`.
 
 .. rubric:: Footnotes
 
-.. [#]  Note that some default partitioning scheme will most likely not provide
+.. [#]  Note that some default partitioning schemes may not provide
     enough space to the partition containing the default path for libvirt image
-    storage (/var/lib/libvirt/images). The easiest fix is to customize the
-    partition layout at the time of install to provide at least 200 GB of space for
-    that path.
+    storage (/var/lib/libvirt/images). The easiest fix is to export the
+    LIBVIRT_VOL_POOL_TARGET and LIBVIRT_VOL_POOL parameters in your environment
+    prior to running instack-virt-setup above (see note `there`_).
+    Alternatively you can just customize the partition layout at the time of
+    install to provide at least 200 GB of space for that path.
 
 .. [#]  The libvirt virtual machines have been defined under the system
     instance (qemu:///system). The user account executing these instructions
@@ -255,3 +280,5 @@ Continue with :doc:`../installation/installing`.
     ``sudo virsh``.
 
 .. _Red Hat Satellite User Guide: https://access.redhat.com/documentation/en-US/Red_Hat_Satellite/
+
+.. _Minimum Requirements: http://docs.openstack.org/developer/tripleo-docs/environments/virtual.html#minimum-system-requirements

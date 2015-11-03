@@ -4,7 +4,7 @@ Undercloud Installation
 This section contains instructions on how to install the undercloud and how to
 update components after installation.
 
-.. toctree::
+.. include:: installing.rst
 
-   Installing the Undercloud <installing>
-   Updating Undercloud Components <updating>
+.. include:: updating.rst
+

@@ -1,5 +1,5 @@
 Installing the Undercloud
-==========================
+--------------------------
 
 #. Log in to your machine (baremetal or VM) where you want to install the
    undercloud as a non-root user (such as the stack user)::

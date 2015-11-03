@@ -1,3 +1,5 @@
+.. _node_config:
+
 Modifying default node configuration
 ====================================
 

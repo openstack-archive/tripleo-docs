@@ -312,7 +312,7 @@ Nova, Neutron, Glance and Ironic.
 To deploy the overcloud Tuskar needs gather all plan information it keeps and
 build a Heat templates which describe desired overcloud.
 
-This template is served to to Heat which will orchestrate the whole deployment
+This template is served to Heat which will orchestrate the whole deployment
 and it will create a stack. Stack is Heat's own term for the applications that
 it creates. The overcloud, in Heat terms, is a particularly complex instance of
 a stack.

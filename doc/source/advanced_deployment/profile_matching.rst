@@ -153,6 +153,10 @@ instead add the profile "tags" manually. The example below will add the
 Create flavors to use advanced matching
 ---------------------------------------
 
+Default profile flavors should have been created when the undercloud was
+installed, and they will be usable without modification in most environments.
+However, if custom profile flavors are needed, they can be created as follows.
+
 In order to use the profiles assigned to the Ironic nodes, Nova needs to have
 flavors that have the property "capabilities:profile" set to the intended profile.
 

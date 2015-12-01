@@ -127,7 +127,7 @@ Configuration Files
 instackenv.json
 ^^^^^^^^^^^^^^^
 
-Create a JSON file describing your baremetal nodes, call it
+Create a JSON file describing your Overcloud baremetal nodes, call it
 ``instackenv.json`` and place in your home directory. The file should contain
 a JSON object with the only field ``nodes`` containing list of node
 descriptions.

@@ -153,6 +153,14 @@ Some fields are optional if you're going to use introspection later:
 
 * ``disk`` - hard driver size in GiB
 
+It is also possible (but optional) to set Ironic node capabilities directly
+in the JSON file. This can be useful for assigning node profiles or setting
+boot options at registration time:
+
+* ``capabilities`` - Ironic node capabilities.  For example::
+
+    "capabilities": "profile:compute,boot_option:local"
+
 For example::
 
     {

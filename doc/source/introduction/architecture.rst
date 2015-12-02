@@ -206,21 +206,21 @@ fields out and run introspection of the nodes afterwards.
 
 The sequence of events is pictured below:
 
-.. image:: ../_images/discovery_diagram.png
+.. image:: ../_images/introspection_diagram.png
 
 * The user, via the command-line tools, or through direct API calls,
   registers the power management credentials for a node with Ironic.
 * The user then instructs Ironic to reboot the node.
 * Because the node is new, and not already fully registered, there are no
   specific PXE-boot instructions for it. In that case, the default action is to
-  boot into a discovery ramdisk
-* The discovery ramdisk probes the hardware on the node and gathers facts,
+  boot into an introspection ramdisk
+* The introspection ramdisk probes the hardware on the node and gathers facts,
   including the number of CPU cores, the local disk size and the amount of RAM.
-* The ramdisk posts the facts to the discoverd API.
+* The ramdisk posts the facts to the ironic-inspector API.
 * All facts are passed and stored in the Ironic database.
 * There can be performed advanced role matching via the ''ahc-match'' tool,
   which simply adds an additional role categorization to Ironic based on
-  discovered node facts and specified conditions.
+  introspected node facts and specified conditions.
 
 
 Flavors
@@ -234,12 +234,13 @@ hasn't reached their quota limit, the flavor acts as a set of instructions on
 exactly what kind of VM to create on the user's behalf.
 
 In the undercloud, where the machines are usually physical rather than virtual
-(or, at least, pre-existing, rather than created on demand), flavors have a
-slightly different effect. Essentially, they act as a constraint. Of all of the
-discovered hardware, only nodes which match a specified flavor are suitable for
-a particular role. This can be used to ensure that the large machines with a
-great deal of RAM and CPU capacity are used to run Nova in the overcloud, and
-the smaller machines run less demanding services, such as Keystone.
+(or, at least, pre-existing, rather than created on demand), flavors have
+a slightly different effect. Essentially, they act as a constraint. Of all of
+the introspected hardware, only nodes which match a specified flavor are
+suitable for a particular role. This can be used to ensure that the large
+machines with a great deal of RAM and CPU capacity are used to run Nova in the
+overcloud, and the smaller machines run less demanding services, such as
+Keystone.
 
 The version of TripleO included in |project| is capable of handling flavors in
 two different modes.
@@ -319,8 +320,8 @@ a stack.
 
 In order to the stack to be deployed, Heat makes successive calls to Nova,
 OpenStack's compute service controller. Nova depends upon Ironic, which, as
-described above has acquired an inventory of discovered hardware by this stage
-in the process.
+described above has acquired an inventory of introspected hardware by this
+stage in the process.
 
 At this point, Nova flavors may act as a constraint, influencing the range of
 machines which may be picked for deployment by the Nova scheduler. For each

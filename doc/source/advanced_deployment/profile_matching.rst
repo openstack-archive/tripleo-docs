@@ -13,12 +13,12 @@ Enable advanced profile matching
 
 * Add the credentials for Ironic and Swift to the
   **/etc/ahc-tools/ahc-tools.conf** file.
-  These will be the same credentials that ironic-discoverd uses,
-  and can be copied from **/etc/ironic-discoverd/discoverd.conf**::
+  These will be the same credentials that ironic-inspector uses,
+  and can be copied from **/etc/ironic-inspector/inspector.conf**::
 
     $ sudo -i
     # mkdir -p /etc/ahc-tools
-    # sed 's/\[discoverd/\[ironic/' /etc/ironic-discoverd/discoverd.conf > /etc/ahc-tools/ahc-tools.conf
+    # sed 's/\[discoverd/\[ironic/' /etc/ironic-inspector/inspector.conf > /etc/ahc-tools/ahc-tools.conf
     # chmod 0600 /etc/ahc-tools/ahc-tools.conf
     # exit
 
@@ -43,19 +43,19 @@ Every introspection run (as described in
 :doc:`../basic_deployment/basic_deployment_cli`) collects a lot of additional
 facts about the hardware and puts them as JSON in Swift. Swift container name
 is ``ironic-inspector`` and can be modified in
-**/etc/ironic-discoverd/discoverd.conf**. Swift object name is stored under
+**/etc/ironic-inspector/inspector.conf**. Swift object name is stored under
 ``hardware_swift_object`` key in Ironic node extra field.
 
 As an example, to download the swift data for all nodes to a local directory
 and use that to collect a list of node mac addresses::
 
-    # You will need the discoverd user password
-    # from /etc/ironic-discoverd/discoverd.conf:
-    export IRONIC_DISCOVERD_PASSWORD=
+    # You will need the ironic-inspector user password
+    # from /etc/ironic-inspector/inspector.conf:
+    export IRONIC_INSPECTOR_PASSWORD=
 
     # Download the extra introspection data from swift:
     for node in $(ironic node-list | grep -v UUID| awk '{print $2}');
-      do swift -U service:ironic -K $IRONIC_DISCOVERD_PASSWORD download ironic-discoverd extra_hardware-$node;
+      do swift -U service:ironic -K $IRONIC_INSPECTOR_PASSWORD download ironic-inspector extra_hardware-$node;
     done
 
     # Use jq to access the local data - for example gather macs:
@@ -107,7 +107,7 @@ There is a set of helper functions to make matching more flexible.
 There are also placeholders, *$disk* and *$eth* in the above example.
 These will store the value in that place for later use.
 
-* For example if we had a "fact" from discovery::
+* For example if we had a "fact" from introspection::
 
     ('disk', 'sda', 'size', '40')
 

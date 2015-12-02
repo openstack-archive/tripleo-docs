@@ -217,9 +217,6 @@ ironic inspector (former ironic-discoverd)
 Ironic Inspector project is responsible for inspection of hardware properties
 for newly enrolled nodes (see also ironic_).
 
-Ironic Inspector was called ironic-discoverd previously, and the RPM packages
-are still based on the old version, so they are using the old name for now.
-
 **How to contribute**
 
 Ironic Inspector uses `tox <https://tox.readthedocs.org/en/latest/>`_ to manage
@@ -231,10 +228,6 @@ for details.
 
 * Upstream Project: https://github.com/openstack/ironic-inspector
 * PyPI: https://pypi.python.org/pypi/ironic-inspector
-
-  Also https://pypi.python.org/pypi/ironic-discoverd for the old version which
-  |project| currently uses.
-
 * Bugs: https://bugs.launchpad.net/ironic-inspector
 * Blueprints: https://blueprints.launchpad.net/ironic-inspector
 
@@ -412,10 +405,9 @@ command with consistent syntax and behaviour.
 
 python-tripleoclient
 ^^^^^^^^^^^^^^^^^^^^
-The python-tripleoclient is a CLI tool embedded into
-python-openstackclient. It provides functions related to instack
-installation and initial configuration like node discovery, overcloud image
-building and uploading, etc.
+The python-tripleoclient is a CLI tool embedded into python-openstackclient. It
+provides functions related to instack installation and initial configuration
+like node introspection, overcloud image building and uploading, etc.
 
 **How to contribute**
 

@@ -4,10 +4,10 @@ Automated Health Check (AHC)
 Start with matching the nodes to profiles as described in
 :doc:`profile_matching`.
 
-Enable running benchmarks during discovery
-------------------------------------------
+Enable running benchmarks during introspection
+----------------------------------------------
 
-By default, the benchmark tests do not run during the discovery process.
+By default, the benchmark tests do not run during the introspection process.
 You can enable this feature by setting *inspection_runbench = true* in the
 **undercloud.conf** file prior to installing the undercloud.
 
@@ -18,7 +18,7 @@ If you want to enable this feature after installing the undercloud, you can set
 Analyze the collected benchmark data
 ------------------------------------
 
-After discovery has completed, we can do analysis on the benchmark data.
+After introspection has completed, we can do analysis on the benchmark data.
 
 * Run the ``ahc-report`` script to see a general overview of the hardware
 

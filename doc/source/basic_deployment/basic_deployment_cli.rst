@@ -195,9 +195,9 @@ Register nodes for your deployment with Ironic::
    in the /etc/ironic/ironic.conf file to "True" and restart the
    openstack-ironic-conductor service.
 
-   Also, note that if "openstack undercloud install" is re-run the value
-   of the "force_power_state_during_sync" configuration option will be
-   set back to the default, which is "False".
+   Also, note that if ``openstack undercloud install`` is re-run the value of
+   the "force_power_state_during_sync" configuration option will be set back to
+   the default, which is "False".
 
 Assign kernel and ramdisk to nodes::
 
@@ -324,8 +324,8 @@ configured for the virtual environment.  To customize this, see the output of::
 .. admonition:: Virtual
    :class: virtual
 
-   When deploying the Compute node in a virtual machine, add `--libvirt-type
-   qemu` or launching instances on the deployed overcloud will fail.
+   When deploying the Compute node in a virtual machine, add ``--libvirt-type
+   qemu`` or launching instances on the deployed overcloud will fail.
 
 .. note::
    To deploy an overcloud with multiple controllers and achieve HA

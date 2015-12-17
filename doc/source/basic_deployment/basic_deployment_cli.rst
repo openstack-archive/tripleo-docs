@@ -150,66 +150,19 @@ non-root user that was used to install the undercloud.
 
        export DIB_INSTALLTYPE_puppet_modules=source
 
-  .. admonition:: Source
-     :class: source
-
-     To use a git checkout for only a specific module, export the following variable::
-
-       export DIB_INSTALLTYPE_puppet_tripleo=source
-
-     Replace ``puppet_tripleo`` with the name of the puppet module to be installed
-     from source, replacing any -'s with _'s.
-
-     To use a pending review for a module, set its installtype to source as
-     described above, then also export the following variables::
-
-       export DIB_REPOLOCATION_puppet_tripleo=https://review.openstack.org/openstack/puppet-tripleo
-       export DIB_REPOREF_puppet_tripleo=refs/changes/30/223330/1
-
-     This time replace the name of the module in the variable name and the review URL.
-     The correct value for the ``reporef`` can be found in the ``Download`` section
-     of the Gerrit UI.  Look for a string that matches the format of the example above.
+     It is also possible to use this functionality to use an in-progress review
+     as part of the overcloud image build.  See
+     :doc:`../advanced_deployment/in_progress_review` for details.
 
   ::
 
    openstack overcloud image build --all
 
   .. note::
-    This script will build **overcloud-full** images (\*.qcow2, \*.initrd,
-    \*.vmlinuz), **deploy-ramdisk-ironic** images (\*.initramfs, \*.kernel),
-    **ironic-python-agent** images (\*.initramfs, \*.kernel) and **testing**
-    fedora-user.qcow2 (which is always Fedora based).
+    This command will build **overcloud-full** images (\*.qcow2, \*.initrd,
+    \*.vmlinuz) and **ironic-python-agent** images (\*.initramfs, \*.kernel)
 
-Build a single image
-````````````````````
-
-The previous command builds all the images needed for an overcloud deploy.
-However, you may need to rebuild a single one of them. Use the following
-commands if you want to do it:
-
-  ::
-
-   openstack overcloud image build --type {agent-ramdisk, deploy-ramdisk, fedora-user, overcloud-full}
-
-If the target image exist, this commands ends silently. Make sure to delete a
-previous version of the image to run the command as you expect.
-
-Moreover, you can build the image with an extra element of your choice using the
-``--builder-extra-args`` argument:
-
-  ::
-
-   openstack overcloud image build --type overcloud-full \
-       --builder-extra-args overcloud-network-midonet
-
-  .. note::
-    Make sure the element is available in the ``$ELEMENTS_PATH`` environment
-    variable
-
-  .. note::
-    remove any previous ``overcloud-full.qcow2`` in your ``$path`` before run
-    any rebuild command
-
+    To rebuild only a single image, see :doc:`../advanced_deployment/build_single_image`.
 
 Upload Images
 -------------
@@ -275,33 +228,8 @@ Introspect hardware attributes of nodes::
    The process can take up to 5 minutes for VM / 15 minutes for baremetal. If
    the process takes longer, see :ref:`introspection_problems`.
 
-Introspecting a single node
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-You can also introspect nodes one by one.
-When doing so, you must take care to set the correct node states manually.
-Use ``ironic node-show UUID`` command to figure out whether nodes are in
-``manageable`` or ``available`` state. For all nodes in ``available`` state,
-start with putting a node to ``manageable`` state::
-
-    ironic node-set-provision-state UUID manage
-
-Then you can run introspection::
-
-    openstack baremetal introspection start UUID
-
-This command won't poll for the introspection result, use the following command
-to check the current introspection state::
-
-    openstack baremetal introspection status UUID
-
-Repeat it for every node until you see ``True`` in the ``finished`` field.
-The ``error`` field will contain an error message if introspection failed,
-or ``None`` if introspection succeeded for this node.
-
-Do not forget to make nodes available for deployment afterwards::
-
-    ironic node-set-provision-state UUID provide
+.. note:: If you need to introspect just a single node, see
+   :doc:`../advanced_deployment/introspect_single_node`
 
 Flavor Details
 --------------

@@ -7,6 +7,8 @@ In this chapter you will find advanced deployment of various |project| areas.
 .. toctree::
 
    root_device
+   build_single_image
+   introspect_single_node
    profile_matching
    introspection_data
    node_config
@@ -16,6 +18,10 @@ In this chapter you will find advanced deployment of various |project| areas.
    deploy_manila
    cinder_netapp
    neutron_midonet
-   tripleo.sh
    ssl
    node_placement
+   # TODO(bnemec): Add a new developer section for the docs that aren't
+   # relevant to regular users.
+   tripleo.sh
+   in_progress_review
+

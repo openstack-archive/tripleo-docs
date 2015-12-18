@@ -263,13 +263,18 @@ Do not forget to make nodes available for deployment afterwards::
 
     ironic node-set-provision-state UUID provide
 
-Create Flavors
+Flavor Details
 --------------
 
-Create the necessary flavor::
+The undercloud will have a number of default flavors created at install time.
+In most cases these flavors do not need to be modified, but they can be if
+desired.  By default, all overcloud instances will be booted with the
+``baremetal`` flavor, so all baremetal nodes must have at least as much
+memory, disk, and cpu as that flavor.
 
-    openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 baremetal
-    openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" baremetal
+In addition, there are profile-specific flavors created which can be used with
+the profile-matching feature of Ironic.  For more details on deploying with
+profiles, see :doc:`../advanced_deployment/profile_matching`.
 
 Configure a nameserver for the Overcloud
 ----------------------------------------

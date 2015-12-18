@@ -23,7 +23,7 @@ space [#]_.
 
 The baremetal machine must meet the following minimum system requirements:
 
-* Virtualization hardware extenstions enabled (nested KVM is **not** supported)
+* Virtualization hardware extensions enabled (nested KVM is **not** supported)
 * 1 quad core CPU
 * 12 GB free memory
 * 120 GB disk space

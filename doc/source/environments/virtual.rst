@@ -155,6 +155,11 @@ Preparing the Virtual Environment (Automated)
          export NODE_CPU=4
          export NODE_MEM=16384
 
+    If you want to change the values only for the undercloud node::
+
+         export UNDERCLOUD_NODE_CPU=4
+         export UNDERCLOUD_NODE_MEM=16384
+
   .. admonition:: RHEL
      :class: rhel
 

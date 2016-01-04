@@ -66,8 +66,8 @@ of bugs in our scripts), a node can be in the "AVAILABLE" state, which is meant
 for deployment, not for introspection. You should advance node to the
 "MANAGEABLE" state before introspection and move it back before deployment.
 Please refer to `upstream node states documentation
-<https://github.com/openstack/ironic-inspector#node-states>`_ for information
-on how to fix it.
+<http://docs.openstack.org/developer/ironic-inspector/usage.html#node-states>`_
+for information on how to fix it.
 
 How can introspection be stopped?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -89,4 +89,4 @@ then remove ironic-inspector cache and restart it::
     sudo systemctl restart openstack-ironic-inspector
 
 
-.. _ironic-inspector troubleshooting documentation: https://github.com/openstack/ironic-inspector#troubleshooting
+.. _ironic-inspector troubleshooting documentation: http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html

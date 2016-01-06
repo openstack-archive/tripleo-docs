@@ -107,6 +107,46 @@ Installing the Undercloud
      The correct value for the ``reporef`` can be found in the ``Download`` section
      of the Gerrit UI.  Look for a string that matches the format of the example above.
 
+  .. admonition:: SSL
+     :class: ssl
+
+     To enable SSL on the undercloud, you must set the ``undercloud_service_certificate``
+     option in ``undercloud.conf`` to an appropriate certificate file.  Important:
+     The certificate file's Common Name *must* be set to the value of
+     ``undercloud_public_vip`` in undercloud.conf.
+
+     If you do not have a trusted CA signed certificate file, you can alternatively
+     generate a self-signed certificate file using the following commands::
+
+         openssl genrsa -out privkey.pem 2048
+
+     The next command will prompt for some identification details.  Most of these don't
+     matter, but make sure the ``Common Name`` entered matches the value of
+     ``undercloud_public_vip`` in undercloud.conf::
+
+         openssl req -new -x509 -key privkey.pem -out cacert.pem -days 365
+
+     Combine the two files into one for HAProxy to use.  The order of the
+     files in this command matters, so do not change it::
+
+         cat cacert.pem privkey.pem > undercloud.pem
+
+     Move the file to a more appropriate location and set the SELinux context::
+
+         sudo mkdir /etc/pki/instack-certs
+         sudo cp undercloud.pem /etc/pki/instack-certs
+         sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
+         sudo restorecon -R /etc/pki/instack-certs
+
+     ``undercloud_service_certificate`` should then be set to
+     ``/etc/pki/instack-certs/undercloud.pem``.
+
+     Add the self-signed CA certificate to the undercloud system's trusted
+     certificate store::
+
+        sudo cp cacert.pem /etc/pki/ca-trust/source/anchors/
+        sudo update-ca-trust extract
+
   Install the undercloud::
 
       openstack undercloud install

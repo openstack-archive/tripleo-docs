@@ -16,6 +16,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    Deploying Manila <deploy_manila>
    Configuring Cinder with a NetApp Backend <cinder_netapp>
    tripleo.sh <tripleo.sh>
+   Deploying with SSL <ssl>
 
 
 .. <MOVE THESE UNDER TOCTREE WHEN READY, KEEP LOGICAL WORKFLOW ORDER>

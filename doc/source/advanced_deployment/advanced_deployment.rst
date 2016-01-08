@@ -20,6 +20,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    neutron_midonet
    ssl
    node_placement
+   ops_tools
    # TODO(bnemec): Add a new developer section for the docs that aren't
    # relevant to regular users.
    tripleo.sh

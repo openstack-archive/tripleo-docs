@@ -174,12 +174,41 @@ non-root user that was used to install the undercloud.
 
    openstack overcloud image build --all
 
-
   .. note::
     This script will build **overcloud-full** images (\*.qcow2, \*.initrd,
     \*.vmlinuz), **deploy-ramdisk-ironic** images (\*.initramfs, \*.kernel),
     **ironic-python-agent** images (\*.initramfs, \*.kernel) and **testing**
     fedora-user.qcow2 (which is always Fedora based).
+
+Build a single image
+````````````````````
+
+The previous command builds all the images needed for an overcloud deploy.
+However, you may need to rebuild a single one of them. Use the following
+commands if you want to do it:
+
+  ::
+
+   openstack overcloud image build --type {agent-ramdisk, deploy-ramdisk, fedora-user, overcloud-full}
+
+If the target image exist, this commands ends silently. Make sure to delete a
+previous version of the image to run the command as you expect.
+
+Moreover, you can build the image with an extra element of your choice using the
+``--builder-extra-args`` argument:
+
+  ::
+
+   openstack overcloud image build --type overcloud-full \
+       --builder-extra-args overcloud-network-midonet
+
+  .. note::
+    Make sure the element is available in the ``$ELEMENTS_PATH`` environment
+    variable
+
+  .. note::
+    remove any previous ``overcloud-full.qcow2`` in your ``$path`` before run
+    any rebuild command
 
 
 Upload Images

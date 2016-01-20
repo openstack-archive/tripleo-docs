@@ -15,5 +15,6 @@ In this chapter you will find advanced deployment of various |project| areas.
    network_isolation
    deploy_manila
    cinder_netapp
+   neutron_midonet
    tripleo.sh
    ssl

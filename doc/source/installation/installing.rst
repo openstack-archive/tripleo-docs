@@ -162,3 +162,8 @@ so it is not necessary to copy them to ``undercloud.conf``.
 .. note::
     Any passwords set in ``undercloud.conf`` will take precedence over the ones in
     ``undercloud-passwords.conf``.
+
+.. note::
+    ``openstack undercloud install`` can be rerun to reapply changes from
+    undercloud.conf to the undercloud. Note that this should **not** be done if an
+    overcloud has already been deployed or is in progress.

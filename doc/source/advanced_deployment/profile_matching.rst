@@ -1,222 +1,187 @@
 Advanced Profile Matching
 =========================
 
-Here are additional setup steps to take advantage of the advanced profile
-matching and the AHC features.
+Profile matching allows a user to specify precisely which nodes will receive
+which flavor. Here are additional setup steps to take advantage of the profile
+matching. In this document "profile" is a capability that is assigned to both
+ironic node and nova flavor to create a link between them.
 
-Enable advanced profile matching
---------------------------------
+After profile is assigned to a flavor, nova will only deploy it on ironic
+nodes with the same profile. Deployment will fail if not enough ironic nodes
+are tagged with a profile.
 
-* Install the ahc-tools package::
-
-    sudo yum install -y ahc-tools
-
-* Add the credentials for Ironic and Swift to the
-  **/etc/ahc-tools/ahc-tools.conf** file.
-  These will be the same credentials that ironic-inspector uses,
-  and can be copied from **/etc/ironic-inspector/inspector.conf**::
-
-    $ sudo -i
-    # mkdir -p /etc/ahc-tools
-    # sed 's/\[discoverd/\[ironic/' /etc/ironic-inspector/inspector.conf > /etc/ahc-tools/ahc-tools.conf
-    # chmod 0600 /etc/ahc-tools/ahc-tools.conf
-    # exit
-
-  Example::
-
-    [ironic]
-    os_auth_url = http://192.0.2.1:5000/v2.0
-    os_username = ironic
-    os_password = <PASSWORD>
-    os_tenant_name = service
-
-    [swift]
-    os_auth_url = http://192.0.2.1:5000/v2.0
-    os_username = ironic
-    os_password = <PASSWORD>
-    os_tenant_name = service
-
-Accessing additional introspection data
----------------------------------------
-
-Every introspection run (as described in
-:doc:`../basic_deployment/basic_deployment_cli`) collects a lot of additional
-facts about the hardware and puts them as JSON in Swift. Swift container name
-is ``ironic-inspector`` and can be modified in
-**/etc/ironic-inspector/inspector.conf**. Swift object name is stored under
-``hardware_swift_object`` key in Ironic node extra field.
-
-As an example, to download the swift data for all nodes to a local directory
-and use that to collect a list of node mac addresses::
-
-    # You will need the ironic-inspector user password
-    # from /etc/ironic-inspector/inspector.conf:
-    export IRONIC_INSPECTOR_PASSWORD=
-
-    # Download the extra introspection data from swift:
-    for node in $(ironic node-list | grep -v UUID| awk '{print $2}');
-      do swift -U service:ironic -K $IRONIC_INSPECTOR_PASSWORD download ironic-inspector extra_hardware-$node;
-    done
-
-    # Use jq to access the local data - for example gather macs:
-    for f in extra_hardware-*;
-      do cat $f | jq -r 'map(select(.[0]=="network" and .[2]=="serial"))';
-    done
-
-State file
-----------
-
-Configuration file **/etc/ahc-tools/edeploy/state** defines how many nodes of
-each profile we want to match. This file contains list of tuples with profile
-name and number of nodes for this profile. ``*`` symbol can be used to match
-any number, but make sure that such tuple will go last.
-
-For example to start with 1 control node and any number of compute ones,
-populate this file with the following contents::
-
-    [('control', '1'), ('compute', '*')]
-
-Matching rules
---------------
-
-These matching rules will determine what profile gets assigned to each node
-and are stored in files named **/etc/ahc-tools/edeploy/PROFILE.specs** for
-each profile defined in **/etc/ahc-tools/edeploy/state**.
-
-Open the **/etc/ahc-tools/edeploy/control.specs** file.
-This is a JSON-like file that might look like this::
-
-      [
-       ('disk', '$disk', 'size', 'gt(4)'),
-       ('network', '$eth', 'ipv4', 'network(192.0.2.0/24)'),
-       ('memory', 'total', 'size', 'ge(4294967296)'),
-      ]
-
-These rules match on the data collected during introspection.
-Note that disk size is in GiB, while memory size is in KiB.
-
-There is a set of helper functions to make matching more flexible.
-
-* network() : the network interface shall be in the specified network
-* gt(), ge(), lt(), le() : greater than (or equal), lower than (or equal)
-* in() : the item to match shall be in a specified set
-* regexp() : match a regular expression
-* or(), and(), not(): boolean functions. or() and and() take 2 parameters
-  and not() one parameter.
-
-There are also placeholders, *$disk* and *$eth* in the above example.
-These will store the value in that place for later use.
-
-* For example if we had a "fact" from introspection::
-
-    ('disk', 'sda', 'size', '40')
-
-This would match the first rule in the above control.specs file,
-and we would store ``"disk": "sda"``.
-
-Running advanced profile matching
----------------------------------
-
-* After adjusting the matching rules, we are ready to do the matching::
-
-      sudo ahc-match
-
-* This will attempt to match all of the available nodes to the roles
-  we have defined in the **/etc/ahc-tools/edeploy/state** file.
-  When a node matches a role, the role is added to the node in Ironic in
-  the form of a capability. We can check this with ``ironic node-show``::
-
-        [stack@instack ~]# ironic node-show b73fb5fa-1a2c-49c6-b38e-8de41e3c0532 | grep properties -A2
-        | properties             | {u'memory_mb': u'4096', u'cpu_arch': u'x86_64', u'local_gb': u'40',      |
-        |                        | u'cpus': u'1', u'capabilities': u'profile:control,boot_option:local'}    |
-        | instance_uuid          | None
-
-* In the above output, we can see that the control profile is added
-  as a capability to the node. Next we will need to create flavors in Nova
-  that actually map to these profiles.
-
-[Optional] Manually add the profiles to the nodes
--------------------------------------------------
-
-In order to use the matching functionality without using the AHC tools. We can
-instead add the profile "tags" manually. The example below will add the
-"control" profile to a node::
-
-    ironic node-update <UUID> replace properties/capabilities='profile:control,boot_option:local'
+There are two ways to assign a profile to a node. You can assign it directly
+or specify one or many suitable profiles for the deployment command to choose
+from. It can be done either manually or using the introspection rules.
 
 .. note::
+    Do not miss the "boot_option" part from any commands below,
+    otherwise your deployment won't work as expected.
 
-  We can not update only a single key from the capabilities dictionary, so we
-  need to specify both the profile and the boot_option above. Otherwise, the
-  boot_option key will get removed.
-
-Create flavors to use advanced matching
----------------------------------------
+Create flavors to use profile matching
+--------------------------------------
 
 Default profile flavors should have been created when the undercloud was
 installed, and they will be usable without modification in most environments.
 However, if custom profile flavors are needed, they can be created as follows.
 
 In order to use the profiles assigned to the Ironic nodes, Nova needs to have
-flavors that have the property "capabilities:profile" set to the intended profile.
+flavors that have the property ``capabilities:profile`` set to the intended
+profile.
 
 For example, with just the compute and control profiles:
 
-* Create the flavors
-
-  ::
+* Create the flavors::
 
     openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 control
     openstack flavor create --id auto --ram 4096 --disk 40 --vcpus 1 compute
 
 .. note::
+    The values for ram, disk, and vcpus should be set to a minimal lower bound,
+    as Nova will still check that the Ironic nodes have at least this much.
 
-  The values for ram, disk, and vcpus should be set to a minimal lower bound,
-  as Nova will still check that the Ironic nodes have at least this much
-  even if we set lower properties in the **.specs** files.
-
-* Assign the properties
-
-  ::
+* Assign the properties::
 
     openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" --property "capabilities:profile"="compute" compute
     openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" --property "capabilities:profile"="control" control
 
+Manual profile tagging
+----------------------
+
+To assign a profile to a node directly, issue the following command::
+
+    ironic node-update <UUID OR NAME> replace properties/capabilities=profile:<PROFILE>,boot_option:local
+
+Alternatively, you can provide a number of profiles as capabilities in form of
+``<PROFILE>_profile:1``, which later can be automatically converted to one
+assigned profile (see `Use the flavors to deploy`_ for details). For example::
+
+    ironic node-update <UUID OR NAME> replace properties/capabilities=compute_profile:1,control_profile:1,boot_option:local
+
+Finally, to clean all profile information from an available nodes, use::
+
+    ironic node-update <UUID OR NAME> replace properties/capabilities=boot_option:local
+
+.. note::
+    We can not update only a single key from the capabilities dictionary, so we
+    need to specify both the profile and the boot_option above. Otherwise, the
+    boot_option key will get removed.
+
+Also see :ref:`instackenv` for details on how to set profile in the
+``instackenv.json`` file.
+
+Automated profile tagging
+-------------------------
+
+`Introspection rules`_ can be used to conduct automatic profile assignment
+based on data received from the introspection ramdisk. A set of introspection
+rules should be created before introspection that either set ``profile`` or
+``<PROFILE>_profile`` capabilities on a node.
+
+The exact structure of data received from the ramdisk depends on both ramdisk
+implementation and enabled plugins, and on enabled *ironic-inspector*
+processing hooks. The most basic properties are ``cpus``, ``cpu_arch``,
+``local_gb`` and ``memory_mb``, which represent CPU number, architecture,
+local hard drive size in GiB and RAM size in MiB. See
+:ref:`introspection_data` for more details on what our current ramdisk
+provides.
+
+For example, imagine we have the following hardware: with disk sizes > 1 TiB
+for object storage and with smaller disks for compute and controller nodes.
+We also need to make sure that no hardware with seriously insufficient
+properties gets to the fleet at all.
+
+Create a JSON file, for example ``rules.json``, with the following contents::
+
+    [
+        {
+            "description": "Fail introspection for unexpected nodes",
+            "conditions": [
+                {"op": "lt", "field": "memory_mb", "value": 4096}
+            ],
+            "actions": [
+                {"action": "fail", "message": "Memory too low, expected at least 4 GiB"}
+            ]
+        },
+        {
+            "description": "Assign profile for object storage",
+            "conditions": [
+                {"op": "ge", "field": "local_gb", "value": 1024}
+            ],
+            "actions": [
+                {"action": "set-capability", "name": "profile", "value": "swift"}
+            ]
+        },
+        {
+            "description": "Assign possible profiles for compute and controller",
+            "conditions": [
+                {"op": "lt", "field": "local_gb", "value": 1024},
+                {"op": "ge", "field": "local_gb", "value": 40}
+            ],
+            "actions": [
+                {"action": "set-capability", "name": "compute_profile", "value": "1"},
+                {"action": "set-capability", "name": "control_profile", "value": "1"}
+            ]
+        }
+    ]
+
+.. note::
+    This example may need to be adjusted to work on a virtual environment.
+
+Before introspection load this file into *ironic-inspector*::
+
+    openstack baremetal introspection rule import /path/to/rules.json
+
+Then (re)start the introspection. Check assigned profiles or possible profiles
+using command::
+
+    openstack overcloud profiles list
+
+If you've made a mistake in introspection rules, you can delete all them::
+
+    openstack baremetal introspection rule purge
+
+Then reupload the updates rules file and restart introspection.
 
 Use the flavors to deploy
 -------------------------
 
 By default, all nodes are deployed to the **baremetal** flavor.
-The |project| CLI has options to support more advanced role matching.
+To use profile matching you have to `Create flavors to use profile matching`_
+first, then use specific flavors for deployment. For each node role set
+``--ROLE-flavor`` to the name of the flavor and ``--ROLE-scale`` to the number
+of nodes you want to end up with for this role.
 
-Continuing with the example with only a control and compute profile:
+After profiles and possible profiles are tagged either manually or during
+the introspection, we need to turn possible profiles into an appropriate
+number of profiles and validate the result. Continuing with the example with
+only control and compute profiles::
 
-* Deploy the overcloud
+    openstack overcloud profiles match --control-flavor control --control-scale 1 --compute-flavor compute --compute-scale 1
 
-  ::
+* This command first tries to find enough nodes with ``profile`` capability.
 
-    openstack overcloud deploy --control-flavor control --compute-flavor compute --templates
+* If there are not enough such nodes, it then looks at available nodes with
+  ``PROFILE_profile`` capabilities. If enough of such nodes is found, then
+  their ``profile`` capabilities are update to make the choice permanent.
+
+This command should exit without errors (and optionally without warnings).
+
+You can see the resulting profiles in the node list provided by
+
+::
+
+    $ openstack overcloud profiles list
+    +--------------------------------------+-----------+-----------------+-----------------+-------------------+
+    | Node UUID                            | Node Name | Provision State | Current Profile | Possible Profiles |
+    +--------------------------------------+-----------+-----------------+-----------------+-------------------+
+    | 581c0aca-64f0-48a8-9881-bba3c2882d6a |           | available       | control         | compute, control  |
+    | ace8ae8d-d18f-4122-b6cf-e8418c7bb04b |           | available       | compute         | compute, control  |
+    +--------------------------------------+-----------+-----------------+-----------------+-------------------+
+
+Make sure to provide the same arguments for deployment later on::
+
+    openstack overcloud deploy --control-flavor control --control-scale 1 --compute-flavor compute --compute-scale 1 --templates
 
 
-Use the flavors to scale
--------------------------
-
-The process to scale an overcloud that uses our advanced profiles is the same
-as the process used when we only have the **baremetal** flavor.
-
-.. note::
-
-  The original overcloud must have been deployed as above in order to scale
-  using advanced profiles, as the flavor to role mapping happens then.
-
-* Update the **/etc/ahc-tools/edeploy/state** file to match the number
-  of nodes we want to match to each role.
-
-* Run `sudo ahc-match` to match available nodes to the defined roles.
-
-* Scale the overcloud (example below adds two more nodes to the compute role)
-
-  ::
-
-    openstack overcloud scale stack overcloud overcloud -r Compute-1 -n 2
-
+.. _Introspection rules: http://docs.openstack.org/developer/ironic-inspector/usage.html#introspection-rules

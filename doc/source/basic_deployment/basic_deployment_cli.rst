@@ -273,8 +273,8 @@ desired.  By default, all overcloud instances will be booted with the
 memory, disk, and cpu as that flavor.
 
 In addition, there are profile-specific flavors created which can be used with
-the profile-matching feature of Ironic.  For more details on deploying with
-profiles, see :doc:`../advanced_deployment/profile_matching`.
+the profile-matching feature.  For more details on deploying with profiles,
+see :doc:`../advanced_deployment/profile_matching`.
 
 Configure a nameserver for the Overcloud
 ----------------------------------------

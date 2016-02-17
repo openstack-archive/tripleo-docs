@@ -70,6 +70,8 @@ Finally, to clean all profile information from an available nodes, use::
 Also see :ref:`instackenv` for details on how to set profile in the
 ``instackenv.json`` file.
 
+.. _auto-profile-tagging:
+
 Automated profile tagging
 -------------------------
 

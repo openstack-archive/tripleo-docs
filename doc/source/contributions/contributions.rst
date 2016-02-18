@@ -23,7 +23,7 @@ Contributing to this Documentation
 |project| User Documentation lives on Github under |project|
 organization.
 
-Learn `how to contribute into |project| Docs
+Learn `how to contribute into TripleO Docs
 <https://git.openstack.org/openstack/tripleo-docs>`_.
 
 
@@ -41,7 +41,7 @@ upstream projects, please follow OpenStack's process of filing bugs.
   in our list of :doc:`../introduction/components`.
 
 
-**|project| If the bug impacts the |project| project as a whole, you can file a
+**|project|** If the bug impacts the |project| project as a whole, you can file a
 bug in |bug_tracker|:
 
 #. Go to |bug_tracker_url|

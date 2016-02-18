@@ -46,7 +46,7 @@ Initiating Migration
 
 First, obtain a list of the current Nova services::
 
-    source ~stack/overcloudrc  # admin credentials for the overcloud
+    source ~/overcloudrc  # admin credentials for the overcloud
     nova service-list
 
 Disable the `nova-compute` service on the node you wish to quiesce, to prevent

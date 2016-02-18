@@ -100,7 +100,7 @@ You may then deploy your overcloud referencing the additional environment file::
 
 For a more complete example, which creates an additional user and configures
 SSH keys by accessing the nova metadata server, see
-/usr/share/openstack-tripleo-heat-templates/firstboot/userdata_example.yaml
+`/usr/share/openstack-tripleo-heat-templates/firstboot/userdata_example.yaml`
 on the undercloud node or the tripleo-heat-templates_ repo.
 
 .. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates
@@ -122,7 +122,7 @@ integration points for additional third-party services, drivers or plugins.
    configuration, see :ref:`node_config` as this may provide a simpler solution.
 
 .. note::
-    Note, the per-node interface only enable *individual* nodes to be configured,
+    The per-node interface only enable *individual* nodes to be configured,
     if cluster-wide configuration is required, the Post-Deploy interfaces should be
     used instead.
 
@@ -157,9 +157,9 @@ via standard heat SoftwareConfig_ resources::
 
       NodeDeployment:
         type: OS::Heat::SoftwareDeployment
-          properties:
-            config: {get_resource: NodeConfig}
-            server: {get_param: server}
+        properties:
+          config: {get_resource: NodeConfig}
+          server: {get_param: server}
     outputs:
       deploy_stdout:
         description: Deployment reference, used to trigger post-deploy on changes
@@ -178,7 +178,7 @@ hence when any post-deploy actions (such as re-applying puppet manifests on upda
 may need to be performed.
 
 For a more complete example showing how to apply a personalized map of per-node configuration
-to each node, see /usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml
+to each node, see `/usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml`
 or the tripleo-heat-templates_ repo.
 
 .. _SoftwareConfig: http://docs.openstack.org/developer/heat/template_guide/software_deployment.html

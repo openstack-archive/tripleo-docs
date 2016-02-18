@@ -90,7 +90,7 @@ Replacing Bootstrap Node
 
 If node with index 0 is being replaced it's necessary to edit heat templates
 and change bootstrap node index before starting replacement. Open
-`overcloud-without-mergepy.yaml` file in root directory of heat templates and
+`overcloud.yaml` file in root directory of heat templates and
 change lines::
 
     bootstrap_nodeid: {get_attr: [Controller, resource.0.hostname]}

@@ -552,12 +552,12 @@ via the gateway at 172.17.0.1 on the Internal API network:
 Example::
 
             -
-                  type: vlan
-                  device: bond1
-                  vlan_id: {get_param: InternalApiNetworkVlanID}
-                  addresses:
-                  -
-                    ip_netmask: {get_param: InternalApiIpSubnet}
+              type: vlan
+              device: bond1
+              vlan_id: {get_param: InternalApiNetworkVlanID}
+              addresses:
+              -
+                ip_netmask: {get_param: InternalApiIpSubnet}
               routes:
                 -
                   ip_netmask: 10.1.2.0/24
@@ -723,7 +723,7 @@ service will be bound to the host IP within the named network on each host.
 
 .. note::
   The services will be assigned to the networks according to the
-  ``ServiceNetMap`` in ``overcloud-without-mergepy.yaml``. Unless these
+  ``ServiceNetMap`` in ``overcloud.yaml``. Unless these
   defaults need to be overridden, the ServiceNetMap does not need to be defined
   in the environment file.
 
@@ -826,6 +826,7 @@ the TripleO Heat Templates, you will find that they have been updated with
 these parameters. If you have NIC configuration templates from an older version
 of TripleO Heat Templates, then you will need to add these parameters and
 modify the provisioning network to take advantage of static IP addresses.
+
 Deploying the Overcloud With Network Isolation
 ----------------------------------------------
 
@@ -951,4 +952,3 @@ to a provider network if Neutron is to provide DHCP services to tenant VMs::
     --allocation-pool start=10.9.101.50,end=10.9.101.100 \
     --gateway 10.9.101.254 \
     provider_network 10.9.101.0/24
-

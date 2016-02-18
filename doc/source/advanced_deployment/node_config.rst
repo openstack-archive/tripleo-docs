@@ -4,7 +4,7 @@ Modifying default node configuration
 ====================================
 
 Many service configurarion options are already exposed via parameters in the
-top-level `overcloud-without-mergepy.yaml` template, and these options should
+top-level `overcloud.yaml` template, and these options should
 be used wherever available to influence overcloud configuration.
 
 However in the event the service configuration required is not exposed
@@ -27,7 +27,7 @@ value for compute nodes::
           nova::compute::reserved_host_memory: some_value
     EOF
 
-   openstack overcloud deploy -e compute_params.yaml
+    openstack overcloud deploy -e compute_params.yaml
 
 The parameters available are:
 
@@ -46,9 +46,9 @@ The parameters available are:
 
 .. note::
 
-   If you set a configuration of a puppet class which is not being included
-   yet, make sure you include it in the ExtraConfig definition, for example
-   if you want to change CPU allocation ratio::
+    If you set a configuration of a puppet class which is not being included
+    yet, make sure you include it in the ExtraConfig definition, for example
+    if you want to change CPU allocation ratio::
 
        parameters:
          NovaComputeExtraConfig:

@@ -318,15 +318,16 @@ and it will create a stack. Stack is Heat's own term for the applications that
 it creates. The overcloud, in Heat terms, is a particularly complex instance of
 a stack.
 
-In order to the stack to be deployed, Heat makes successive calls to Nova,
+In order for the stack to be deployed, Heat makes successive calls to Nova,
 OpenStack's compute service controller. Nova depends upon Ironic, which, as
 described above has acquired an inventory of introspected hardware by this
 stage in the process.
 
-At this point, Nova flavors may act as a constraint, influencing the range of
-machines which may be picked for deployment by the Nova scheduler. For each
-request to deploy a new node with a specific role, Nova filters the of available
-nodes, ensuring that the selected nodes meets the hardware requirements.
+At this point, Nova flavors may act as a constraint, influencing the
+range of machines which may be picked for deployment by the Nova
+scheduler. For each request to deploy a new node with a specific role,
+Nova filters the list of available nodes, ensuring that the selected
+nodes meet the hardware requirements.
 
 Once the target node has been selected, Ironic does the actual provisioning of
 the node, Ironic retrieves the OS image associated with the role from Glance,

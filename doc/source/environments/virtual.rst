@@ -102,7 +102,7 @@ Preparing the Virtual Environment (Automated)
 
 #. Make sure you are logged in as the non-root user you intend to use.
 
-   * Example commands to log in as the non-root user::
+   * Example command to log in as the non-root user::
 
        su - stack
 
@@ -123,7 +123,7 @@ Preparing the Virtual Environment (Automated)
 
 #. The virt setup automatically sets up a vm for the Undercloud installed with
    the same base OS as the host. See the Note below to choose a different
-   OS.:
+   OS:
 
    .. note::
       To setup the undercloud vm with a base OS different from the host,
@@ -155,7 +155,7 @@ Preparing the Virtual Environment (Automated)
          export NODE_CPU=4
          export NODE_MEM=16384
 
-    Note the settings above only influence the VMs created for overcloud 
+    Note the settings above only influence the VMs created for overcloud
     deployment.  If you want to change the values for the undercloud node::
 
          export UNDERCLOUD_NODE_CPU=4

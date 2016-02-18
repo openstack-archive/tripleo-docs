@@ -313,7 +313,7 @@ configured for the virtual environment.  To customize this, see the output of::
   of Ceph for Glance, Cinder, Nova or all of them. To do so, use the
   following arguments when deploying::
 
-      --ceph-storage-scale <number of nodes> --templates -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+      --ceph-storage-scale <number of nodes> -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
 
   By default when Ceph is enabled the Cinder LVM back-end is disabled. This
   behavior may be changed passing::

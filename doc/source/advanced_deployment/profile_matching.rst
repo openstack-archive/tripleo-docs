@@ -137,11 +137,11 @@ using command::
 
     openstack overcloud profiles list
 
-If you've made a mistake in introspection rules, you can delete all them::
+If you've made a mistake in introspection rules, you can delete them all::
 
     openstack baremetal introspection rule purge
 
-Then reupload the updates rules file and restart introspection.
+Then reupload the updated rules file and restart introspection.
 
 Use the flavors to deploy
 -------------------------
@@ -163,7 +163,7 @@ only control and compute profiles::
 
 * If there are not enough such nodes, it then looks at available nodes with
   ``PROFILE_profile`` capabilities. If enough of such nodes is found, then
-  their ``profile`` capabilities are update to make the choice permanent.
+  their ``profile`` capabilities are updated to make the choice permanent.
 
 This command should exit without errors (and optionally without warnings).
 

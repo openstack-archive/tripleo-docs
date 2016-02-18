@@ -67,10 +67,10 @@ Creating the Share
 
 #. Create a share network to host the shares:
 
-   - Create the overcloud networks. The
-     :doc:`../basic_deployment/basic_deployment` doc has a more detailed
-     explanation about creating the network and subnet. Note that you may also
-     need to perform the following steps to get Manila working::
+   - Create the overcloud networks. The :doc:`../basic_deployment/basic_deployment`
+     doc has a more detailed explanation about creating the network
+     and subnet. Note that you may also need to perform the following
+     steps to get Manila working::
 
        neutron router-create router1
        neutron router-interface-add router1 [subnet id]

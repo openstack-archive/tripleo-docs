@@ -100,6 +100,3 @@ to::
 
     bootstrap_nodeid: {get_attr: [Controller, resource.1.hostname]}
     bootstrap_nodeid_ip: {get_attr: [Controller, resource.1.ip_address]}
-
-Tuskar doesn't support template editing so it's possible to do this change only
-if overcloud is deployed with :doc:`templates directly <../advanced_deployment/template_deploy>`.

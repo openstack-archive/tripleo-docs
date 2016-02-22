@@ -1,27 +1,23 @@
 Deploying with Heat Templates
 =============================
 
-It is possible to deploy to heat directly, using a directory of templates,
-e.g without using any Tuskar plan.  This is potentially a more convenient
-approach if you are only deploying via the CLI (the UI requires Tuskar),
-and/or if you are developing significant enhancements or site-specific
-additions to the templates.
+It is possible to use the ``--templates`` and ``--environment-file``
+options to override specific templates or even deploy using a separate
+set of templates entirely.
 
 
-Deploying an Overcloud without Tuskar
--------------------------------------
+Deploying an Overcloud using the default templates
+--------------------------------------------------
 
-You may use the ``--templates`` option to enable deploying only using heat
-templates, e.g no tuskar plan::
+The ``--templates`` option without an argument enables deploying using
+the packaged Heat templates::
 
     openstack overcloud deploy --templates
 
 .. note::
 
     The default location for the templates is
-    `/usr/share/openstack-tripleo-heat-templates`.  Using this option
-    will not include any modifications to the Tuskar role templates which
-    may have been performed, templates are always read from local files.
+    `/usr/share/openstack-tripleo-heat-templates`.
 
 
 Overriding specific templates with local versions

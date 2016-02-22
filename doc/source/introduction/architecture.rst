@@ -93,10 +93,7 @@ infrastructure to deploy and operate OpenStack itself delivers several benefits:
   architecture, which has gone through extensive community review.
 
 It should be noted that not everything in |project| is a reused OpenStack
-element. The Tuskar API, for example (which lets users design the workload cloud
-that they want to deploy), is found in |project| but not, so far at least, in
-a typical Openstack instance. The Tuskar API is described in more detail below.
-
+element.
 
 
 Deployment Workflow Overview
@@ -263,10 +260,7 @@ Deployment Planning
 ^^^^^^^^^^^^^^^^^^^
 
 Whole part of planning your deployment is based on concept of **overcloud
-roles**.
-
-Roles are stored in the Tuskar DB, and are used through interaction with the
-Tuskar API. A role brings together following things:
+roles**. A role brings together following things:
 
 * An image; the software to be installed on a node
 * A flavor; the size of node suited to the role
@@ -303,16 +297,13 @@ Customizable things during deployment planning are:
 Deployment
 ^^^^^^^^^^
 
-Deployment to physical servers happens through a collaboration of Tuskar, Heat,
-Nova, Neutron, Glance and Ironic.
+Deployment to physical servers happens through a collaboration of
+Heat, Nova, Neutron, Glance and Ironic.
 
-To deploy the overcloud Tuskar needs gather all plan information it keeps and
-build a Heat templates which describe desired overcloud.
-
-This template is served to Heat which will orchestrate the whole deployment
-and it will create a stack. Stack is Heat's own term for the applications that
-it creates. The overcloud, in Heat terms, is a particularly complex instance of
-a stack.
+The Heat templates and environments are served to Heat which will
+orchestrate the whole deployment and it will create a stack. Stack is
+Heat's own term for the applications that it creates. The overcloud,
+in Heat terms, is a particularly complex instance of a stack.
 
 In order for the stack to be deployed, Heat makes successive calls to Nova,
 OpenStack's compute service controller. Nova depends upon Ironic, which, as
@@ -412,7 +403,5 @@ stages:
 
 * Making sure you have enough nodes to deploy on (or register new nodes as
   described in the "Undercloud Data Preparation" section above).
-* Updating the plan managed by Tuskar, as described in the "Deployment Planning"
-  section above.
 * Calling Heat to update the stack which will apply the set of changes to the
   overcloud.

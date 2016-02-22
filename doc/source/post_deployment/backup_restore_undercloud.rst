@@ -36,7 +36,7 @@ Now restore the MariaDB configuration file and database backup, then start the M
   systemctl start mariadb
   cat /root/undercloud-all-databases.sql | mysql
   # Now we need to clean out some old permissions to be recreated
-  for i in ceilometer glance heat ironic keystone neutron nova tuskar;do mysql -e "drop user $i";done
+  for i in ceilometer glance heat ironic keystone neutron nova;do mysql -e "drop user $i";done
   mysql -e 'flush privileges'
 
 Now create the stack user and restore the stack users home directory::

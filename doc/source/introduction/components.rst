@@ -232,37 +232,6 @@ for details.
 * Blueprints: https://blueprints.launchpad.net/ironic-inspector
 
 
-Deployment Planning
--------------------
-Tuskar
-^^^^^^
-The Tuskar project is responsible for planning of deployments through the use
-of two main concepts: Role (unit of functionality, e.g. 'Compute') and Plan.
-A given Role is associated with a number of Heat templates and extra
-data files and Tuskar allows the user to provide values for a Role's template
-attributes.
-
-Once a Plan is specified in terms of Roles (and any desired
-template attributes have been set) Tuskar can assemble and generate the
-corresponding Heat deployment files and return these to the caller
-(ready to be passed to Heat).
-
-**How to contribute**
-
-The Tuskar project uses the usual OpenStack code review process with gerrit
-reviews (see links below). Tuskar is a sub-project falling under TripleO
-and as such you can use the #tripleo irc channel (freenode) or the weekly
-TripleO meeting to bring up issues about Tuskar, as well as the openstack-dev
-mailing list of course.
-
-**Useful links**
-
-* Upstream Project: https://github.com/openstack/tuskar
-* PyPI: https://pypi.python.org/pypi/tuskar
-* Bugs: https://bugs.launchpad.net/tuskar
-* Blueprints: https://blueprints.launchpad.net/tuskar
-* REST API http://specs.openstack.org/openstack/tripleo-specs/specs/juno/tripleo-juno-tuskar-rest-api.html
-* Reviews: https://review.openstack.org/#/q/status:open+project:openstack/tuskar,n,z
 
 Deployment & Orchestration
 --------------------------
@@ -313,8 +282,7 @@ tripleo-heat-templates
 
 The tripleo-heat-templates describe the OpenStack deployment in Heat
 Orchestration Template YAML files and Puppet manifests. The templates
-are processed through Tuskar and materialized into an actual
-deployment via Heat.
+are deployed via Heat.
 
 **How to contribute**
 
@@ -425,3 +393,18 @@ like node introspection, overcloud image building and uploading, etc.
     <GLOBAL_LINKS>
 
 .. _OpenStack Developer's Guide: http://docs.openstack.org/infra/manual/developers.html
+
+
+Deprecated
+----------
+Tuskar
+^^^^^^
+
+The Tuskar project was responsible for planning the deployments and
+generating the corresponding Heat templates. This is no longer
+necessary as Heat supports this composability out of the box.
+
+The source code is available below, but please note that it should not
+be used for new deployments.
+
+https://github.com/openstack/tuskar

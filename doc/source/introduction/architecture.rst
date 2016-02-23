@@ -16,10 +16,6 @@ Architecture Overview
 |project| is a community developed approach and set of tools for deploying,
 and managing an OpenStack cloud.
 
-Some concepts, particularly the role matching and Automated Health checking,
-are inspired by `SpinalStack
-<http://spinal-stack.readthedocs.org/en/latest/>`_.
-
 
 TripleO
 ^^^^^^^

@@ -85,8 +85,9 @@ following for each node::
 
 then remove ironic-inspector cache and restart it::
 
-    rm /var/lib/ironic-inspector/inspector.sqlite
+    sudo rm /var/lib/ironic-inspector/inspector.sqlite
     sudo systemctl restart openstack-ironic-inspector
+    sudo ironic-inspector-dbsync --config-file /etc/ironic-inspector/inspector.conf upgrade
 
 
 .. _ironic-inspector troubleshooting documentation: http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html

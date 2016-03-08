@@ -63,6 +63,31 @@ Alternatively, all of the above options can be execute at once with::
 
   tripleo-common/scripts/tripleo.sh --all
 
+Test overcloud::
+
+  tripleo-common/scripts/tripleo.sh --overcloud-pingtest
+
+Requirements for testing the overcloud: overcloudrc file (Located by default
+in the undercloud current user’s directory).
+
+This option will check that the overcloud is able to create a stack,
+testing several OpenStack components in the process. The following steps
+are made in order to check the stack creation:
+
+- Download a Linux image and upload it to glance with the name pingtest_image.
+
+- Create an external neutron network called nova.
+
+- Create a subnet in the nova network.
+
+- Create a test stack called tenant-stack, using heat, which spawns a guest in
+the overcloud and attach it to the nova network.
+
+- Ping the floating IP address assigned to the new guest.
+
+After the test, the created resources are deleted.
+
+
 Environment variables
 ^^^^^^^^^^^^^^^^^^^^^
 

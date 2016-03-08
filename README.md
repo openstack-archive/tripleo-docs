@@ -1,4 +1,0 @@
-TripleO Documentation
-=====================
-
-TripleO documentation.

@@ -168,7 +168,7 @@ Example::
     TenantNetCidr: 172.16.0.0/24
     ExternalNetCidr: 10.1.2.0/24
     # CIDR subnet mask length for provisioning network
-    ControlPlaneSubnetCidr: 24
+    ControlPlaneSubnetCidr: '24'
     InternalApiAllocationPools: [{'start': '172.17.0.10', 'end': '172.17.0.200'}]
     StorageAllocationPools: [{'start': '172.18.0.10', 'end': '172.18.0.200'}]
     StorageMgmtAllocationPools: [{'start': '172.19.0.10', 'end': '172.19.0.200'}]

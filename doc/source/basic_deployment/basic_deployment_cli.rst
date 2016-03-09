@@ -252,12 +252,17 @@ Assign kernel and ramdisk to nodes::
 
     openstack baremetal configure boot
 
-If your hardware has several hard drives, it's highly recommended that you
-specify the exact device to be used during introspection and deployment
-as a root device. Please refer to the `Ironic root device hints documentation
-<http://docs.openstack.org/developer/ironic/deploy/install-guide.html#specifying-the-disk-for-deployment>`_
-for details on how to do it.
+.. note::
+    If your hardware has several hard drives, it's highly recommended that you
+    specify the exact device to be used during introspection and deployment
+    as a root device. Please see :ref:`root_device` for details.
 
+    If you don't specify the root device explicitly, any device may be picked.
+    Also the device chosen automatically is NOT guaranteed to be the same
+    across rebuilds. Make sure to wipe the previous installation before
+    rebuilding in this case.
+
+.. _introspection:
 
 Introspect Nodes
 ----------------

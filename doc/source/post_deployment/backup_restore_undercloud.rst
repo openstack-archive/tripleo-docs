@@ -62,7 +62,7 @@ We have to now install the swift and glance base packages, and then restore thei
 Finally we rerun the undercloud installation from the stack user, making sure to run it in the stack user home dir::
 
   su - stack
-  sudo yum install -y python-rdomanager-oscplugin
+  sudo yum install -y python-tripleoclient
   # Double check hostname is correctly set in /etc/hosts
   openstack install undercloud
 

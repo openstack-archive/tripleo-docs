@@ -177,7 +177,17 @@ Register Nodes
 
 Register nodes for your deployment with Ironic::
 
-    openstack baremetal import --json instackenv.json
+    openstack baremetal import instackenv.json
+
+.. note::
+   The file to be imported may be either JSON, YAML or CSV format, and
+   the type is detected via the file extension (json, yaml, csv).
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   If you're running an old (stable/liberty or older) tripleoclient version
+   however then you must specify --json explicitly and only use that format.
 
 .. note::
    It's not recommended to delete nodes and/or rerun this command after

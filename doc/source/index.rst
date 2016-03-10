@@ -77,5 +77,10 @@ steps are marked as follows:
 
    Step that should only be run when deploying with SSL OpenStack endpoints
 
+.. admonition:: Self-Signed SSL
+   :class: selfsigned
+
+   Step that should only be run when deploying with SSL and a self-signed certificate.
+
 Any such steps should *not* be run if the target environment does not match
 the section marking.

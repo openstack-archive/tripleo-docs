@@ -377,9 +377,14 @@ configured for the virtual environment.  To customize this, see the output of::
 
       rhel-7-server-openstack-6.0-rpms
 
-::
+.. admonition:: SSL
+   :class: ssl
 
-  openstack overcloud deploy --templates
+   To deploy an overcloud with SSL, see :doc:`../advanced_deployment/ssl`.
+
+Run the deploy command, including any additional parameters as necessary::
+
+  openstack overcloud deploy --templates [additional parameters]
 
 .. admonition:: Virtual
    :class: virtual

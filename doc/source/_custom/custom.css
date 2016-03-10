@@ -68,6 +68,7 @@
 .ceph {background: #eff;}
 .source {background: #bbb;}
 .ssl {background: #ffe;}
+.selfsigned {background: #ffd;}
 
 /* admonition selector */
 #admonition_selector {

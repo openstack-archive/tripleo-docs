@@ -10,3 +10,4 @@ Documentation on how to deploy custom configurations with |project|.
    node_specific_hieradata
    extra_config
    template_deploy
+   deploy_swift

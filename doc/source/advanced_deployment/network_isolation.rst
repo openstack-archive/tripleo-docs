@@ -121,11 +121,11 @@ Workflow
 
 The procedure for enabling network isolation is this:
 
-1. Create network environment file (e.g. /home/stack/network-environment.yaml)
-2. Edit IP subnets and VLANs in the environment file to match local environment
-3. Make a copy of the appropriate sample network interface configurations
-4. Edit the network interface configurations to match local environment
-5. Deploy overcloud with the proper parameters to include network isolation
+#. Create network environment file (e.g. /home/stack/network-environment.yaml)
+#. Edit IP subnets and VLANs in the environment file to match local environment
+#. Make a copy of the appropriate sample network interface configurations
+#. Edit the network interface configurations to match local environment
+#. Deploy overcloud with the proper parameters to include network isolation
 
 The next section will walk through the elements that need to be added to
 the network-environment.yaml to enable network isolation. The sections

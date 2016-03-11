@@ -11,3 +11,7 @@
 .tox
 doc/build
 build
+
+# pbr generates these
+AUTHORS
+ChangeLog

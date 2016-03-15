@@ -2,7 +2,7 @@ tripleo.sh
 ==========
 
 `tripleo.sh
-<http://git.openstack.org/cgit/openstack/tripleo-common/tree/scripts/tripleo.sh>`_
+<http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/scripts/tripleo.sh>`_
 is a script that can be used to help bootstrap development environments. It
 automates many of the steps in this documentation to help get setup faster.
 It's opinionated automation around other production tooling
@@ -13,12 +13,12 @@ tripleo.sh is also used by tripleo-ci to test TripleO patches.
 Get tripleo.sh
 --------------
 
-tripleo.sh is from the `tripleo-common
-<http://git.openstack.org/cgit/openstack/tripleo-common>`_ project. git clone
-tripleo-common, and the script is under the scripts/ directory::
+tripleo.sh is from the `tripleo-ci
+<http://git.openstack.org/cgit/openstack-infra/tripleo-ci>`_ project. git
+clone tripleo-ci, and the script is under the scripts/ directory::
 
-  git clone https://git.openstack.org/openstack/tripleo-common
-  tripleo-common/scripts/tripleo.sh --help
+  git clone https://git.openstack.org/openstack-infra/tripleo-ci
+  tripleo-ci/scripts/tripleo.sh --help
 
 
 Using tripleo.sh
@@ -37,35 +37,35 @@ corresponding order with how a TripleO deployment is done.
 
 Repository setup::
 
-  tripleo-common/scripts/tripleo.sh --repo-setup
+  tripleo-ci/scripts/tripleo.sh --repo-setup
 
 Installing the undercloud::
 
-  tripleo-common/scripts/tripleo.sh --undercloud
+  tripleo-ci/scripts/tripleo.sh --undercloud
 
 Building overcloud images::
 
-  tripleo-common/scripts/tripleo.sh --overcloud-images
+  tripleo-ci/scripts/tripleo.sh --overcloud-images
 
 Registering nodes::
 
-  tripleo-common/scripts/tripleo.sh --register-nodes
+  tripleo-ci/scripts/tripleo.sh --register-nodes
 
 Introspect nodes::
 
-  tripleo-common/scripts/tripleo.sh --introspect-nodes
+  tripleo-ci/scripts/tripleo.sh --introspect-nodes
 
 Deploy overcloud::
 
-  tripleo-common/scripts/tripleo.sh --overcloud-deploy
+  tripleo-ci/scripts/tripleo.sh --overcloud-deploy
 
 Alternatively, all of the above options can be execute at once with::
 
-  tripleo-common/scripts/tripleo.sh --all
+  tripleo-ci/scripts/tripleo.sh --all
 
 Test overcloud::
 
-  tripleo-common/scripts/tripleo.sh --overcloud-pingtest
+  tripleo-ci/scripts/tripleo.sh --overcloud-pingtest
 
 Requirements for testing the overcloud: overcloudrc file (Located by default
 in the undercloud current user’s directory).
@@ -93,5 +93,5 @@ Environment variables
 
 Certain values and assumptions can be changed via environment variables. See
 the `tripleo.sh
-<http://git.openstack.org/cgit/openstack/tripleo-common/tree/scripts/tripleo.sh>`_
+<http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/scripts/tripleo.sh>`_
 source code for details.

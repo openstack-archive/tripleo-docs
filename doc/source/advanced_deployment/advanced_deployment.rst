@@ -16,6 +16,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    extra_config
    template_deploy
    network_isolation
+   network_isolation_virt
    deploy_manila
    cinder_netapp
    neutron_midonet

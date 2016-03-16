@@ -8,14 +8,14 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   Introduction <introduction/introduction>
-   Environment Setup <environments/environments>
-   Undercloud Installation <installation/installation>
-   Basic Deployment (CLI) <basic_deployment/basic_deployment_cli>
-   Advanced Deployment <advanced_deployment/advanced_deployment>
-   Post Deployment <post_deployment/post_deployment>
-   Troubleshooting <troubleshooting/troubleshooting>
-   How to Contribute <contributions/contributions>
+   introduction/introduction
+   environments/environments
+   installation/installation
+   basic_deployment/basic_deployment_cli
+   advanced_deployment/advanced_deployment
+   post_deployment/post_deployment
+   troubleshooting/troubleshooting
+   contributions/contributions
 
 
 Documentation Conventions

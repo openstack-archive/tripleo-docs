@@ -28,5 +28,5 @@ Go to :doc:`components` to learn more.
 .. toctree::
    :hidden:
 
-   Architecture <architecture>
-   Components <components>
+   architecture
+   components

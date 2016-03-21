@@ -24,6 +24,10 @@ Installing the Undercloud
       enforcement must be turned off for some reason, it should instead be set
       to permissive.
 
+   .. note::
+      vlan tagged interfaces must follow the if_name.vlan_id convention, like for
+      example: eth0.vlan100 or bond0.vlan120.
+
    .. admonition:: Baremetal
       :class: baremetal
 

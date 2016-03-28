@@ -67,7 +67,7 @@ Creating the Share
 
 #. Create a share network to host the shares:
 
-   - Create the overcloud networks. The :doc:`../basic_deployment/basic_deployment`
+   - Create the overcloud networks. The :doc:`../basic_deployment/basic_deployment_cli`
      doc has a more detailed explanation about creating the network
      and subnet. Note that you may also need to perform the following
      steps to get Manila working::

@@ -6,6 +6,7 @@ In this chapter you will find advanced deployment of various |project| areas.
 
 .. toctree::
 
+   root_device
    profile_matching
    introspection_data
    node_config

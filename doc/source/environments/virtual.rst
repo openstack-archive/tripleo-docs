@@ -149,7 +149,8 @@ Preparing the Virtual Environment (Automated)
 
   .. note::
 
-    By default, VMs will be created with 1 vCPU and 4096 MiB RAM. To adjust
+    By default, the overcloud VMs will be created with 1 vCPU and 5120 MiB RAM and
+    the undercloud VM with 2 vCPU and 6144 MiB. To adjust
     those values::
 
          export NODE_CPU=4

@@ -319,17 +319,17 @@ see :doc:`../advanced_deployment/profile_matching`.
 Configure a nameserver for the Overcloud
 ----------------------------------------
 
-Overcloud nodes need to have a configured nameserver so that they can resolve
+Overcloud nodes can have a nameserver configured in order to resolve
 hostnames via DNS. The nameserver is defined in the undercloud's neutron
-subnet. Define the nameserver to be used for the environment::
+subnet. If needed, define the nameserver to be used for the environment::
 
     # List the available subnets
     neutron subnet-list
     neutron subnet-update <subnet-uuid> --dns-nameserver <nameserver-ip>
 
 .. note::
-   A public DNS server, such as 8.8.8.8 can be used if there is no internal DNS
-   server.
+   A public DNS server, such as 8.8.8.8 or the undercloud DNS name server
+   can be used if there is no internal DNS server.
 
 .. admonition:: Virtual
    :class: virtual

@@ -248,7 +248,7 @@ environment which enables the configuration.
 
 The "actions" property of the `OS::Heat::SoftwareDeployments` resource may be
 used to specify when the configuration should be applied, e.g only on CREATE,
-only on DELETE etc.  If this is ommitted, the heat default is to apply the
+only on DELETE etc.  If this is omitted, the heat default is to apply the
 config on CREATE and UPDATE, e.g on initial deployment and every subsequent
 update.
 

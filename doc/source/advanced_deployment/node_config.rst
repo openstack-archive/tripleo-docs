@@ -3,7 +3,7 @@
 Modifying default node configuration
 ====================================
 
-Many service configurarion options are already exposed via parameters in the
+Many service configuration options are already exposed via parameters in the
 top-level `overcloud.yaml` template, and these options should
 be used wherever available to influence overcloud configuration.
 

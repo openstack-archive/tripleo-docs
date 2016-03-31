@@ -80,8 +80,8 @@ are made in order to check the stack creation:
 
 - Create a subnet in the nova network.
 
-- Create a test stack called tenant-stack, using heat, which spawns a guest in
-the overcloud and attach it to the nova network.
+- Create a test stack called tenant-stack, using heat, which spawns a guest
+  in the overcloud and attach it to the nova network.
 
 - Ping the floating IP address assigned to the new guest.
 

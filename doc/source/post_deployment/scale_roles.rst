@@ -13,7 +13,7 @@ the following command can be used::
 
 .. note::
    When scaling down random servers of specified role will be deleted, how to
-   delete specific nodes is decribed in :ref:`delete_nodes`.
+   delete specific nodes is described in :ref:`delete_nodes`.
 
 .. note::
    The different scale parameters can be seen in the output of::

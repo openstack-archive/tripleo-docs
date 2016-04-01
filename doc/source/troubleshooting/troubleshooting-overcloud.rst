@@ -19,7 +19,7 @@ has failed::
  | 7e88af95-535c-4a55-b78d-2c3d9850d854 | overcloud  | CREATE_FAILED      | 2015-04-06T17:57:16Z |
  +--------------------------------------+------------+--------------------+----------------------+
 
-Occassionally, Heat is not even able to create the the stack, so the ``heat
+Occasionally, Heat is not even able to create the the stack, so the ``heat
 stack-list`` output will be empty. If this is the case, observe the message
 that was printed to the terminal when ``instack-deploy-overcloud`` or ``heat
 stack-create`` was run.
@@ -52,7 +52,7 @@ in the resulting table.
   For example, **Maintenance** goes to ``True`` automatically, if wrong power
   credentials are provided.
 
-* If **Provision State** is ``available`` then the problem occured before
+* If **Provision State** is ``available`` then the problem occurred before
   bare metal deployment has even started. Proceed with `Debugging Using Heat`_.
 
 * If **Provision State** is ``active`` and **Power State** is ``power on``,

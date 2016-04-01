@@ -31,7 +31,7 @@ Learn `how to contribute into TripleO Docs
 Reporting Bugs
 --------------
 
-**OpenStack Upstream**: If you find bugs or volnurabilities which affect
+**OpenStack Upstream**: If you find bugs or vulnerabilities which affect
 upstream projects, please follow OpenStack's process of filing bugs.
 
 * Learn `how to create Bugs in OpenStack

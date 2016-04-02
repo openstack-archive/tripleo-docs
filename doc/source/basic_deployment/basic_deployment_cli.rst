@@ -79,7 +79,7 @@ non-root user that was used to install the undercloud.
 
           export NODE_DIST=rhel7
 
-#. Install the current-passed-ci delorean repo and deps repo into the overcloud images:
+#. Install the ``current-tripleo`` delorean repo and deps repo into the overcloud images:
 
     ::
 

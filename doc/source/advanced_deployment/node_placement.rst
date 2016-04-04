@@ -31,6 +31,11 @@ If this approach is used, all nodes for a given role (e.g Controller, Compute
 or each of the Storage roles) must be tagged in the same way, or the Nova
 scheduler will be unable to match the capabilities correctly.
 
+.. note:: Profile matching is redundant when precise node placement is used.
+          To avoid scheduling failures you should use the default "baremetal"
+          flavor for deployment in this case, not the flavors designed for
+          profile matching ("compute", "control", etc).
+
 Create an environment file with Scheduler Hints
 ----------------------------------------------
 

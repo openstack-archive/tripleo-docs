@@ -58,6 +58,31 @@ environment misconfiguration, particularly BIOS boot settings. Please refer to
 `ironic-inspector troubleshooting documentation`_ for information on how to
 detect and fix such problems.
 
+Accessing the ramdisk
+~~~~~~~~~~~~~~~~~~~~~
+
+Note that the introspection ramdisk is by default built with `the
+dynamic-login element`_, so you can set up an SSH key and log into it for
+debugging.
+
+First, think of a temporary root password. Generate a hash by feeding it
+into ``openssl passwd -1`` command. Edit ``/httpboot/inspector.ipxe``
+manually. Find the line starting with "kernel" and append rootpwd="HASH" to it.
+Do not append the real password. Alternatively, you can append
+sshkey="PUBLIC_SSH_KEY" with your public SSH key.
+
+.. note::
+    In both cases quotation marks are required!
+
+When ramdisk is running, figure out its IP address by checking ``arp`` utility
+or DHCP logs from
+
+::
+
+    sudo journalctl -u openstack-ironic-inspector-dnsmasq
+
+SSH as a root user with the temporary password or the SSH key.
+
 Refusing to introspect node with provision state "available"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -90,3 +115,4 @@ then remove ironic-inspector cache and restart it::
 
 
 .. _ironic-inspector troubleshooting documentation: http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html
+.. _the dynamic-login element: https://github.com/openstack/diskimage-builder/tree/master/elements/dynamic-login

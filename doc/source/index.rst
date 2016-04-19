@@ -22,8 +22,8 @@ Documentation Conventions
 =========================
 
 Some steps in the following instructions only apply to certain environments,
-such as deployments to real baremetal and deployments using RHEL. These
-steps are marked as follows:
+such as deployments to real baremetal and deployments using Red Hat Enterprise
+Linux (RHEL). These steps are marked as follows:
 
 .. admonition:: RHEL
    :class: rhel

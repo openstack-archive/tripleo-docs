@@ -72,20 +72,25 @@ for information on how to fix it.
 How can introspection be stopped?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Currently ironic-inspector does not provide means for stopping introspection.
-The recommended path is to wait until it times out. Changing ``timeout``
-setting in ``/etc/ironic-inspector/inspector.conf`` may be used to reduce this
-timeout from 1 hour (which usually too much, especially on virtual
-environment).
+Starting with the Mitaka release, introspection for a node can be stopped with
+the following command::
+
+    openstack baremetal introspection abort <NODE UUID>
+
+For older versions the recommended path is to wait until it times out.
+Changing ``timeout`` setting in ``/etc/ironic-inspector/inspector.conf``
+may be used to reduce this timeout from 1 hour (which usually too much,
+especially on virtual environment).
 
 If you do need to stop introspection **for all nodes** right now, do the
 following for each node::
 
     ironic node-set-power-state UUID off
 
-then remove ironic-inspector cache and restart it::
+then remove ironic-inspector cache, rebuild it and restart ironic-inspector::
 
     rm /var/lib/ironic-inspector/inspector.sqlite
+    sudo ironic-inspector-dbsync --config-file /etc/ironic-inspector/inspector.conf upgrade
     sudo systemctl restart openstack-ironic-inspector
 
 

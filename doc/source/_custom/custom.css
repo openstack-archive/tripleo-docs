@@ -71,6 +71,8 @@
 .source {background: #bbb;}
 .ssl {background: #ffe;}
 .selfsigned {background: #ffd;}
+.ltom {background: #dee;}
+.mton {background: #ded;}
 
 /* admonition selector */
 #admonition_selector {

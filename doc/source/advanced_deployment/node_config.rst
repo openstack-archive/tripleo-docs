@@ -22,7 +22,7 @@ value for compute nodes::
 
 
     cat > compute_params.yaml << EOF
-    parameters_defaults:
+    parameter_defaults:
         NovaComputeExtraConfig:
           nova::compute::reserved_host_memory: some_value
     EOF
@@ -50,7 +50,7 @@ The parameters available are:
     yet, make sure you include it in the ExtraConfig definition, for example
     if you want to change CPU allocation ratio::
 
-       parameters_defaults:
+       parameter_defaults:
          NovaComputeExtraConfig:
            'nova::scheduler::filter::cpu_allocation_ratio': '11.0'
            compute_classes:

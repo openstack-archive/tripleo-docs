@@ -11,7 +11,7 @@ suffix of instance name in `nova list` output. In this following text
 `overcloud-controller-1` node is replaced with `overcloud-controller-3`::
 
     $ cat ~/remove.yaml
-    parameters:
+    parameters_defaults:
       ControllerRemovalPolicies:
           [{'resource_list': ['1']}]
 

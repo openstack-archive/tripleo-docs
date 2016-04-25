@@ -792,7 +792,7 @@ the environment)::
 
   parameter_defaults:
     # CIDR subnet mask length for provisioning network
-    ControlPlaneSubnetCidr: 24
+    ControlPlaneSubnetCidr: '24'
     # Gateway router for the provisioning network (or Undercloud IP)
     ControlPlaneDefaultRoute:10.8.146.254
     # Generally the IP of the Undercloud

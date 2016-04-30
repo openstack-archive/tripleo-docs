@@ -15,6 +15,7 @@ Contents:
    advanced_deployment/advanced_deployment
    post_deployment/post_deployment
    troubleshooting/troubleshooting
+   tht_walkthrough/tht_walkthrough
    contributions/contributions
 
 

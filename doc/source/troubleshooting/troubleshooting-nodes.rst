@@ -83,6 +83,19 @@ or DHCP logs from
 
 SSH as a root user with the temporary password or the SSH key.
 
+Accessing logs from the ramdisk
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Introspection logs are saved on ramdisk failures. Starting with the Newton
+release, they are actually stored on all introspection failures. The standard
+location is ``/var/log/ironic-inspector/ramdisk``, and the files there are
+actually ``tar.gz`` without an extension.
+
+To collect introspection logs in other cases, set
+``always_store_ramdisk_logs = true`` in
+``/etc/ironic-inspector/inspector.conf``, restart the
+``openstack-ironic-inspector`` service and retry the introspection.
+
 Refusing to introspect node with provision state "available"
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

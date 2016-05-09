@@ -33,10 +33,21 @@ The parameters available are:
 
   * `ExtraConfig`: Apply the data to all nodes, e.g all roles
   * `NovaComputeExtraConfig`: Apply the data only to Compute nodes
-  * `controllerExtraConfig`: Apply the data only to Controller nodes *(note the inconsistent capitalization...)*
+  * `ControllerExtraConfig`: Apply the data only to Controller nodes
   * `BlockStorageExtraConfig`: Apply the data only to BlockStorage nodes
   * `ObjectStorageExtraConfig`: Apply the data only to ObjectStorage nodes
   * `CephStorageExtraConfig`: Apply the data only to CephStorage nodes
+
+.. note::
+
+    Previously the parameter for Controller nodes was named
+    `controllerExtraConfig` (note the inconsistent capitalization). If
+    you are updating a deployment which used the old parameter, all
+    values previously passed to `controllerExtraConfig` should be
+    passed to `ControllerExtraConfig` instead, and
+    `controllerExtraConfig: {}` should be explicitly set in
+    `parameter_defaults`, to ensure that values from the old parameter
+    will not be used anymore.
 
 .. note::
 

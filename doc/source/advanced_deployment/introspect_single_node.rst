@@ -1,7 +1,7 @@
 Introspecting a Single Node
 ===========================
 
-In addition to bulk introspetion, you can also introspect nodes one by one.
+In addition to bulk introspection, you can also introspect nodes one by one.
 When doing so, you must take care to set the correct node states manually.
 Use ``ironic node-show UUID`` command to figure out whether nodes are in
 ``manageable`` or ``available`` state. For all nodes in ``available`` state,

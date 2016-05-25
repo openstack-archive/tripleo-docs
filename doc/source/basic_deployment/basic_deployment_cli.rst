@@ -190,6 +190,9 @@ Register nodes for your deployment with Ironic::
    however then you must specify --json explicitly and only use that format.
 
 .. note::
+   The file format for node import is documented, see :ref:`instackenv`.
+
+.. note::
    It's not recommended to delete nodes and/or rerun this command after
    you have proceeded to the next steps. Particularly, if you start introspection
    and then re-register nodes, you won't be able to retry introspection until

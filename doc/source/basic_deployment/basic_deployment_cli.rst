@@ -201,6 +201,13 @@ Register nodes for your deployment with Ironic::
    the "force_power_state_during_sync" configuration option will be set back to
    the default, which is "False".
 
+.. note::
+   If you want to take advantage of the ENROLL provisioning state introduced in
+   OpenStack Liberty, you must enable an Ironic API version >= 1.11 (for
+   instance by setting the OS_BAREMETAL_API_VERSION environment variable), and
+   pass the option ``--initial-state=enroll`` to ``openstack baremetal
+   import``.
+
 Assign kernel and ramdisk to nodes::
 
     openstack baremetal configure boot

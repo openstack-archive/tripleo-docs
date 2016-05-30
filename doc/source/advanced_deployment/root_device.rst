@@ -27,6 +27,32 @@ Where the new value is calculated as a real disk size in GiB minus 1 GiB to
 account for partitioning (the introspection process does this calculation
 automatically).
 
+Setting root device hints automatically
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Starting with the Newton release it is possible to autogenerate root device
+hints for all nodes instead of setting them one by one. Pass the
+``--root-device`` argument to the ``openstack baremetal configure boot``
+**after a successful introspection**. This argument can accept a device list
+in the order of preference, for example::
+
+    openstack baremetal configure boot --root-device=sdb,sdc,vda
+
+It can also accept one of two strategies: ``smallest`` will pick the smallest
+device, ``largest`` will pick the largest one. By default only disk devices
+larger than 4 GiB are considered at all, set the ``--root-device-minimum-size``
+argument to change.
+
+.. note::
+   Subsequent runs of this command on the same set of nodes does nothing,
+   as root device hints are already recorded on nodes and are not overwritten.
+   If you want to change existing root device hints, first remove them manually
+   as described above.
+
+.. note::
+   This command relies on introspection data, so if you change disk devices on
+   the machines, introspection must be rerun before rerunning this command.
+
 Using introspection data to find the root device
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

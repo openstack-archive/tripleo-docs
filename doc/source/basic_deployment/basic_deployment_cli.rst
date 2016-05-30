@@ -175,65 +175,48 @@ Load the images into the undercloud Glance::
 Register Nodes
 --------------
 
-Register nodes for your deployment with Ironic::
+Register and configure nodes for your deployment with Ironic::
 
     openstack baremetal import instackenv.json
 
-.. note::
-   The file to be imported may be either JSON, YAML or CSV format, and
-   the type is detected via the file extension (json, yaml, csv).
+The file to be imported may be either JSON, YAML or CSV format, and
+the type is detected via the file extension (json, yaml, csv).
+The file format is documented in :ref:`instackenv`.
 
 .. admonition:: Stable Branch
    :class: stable
 
-   If you're running an old (stable/liberty or older) tripleoclient version
-   however then you must specify --json explicitly and only use that format.
+   For TripleO release Liberty and older an explicit ``--json`` or ``--csv``
+   flag is required for JSON and CSV formats accordingly.
 
-.. note::
-   The file format for node import is documented, see :ref:`instackenv`.
+.. admonition:: Stable Branch
+   :class: stable
 
-.. note::
+   For TripleO release Mitaka and older the following command must be run
+   after registration to assign the deployment kernel and ramdisk to all nodes:
+
+        openstack baremetal configure boot
+
+Starting with the Newton release you can take advantage of the ``enroll``
+provisioning state - see :doc:`../advanced_deployment/node_states` for details.
+
+If your hardware has several hard drives, it's highly recommended that you
+specify the exact device to be used during introspection and deployment
+as a root device. Please see :ref:`root_device` for details.
+
+.. warning::
+   If you don't specify the root device explicitly, any device may be picked.
+   Also the device chosen automatically is **NOT** guaranteed to be the same
+   across rebuilds. Make sure to wipe the previous installation before
+   rebuilding in this case.
+
+.. warning::
    It's not recommended to delete nodes and/or rerun this command after
    you have proceeded to the next steps. Particularly, if you start introspection
    and then re-register nodes, you won't be able to retry introspection until
    the previous one times out (1 hour by default). If you are having issues
    with nodes after registration, please follow
    :ref:`node_registration_problems`.
-
-.. note::
-   By default Ironic will not sync the power state of the nodes,
-   because in our HA (high availability) model Pacemaker is the
-   one responsible for controlling the power state of the nodes
-   when fencing.  If you are using a non-HA setup and want Ironic
-   to take care of the power state of the nodes please change the
-   value of the "force_power_state_during_sync" configuration option
-   in the /etc/ironic/ironic.conf file to "True" and restart the
-   openstack-ironic-conductor service.
-
-   Also, note that if ``openstack undercloud install`` is re-run the value of
-   the "force_power_state_during_sync" configuration option will be set back to
-   the default, which is "False".
-
-.. note::
-   If you want to take advantage of the ENROLL provisioning state introduced in
-   OpenStack Liberty, you must enable an Ironic API version >= 1.11 (for
-   instance by setting the OS_BAREMETAL_API_VERSION environment variable), and
-   pass the option ``--initial-state=enroll`` to ``openstack baremetal
-   import``.
-
-Assign kernel and ramdisk to nodes::
-
-    openstack baremetal configure boot
-
-.. note::
-    If your hardware has several hard drives, it's highly recommended that you
-    specify the exact device to be used during introspection and deployment
-    as a root device. Please see :ref:`root_device` for details.
-
-    If you don't specify the root device explicitly, any device may be picked.
-    Also the device chosen automatically is NOT guaranteed to be the same
-    across rebuilds. Make sure to wipe the previous installation before
-    rebuilding in this case.
 
 .. _introspection:
 

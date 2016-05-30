@@ -5,7 +5,8 @@ In addition to bulk introspection, you can also introspect nodes one by one.
 When doing so, you must take care to set the correct node states manually.
 Use ``ironic node-show UUID`` command to figure out whether nodes are in
 ``manageable`` or ``available`` state. For all nodes in ``available`` state,
-start with putting a node to ``manageable`` state::
+start with putting a node to ``manageable`` state (see
+:doc:`../advanced_deployment/node_states` for details)::
 
     ironic node-set-provision-state UUID manage
 

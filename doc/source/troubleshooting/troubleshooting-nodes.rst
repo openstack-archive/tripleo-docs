@@ -42,6 +42,22 @@ A Wrong IPMI address can be fixed with the following command::
 
     ironic node-update <NODE UUID> replace driver_info/ipmi_address=<NEW IPMI ADDRESS>
 
+Node power state is not enforced by Ironic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default Ironic will not forcibly sync the power state of the nodes,
+because in our HA (high availability) model Pacemaker is the
+one responsible for controlling the power state of the nodes
+when fencing.  If you are using a non-HA setup and want Ironic
+to take care of the power state of the nodes please change the
+value of the ``force_power_state_during_sync`` configuration option
+in the ``/etc/ironic/ironic.conf`` file to ``True`` and restart the
+openstack-ironic-conductor service.
+
+Also, note that if ``openstack undercloud install`` is re-run the value of
+the ``force_power_state_during_sync`` configuration option will be set back to
+the default, which is ``False``.
+
 
 .. _introspection_problems:
 

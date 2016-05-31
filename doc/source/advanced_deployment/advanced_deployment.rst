@@ -19,6 +19,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    network_isolation_virt
    deploy_manila
    cinder_netapp
+   ceph_config
    neutron_midonet
    ssl
    node_placement

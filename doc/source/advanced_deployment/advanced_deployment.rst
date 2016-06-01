@@ -18,6 +18,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    network_isolation
    network_isolation_virt
    deploy_manila
+   cinder_custom_backend
    cinder_netapp
    neutron_midonet
    ssl

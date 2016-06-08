@@ -17,6 +17,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    template_deploy
    network_isolation
    network_isolation_virt
+   high_availability
    deploy_manila
    cinder_netapp
    ceph_config
@@ -27,4 +28,3 @@ In this chapter you will find advanced deployment of various |project| areas.
    # relevant to regular users.
    tripleo.sh
    in_progress_review
-

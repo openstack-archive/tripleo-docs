@@ -74,7 +74,7 @@ Installing the Undercloud
     sudo yum install -y python-tripleoclient
 
 
-#. Run the script to install the undercloud:
+#. Run the command to install the undercloud:
 
   .. admonition:: Baremetal
      :class: baremetal

@@ -1,3 +1,40 @@
+   .. admonition:: Stable Branch
+      :class: stable
+
+      Enable the appropriate repos for the desired release, as indicated below.
+      Do not enable any other repos not explicitly marked for that release.
+
+      .. admonition:: Liberty
+         :class: liberty
+
+         Enable latest RDO Liberty Delorean repository for all packages
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-liberty.repo https://trunk.rdoproject.org/centos7-liberty/current/delorean.repo
+
+         Enable the Liberty Delorean Deps repository
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-deps-liberty.repo http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo
+
+      .. admonition:: Mitaka
+         :class: mitaka
+
+         Enable latest RDO Mitaka Delorean repository for all packages
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-mitaka.repo https://trunk.rdoproject.org/centos7-mitaka/current/delorean.repo
+
+         Enable the Mitaka Delorean Deps repository
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-deps-mitaka.repo http://trunk.rdoproject.org/centos7-mitaka/delorean-deps.repo
+
+
    Enable last known good RDO Trunk Delorean repository for core openstack packages
 
    ::
@@ -21,20 +58,3 @@
    ::
 
      sudo curl -L -o /etc/yum.repos.d/delorean-deps.repo http://trunk.rdoproject.org/centos7/delorean-deps.repo
-
-   .. admonition:: Stable Branch
-      :class: stable
-
-      *Skip all repos mentioned above, other than epel-release which is still required.*
-
-      Enable latest RDO Stable Delorean repository for all packages
-
-      ::
-
-         sudo curl -L -o /etc/yum.repos.d/delorean-liberty.repo https://trunk.rdoproject.org/centos7-liberty/current/delorean.repo
-
-      Enable the Delorean Deps repository
-
-      ::
-
-         sudo curl -L -o /etc/yum.repos.d/delorean-deps-liberty.repo http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo

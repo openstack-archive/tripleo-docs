@@ -14,6 +14,7 @@ In this chapter you will find advanced deployment of various |project| areas.
    ready_state
    introspection_data
    node_config
+   node_specific_hieradata
    extra_config
    template_deploy
    network_isolation

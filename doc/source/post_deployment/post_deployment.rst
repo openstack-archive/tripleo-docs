@@ -13,4 +13,5 @@ In this chapter you will find advanced management of various |project| areas.
    replace_controller
    vm_snapshot
    package_update
+   build_single_image
    backup_restore_undercloud

@@ -159,7 +159,7 @@ non-root user that was used to install the undercloud.
 
      It is also possible to use this functionality to use an in-progress review
      as part of the overcloud image build.  See
-     :doc:`../advanced_deployment/in_progress_review` for details.
+     :doc:`../developer/in_progress_review` for details.
 
   ::
 
@@ -169,7 +169,7 @@ non-root user that was used to install the undercloud.
     This command will build **overcloud-full** images (\*.qcow2, \*.initrd,
     \*.vmlinuz) and **ironic-python-agent** images (\*.initramfs, \*.kernel)
 
-    To rebuild only a single image, see :doc:`../advanced_deployment/build_single_image`.
+    To rebuild only a single image, see :doc:`../post_deployment/build_single_image`.
 
 Upload Images
 -------------

@@ -84,7 +84,7 @@ non-root user that was used to install the undercloud.
     ::
 
         export USE_DELOREAN_TRUNK=1
-        export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7/current-tripleo/"
+        export DELOREAN_TRUNK_REPO="http://buildlogs.centos.org/centos/7/cloud/x86_64/rdo-trunk-master-tripleo/"
         export DELOREAN_REPO_FILE="delorean.repo"
 
    .. admonition:: Stable Branch

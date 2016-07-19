@@ -2,22 +2,20 @@ Deploying with SSL
 ==================
 
 TripleO supports deploying with SSL on the public OpenStack endpoints.
-The following explains how to enable that.
+
+This document will focus on deployments using network isolation.  For more
+details on deploying that way, see
+:doc:`../advanced_deployment/network_isolation`
 
 Overcloud SSL
 -------------
 
-Public VIP Details
-~~~~~~~~~~~~~~~~~~
-To start, it is necessary to have a predictable public VIP.  As of this
-writing, that means using network isolation.  With network isolation, the
-first address in the external network allocation range will be assigned
-as the public VIP.  For details on deploying with network isolation, see
-:doc:`../advanced_deployment/network_isolation`.
+Certificate and Public VIP Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is important that the public VIP be predictable because the SSL
-certificate's Common Name must match the address of the configured
-overcloud public endpoints.  There are two ways to accomplish this:
+The public VIP of the deployed overcloud needs to be predictable in order for
+the SSL certificate to be configured properly.  There are two options for
+configuring the certificate:
 
 #. The certificate's Common Name can be set to the IP of the public
    VIP.  In this case, the Common Name must match *exactly*.  If the public
@@ -29,6 +27,19 @@ overcloud public endpoints.  There are two ways to accomplish this:
    for the FQDN of the overcloud endpoints.  Wild cards should work fine.
    Note that this option also requires pre-configuration of the specified
    DNS server with the appropriate FQDN and public VIP.
+
+In either case, the public VIP must be explicitly specified as part of the
+deployment configuration.  This can be done by passing an environment file
+like the following::
+
+    parameter_defaults:
+        PublicVirtualFixedIPs: [{'ip_address':'10.0.0.1'}]
+
+.. note:: If network isolation is not in use, the ControlFixedIPs parameter
+          should be set instead.
+
+The selected IP should fall in the specified allocation range for the public
+network.
 
 Certificate Details
 ~~~~~~~~~~~~~~~~~~~
@@ -79,11 +90,11 @@ An abbreviated version of how the file should look::
 
     parameter_defaults:
         SSLCertificate: |
-        -----BEGIN CERTIFICATE-----
-        MIIDgzCCAmugAwIBAgIJAKk46qw6ncJaMA0GCSqGSIb3DQEBCwUAMFgxCzAJBgNV
-        [snip]
-        sFW3S2roS4X0Af/kSSD8mlBBTFTCMBAj6rtLBKLaQbIxEpIzrgvp
-        -----END CERTIFICATE-----
+          -----BEGIN CERTIFICATE-----
+          MIIDgzCCAmugAwIBAgIJAKk46qw6ncJaMA0GCSqGSIb3DQEBCwUAMFgxCzAJBgNV
+          [snip]
+          sFW3S2roS4X0Af/kSSD8mlBBTFTCMBAj6rtLBKLaQbIxEpIzrgvp
+          -----END CERTIFICATE-----
     [rest of file snipped]
 
 ``SSLKey`` should look similar, except with the value of the private key.
@@ -127,7 +138,7 @@ To do so, create a new file named something like ``cloudname.yaml``::
 
     parameter_defaults:
         CloudName: my-overcloud.my-domain.com
-        DnsServers: 10.0.0.1
+        DnsServers: 10.0.0.100
 
 Replace the values with ones appropriate for the target environment.  Note that
 the configured DNS server(s) must have an entry for the configured ``CloudName``

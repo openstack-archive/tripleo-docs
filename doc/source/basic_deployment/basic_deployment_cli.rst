@@ -87,12 +87,19 @@ non-root user that was used to install the undercloud.
         export DELOREAN_TRUNK_REPO="http://buildlogs.centos.org/centos/7/cloud/x86_64/rdo-trunk-master-tripleo/"
         export DELOREAN_REPO_FILE="delorean.repo"
 
-   .. admonition:: Stable Branch
-      :class: stable
+   .. admonition:: Liberty
+      :class: liberty
 
       ::
 
           export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
+
+   .. admonition:: Mitaka
+      :class: mitaka
+
+      ::
+
+          export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-mitaka/current/"
 
 
 #. Build the required images:
@@ -183,8 +190,8 @@ The file to be imported may be either JSON, YAML or CSV format, and
 the type is detected via the file extension (json, yaml, csv).
 The file format is documented in :ref:`instackenv`.
 
-.. admonition:: Stable Branch
-   :class: stable
+.. admonition:: Liberty
+   :class: liberty
 
    For TripleO release Liberty and older an explicit ``--json`` or ``--csv``
    flag is required for JSON and CSV formats accordingly.

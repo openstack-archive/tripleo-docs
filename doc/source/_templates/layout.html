@@ -20,6 +20,13 @@
         <li><input type="checkbox" id="rhel" checked="checked"><label for="rhel" title="Step that should only be run when using RHEL.">RHEL</label></li>
       </ul>
 
+      <span class="title">Branches</span>
+      <ul>
+        <li><input type="checkbox" id="stable" checked=""><label for="stable" title="Step that should only be run when choosing to use components from their stable branches rather than using packages/source based on current master.">Install from stable branch</label></li>
+        <li><input type="checkbox" id="liberty" checked=""><label for="liberty" title="Step that should only be run when installing from the Liberty stable branch.">Install from Liberty branch</label></li>
+        <li><input type="checkbox" id="mitaka" checked=""><label for="mitaka" title="Step that should only be run when installing from the Mitaka stable branch.">Install from Mitaka branch</label></li>
+      </ul>
+
       <span class="title">RHEL Registration Types</span>
       <ul>
         <li><input type="checkbox" id="portal" checked="checked"><label for="portal" title="Step that should only be run when registering to the Red Hat Portal.">Portal</label></li>
@@ -43,8 +50,6 @@
       <ul>
          <li><input type="checkbox" id="source" checked=""><label for="source"
             title="Step that should only be run when choosing to use some components directly from their git source code repositories instead of packages.">Install from source</label></li>
-        <li><input type="checkbox" id="stable" checked=""><label for="stable"
-            title="Step that should only be run when choosing to use components from their stable branches rather than using packages/source based on current master.">Install from stable branch</label></li>
       </ul>
 
 

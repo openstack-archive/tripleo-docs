@@ -110,6 +110,11 @@ the private key and certificate files in their respective locations.
 .. note:: The certificate and key will be multi-line values, and all of the lines
           must be indented to the same level.
 
+.. note:: In Newton the certificate parameters have been decoupled from the
+          other parameters required to enable SSL, so the certificate
+          parameters can be set in any environment file, not just
+          ``enable-tls.yaml``.
+
 An abbreviated version of how the file should look::
 
     parameter_defaults:
@@ -127,17 +132,24 @@ An abbreviated version of how the file should look::
 signer uses an intermediate certificate.  Note that the ``|`` character must
 be added as in the other values to indicate that this is a multi-line value.
 
-When the certificate's common name is set to the public VIP, all instances
-of ``CLOUDNAME`` in enable-tls.yaml must be replaced with ``IP_ADDRESS``.
-This is not necessary when using a DNS name for the overcloud endpoints
+.. admonition:: Stable Branch
+   :class: stable
 
-.. note:: This command should be run exactly as shown below.  Do not replace
-          ``IP_ADDRESS`` with an actual address.  Heat will insert the
-          appropriate value at deploy time.
+    In Newton, the EndpointMap and SSL certificates have been decoupled,
+    but in Mitaka and Liberty it may be necessary to modify the EndpointMap
+    in enable-tls.yaml
 
-::
+    When the certificate's common name is set to the public VIP, all instances
+    of ``CLOUDNAME`` in enable-tls.yaml must be replaced with ``IP_ADDRESS``.
+    This is not necessary when using a DNS name for the overcloud endpoints
 
-    sed -i 's/CLOUDNAME/IP_ADDRESS/' ~/ssl-heat-templates/environments/enable-tls.yaml
+    .. note:: This command should be run exactly as shown below.  Do not replace
+              ``IP_ADDRESS`` with an actual address.  Heat will insert the
+              appropriate value at deploy time.
+
+    ::
+
+        sed -i 's/CLOUDNAME/IP_ADDRESS/' ~/ssl-heat-templates/environments/enable-tls.yaml
 
 When using a self-signed certificate or a signer whose certificate is
 not in the default trust store on the overcloud image it will be necessary
@@ -168,22 +180,57 @@ Replace the values with ones appropriate for the target environment.  Note that
 the configured DNS server(s) must have an entry for the configured ``CloudName``
 that matches the public VIP.
 
+In addition, when a DNS endpoint is being used, make sure to pass the
+``tls-endpoints-public-dns.yaml`` environment to your deploy command.  See the examples
+below.
+
 Deploying an SSL Environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The ``enable-tls.yaml`` file must be passed to the overcloud deploy command to
-enable SSL on the public endpoints.  Include the following additional parameter
-in the overcloud deploy command::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml
+The ``enable-tls.yaml`` file must always be passed to use SSL on the public
+endpoints.  Depending on the specific configuration, additional files will
+also be needed.  Examples of the necessary parameters for different scenarios
+follow.
 
-The ``inject-trust-anchor.yaml`` file must also be passed if a root certificate
-needs to be injected.  The additional parameters in that case would instead
-look like::
+IP-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-ip.yaml
 
-When DNS endpoints are being used, the ``cloudname.yaml`` file must also be passed.
-The additional parameters would be (``inject-trust-anchor.yaml`` may also be used
-if it is needed for the configured certificate)::
+Self-signed IP-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/cloudname.yaml [-e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml]
+    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-ip.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+
+DNS-based certificate::
+
+    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml
+
+Self-signed DNS-based certificate::
+
+    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+
+.. admonition:: Stable Branch
+   :class: stable
+
+    In Mitaka and older releases, the EndpointMap was in enable-tls.yaml, so there
+    is no need to pass a tls-endpoints-*.yaml file.  However, this means that the
+    enable-tls.yaml file must be rebased when upgrading to reflect any new endpoints
+    that may have been added.  Examples of the necessary parameters for different
+    scenarios follow.
+
+    The ``enable-tls.yaml`` file must be passed to the overcloud deploy command to
+    enable SSL on the public endpoints.  Include the following additional parameter
+    in the overcloud deploy command::
+
+        -e ~/ssl-heat-templates/environments/enable-tls.yaml
+
+    The ``inject-trust-anchor.yaml`` file must also be passed if a root certificate
+    needs to be injected.  The additional parameters in that case would instead
+    look like::
+
+        -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+
+    When DNS endpoints are being used, the ``cloudname.yaml`` file must also be passed.
+    The additional parameters would be (``inject-trust-anchor.yaml`` may also be used
+    if it is needed for the configured certificate)::
+
+        -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/cloudname.yaml [-e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml]

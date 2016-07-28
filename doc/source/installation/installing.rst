@@ -56,10 +56,6 @@ Installing the Undercloud
          sudo yum install -y yum-utils
          sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
-  Enable epel::
-
-    sudo yum -y install epel-release
-
 .. include:: ../repositories.txt
 
 .. We need to manually continue our list numbering here since the above

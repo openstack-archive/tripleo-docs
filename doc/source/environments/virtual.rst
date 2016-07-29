@@ -109,10 +109,6 @@ Preparing the Virtual Environment (Automated)
 
 #. Enable needed repositories:
 
-  Enable epel::
-
-    sudo yum -y install epel-release
-
 .. include:: ../repositories.txt
 
 .. We need to manually continue our list numbering here since the above

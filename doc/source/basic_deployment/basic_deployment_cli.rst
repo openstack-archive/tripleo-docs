@@ -329,19 +329,14 @@ Run the deploy command, including any additional parameters as necessary::
 
   openstack overcloud deploy --templates [additional parameters]
 
+To deploy an overcloud with multiple controllers and achieve HA,
+follow :doc:`../advanced_deployment/high_availability`.
+
 .. admonition:: Virtual
    :class: virtual
 
    When deploying the Compute node in a virtual machine, add ``--libvirt-type
    qemu`` or launching instances on the deployed overcloud will fail.
-
-.. note::
-   To deploy an overcloud with multiple controllers and achieve HA
-   you must provision at least 3 controller nodes, specify an NTP
-   server and enable Pacemaker as cluster resource manager. To do
-   so add the following arguments to the deploy command::
-
-    --control-scale 3 -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml --ntp-server pool.ntp.org
 
 .. note::
 

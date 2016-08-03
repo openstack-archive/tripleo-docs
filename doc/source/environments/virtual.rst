@@ -145,18 +145,20 @@ Preparing the Virtual Environment (Automated)
 
   .. note::
 
-    By default, the overcloud VMs will be created with 1 vCPU and 5120 MiB RAM and
-    the undercloud VM with 2 vCPU and 6144 MiB. To adjust
-    those values::
+    By default, 2 overcloud VMs will be created with 1 vCPU, 5120 MiB RAM and
+    40 GB.  To adjust those values set the following::
 
-         export NODE_CPU=4
-         export NODE_MEM=16384
+         export NODE_COUNT=2
+         export NODE_CPU=1
+         export NODE_MEM=5120
+         export NODE_DISK=40
 
-    Note the settings above only influence the VMs created for overcloud
-    deployment.  If you want to change the values for the undercloud node::
+    The undercloud VM will be created with 2 vCPU and 6144 MiB and 30 GB of
+    disk by default. To ajust those values set the following::
 
-         export UNDERCLOUD_NODE_CPU=4
-         export UNDERCLOUD_NODE_MEM=16384
+         export UNDERCLOUD_NODE_CPU=2
+         export UNDERCLOUD_NODE_MEM=6144
+         export UNDERCLOUD_NODE_DISK=30
 
   .. admonition:: RHEL
      :class: rhel

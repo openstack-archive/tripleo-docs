@@ -12,10 +12,13 @@ Contents:
    environments/environments
    installation/installation
    basic_deployment/basic_deployment_cli
-   advanced_deployment/advanced_deployment
    post_deployment/post_deployment
+   advanced_deployment/features
+   advanced_deployment/baremetal_nodes
+   advanced_deployment/backends
+   advanced_deployment/custom
    troubleshooting/troubleshooting
-   tht_walkthrough/tht_walkthrough
+   developer/developer
    contributions/contributions
 
 

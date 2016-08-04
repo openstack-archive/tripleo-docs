@@ -89,7 +89,7 @@ Installing the Undercloud
 
      It is also possible to use this functionality to use an in-progress review
      as part of the undercloud install.  See
-     :doc:`../advanced_deployment/in_progress_review` for details.
+     :doc:`../developer/in_progress_review` for details.
 
   .. admonition:: SSL
      :class: ssl

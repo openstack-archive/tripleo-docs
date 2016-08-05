@@ -47,19 +47,26 @@ Certificate Details
 .. admonition:: Self-Signed SSL
    :class: selfsigned
 
+   It is not recommended that the self-signed certificate is trusted; So for
+   this purposes, having a self-signed CA certificate is a better choice. In
+   this case we will trust the self-signed CA certificate, and not the leaf
+   certificate that will be used for the public VIP; This leaf certificate,
+   however, will be signed by the self-signed CA.
+
    For the self-signed case, just the predictable public VIP method will
    be documented, as DNS configuration is outside the scope of this document.
 
    Generate a private key::
 
-       openssl genrsa -out overcloud-privkey.pem 2048
+       openssl genrsa -out overcloud-ca-privkey.pem 2048
 
    Generate a self-signed CA certificate.  This command will prompt for some
    identifying information.  Most of the fields don't matter, but this
    is where the Common Name must be set to the first IP in the external
    network allocation pool::
 
-       openssl req -new -x509 -key overcloud-privkey.pem -out overcloud-cacert.pem -days 365
+       openssl req -new -x509 -key overcloud-ca-privkey.pem \
+            -out overcloud-cacert.pem -days 365
 
    Add the self-signed CA certificate to the undercloud's trusted certificate
    store.  Adding this file to the overcloud nodes will be discussed later::
@@ -67,7 +74,24 @@ Certificate Details
        sudo cp overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/
        sudo update-ca-trust extract
 
-The contents of the private key and CA certificate files must be provided
+    Generate the leaf certificate request and key that will be used for the
+    public VIP::
+
+        openssl req -newkey rsa:2048 -days 365 \
+              -nodes -keyout server-key.pem -out server-req.pem
+
+    Process the server RSA key::
+
+        openssl rsa -in server-key.pem -out server-key.pem
+
+    Sign the leaf certificate with the CA certificate and generate the
+    certificate::
+
+        openssl x509 -req -in server-req.pem -days 365 \
+              -CA overcloud-cacert.pem -CAkey overcloud-ca-privkey.pem \
+              -set_serial 01 -out server-cert.pem
+
+The contents of the private key and certificate files must be provided
 to Heat as part of the deployment command.  To do this, there is a sample
 environment file in tripleo-heat-templates with fields for the file contents.
 
@@ -81,7 +105,7 @@ of the templates::
 Then edit the enable-tls.yaml environment file.  If using the location from the
 previous command, the correct file would be in
 ``~/ssl-heat-templates/environments/enable-tls.yaml``.  Insert the contents of
-the private key and CA certificate files in their respective locations.
+the private key and certificate files in their respective locations.
 
 .. note:: The certificate and key will be multi-line values, and all of the lines
           must be indented to the same level.

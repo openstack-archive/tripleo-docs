@@ -48,7 +48,7 @@ Certificate Details
    :class: selfsigned
 
    It is not recommended that the self-signed certificate is trusted; So for
-   this purposes, having a self-signed CA certificate is a better choice. In
+   this purpose, having a self-signed CA certificate is a better choice. In
    this case we will trust the self-signed CA certificate, and not the leaf
    certificate that will be used for the public VIP; This leaf certificate,
    however, will be signed by the self-signed CA.

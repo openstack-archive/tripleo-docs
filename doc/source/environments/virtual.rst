@@ -78,7 +78,6 @@ Preparing the Virtual Environment (Automated)
          rhel-7-server-extras-rpms
          rhel-7-server-openstack-6.0-rpms
 
-
      See the `Red Hat Satellite User Guide`_ for how to configure the system to
      register with a Satellite server. It is suggested to use an activation
      key that automatically enables the above repos for registered systems.

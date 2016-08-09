@@ -86,21 +86,40 @@ non-root user that was used to install the undercloud.
         export USE_DELOREAN_TRUNK=1
         export DELOREAN_TRUNK_REPO="http://buildlogs.centos.org/centos/7/cloud/x86_64/rdo-trunk-master-tripleo/"
         export DELOREAN_REPO_FILE="delorean.repo"
+        export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
 
-   .. admonition:: Liberty
-      :class: liberty
-
-      ::
-
-          export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
-
-   .. admonition:: Mitaka
-      :class: mitaka
+   .. admonition:: Ceph
+      :class: ceph
 
       ::
 
-          export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-mitaka/current/"
+         export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Jewel.repo"
 
+   .. admonition:: Stable Branch
+      :class: stable
+
+      .. admonition:: Liberty
+         :class: liberty
+
+         ::
+
+            export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
+            export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
+
+      .. admonition:: Mitaka
+         :class: mitaka
+
+         ::
+
+            export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-mitaka/current/"
+            export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
+
+      .. admonition:: Ceph
+         :class: ceph
+
+         ::
+
+            export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
 
 #. Build the required images:
 
@@ -129,6 +148,28 @@ non-root user that was used to install the undercloud.
             export REG_REPOS="rhel-7-server-rpms rhel-7-server-extras-rpms rhel-ha-for-rhel-7-server-rpms \
                 rhel-7-server-optional-rpms rhel-7-server-openstack-6.0-rpms"
 
+     .. admonition:: Ceph
+        :class: ceph
+
+        If using Ceph, additional channels need to be added to `REG_REPOS`.
+        Enable the appropriate channels for the desired release, as indicated below.
+        Do not enable any other channels not explicitly marked for that release.
+
+        ::
+
+           rhel-7-server-rhceph-2-mon-rpms
+           rhel-7-server-rhceph-2-osd-rpms
+           rhel-7-server-rhceph-2-tools-rpms
+
+        .. admonition:: Stable branch
+           :class: stable
+
+           ::
+
+              rhel-7-server-rhceph-1.3-mon-rpms
+              rhel-7-server-rhceph-1.3-osd-rpms
+              rhel-7-server-rhceph-1.3-tools-rpms
+
   .. admonition:: RHEL Satellite Registration
      :class: satellite
 
@@ -147,6 +188,9 @@ non-root user that was used to install the undercloud.
             # rhel-7-server-optional-rpms
             # rhel-7-server-extras-rpms
             # rhel-7-server-openstack-6.0-rpms
+            # rhel-7-server-rhceph-{2,1.3}-mon-rpms
+            # rhel-7-server-rhceph-{2,1.3}-osd-rpms
+            # rhel-7-server-rhceph-{2,1.3}-tools-rpms
             export REG_ACTIVATION_KEY="[activation key]"
 
   .. admonition:: Source
@@ -292,11 +336,6 @@ configured for the virtual environment.  To customize this, see the output of::
   following arguments when deploying::
 
       --ceph-storage-scale <number of nodes> -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
-
-  By default when Ceph is enabled the Cinder LVM back-end is disabled. This
-  behavior may be changed passing::
-
-      --cinder-lvm
 
 .. admonition:: RHEL Satellite Registration
   :class: satellite

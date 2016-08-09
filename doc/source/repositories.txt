@@ -34,6 +34,15 @@
 
             sudo curl -L -o /etc/yum.repos.d/delorean-deps-mitaka.repo http://trunk.rdoproject.org/centos7-mitaka/delorean-deps.repo
 
+      .. admonition:: Ceph
+         :class: ceph
+
+         Enable the CentOS Storage SIG Ceph/Hammer repository if deploying Ceph (managed or external)
+
+         ::
+
+            sudo yum -y install --enablerepo=extras centos-release-ceph-hammer
+            sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Hammer.repo
 
    Enable last known good RDO Trunk Delorean repository for core openstack packages
 
@@ -52,9 +61,20 @@
      includepkgs=diskimage-builder,instack,instack-undercloud,os-apply-config,os-cloud-config,os-collect-config,os-net-config,os-refresh-config,python-tripleoclient,openstack-tripleo-common,openstack-tripleo-heat-templates,openstack-tripleo-image-elements,openstack-tripleo,openstack-tripleo-puppet-elements,openstack-puppet-modules,puppet-*
      EOF"
 
-
    Enable the Delorean Deps repository
 
    ::
 
      sudo curl -L -o /etc/yum.repos.d/delorean-deps.repo http://trunk.rdoproject.org/centos7/delorean-deps.repo
+
+   .. admonition:: Ceph
+      :class: ceph
+
+      Enable the CentOS Storage SIG Ceph/Jewel repository if deploying Ceph (managed or external)
+
+      ::
+
+        sudo yum-config-manager --add-repo https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-ceph-jewel/master/CentOS-Ceph-Jewel.repo
+        sudo yum-config-manager --disable centos-ceph-jewel
+        sudo yum-config-manager --enable centos-ceph-jewel-test
+        sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo

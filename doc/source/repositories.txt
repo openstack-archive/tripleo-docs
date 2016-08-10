@@ -5,7 +5,7 @@
       Do not enable any other repos not explicitly marked for that release.
 
       .. admonition:: Liberty
-         :class: liberty
+         :class: liberty ktol
 
          Enable latest RDO Liberty Delorean repository for all packages
 
@@ -20,7 +20,7 @@
             sudo curl -L -o /etc/yum.repos.d/delorean-deps-liberty.repo http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo
 
       .. admonition:: Mitaka
-         :class: mitaka
+         :class: mitaka ltom
 
          Enable latest RDO Mitaka Delorean repository for all packages
 

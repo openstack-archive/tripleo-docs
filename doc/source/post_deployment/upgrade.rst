@@ -81,7 +81,6 @@ Upgrading the Undercloud
 
    The following command will upgrade the undercloud::
 
-      # TODO: In the future this might be taken care of by tripleoclient automatically
       sudo systemctl stop openstack-*
       sudo systemctl stop neutron-*
       sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient

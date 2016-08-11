@@ -14,3 +14,4 @@ Documentation on how to enable and configure various features available in
    node_placement
    ops_tools
    high_availability
+   baremetal_overcloud

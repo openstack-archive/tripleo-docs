@@ -74,22 +74,22 @@ Certificate Details
        sudo cp overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/
        sudo update-ca-trust extract
 
-    Generate the leaf certificate request and key that will be used for the
-    public VIP::
+   Generate the leaf certificate request and key that will be used for the
+   public VIP::
 
-        openssl req -newkey rsa:2048 -days 365 \
-              -nodes -keyout server-key.pem -out server-req.pem
+       openssl req -newkey rsa:2048 -days 365 \
+            -nodes -keyout server-key.pem -out server-req.pem
 
-    Process the server RSA key::
+   Process the server RSA key::
 
-        openssl rsa -in server-key.pem -out server-key.pem
+       openssl rsa -in server-key.pem -out server-key.pem
 
-    Sign the leaf certificate with the CA certificate and generate the
-    certificate::
+   Sign the leaf certificate with the CA certificate and generate the
+   certificate::
 
-        openssl x509 -req -in server-req.pem -days 365 \
-              -CA overcloud-cacert.pem -CAkey overcloud-ca-privkey.pem \
-              -set_serial 01 -out server-cert.pem
+       openssl x509 -req -in server-req.pem -days 365 \
+             -CA overcloud-cacert.pem -CAkey overcloud-ca-privkey.pem \
+             -set_serial 01 -out server-cert.pem
 
 The contents of the private key and certificate files must be provided
 to Heat as part of the deployment command.  To do this, there is a sample

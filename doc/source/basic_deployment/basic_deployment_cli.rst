@@ -335,8 +335,9 @@ follow :doc:`../advanced_deployment/high_availability`.
 .. admonition:: Virtual
    :class: virtual
 
-   When deploying the Compute node in a virtual machine, add ``--libvirt-type
-   qemu`` or launching instances on the deployed overcloud will fail.
+   When deploying the Compute node in a virtual machine
+   without nested guest support, add  ``--libvirt-type qemu``
+   or launching instances on the deployed overcloud will fail.
 
 .. note::
 

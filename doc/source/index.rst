@@ -18,6 +18,7 @@ Contents:
    advanced_deployment/backends
    advanced_deployment/custom
    troubleshooting/troubleshooting
+   mistral-api/mistral-api
    developer/developer
    contributions/contributions
 

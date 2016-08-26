@@ -394,6 +394,22 @@ like node introspection, overcloud image building and uploading, etc.
 
 .. _OpenStack Developer's Guide: http://docs.openstack.org/infra/manual/developers.html
 
+tripleo-ui
+^^^^^^^^^^
+
+TripleO UI is the web interface for TripleO.
+
+**How to contribute**
+
+* See the `documentation <http://git.openstack.org/cgit/openstack/tripleo-ui/tree/README.md>`_
+  for details.
+
+
+**Useful links**
+
+* Bugs: https://bugs.launchpad.net/tripleo-ui
+* Blueprints: https://blueprints.launchpad.net/tripleo-ui
+
 
 Deprecated
 ----------

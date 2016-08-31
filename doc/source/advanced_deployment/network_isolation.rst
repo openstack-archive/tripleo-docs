@@ -87,6 +87,7 @@ Controller:
 * Internal API
 * Storage
 * Storage Management
+* Tenant
 * External
 
 Compute:

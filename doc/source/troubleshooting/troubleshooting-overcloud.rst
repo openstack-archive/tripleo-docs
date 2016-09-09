@@ -228,6 +228,8 @@ Debugging Using Heat
 
     $ sudo sosreport --all-logs
 
+.. _no-valid-host:
+
 No Valid Host Found Error
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

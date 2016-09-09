@@ -14,14 +14,21 @@ You can upgrade any packages that are installed on the undercloud machine.
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
 
-3. Use yum to update all installed packages::
+3. Stop all OpenStack services so that they are not restarted by packaging
+   scripts when they are updated. The service restarts will be handled by the
+   undercloud upgrade command after new configuration has been applied.::
 
-    sudo yum update -y
+    sudo systemctl stop openstack-*
+    sudo systemctl stop neutron-*
 
-    # You can specify the package names to update as options in the yum update command.
+#. Update the TripleO CLI package::
 
-   .. note::
+    sudo yum -y update python-tripleoclient
 
-      You do not need to restart any services after you update.
+#. Run the undercloud upgrade command. This command will upgrade all packages
+   and use puppet to apply new configuration and restart all OpenStack
+   services.::
+
+    openstack undercloud upgrade
 
 #. Proceed with :ref:`package_update`.

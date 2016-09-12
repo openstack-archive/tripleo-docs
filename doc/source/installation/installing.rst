@@ -94,8 +94,53 @@ Installing the Undercloud
   .. admonition:: SSL
      :class: ssl
 
-     To enable SSL on the undercloud, you must set the ``undercloud_service_certificate``
-     option in ``undercloud.conf`` to an appropriate certificate file.  Important:
+     To enable SSL with an automatically generated certificate, you must set
+     the ``generate_service_certificate`` option in ``undercloud.conf`` to
+     ``True``. This will generate a certificate in ``/etc/pki/tls/certs`` with
+     a file name that follows the following pattern:
+
+     undercloud-[undercloud_public_vip].pem
+
+     This will be a PEM file in a format that HAProxy can understand (See the
+     HAProxy documentation for more information on this).
+
+     This option for auto-generating certificates uses Certmonger to request
+     and keep track of the certificate. So you will see a certificate with the
+     ID of ``undercloud-haproxy-public-cert`` in certmonger (you can check this
+     by using the ``sudo getcert list`` command). Note that this also implies
+     that certmonger will manage the certificate's lifecycle, so when it needs
+     renewing, certmonger will do that for you.
+
+     The default is to use Certmonger's ``local`` CA. So using this option has
+     the side-effect of extracting Certmonger's local CA to a PEM file that is
+     located in the following path:
+
+     ``/etc/pki/ca-trust/source/anchors/cm-local-ca.pem``
+
+     This certificate will then be added to the trusted CA chain, since this is
+     needed to be able to use the undercloud's endpoints with that certificate.
+
+     However, it is possible to not use certmonger's ``local`` CA. For
+     instance, one can use FreeIPA as the CA by setting the option
+     ``certificate_generation_ca`` in ``undercloud.conf`` to have 'IPA' as the
+     value. This requires the undercloud host to be enrolled as a FreeIPA
+     client, and to define a ``haproxy/<undercloud FQDN>@<KERBEROS DOMAIN>``
+     service in FreeIPA. We also need to set the option ``service_principal``
+     to the relevant value in ``undercloud.conf``. Finally, we need to set the
+     public endpoints to use FQDNs instead of IP addresses, which will also
+     then use an FQDN for the certificate.
+
+     To enable an FQDN for the certificate we set the ``undercloud_public_vip``
+     to the desired hostname in ``undercloud.conf``. This will in turn also set
+     the keystone endpoints to relevant values.
+
+     Note that the ``generate_service_certificate`` option doesn't take into
+     account the ``undercloud_service_certificate`` option and will have
+     precedence over it.
+
+     To enable SSL on the undercloud with a pre-created certificate, you must
+     set the ``undercloud_service_certificate`` option in ``undercloud.conf``
+     to an appropriate certificate file.  Important:
      The certificate file's Common Name *must* be set to the value of
      ``undercloud_public_vip`` in undercloud.conf.
 

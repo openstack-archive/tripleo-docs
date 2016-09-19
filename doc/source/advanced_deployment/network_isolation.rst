@@ -193,7 +193,7 @@ Example::
     NeutronExternalNetworkBridge: "''"
     # Customize bonding options if required (ignored if bonds are not used)
     BondInterfaceOvsOptions:
-        "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
+        "lacp=active other-config:lacp-fallback-ab=true"
 
 Configure IP Subnets
 --------------------
@@ -230,7 +230,7 @@ The example bonding options will try to negotiate LACP, but will fallback to
 active-backup if LACP cannot be established::
 
   BondInterfaceOvsOptions:
-    "bond_mode=balance-tcp lacp=active other-config:lacp-fallback-ab=true"
+    "lacp=active other-config:lacp-fallback-ab=true"
 
 The BondInterfaceOvsOptions parameter will pass the options to Open vSwitch
 when setting up bonding (if used in the environment). The value above will
@@ -350,6 +350,11 @@ Example::
       description: The ovs_options string for the bond interface. Set things like
                    lacp=active and/or bond_mode=balance-slb using this option.
       type: string
+      constraints:
+      - allowed_pattern: "^((?!balance.tcp).)*$"
+        description: |
+          The balance-tcp bond mode is known to cause packet loss and should
+          not be used in BondInterfaceOvsOptions.
     ExternalNetworkVlanID:
       default: 10
       description: Vlan ID for the external network traffic.

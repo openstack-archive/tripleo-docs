@@ -7,6 +7,91 @@ This document will focus on deployments using network isolation.  For more
 details on deploying that way, see
 :doc:`../advanced_deployment/network_isolation`
 
+Undercloud SSL
+--------------
+
+To enable SSL with an automatically generated certificate, you must set
+the ``generate_service_certificate`` option in ``undercloud.conf`` to
+``True``. This will generate a certificate in ``/etc/pki/tls/certs`` with
+a file name that follows the following pattern::
+
+undercloud-[undercloud_public_vip].pem
+
+This will be a PEM file in a format that HAProxy can understand (See the
+HAProxy documentation for more information on this).
+
+This option for auto-generating certificates uses Certmonger to request
+and keep track of the certificate. So you will see a certificate with the
+ID of ``undercloud-haproxy-public-cert`` in certmonger (you can check this
+by using the ``sudo getcert list`` command). Note that this also implies
+that certmonger will manage the certificate's lifecycle, so when it needs
+renewing, certmonger will do that for you.
+
+The default is to use Certmonger's ``local`` CA. So using this option has
+the side-effect of extracting Certmonger's local CA to a PEM file that is
+located in the following path::
+
+``/etc/pki/ca-trust/source/anchors/cm-local-ca.pem``
+
+This certificate will then be added to the trusted CA chain, since this is
+needed to be able to use the undercloud's endpoints with that certificate.
+
+However, it is possible to not use certmonger's ``local`` CA. For
+instance, one can use FreeIPA as the CA by setting the option
+``certificate_generation_ca`` in ``undercloud.conf`` to have 'IPA' as the
+value. This requires the undercloud host to be enrolled as a FreeIPA
+client, and to define a ``haproxy/<undercloud FQDN>@<KERBEROS DOMAIN>``
+service in FreeIPA. We also need to set the option ``service_principal``
+to the relevant value in ``undercloud.conf``. Finally, we need to set the
+public endpoints to use FQDNs instead of IP addresses, which will also
+then use an FQDN for the certificate.
+
+To enable an FQDN for the certificate we set the ``undercloud_public_vip``
+to the desired hostname in ``undercloud.conf``. This will in turn also set
+the keystone endpoints to relevant values.
+
+Note that the ``generate_service_certificate`` option doesn't take into
+account the ``undercloud_service_certificate`` option and will have
+precedence over it.
+
+To enable SSL on the undercloud with a pre-created certificate, you must
+set the ``undercloud_service_certificate`` option in ``undercloud.conf``
+to an appropriate certificate file.  Important:
+The certificate file's Common Name *must* be set to the value of
+``undercloud_public_vip`` in undercloud.conf.
+
+If you do not have a trusted CA signed certificate file, you can alternatively
+generate a self-signed certificate file using the following command::
+
+    openssl genrsa -out privkey.pem 2048
+
+The next command will prompt for some identification details.  Most of these don't
+matter, but make sure the ``Common Name`` entered matches the value of
+``undercloud_public_vip`` in undercloud.conf::
+
+    openssl req -new -x509 -key privkey.pem -out cacert.pem -days 365
+
+Combine the two files into one for HAProxy to use.  The order of the
+files in this command matters, so do not change it::
+
+    cat cacert.pem privkey.pem > undercloud.pem
+
+Move the file to a more appropriate location and set the SELinux context::
+
+    sudo mkdir /etc/pki/instack-certs
+    sudo cp undercloud.pem /etc/pki/instack-certs
+    sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
+    sudo restorecon -R /etc/pki/instack-certs
+
+``undercloud_service_certificate`` should then be set to
+``/etc/pki/instack-certs/undercloud.pem``.
+
+Add the self-signed CA certificate to the undercloud system's trusted
+certificate store::
+
+   sudo cp cacert.pem /etc/pki/ca-trust/source/anchors/
+   sudo update-ca-trust extract
+
 Overcloud SSL
 -------------
 

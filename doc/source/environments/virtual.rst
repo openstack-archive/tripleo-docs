@@ -21,22 +21,12 @@ space [#]_.
    The virtual machine disk files are thinly provisioned and will not take up
    the full 40GB initially.
 
-The baremetal machine must meet the following minimum system requirements:
+The baremetal machine should meet the following minimum system requirements:
 
 * Virtualization hardware extensions enabled (nested KVM is **not** supported)
 * 1 quad core CPU
-* 12 GB free memory
-* 120 GB disk space
-
-..
-    <REMOVE WHEN HA IS AVAILABLE>
-
-    For minimal **HA (high availability)** deployment you need at least 3 Overcloud
-    Controllers and 2 Overcloud Computes which increases the minimum system
-    requirements up to:
-
-    * 24 GB free memory
-    * 240 GB disk space.
+* 32 GB free memory
+* 240 GB disk space
 
 |project| currently supports the following operating systems:
 
@@ -144,19 +134,19 @@ Preparing the Virtual Environment (Automated)
 
   .. note::
 
-    By default, 2 overcloud VMs will be created with 1 vCPU, 5120 MiB RAM and
+    By default, 2 overcloud VMs will be created with 1 vCPU, 6144 MiB RAM and
     40 GB.  To adjust those values set the following::
 
          export NODE_COUNT=2
          export NODE_CPU=1
-         export NODE_MEM=5120
+         export NODE_MEM=6144
          export NODE_DISK=40
 
-    The undercloud VM will be created with 2 vCPU and 6144 MiB and 30 GB of
-    disk by default. To ajust those values set the following::
+    The undercloud VM will be created with 4 vCPUs and 8192 MiB and 30 GB of
+    disk by default. To adjust those values set the following::
 
-         export UNDERCLOUD_NODE_CPU=2
-         export UNDERCLOUD_NODE_MEM=6144
+         export UNDERCLOUD_NODE_CPU=4
+         export UNDERCLOUD_NODE_MEM=8192
          export UNDERCLOUD_NODE_DISK=30
 
   .. admonition:: RHEL

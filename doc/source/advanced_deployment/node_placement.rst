@@ -1,5 +1,5 @@
-Controlling Node Placement
-==========================
+Controlling Node Placement and IP Assignment
+============================================
 
 By default, nodes are assigned randomly via the Nova scheduler, either from
 a generic pool of nodes, or from a subset of nodes identified via specific

@@ -126,27 +126,33 @@ for information on how to fix it.
 How can introspection be stopped?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Starting with the Mitaka release, introspection for a node can be stopped with
-the following command::
+Introspection for a node can be stopped with the following command::
 
     openstack baremetal introspection abort <NODE UUID>
 
-For older versions the recommended path is to wait until it times out.
-Changing ``timeout`` setting in ``/etc/ironic-inspector/inspector.conf``
-may be used to reduce this timeout from 1 hour (which usually too much,
-especially on virtual environment).
+.. admonition:: Liberty
+   :class: liberty
 
-If you do need to stop introspection **for all nodes** right now, do the
-following for each node::
+   The ``abort`` command above was introduced in the Mitaka release.
+   For older versions the recommended path is to wait until it times out.
+   Changing ``timeout`` setting in ``/etc/ironic-inspector/inspector.conf``
+   may be used to reduce the timeout from 1 hour (which is usually too much,
+   especially on virtual environments).
 
-    ironic node-set-power-state UUID off
+   If you do need to stop introspection **for all nodes** right now on
+   the Liberty release, you can do the following for each node::
 
-then remove ironic-inspector cache, rebuild it and restart ironic-inspector::
+       ironic node-set-power-state UUID off
 
-    rm /var/lib/ironic-inspector/inspector.sqlite
-    sudo ironic-inspector-dbsync --config-file /etc/ironic-inspector/inspector.conf upgrade
-    sudo systemctl restart openstack-ironic-inspector
+   then remove ironic-inspector cache, rebuild it and restart
+   ironic-inspector::
 
+       rm /var/lib/ironic-inspector/inspector.sqlite
+       sudo ironic-inspector-dbsync --config-file /etc/ironic-inspector/inspector.conf upgrade
+       sudo systemctl restart openstack-ironic-inspector
+
+   Note that this procedure is not recommended and may have unexpected side
+   effects.
 
 .. _ironic-inspector troubleshooting documentation: http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html
 .. _the dynamic-login element: https://github.com/openstack/diskimage-builder/tree/master/elements/dynamic-login

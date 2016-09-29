@@ -319,3 +319,34 @@ Self-signed DNS-based certificate::
     if it is needed for the configured certificate)::
 
         -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/cloudname.yaml [-e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml]
+
+Getting the overcloud to trust CAs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned above, it is possible to get the overcloud to trust a CA by using
+the ``~/ssl-heat-templates/environments/inject-trust-anchor.yaml`` environment
+and adding the necessary details there. However, that environment has the
+restriction that it will only allow you to inject one CA. However, the
+file ``~/ssl-heat-templates/environments/inject-trust-anchor-hiera.yaml`` is an
+alternative that actually supports as many CA certificates as you need.
+
+.. note:: This is only available since Newton. Older versions of TripleO don't
+          support this.
+
+This file is a template of how you should fill the ``CAMap`` parameter which is
+passed via parameter defaults. It looks like this:
+
+    CAMap:
+      first-ca-name:
+        content: |
+          The content of the CA cert goes here
+      second-ca-name:
+        content: |
+          The content of the CA cert goes here
+
+where ``first-ca-name`` and ``second-ca-name`` will generate the files
+``first-ca-name.pem`` and ``second-ca-name.pem`` respectively. These files will
+be stored in the ``/etc/pki/ca-trust/source/anchors/`` directory in each node
+of the overcloud and will be added to the trusted certificate chain of each of
+the nodes. You must be careful that the content is a block string in yaml and
+is in PEM format.

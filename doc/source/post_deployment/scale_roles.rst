@@ -3,9 +3,15 @@ Scaling overcloud roles
 If you want to increase or decrease resource capacity of a running overcloud,
 you can start more servers of a selected role or delete some servers if
 capacity should be decreased. To set the capacity for the compute role,
-the following command can be used::
+first an environment file should be created::
 
-    openstack overcloud deploy --templates [templates dir] --compute-scale 5
+    $ cat ~/environment.yaml
+    parameter_defaults:
+      ComputeCount: 5
+
+Then following command can be used to deploy it::
+
+    openstack overcloud deploy --templates [templates dir] -e ~/environment.yaml
 
 .. note::
    Scaling out assumes that newly added nodes has already been

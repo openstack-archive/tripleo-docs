@@ -422,13 +422,13 @@ Edit the address ranges, or use the necessary neutron commands to match the
 environment appropriately. This assumes a dedicated interface or native VLAN::
 
 
-    neutron net-create nova --router:external --provider:network_type flat \
+    neutron net-create public --router:external --provider:network_type flat \
       --provider:physical_network datacentre
-    neutron subnet-create --name nova --disable-dhcp \
+    neutron subnet-create --name public --disable-dhcp \
       --allocation-pool start=172.16.23.140,end=172.16.23.240 \
-      --gateway 172.16.23.251 nova 172.16.23.128/25
+      --gateway 172.16.23.251 public 172.16.23.128/25
 
-The example shows naming the network "nova" because that will make tempest
+The example shows naming the network "public" because that will make tempest
 tests to pass, based on the default floating pool name set in nova.conf. You
 can confirm that the network was created with::
 
@@ -439,17 +439,17 @@ Sample output of the command::
     +--------------------------------------+-------------+-------------------------------------------------------+
     | id                                   | name        | subnets                                               |
     +--------------------------------------+-------------+-------------------------------------------------------+
-    | d474fe1f-222d-4e32-802b-cde86e746a2a | nova        | 01c5f621-1e0f-4b9d-9c30-7dc59592a52f 172.16.23.128/25 |
+    | d474fe1f-222d-4e32-802b-cde86e746a2a | public        | 01c5f621-1e0f-4b9d-9c30-7dc59592a52f 172.16.23.128/25 |
     +--------------------------------------+-------------+-------------------------------------------------------+
 
 To use a VLAN, the following example should work. Customize the address ranges
 and VLAN id based on the environment::
 
-    neutron net-create nova --router:external --provider:network_type vlan \
+    neutron net-create public --router:external --provider:network_type vlan \
       --provider:physical_network datacentre --provider:segmentation_id 195
-    neutron subnet-create --name nova --disable-dhcp \
+    neutron subnet-create --name public --disable-dhcp \
       --allocation-pool start=172.16.23.140,end=172.16.23.240 \
-      --gateway 172.16.23.251 nova 172.16.23.128/25
+      --gateway 172.16.23.251 public 172.16.23.128/25
 
 
 Validate the Overcloud

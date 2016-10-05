@@ -136,6 +136,13 @@ environment file (``ironic-config.yaml`` in this guide):
   values: ``full`` erases all data and ``metadata`` erases only disk metadata.
   The former is more secure, the latter is faster.
 
+  .. admonition:: Virtual
+      :class: virtual
+
+      It is highly recommended to set this parameter to ``metadata``
+      for virtual environments, as full cleaning can be extremely slow there.
+
+
 * ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
   it's on by default. Also iPXE is required for UEFI boot support.

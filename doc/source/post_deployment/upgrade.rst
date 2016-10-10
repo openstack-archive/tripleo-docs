@@ -78,6 +78,18 @@ Upgrading the Undercloud
           sudo systemctl start mariadb
           mysql -u root < /home/stack/backup.sql
 
+   .. admonition:: Mitaka to Newton
+      :class: mton
+
+       In newton the undercloud telemetry services are **disabled** by default.
+       In order to maintain the telemetry services during the mitaka to newton
+       upgrade the operator must explicitly enable them **before** running the
+       undercloud upgrade. This is done by adding::
+
+          enable_telemetry = true
+
+       in the [DEFAULT] section of the undercloud.conf configuration file.
+
 
    The following command will upgrade the undercloud::
 
@@ -165,6 +177,21 @@ Upgrading the Overcloud
           -e <full environment> \
           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-keystone-liberty-mitaka.yaml
 
+.. admonition:: Mitaka to Newton
+   :class: mton
+
+
+    **Deliver the migration for ceilometer to run under httpd.**
+
+    This is to deliver the migration for ceilometer to be run under httpd (apache)
+    rather than eventlet as was the case before. To execute this step run
+    `overcloud deploy`, passing in the full set of environment files plus
+    `major-upgrade-ceilometer-wsgi-mitaka-newton.yaml`::
+
+      openstack overcloud deploy --templates \
+          -e <full environment> \
+          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-ceilometer-wsgi-mitaka-newton.yaml
+
 #. Upgrade initialization
 
    The initialization step switches to new repositories on overcloud
@@ -205,6 +232,29 @@ Upgrading the Overcloud
    services should be upgraded before swift proxy services.
 
 #. Upgrade controller and block storage nodes
+
+
+   .. admonition:: Mitaka to Newton
+      :class: mton
+
+       **Explicitly disable sahara services if so desired:**
+       As discussed at bug1630247_  sahara services are disabled by default
+       in the Newton overcloud deployment. This special case is handled for
+       the duration of the upgrade by defaulting to 'keep sahara-*'.
+
+       That is by default sahara services are restarted after the mitaka to
+       newton upgrade of controller nodes and sahara config is re-applied
+       during the final upgrade converge step.
+
+       If an operator wishes to **disable** sahara services as part of the mitaka
+       to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
+       environment file during the controller upgrade step as well as during
+       the converge step later::
+
+          openstack overcloud deploy --templates \
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker.yaml
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-remove-sahara.yaml
 
    All controllers will be upgraded in sync in order to make services
    only talk to DB schema versions they expect. Services will be
@@ -249,6 +299,33 @@ Upgrading the Overcloud
 
 #. Apply configuration from upgraded tripleo-heat-templates
 
+   .. admonition:: Mitaka to Newton
+      :class: mton
+
+       **Explicitly disable sahara services if so desired:**
+       As discussed at bug1630247_  sahara services are disabled by default
+       in the Newton overcloud deployment. This special case is handled for
+       the duration of the upgrade by defaulting to 'keep sahara-*'.
+
+       That is by default sahara services are restarted after the mitaka to
+       newton upgrade of controller nodes and sahara config is re-applied
+       during the final upgrade converge step.
+
+       If an operator wishes to **disable** sahara services as part of the mitaka
+       to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
+       environment file during the controller upgrade earlier and converge
+       step here::
+
+          openstack overcloud deploy --templates \
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-remove-sahara.yaml
+
+   .. _bug1630247: https://bugs.launchpad.net/tripleo/+bug/1630247
+   .. _major-upgrade-remove-sahara.yaml: https://github.com/openstack/tripleo-heat-templates/blob/2e6cc07c1a74c2dd7be70568f49834bace499937/environments/major-upgrade-remove-sahara.yaml
+
+
+
    This step unpins compute services communication (upgrade level) on
    controller and compute nodes, and it triggers configuration
    management tooling to converge the overcloud configuration
@@ -262,3 +339,19 @@ Upgrading the Overcloud
       openstack overcloud deploy --templates \
           -e <full environment> \
           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
+
+.. admonition:: Mitaka to Newton
+   :class: mton
+
+
+    **Deliver the data migration for aodh.**
+
+    This is to deliver the data migration for aodh. In Newton, aodh uses its
+    own mysql backend. This step migrates all the existing alarm data from
+    mongodb to the new mysql backend. To execute this step run
+    `overcloud deploy`, passing in the full set of environment files plus
+    `major-upgrade-aodh-migration.yaml`::
+
+      openstack overcloud deploy --templates \
+          -e <full environment> \
+          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-aodh-migration.yaml

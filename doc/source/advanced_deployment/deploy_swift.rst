@@ -99,3 +99,18 @@ files. It should be the same on all nodes in the ring.::
     d41c1b4f93a98a693a6ede074a1b78585af2dc89  /etc/swift/account.ring.gz
     1d10d8cb826308a058c7089fdedfeca122426da9  /etc/swift/container.ring.gz
     f26639938660ee0111e4e7bc1b45f28a0b9f6079  /etc/swift/object.ring.gz
+
+You can also check this by using the ``swift-recon`` command on one of the
+overcloud nodes. It will query all other servers and compare all checksums and
+a summary like this::
+
+    [root@overcloud-controller-0 ~]# swift-recon --md5
+    ===============================================================================
+    --> Starting reconnaissance on 3 hosts (object)
+    ===============================================================================
+    [2016-10-14 12:37:11] Checking ring md5sums
+    3/3 hosts matched, 0 error[s] while checking hosts.
+    ===============================================================================
+    [2016-10-14 12:37:11] Checking swift.conf md5sum
+    3/3 hosts matched, 0 error[s] while checking hosts.
+    ===============================================================================

@@ -38,19 +38,19 @@ Get Images
        work with older images, so if the deployment fails it may be necessary to
        delete the older images and restart the process from this step.
 
+       Alternatively, images are available via RDO at
+       http://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/
+
        The image files required are::
 
-           deploy-ramdisk-ironic.initramfs
-           deploy-ramdisk-ironic.kernel
            ironic-python-agent.initramfs
            ironic-python-agent.kernel
            overcloud-full.initrd
            overcloud-full.qcow2
            overcloud-full.vmlinuz
 
-Images must be built prior to doing a deployment. An IPA ramdisk,
-deployment ramdisk, and openstack-full image can all be built using
-instack-undercloud.
+Images must be built prior to doing a deployment. An IPA ramdisk and
+openstack-full image can be built using instack-undercloud.
 
 It's recommended to build images on the installed undercloud directly since all
 the dependencies are already present.

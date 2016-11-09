@@ -15,3 +15,4 @@ Documentation on how to enable and configure various features available in
    ops_tools
    high_availability
    baremetal_overcloud
+   ovs_dpdk_config

@@ -293,6 +293,17 @@ as a root device. Please see :ref:`root_device` for details.
 Introspect Nodes
 ----------------
 
+
+.. admonition:: Validations
+
+   Once the undercloud is installed, you can run the
+   ``pre-introspection`` validations::
+
+     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-introspection"]}'
+
+   Then verify the results as described in :ref:`running_validation_group`.
+
+
 Introspect hardware attributes of nodes::
 
     openstack baremetal introspection bulk start
@@ -340,6 +351,16 @@ subnet. If needed, define the nameserver to be used for the environment::
 
 Deploy the Overcloud
 --------------------
+
+.. admonition:: Validations
+
+   Before you start the deployment, you may want to run the
+   ``pre-deployment`` validations::
+
+     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-deployment"]}'
+
+   Then verify the results as described in :ref:`running_validation_group`.
+
 
 By default 1 compute and 1 control node will be deployed, with networking
 configured for the virtual environment.  To customize this, see the output of::
@@ -416,6 +437,15 @@ follow :doc:`../advanced_deployment/high_availability`.
 
 Post-Deployment
 ---------------
+
+.. admonition:: Validations
+
+  After the deployment finished, you can run the ``post-deployment``
+  validations::
+
+    openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["post-deployment"]}'
+
+  Then verify the results as described in :ref:`running_validation_group`.
 
 
 Access the Overcloud

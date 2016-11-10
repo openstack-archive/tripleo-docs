@@ -96,6 +96,13 @@ Installing the Undercloud
 
      To deploy an undercloud with SSL, see :doc:`../advanced_deployment/ssl`.
 
+  .. admonition:: Validations
+
+     :doc:`../validations/validations` will be installed and
+     configured during undercloud installation. You can set
+     ``enable_validations = false`` in ``undercloud.conf`` to prevent
+     that.
+
 
   Install the undercloud::
 

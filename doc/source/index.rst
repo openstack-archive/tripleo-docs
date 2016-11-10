@@ -18,6 +18,7 @@ Contents:
    advanced_deployment/backends
    advanced_deployment/custom
    troubleshooting/troubleshooting
+   validations/validations
    mistral-api/mistral-api
    developer/developer
    contributions/contributions
@@ -101,6 +102,10 @@ Linux (RHEL). These steps are marked as follows:
    :class: selfsigned
 
    Step that should only be run when deploying with SSL and a self-signed certificate.
+
+.. admonition:: Validations
+
+   Steps that will run the pre and post-deployment validations
 
 Any such steps should *not* be run if the target environment does not match
 the section marking.

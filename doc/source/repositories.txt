@@ -54,6 +54,32 @@
                sudo yum -y install --enablerepo=extras centos-release-ceph-hammer
                sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Hammer.repo
 
+      .. admonition:: Newton
+         :class: newton mton
+
+         Enable latest RDO Newton Delorean repository for all packages
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-newton.repo https://trunk.rdoproject.org/centos7-newton/current/delorean.repo
+
+         Enable the Newton Delorean Deps repository
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-deps-newton.repo http://trunk.rdoproject.org/centos7-newton/delorean-deps.repo
+
+         .. admonition:: Ceph
+            :class: ceph
+
+            Enable the CentOS Storage SIG Ceph/Jewel repository if using Ceph
+
+            ::
+
+               sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
+               sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
+
+
    Enable last known good RDO Trunk Delorean repository for core openstack packages
 
    ::

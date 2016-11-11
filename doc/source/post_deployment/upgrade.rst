@@ -81,15 +81,20 @@ Upgrading the Undercloud
    .. admonition:: Mitaka to Newton
       :class: mton
 
-       In newton the undercloud telemetry services are **disabled** by default.
-       In order to maintain the telemetry services during the mitaka to newton
-       upgrade the operator must explicitly enable them **before** running the
-       undercloud upgrade. This is done by adding::
+       In the first release of instack-undercloud newton(5.0.0), the undercloud
+       telemetry services are **disabled** by default. In order to maintain the
+       telemetry services during the mitaka to newton upgrade the operator must
+       explicitly enable them **before** running the undercloud upgrade. This
+       is done by adding::
 
           enable_telemetry = true
 
        in the [DEFAULT] section of the undercloud.conf configuration file.
 
+       If you are using any newer newton release, this option is switched back
+       to **enabled** by default to make upgrade experience better. Hence, if
+       you are using a later newton release you don't need to explicitly enable
+       this option.
 
    The following command will upgrade the undercloud::
 

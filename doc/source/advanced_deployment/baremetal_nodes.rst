@@ -14,3 +14,4 @@ Documentation on how to do advanced configuration of baremetal nodes in
    profile_matching
    ready_state
    introspection_data
+   whole_disk_images

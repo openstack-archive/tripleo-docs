@@ -215,13 +215,16 @@ non-root user that was used to install the undercloud.
 
     To rebuild only a single image, see :doc:`../post_deployment/build_single_image`.
 
+.. note::
+
+       If you want to use whole disk images with TripleO, please see :doc:`../advanced_deployment/whole_disk_images`.
+
 Upload Images
 -------------
 
 Load the images into the undercloud Glance::
 
     openstack overcloud image upload
-
 
 Register Nodes
 --------------

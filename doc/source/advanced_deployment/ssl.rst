@@ -146,9 +146,9 @@ Certificate Details
        openssl genrsa -out overcloud-ca-privkey.pem 2048
 
    Generate a self-signed CA certificate.  This command will prompt for some
-   identifying information.  Most of the fields don't matter, but this
-   is where the Common Name must be set to the first IP in the external
-   network allocation pool::
+   identifying information.  Most of the fields don't matter, and the CN should
+   not be the same as the one we'll give the leaf certificate. You can choose a
+   CN for this such as "TripleO CA"::
 
        openssl req -new -x509 -key overcloud-ca-privkey.pem \
             -out overcloud-cacert.pem -days 365
@@ -160,7 +160,9 @@ Certificate Details
        sudo update-ca-trust extract
 
    Generate the leaf certificate request and key that will be used for the
-   public VIP::
+   public VIP. Again, Most of the fields don't matter, but this is where the
+   Common Name must be set to the fixed IP in the external network allocation
+   pool::
 
        openssl req -newkey rsa:2048 -days 365 \
             -nodes -keyout server-key.pem -out server-req.pem

@@ -466,7 +466,7 @@ Create a directory for Tempest (eg. naming it ``tempest``)::
 Tempest expects the tests it discovers to be in the current working directory.
 Set it up accordingly::
 
-    /usr/share/openstack-tempest-liberty/tools/configure-tempest-directory
+    /usr/share/openstack-tempest-*/tools/configure-tempest-directory
 
 The ``~/tempest-deployer-input.conf`` file was created during deployment and
 contains deployment specific settings. Use that file to configure

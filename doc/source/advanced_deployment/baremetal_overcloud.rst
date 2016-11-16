@@ -148,7 +148,8 @@ Add the ironic environment file when deploying::
 
 .. note::
     We don't require any virtual compute nodes for the bare metal only case,
-    so feel free to pass ``--compute-scale 0``, if you don't need them.
+    so feel free to set ``ComputeCount: 0`` in your environment file, if you
+    don't need them.
 
 Checking deployment
 ~~~~~~~~~~~~~~~~~~~

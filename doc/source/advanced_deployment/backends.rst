@@ -11,4 +11,5 @@ OpenStack projects.
    cinder_custom_backend
    cinder_netapp
    ceph_config
+   ceph_external
    neutron_midonet

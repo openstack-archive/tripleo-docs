@@ -287,13 +287,6 @@ Upgrading the Overcloud
       into one of the controllers and running `sudo pcs cluster start
       --all`.
 
-#. Upgrade compute nodes
-
-   Upgrade compute nodes one-by-one using the
-   `upgrade-non-controller.sh` script on the undercloud node::
-
-      upgrade-non-controller.sh --upgrade <nova-id of compute node>
-
 #. Upgrade ceph storage nodes
 
    If the deployment has any ceph storage nodes, upgrade them
@@ -301,6 +294,13 @@ Upgrading the Overcloud
    undercloud node::
 
       upgrade-non-controller.sh --upgrade <nova-id of ceph storage node>
+
+#. Upgrade compute nodes
+
+   Upgrade compute nodes one-by-one using the
+   `upgrade-non-controller.sh` script on the undercloud node::
+
+      upgrade-non-controller.sh --upgrade <nova-id of compute node>
 
 #. Apply configuration from upgraded tripleo-heat-templates
 

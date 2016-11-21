@@ -106,6 +106,13 @@ non-root user that was used to install the undercloud.
             export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
             export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
 
+         .. admonition:: Ceph
+            :class: ceph
+
+            ::
+
+               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
+
       .. admonition:: Mitaka
          :class: mitaka
 
@@ -114,12 +121,12 @@ non-root user that was used to install the undercloud.
             export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-mitaka/current/"
             export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
 
-      .. admonition:: Ceph
-         :class: ceph
+         .. admonition:: Ceph
+            :class: ceph
 
-         ::
+            ::
 
-            export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
+               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
 
 #. Build the required images:
 
@@ -161,8 +168,17 @@ non-root user that was used to install the undercloud.
            rhel-7-server-rhceph-2-osd-rpms
            rhel-7-server-rhceph-2-tools-rpms
 
-        .. admonition:: Stable branch
-           :class: stable
+        .. admonition:: Mitaka
+           :class: mitaka
+
+           ::
+
+              rhel-7-server-rhceph-1.3-mon-rpms
+              rhel-7-server-rhceph-1.3-osd-rpms
+              rhel-7-server-rhceph-1.3-tools-rpms
+
+        .. admonition:: Liberty
+           :class: liberty
 
            ::
 

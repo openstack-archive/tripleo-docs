@@ -33,4 +33,8 @@ re-configured to use it.  This can be done by re-running::
 
     openstack baremetal configure boot
 
+.. note::
+    If you want to use custom images for boot configuration, specify their names in
+    ``--deploy-kernel`` and ``--deploy-ramdisk`` options.
+
 Now the new image should be fully ready for use by new deployments.

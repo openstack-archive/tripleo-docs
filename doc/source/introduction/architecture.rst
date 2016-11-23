@@ -58,7 +58,7 @@ matching of your hardware prior to deploying OpenStack.
 
 Hardware introspection features enable you to collect data about the properties
 of your hardware prior to deployment, such that specific classes of hardware may
-be matched to specific roles (e.g a special hardware configuration for Compute
+be matched to specific roles (e.g. a special hardware configuration for Compute
 or Storage roles). There is also the option to enable performance benchmarking
 during this phase, such that outliers which do not match the expected
 performance profile may be excluded from the deployment.
@@ -193,7 +193,7 @@ Nodes
 
 Deploying the overcloud requires suitable hardware. The first task is to
 register the available hardware with Ironic, OpenStack's equivalent of a
-hypervisor for managing baremetal servers. User can define the hardware
+hypervisor for managing baremetal servers. Users can define the hardware
 attributes (such as number of CPUs, RAM, disk) manually or he can leave the
 fields out and run introspection of the nodes afterwards.
 

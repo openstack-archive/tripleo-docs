@@ -86,6 +86,11 @@ Linux (RHEL). These steps are marked as follows:
 
    Step that should only be run when installing from the Mitaka stable branch.
 
+.. admonition:: Newton
+   :class: newton
+
+   Step that should only be run when installing from the Newton stable branch.
+
 .. admonition:: SSL
    :class: ssl
 

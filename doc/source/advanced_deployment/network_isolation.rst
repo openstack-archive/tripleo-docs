@@ -28,7 +28,7 @@ The following VLANs will be used in the final deployment:
 * Tenant (Tenant tunneling network for GRE/VXLAN networks)
 * Storage (Access to storage resources from Compute and Controller nodes)
 * Storage Management (Replication, Ceph back-end services)
-* External (Public OpenStack APIs, Horzizon dashboard, optionally floating IPs)
+* External (Public OpenStack APIs, Horizon dashboard, optionally floating IPs)
 * Floating IP (Optional, can be combined with External)
 
 .. note::

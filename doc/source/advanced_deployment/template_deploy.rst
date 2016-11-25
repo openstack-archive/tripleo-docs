@@ -31,7 +31,7 @@ templates.
 The mapping between heat resource types and the underlying templates can be
 found in
 `/usr/share/\
-openstack-tripleo-heat-templates/overcloud-resource-registry-puppet.yaml`
+openstack-tripleo-heat-templates/overcloud-resource-registry-puppet.j2.yaml`
 
 Here is an example of copying a specific resource template and overriding
 so the deployment uses the local version::

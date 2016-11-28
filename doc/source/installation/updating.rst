@@ -14,12 +14,13 @@ You can upgrade any packages that are installed on the undercloud machine.
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
 
-3. Stop all OpenStack services so that they are not restarted by packaging
-   scripts when they are updated. The service restarts will be handled by the
+3. Stop services so that they are not restarted by packaging scripts
+   when they are updated. The service restarts will be handled by the
    undercloud upgrade command after new configuration has been applied.::
 
     sudo systemctl stop openstack-*
     sudo systemctl stop neutron-*
+    sudo systemctl stop openvswitch
 
 #. Update the TripleO CLI package::
 

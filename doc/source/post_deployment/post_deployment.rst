@@ -10,6 +10,7 @@ In this chapter you will find advanced management of various |project| areas.
    scale_roles
    delete_nodes
    quiesce_compute
+   quiesce_cephstorage
    vm_snapshot
    package_update
    upgrade

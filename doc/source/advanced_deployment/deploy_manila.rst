@@ -1,24 +1,6 @@
 Deploying Manila in the Overcloud
 =================================
 
-.. note::
-
-    PLEASE NOTE: **Manila support is WIP** in TripleO. The following
-    may be of interest if you'd like to find out more:
-
-    `https://review.openstack.org/#/c/188137/`_ "Enable Manila integration - as a composable controller service"
-
-    `https://review.openstack.org/#/c/188138/`_ "Add integration with NetApp Manila driver"
-
-    `https://review.openstack.org/#/c/230936/`_ "Add Gluster integration to Manila"
-
-
-
-.. _https://review.openstack.org/#/c/188137/: https://review.openstack.org/#/c/188137/
-.. _https://review.openstack.org/#/c/188138/: https://review.openstack.org/#/c/188138/
-.. _https://review.openstack.org/#/c/230936/: https://review.openstack.org/#/c/230936/
-
-
 This guide assumes that your undercloud is already installed and ready to
 deploy an overcloud with Manila enabled.
 

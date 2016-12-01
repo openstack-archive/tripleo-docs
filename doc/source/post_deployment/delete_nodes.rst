@@ -18,8 +18,9 @@ IDs (which represent nodes) to be deleted.
    changes to the overcloud.
 
 .. note::
-   Before deleting a compute node please make sure that the node is quiesced,
-   see :ref:`quiesce_compute`.
+   Before deleting a compute node or a cephstorage node, please make sure that
+   the node is quiesced, see :ref:`quiesce_compute` or
+   :ref:`quiesce_cephstorage`.
 
 .. note::
    A list of nova instance IDs can be listed with command::

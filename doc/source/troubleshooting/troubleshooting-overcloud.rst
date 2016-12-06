@@ -21,7 +21,7 @@ has failed::
 
 Occasionally, Heat is not even able to create the stack, so the ``heat
 stack-list`` output will be empty. If this is the case, observe the message
-that was printed to the terminal when ``instack-deploy-overcloud`` or ``heat
+that was printed to the terminal when ``openstack overcloud deploy`` or ``heat
 stack-create`` was run.
 
 Next, there are a few layers on which the deployment can fail:

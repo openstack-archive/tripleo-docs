@@ -179,9 +179,9 @@ Example::
     # Set to the router gateway on the external network
     ExternalInterfaceDefaultRoute: 10.1.2.1
     # Gateway router for the provisioning network (or Undercloud IP)
-    ControlPlaneDefaultRoute: 192.0.2.254
+    ControlPlaneDefaultRoute: 192.168.24.1
     # Generally the IP of the Undercloud
-    EC2MetadataIp: 192.0.2.1
+    EC2MetadataIp: 192.168.24.1
     # Define the DNS servers (maximum 2) for the overcloud nodes
     DnsServers: ["8.8.8.8","8.8.4.4"]
     InternalApiNetworkVlanID: 201

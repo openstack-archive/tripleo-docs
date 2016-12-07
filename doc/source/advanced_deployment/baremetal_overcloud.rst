@@ -213,8 +213,8 @@ parameters::
     openstack network create --share --provider-network-type flat \
         --provider-physical-network datacentre --external external
     openstack subnet create --network external \
-        --subnet-range 192.0.2.0/24 --gateway 192.0.2.40 \
-        --allocation-pool start=192.0.2.41,end=192.0.2.100 external-subnet
+        --subnet-range 192.168.24.0/24 --gateway 192.168.24.40 \
+        --allocation-pool start=192.168.24.41,end=192.168.24.100 external-subnet
 
 .. warning::
     Network types other than "flat" are not supported.
@@ -562,7 +562,7 @@ After some time (depending on the image), you will see the prepared instance::
     +--------------------------------------+------------+--------+------------------------+
     | ID                                   | Name       | Status | Networks               |
     +--------------------------------------+------------+--------+------------------------+
-    | 2022d237-e249-44bd-b864-e7f536a8e439 | instance-0 | ACTIVE | external=192.0.2.50  |
+    | 2022d237-e249-44bd-b864-e7f536a8e439 | instance-0 | ACTIVE | external=192.168.24.50  |
     +--------------------------------------+------------+--------+------------------------+
 
 .. note::
@@ -581,11 +581,11 @@ Let's check that it actually got scheduled on a bare metal machine::
 
 You can now log into it::
 
-    $ ssh centos@192.0.2.50
-    The authenticity of host '192.0.2.50 (192.0.2.50)' can't be established.
+    $ ssh centos@192.168.24.50
+    The authenticity of host '192.168.24.50 (192.168.24.50)' can't be established.
     ECDSA key fingerprint is eb:35:45:c5:ed:d9:8a:e8:4b:20:db:06:10:6f:05:74.
     Are you sure you want to continue connecting (yes/no)? yes
-    Warning: Permanently added '192.0.2.50' (ECDSA) to the list of known hosts.
+    Warning: Permanently added '192.168.24.50' (ECDSA) to the list of known hosts.
     [centos@instance-0 ~]$
 
 Now let's try the same with a virtual instance::

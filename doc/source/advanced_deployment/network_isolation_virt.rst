@@ -47,10 +47,10 @@ metadata, we need to specify a couple of extra Heat parameters. Create a file
 called ``/home/stack/custom.yaml`` with the following contents::
 
   parameter_defaults:
-    EC2MetadataIp: 192.0.2.1
-    ControlPlaneDefaultRoute: 192.0.2.1
+    EC2MetadataIp: 192.168.24.1
+    ControlPlaneDefaultRoute: 192.168.24.1
 
-Note that the specified IP addresses ``192.0.2.1`` are the same as the
+Note that the specified IP addresses ``192.168.24.1`` are the same as the
 undercloud IP address.
 
 Modify Your Overcloud Deploy to Enable Network Isolation

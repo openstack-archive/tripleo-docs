@@ -88,9 +88,9 @@ output will display all the nodes in the Ring like this::
     The minimum number of hours before a partition can be reassigned is 1
     The overload factor is 0.00% (0.000000)
     Devices:    id  region  zone      ip address  port  replication ip  replication port      name weight partitions balance meta
-                 0       1     1      192.0.2.22  6000      192.0.2.22              6000        d1 100.00       1024    0.00
-                 1       1     1      192.0.2.24  6000      192.0.2.24              6000        d1 100.00       1024    0.00
-                 2       1     1       192.0.2.6  6000       192.0.2.6              6000        d1 100.00       1024    0.00
+                 0       1     1      192.168.24.22  6000      192.168.24.22              6000        d1 100.00       1024    0.00
+                 1       1     1      192.168.24.24  6000      192.168.24.24              6000        d1 100.00       1024    0.00
+                 2       1     1       192.168.24.6  6000       192.168.24.6              6000        d1 100.00       1024    0.00
 
 Ring configuration be verified by checking the hash of the ``*.ring.gz``
 files. It should be the same on all nodes in the ring.::

@@ -76,11 +76,11 @@ The updated .pp files for the NTP example were:
 
 
 
-Step 2 - overcloud-resource-registry-puppet.yaml resource registry changes
+Step 2 - overcloud-resource-registry-puppet.j2.yaml resource registry changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The resource ``OS::TripleO::Services::Ntp`` must be defined in the resource
-registry (``overcloud-resource-registry-puppet.yaml``)
+registry (``overcloud-resource-registry-puppet.j2.yaml``)
 
 Create a new resource type alias which references the per-service
 heat template file, as described above.

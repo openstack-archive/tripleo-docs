@@ -50,43 +50,53 @@ Get Images
            overcloud-full.vmlinuz
 
 Images must be built prior to doing a deployment. An IPA ramdisk and
-openstack-full image can be built using instack-undercloud.
+openstack-full image can all be built using tripleo-common.
 
 It's recommended to build images on the installed undercloud directly since all
-the dependencies are already present.
+the dependencies are already present, but this is not a requirement.
 
 The following steps can be used to build images. They should be run as the same
-non-root user that was used to install the undercloud.
+non-root user that was used to install the undercloud. If the images are not
+created on the undercloud, one should use a non-root user.
 
 
 #. Choose image operating system:
 
-   The built images will automatically have the same base OS as the
-   running undercloud. To choose a different OS use one of the following
-   commands (make sure you have your OS specific content visible):
+   The common YAML is
+   ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml``.
+   It must be specified along with one of the following.
 
    .. admonition:: CentOS
       :class: centos
 
+      The default YAML for CentOS is
+      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml``
+
       ::
 
-          export NODE_DIST=centos7
+          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml"
 
    .. admonition:: RHEL
       :class: rhel
 
+      The default YAML for RHEL is
+      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-rhel7.yaml``
+
       ::
 
-          export NODE_DIST=rhel7
+          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images/rhel7.yaml"
 
-#. Install the ``current-tripleo`` delorean repo and deps repo into the overcloud images:
+
+#. Install the ``current-tripleo`` delorean repository and deps repository:
+
+.. include:: ../repositories.txt
+
+
+3. Export environment variables
 
     ::
 
-        export USE_DELOREAN_TRUNK=1
-        export DELOREAN_TRUNK_REPO="http://buildlogs.centos.org/centos/7/cloud/x86_64/rdo-trunk-master-tripleo/"
-        export DELOREAN_REPO_FILE="delorean.repo"
-        export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
+        export DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean*"
 
    .. admonition:: Ceph
       :class: ceph
@@ -103,8 +113,7 @@ non-root user that was used to install the undercloud.
 
          ::
 
-            export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-liberty/current/"
-            export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
+            STABLE_RELEASE="liberty"
 
          .. admonition:: Ceph
             :class: ceph
@@ -118,8 +127,7 @@ non-root user that was used to install the undercloud.
 
          ::
 
-            export DELOREAN_TRUNK_REPO="http://trunk.rdoproject.org/centos7-mitaka/current/"
-            export DIB_YUM_REPO_CONF=/etc/yum.repos.d/delorean*
+            STABLE_RELEASE="mitaka"
 
          .. admonition:: Ceph
             :class: ceph
@@ -127,6 +135,21 @@ non-root user that was used to install the undercloud.
             ::
 
                export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
+
+      .. admonition:: Newton
+         :class: newton
+
+         ::
+
+            STABLE_RELEASE="newton"
+
+         .. admonition:: Ceph
+            :class: ceph
+
+            ::
+
+               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Jewel.repo"
+
 
 #. Build the required images:
 
@@ -136,9 +159,9 @@ non-root user that was used to install the undercloud.
 
      Download the RHEL 7.1 cloud image or copy it over from a different location,
      for example:
-     https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.1/x86_64/product-downloads,
+     ``https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.1/x86_64/product-downloads``,
      and define the needed environment variables for RHEL 7.1 prior to running
-     ``openstack overcloud image build --all``::
+     ``tripleo-build-images``::
 
           export DIB_LOCAL_IMAGE=rhel-guest-image-7.1-20150224.0.x86_64.qcow2
 
@@ -223,13 +246,21 @@ non-root user that was used to install the undercloud.
 
   ::
 
-   openstack overcloud image build --all
+    openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml --config-file $OS_YAML
+
+
+  See the help for ``openstack overcloud image build`` for further options.
+
+  The YAML files are cumulative. Order on the command line is important. The
+  packages, elements, and options sections will append. All others will overwrite
+  previously read values.
 
   .. note::
     This command will build **overcloud-full** images (\*.qcow2, \*.initrd,
     \*.vmlinuz) and **ironic-python-agent** images (\*.initramfs, \*.kernel)
 
-    To rebuild only a single image, see :doc:`../post_deployment/build_single_image`.
+    In order to build specific images, one can use the ``--image-name`` flag
+    to ``openstack overcloud image build``. It can be specified multiple times.
 
 .. note::
 
@@ -241,6 +272,8 @@ Upload Images
 Load the images into the undercloud Glance::
 
     openstack overcloud image upload
+
+To upload a single image, see :doc:`../advanced_deployment/upload_single_image`.
 
 Register Nodes
 --------------

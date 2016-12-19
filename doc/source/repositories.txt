@@ -4,31 +4,6 @@
       Enable the appropriate repos for the desired release, as indicated below.
       Do not enable any other repos not explicitly marked for that release.
 
-      .. admonition:: Liberty
-         :class: liberty ktol
-
-         Enable latest RDO Liberty Delorean repository for all packages
-
-         ::
-
-            sudo curl -L -o /etc/yum.repos.d/delorean-liberty.repo https://trunk.rdoproject.org/centos7-liberty/current/delorean.repo
-
-         Enable the Liberty Delorean Deps repository
-
-         ::
-
-            sudo curl -L -o /etc/yum.repos.d/delorean-deps-liberty.repo http://trunk.rdoproject.org/centos7-liberty/delorean-deps.repo
-
-         .. admonition:: Ceph
-            :class: ceph
-
-            Enable the CentOS Storage SIG Ceph/Hammer repository if using Ceph
-
-            ::
-
-               sudo yum -y install --enablerepo=extras centos-release-ceph-hammer
-               sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Hammer.repo
-
       .. admonition:: Mitaka
          :class: mitaka ltom
 

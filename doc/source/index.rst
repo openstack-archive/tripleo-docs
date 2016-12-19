@@ -77,11 +77,6 @@ Linux (RHEL). These steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
-.. admonition:: Liberty
-   :class: liberty
-
-   Step that should only be run when installing from the Liberty stable branch.
-
 .. admonition:: Mitaka
    :class: mitaka
 

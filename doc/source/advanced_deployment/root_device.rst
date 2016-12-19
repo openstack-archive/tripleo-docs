@@ -7,7 +7,7 @@ If your hardware has several hard drives, it's highly recommended that you
 specify the exact device to be used during introspection and deployment
 as a root device. This is done by setting a ``root_device`` property on the
 node in Ironic. Please refer to the `Ironic root device hints documentation`_
-for more details (note that the `Liberty release version`_ lacks some fields).
+for more details.
 
 For example::
 
@@ -104,4 +104,3 @@ with the Mitaka release. Also note that the ``name`` field, while convenient,
 Do not forget to re-run the introspection after setting the root device hints.
 
 .. _Ironic root device hints documentation: http://docs.openstack.org/developer/ironic/deploy/install-guide.html#specifying-the-disk-for-deployment
-.. _Liberty release version: http://docs.openstack.org/developer/ironic/liberty/deploy/install-guide.html#specifying-the-disk-for-deployment

@@ -108,20 +108,6 @@ created on the undercloud, one should use a non-root user.
    .. admonition:: Stable Branch
       :class: stable
 
-      .. admonition:: Liberty
-         :class: liberty
-
-         ::
-
-            STABLE_RELEASE="liberty"
-
-         .. admonition:: Ceph
-            :class: ceph
-
-            ::
-
-               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
-
       .. admonition:: Mitaka
          :class: mitaka
 
@@ -193,15 +179,6 @@ created on the undercloud, one should use a non-root user.
 
         .. admonition:: Mitaka
            :class: mitaka
-
-           ::
-
-              rhel-7-server-rhceph-1.3-mon-rpms
-              rhel-7-server-rhceph-1.3-osd-rpms
-              rhel-7-server-rhceph-1.3-tools-rpms
-
-        .. admonition:: Liberty
-           :class: liberty
 
            ::
 
@@ -285,12 +262,6 @@ Register and configure nodes for your deployment with Ironic::
 The file to be imported may be either JSON, YAML or CSV format, and
 the type is detected via the file extension (json, yaml, csv).
 The file format is documented in :ref:`instackenv`.
-
-.. admonition:: Liberty
-   :class: liberty
-
-   For TripleO release Liberty and older an explicit ``--json`` or ``--csv``
-   flag is required for JSON and CSV formats accordingly.
 
 .. admonition:: Stable Branch
    :class: stable

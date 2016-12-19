@@ -130,29 +130,3 @@ Introspection for a node can be stopped with the following command::
 
     openstack baremetal introspection abort <NODE UUID>
 
-.. admonition:: Liberty
-   :class: liberty
-
-   The ``abort`` command above was introduced in the Mitaka release.
-   For older versions the recommended path is to wait until it times out.
-   Changing ``timeout`` setting in ``/etc/ironic-inspector/inspector.conf``
-   may be used to reduce the timeout from 1 hour (which is usually too much,
-   especially on virtual environments).
-
-   If you do need to stop introspection **for all nodes** right now on
-   the Liberty release, you can do the following for each node::
-
-       ironic node-set-power-state UUID off
-
-   then remove ironic-inspector cache, rebuild it and restart
-   ironic-inspector::
-
-       rm /var/lib/ironic-inspector/inspector.sqlite
-       sudo ironic-inspector-dbsync --config-file /etc/ironic-inspector/inspector.conf upgrade
-       sudo systemctl restart openstack-ironic-inspector
-
-   Note that this procedure is not recommended and may have unexpected side
-   effects.
-
-.. _ironic-inspector troubleshooting documentation: http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html
-.. _the dynamic-login element: https://github.com/openstack/diskimage-builder/tree/master/elements/dynamic-login

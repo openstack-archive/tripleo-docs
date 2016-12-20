@@ -410,6 +410,19 @@ TripleO UI is the web interface for TripleO.
 * Bugs: https://bugs.launchpad.net/tripleo-ui
 * Blueprints: https://blueprints.launchpad.net/tripleo-ui
 
+tripleo-validations
+-------------------
+
+Pre and post-deployment validations for the deployment workflow.
+
+**Useful links**
+
+* Upstream Project: http://git.openstack.org/cgit/openstack/tripleo-validations/
+* Bugs: https://bugs.launchpad.net/tripleo/+bugs?field.tag=validations
+* Documentation for individual validations: http://docs.openstack.org/developer/tripleo-validations/readme.html#existing-validations
+
+.. note:: When reporting an issue, make sure you add the
+          ``validations`` tag.
 
 Deprecated
 ----------

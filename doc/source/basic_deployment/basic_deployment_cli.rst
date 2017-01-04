@@ -263,19 +263,33 @@ Register Nodes
 
 Register and configure nodes for your deployment with Ironic::
 
-    openstack baremetal import instackenv.json
+    openstack overcloud node import instackenv.json
 
 The file to be imported may be either JSON, YAML or CSV format, and
 the type is detected via the file extension (json, yaml, csv).
 The file format is documented in :ref:`instackenv`.
 
+The nodes status will be set to ``manageable`` by default, so that
+introspection may later be run. To also run introspection and make the
+nodes available for deployment in one step, the following flags can be
+used::
+
+    openstack overcloud node import --introspect --provide instackenv.json
+
 .. admonition:: Stable Branch
    :class: stable
 
-   For TripleO release Mitaka and older the following command must be run
-   after registration to assign the deployment kernel and ramdisk to all nodes:
+   .. admonition:: Mitaka
+      :class: mitaka
 
-        openstack baremetal configure boot
+      For TripleO release Mitaka, the import command is::
+
+          openstack baremetal import instackenv.json
+
+      The following command must be run after registration to assign the
+      deployment kernel and ramdisk to all nodes::
+
+          openstack baremetal configure boot
 
 Starting with the Newton release you can take advantage of the ``enroll``
 provisioning state - see :doc:`../advanced_deployment/node_states` for details.
@@ -313,10 +327,28 @@ Introspect Nodes
 
    Then verify the results as described in :ref:`running_validation_group`.
 
+Nodes must be in the ``manageable`` provisioning state in order to run
+introspection. Introspect hardware attributes of nodes with::
 
-Introspect hardware attributes of nodes::
+    openstack overcloud node introspect --all-manageable
 
-    openstack baremetal introspection bulk start
+Nodes can also be specified individually by UUID. The ``--provide``
+flag can be used in order to move the nodes automatically to the
+``available`` provisioning state once the introspection is finished,
+making the nodes available for deployment.
+::
+
+   openstack overcloud node introspect --all-manageable --provide
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   .. admonition:: Mitaka
+      :class: mitaka
+
+      For TripleO release Mitaka, the introspection command is::
+
+          openstack baremetal introspection bulk start
 
 .. note:: **Introspection has to finish without errors.**
    The process can take up to 5 minutes for VM / 15 minutes for baremetal. If
@@ -324,6 +356,16 @@ Introspect hardware attributes of nodes::
 
 .. note:: If you need to introspect just a single node, see
    :doc:`../advanced_deployment/introspect_single_node`
+
+Provide Nodes
+-------------
+
+Only nodes in the ``available`` provisioning state can be deployed to
+(see :doc:`../advanced_deployment/node_states` for details).  To move
+nodes from ``manageable`` to ``available`` the following command can be
+used::
+
+        openstack overcloud node provide --all-manageable
 
 Flavor Details
 --------------
@@ -556,10 +598,6 @@ The overcloud can be redeployed when desired.
 
     # This command should show no stack once the Delete has completed
     heat stack-list
-
-#. Although not required, introspection can be rerun::
-
-    openstack baremetal introspection bulk start
 
 #. Deploy the Overcloud again::
 

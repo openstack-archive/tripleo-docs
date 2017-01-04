@@ -62,22 +62,21 @@ created on the undercloud, one should use a non-root user.
 
 #. Choose image operating system:
 
-   The common YAML is
-   ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml``.
-   It must be specified along with one of the following.
-
    .. admonition:: CentOS
       :class: centos
 
-      The default YAML for CentOS is
-      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml``
-
-      ::
-
-          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml"
+      The image build with no arguments will build CentOS 7. It will include the
+      common YAML of
+      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml``
+      and the CentOS YAML at
+      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml``.
 
    .. admonition:: RHEL
       :class: rhel
+
+      The common YAML is
+      ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml``.
+      It must be specified along with the following.
 
       The default YAML for RHEL is
       ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-rhel7.yaml``
@@ -223,7 +222,14 @@ created on the undercloud, one should use a non-root user.
 
   ::
 
-    openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml --config-file $OS_YAML
+    openstack overcloud image build
+
+  .. admonition:: RHEL
+     :class: rhel
+
+     ::
+
+        openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml --config-file $OS_YAML
 
 
   See the help for ``openstack overcloud image build`` for further options.

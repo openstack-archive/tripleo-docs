@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # instack-undercloud documentation build configuration file, created by
 # sphinx-quickstart on Wed Feb 25 10:56:57 2015.
 #

@@ -346,8 +346,17 @@ hostnames via DNS. The nameserver is defined in the undercloud's neutron
 subnet. If needed, define the nameserver to be used for the environment::
 
     # List the available subnets
-    neutron subnet-list
-    neutron subnet-update <subnet-uuid> --dns-nameserver <nameserver-ip>
+    openstack subnet list
+    openstack subnet set <subnet-uuid> --dns-nameserver <nameserver-ip>
+
+.. admonition:: Stable Branch
+   :class: stable
+
+    For Mitaka release and older, the subnet commands are executed within the
+    `neutron` command::
+
+        neutron subnet-list
+        neutron subnet-update <subnet-uuid> --dns-nameserver <nameserver-ip>
 
 .. note::
    A public DNS server, such as 8.8.8.8 or the undercloud DNS name server
@@ -467,7 +476,7 @@ To use it, simply source the file::
 
     source ~/overcloudrc
 
-To return to working with the undercloud, source the stackrc file again::
+To return to working with the undercloud, source the ``stackrc`` file again::
 
     source ~/stackrc
 
@@ -475,40 +484,39 @@ To return to working with the undercloud, source the stackrc file again::
 Setup the Overcloud network
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Initial networks in Neutron in the Overlcoud need to be created for tenant
+Initial networks in Neutron in the overcloud need to be created for tenant
 instances. The following are example commands to create the initial networks.
-Edit the address ranges, or use the necessary neutron commands to match the
+Edit the address ranges, or use the necessary ``neutron`` commands to match the
 environment appropriately. This assumes a dedicated interface or native VLAN::
 
+    openstack network create public --external --provider-network-type flat \
+    --provider-physical-network datacentre
+    openstack subnet create --allocation-pool start=172.16.23.140,end=172.16.23.240 \
+    --network public --gateway 172.16.23.251 --no-dhcp --subnet-range \
+    172.16.23.128/25 public
 
-    neutron net-create public --router:external --provider:network_type flat \
-      --provider:physical_network datacentre
-    neutron subnet-create --name public --disable-dhcp \
-      --allocation-pool start=172.16.23.140,end=172.16.23.240 \
-      --gateway 172.16.23.251 public 172.16.23.128/25
+The example shows naming the network "public" because that will allow tempest
+tests to pass, based on the default floating pool name set in ``nova.conf``. 
+You can confirm that the network was created with::
 
-The example shows naming the network "public" because that will make tempest
-tests to pass, based on the default floating pool name set in nova.conf. You
-can confirm that the network was created with::
-
-    neutron net-list
+    openstack network list
 
 Sample output of the command::
 
-    +--------------------------------------+-------------+-------------------------------------------------------+
-    | id                                   | name        | subnets                                               |
-    +--------------------------------------+-------------+-------------------------------------------------------+
-    | d474fe1f-222d-4e32-802b-cde86e746a2a | public        | 01c5f621-1e0f-4b9d-9c30-7dc59592a52f 172.16.23.128/25 |
-    +--------------------------------------+-------------+-------------------------------------------------------+
+    +--------------------------------------+----------+--------------------------------------+
+    | ID                                   | Name     | Subnets                              |
+    +--------------------------------------+----------+--------------------------------------+
+    | 4db8dd5d-fab5-4ea9-83e5-bdedbf3e9ee6 | public   | 7a315c5e-f8e2-495b-95e2-48af9442af01 |
+    +--------------------------------------+----------+--------------------------------------+
 
 To use a VLAN, the following example should work. Customize the address ranges
 and VLAN id based on the environment::
 
-    neutron net-create public --router:external --provider:network_type vlan \
-      --provider:physical_network datacentre --provider:segmentation_id 195
-    neutron subnet-create --name public --disable-dhcp \
-      --allocation-pool start=172.16.23.140,end=172.16.23.240 \
-      --gateway 172.16.23.251 public 172.16.23.128/25
+    openstack network create public --external --provider-network-type vlan \
+    --provider-physical-network datacentre --provider-segment 195 \
+    openstack subnet create --allocation-pool start=172.16.23.140,end=172.16.23.240 \
+    --network public --no-dhcp --gateway 172.16.23.251 \
+    --subnet-range 172.16.23.128/25 public
 
 
 Validate the Overcloud

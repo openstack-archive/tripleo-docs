@@ -31,7 +31,17 @@ before, with the ``--update-existing`` flag added::
 Note that if the new image is a ramdisk, the Ironic nodes need to be
 re-configured to use it.  This can be done by re-running::
 
-    openstack baremetal configure boot
+    openstack overcloud node configure --all-manageable
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   .. admonition:: Mitaka
+      :class: mitaka
+
+      For TripleO release Mitaka, the boot configuration command is::
+
+          openstack baremetal configure boot
 
 .. note::
     If you want to use custom images for boot configuration, specify their names in

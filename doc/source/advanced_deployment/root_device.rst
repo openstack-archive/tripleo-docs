@@ -30,13 +30,23 @@ automatically).
 Setting root device hints automatically
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Starting with the Newton release it is possible to autogenerate root device
-hints for all nodes instead of setting them one by one. Pass the
-``--root-device`` argument to the ``openstack baremetal configure boot``
-**after a successful introspection**. This argument can accept a device list
-in the order of preference, for example::
+Starting with the Newton release it is possible to autogenerate root
+device hints for all nodes instead of setting them one by one. Pass the
+``--root-device`` argument to the ``openstack overcloud node
+configure`` **after a successful introspection**. This argument can
+accept a device list in the order of preference, for example::
 
-    openstack baremetal configure boot --root-device=sdb,sdc,vda
+    openstack overcloud node configure --all-manageable --root-device=sdb,sdc,vda
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   .. admonition:: Mitaka
+      :class: mitaka
+
+      For TripleO release Mitaka, the boot configuration command is::
+
+          openstack baremetal configure boot --root-device=sdb,sdc,vda
 
 It can also accept one of two strategies: ``smallest`` will pick the smallest
 device, ``largest`` will pick the largest one. By default only disk devices

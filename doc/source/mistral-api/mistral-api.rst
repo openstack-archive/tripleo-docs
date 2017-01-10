@@ -169,17 +169,18 @@ it can be changed if they are all consistent. This will be the plan name.
             '{"container":"my_cloud"}'
 
 
-Register and Introspect Baremetal Nodes
----------------------------------------
+Working with Bare Metal Nodes
+-----------------------------
 
-Baremetal nodes can be registered with Ironic via Mistral. This functionality
-is provided by the ``tripleo.baremetal`` workflows.
+Some functionality for dealing with bare metal nodes is provided by the
+``tripleo.baremetal`` workflows.
 
 Register Nodes
 ^^^^^^^^^^^^^^
 
-The input for this workflow is a bit larger, so this time we will store it in
-a file and pass it in, rather than working inline.
+Baremetal nodes can be registered with Ironic via Mistral. The input for this
+workflow is a bit larger, so this time we will store it in a file and pass it
+in, rather than working inline.
 
 .. code-block:: bash
 
@@ -258,6 +259,44 @@ nodes to be in the "manageable" state.
 
     $ openstack workflow execution create tripleo.baremetal.v1.introspect \
         '{"nodes_uuids": ["UUID1", "UUID2"]}'
+
+.. _cleaning:
+
+Cleaning Nodes
+^^^^^^^^^^^^^^
+
+It is recommended to clean previous information from all disks on the bare
+metal nodes before new deployments. As TripleO disables automated cleaning, it
+has to be done manually via the ``manual_clean`` workflow. A node has to be in
+the ``manageable`` state for it to work.
+
+.. note::
+    See `Ironic cleaning documentation
+    <http://docs.openstack.org/developer/ironic/deploy/cleaning.html>`_ for
+    more details.
+
+To remove partitions from all disks on a given node, use the following
+command:
+
+.. code-block:: bash
+
+    $ openstack workflow execution create tripleo.baremetal.v1.manual_cleaning \
+        '{"node_uuid": "UUID", "clean_steps": [{"step": "erase_devices_metadata", "interface": "deploy"}]}'
+
+To remove all data from all disks (either by ATA secure erase or by shredding
+them), use the following command:
+
+.. code-block:: bash
+
+    $ openstack workflow execution create tripleo.baremetal.v1.manual_cleaning \
+        '{"node_uuid": "UUID", "clean_steps": [{"step": "erase_devices", "interface": "deploy"}]}'
+
+The node state is set back to ``manageable`` after successful cleaning and to
+``clean failed`` after a failure. Inspect node's ``last_error`` field for the
+cause of the failure.
+
+.. warning::
+    Shredding disks can take really long, up to several hours.
 
 Provide Nodes
 ^^^^^^^^^^^^^

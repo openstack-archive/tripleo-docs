@@ -607,6 +607,10 @@ The overcloud can be redeployed when desired.
     # This command should show no stack once the Delete has completed
     heat stack-list
 
+#. It is recommended that you delete existing partitions from all nodes before
+   redeploying. Starting with TripleO Ocata, you can use existing workflows -
+   see :ref:`cleaning` for details.
+
 #. Deploy the Overcloud again::
 
     openstack overcloud deploy --templates

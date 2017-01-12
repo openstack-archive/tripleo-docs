@@ -243,48 +243,10 @@ metal node suitable for booting the new instance.
 This in turn usually means some mismatch between resources that Nova expects
 to find and resources that Ironic advertised to Nova.
 
-A few things should be checked in this case:
+Start with checking `Ironic troubleshooting guide on this topic
+<http://docs.openstack.org/developer/ironic/deploy/troubleshooting.html#nova-returns-no-valid-host-was-found-error>`_.
 
-#. Introspection should have succeeded for you before, or you should have
-   entered the required Ironic node properties manually.
-   For each node in ``ironic node-list`` use
-   ::
-
-    ironic node-show <IRONIC-NODE-UUID>
-
-   and make sure that ``properties`` JSON field has valid values for keys
-   ``cpus``, ``cpu_arch``, ``memory_mb`` and ``local_gb``.
-
-#. Nova flavor that you are using does not exceed the Ironic node properties
-   above for a required number of nodes. Use
-   ::
-
-    nova flavor-show <FLAVOR NAME>
-
-   to compare.
-
-#. Make sure that enough nodes are in ``available`` state according to
-   ``ironic node-list``. Nodes in ``manageable`` state usually mean they
-   have failed introspection.
-
-#. Make sure nodes you're going to deploy to are not in maintenance mode.
-   Again, use ``ironic node-list`` to check. A node automatically going to
-   maintenance mode usually means wrong power credentials for this node. Check
-   them and then remove maintenance mode::
-
-    ironic node-set-maintenance <IRONIC-NODE-UUID> off
-
-#. If you're using advanced profile matching with multiple flavors, make sure
-   you have enough nodes corresponding to each flavor/profile. Watch
-   ``capabilities`` key in ``properties`` field for ``ironic node-show``.
-   It should contain e.g. ``profile:compute``.
-
-#. It takes some time for nodes information to propagate from Ironic to Nova
-   after introspection. Our tooling usually accounts for it, but if you did
-   some steps manually, there may be a period of time when nodes are not
-   available to Nova yet. Check that
-   ::
-
-    nova hypervisor-stats
-
-   correctly shows total amount of resources in your system.
+If you're using advanced profile matching with multiple flavors, make sure
+you have enough nodes corresponding to each flavor/profile. Watch
+``capabilities`` key in ``properties`` field for ``ironic node-show``.
+It should contain e.g. ``profile:compute``.

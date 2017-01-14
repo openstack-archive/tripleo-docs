@@ -16,3 +16,4 @@ Documentation on how to enable and configure various features available in
    high_availability
    baremetal_overcloud
    ovs_dpdk_config
+   deployed_server

@@ -5,6 +5,10 @@ Virtual Environment
 of actual baremetal. However, one baremetal machine is still
 needed to act as the host for the virtual machines.
 
+.. warning:: Virtual deployments with TripleO are for development and testing
+             purposes only.  This method cannot be used for production-ready
+             deployments.
+
 
 Minimum System Requirements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

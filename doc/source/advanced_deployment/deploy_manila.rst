@@ -4,8 +4,19 @@ Deploying Manila in the Overcloud
 This guide assumes that your undercloud is already installed and ready to
 deploy an overcloud with Manila enabled.
 
-Deploying the Overcloud
------------------------
+Deploying the Overcloud with the Internal Ceph Backend
+------------------------------------------------------
+Ceph deployed by TripleO can be used as a Manila share backend. Make sure that
+Ceph, Ceph MDS and Manila Ceph environment files are included when deploying the
+Overcloud::
+
+    openstack overcloud deploy --templates \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/services/ceph-mds.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/manila-cephfsnative-config.yaml
+
+Deploying the Overcloud with an External Backend
+------------------------------------------------
 .. note::
 
     The :doc:`template_deploy` doc has a more detailed explanation of the

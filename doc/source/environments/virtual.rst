@@ -1,3 +1,6 @@
+.. warning:: These instructions are DEPRECATED as of the Ocata release and will
+             be removed in a future release.
+
 Virtual Environment
 -----------------------------------
 

@@ -428,6 +428,18 @@ configured for the virtual environment.  To customize this, see the output of::
 
     openstack help overcloud deploy
 
+.. admonition:: Swap
+
+  Swap files or partitions can be installed as part of an Overcloud deployment.
+  For adding swap files there is no restriction besides having
+  4GB available on / (by default). When using a swap partition,
+  the partition must exist and be tagged as `swap1` (by default).
+  To deploy a swap file or partition in each Overcloud node use one
+  of the following arguments when deploying::
+
+      -e /usr/share/openstack-tripleo-heat-templates/environments/enable-swap-partition.yaml
+      -e /usr/share/openstack-tripleo-heat-templates/environments/enable-swap.yaml
+
 .. admonition:: Ceph
   :class: ceph
 

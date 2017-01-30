@@ -301,6 +301,7 @@ Introspect Nodes
 
 
 .. admonition:: Validations
+   :class: validations
 
    Once the undercloud is installed, you can run the
    ``pre-introspection`` validations::
@@ -388,6 +389,7 @@ Deploy the Overcloud
 --------------------
 
 .. admonition:: Validations
+   :class: validations
 
    Before you start the deployment, you may want to run the
    ``pre-deployment`` validations::
@@ -403,13 +405,14 @@ configured for the virtual environment.  To customize this, see the output of::
     openstack help overcloud deploy
 
 .. admonition:: Swap
+   :class: optional
 
-  Swap files or partitions can be installed as part of an Overcloud deployment.
-  For adding swap files there is no restriction besides having
-  4GB available on / (by default). When using a swap partition,
-  the partition must exist and be tagged as `swap1` (by default).
-  To deploy a swap file or partition in each Overcloud node use one
-  of the following arguments when deploying::
+   Swap files or partitions can be installed as part of an Overcloud deployment.
+   For adding swap files there is no restriction besides having
+   4GB available on / (by default). When using a swap partition,
+   the partition must exist and be tagged as `swap1` (by default).
+   To deploy a swap file or partition in each Overcloud node use one
+   of the following arguments when deploying::
 
       -e /usr/share/openstack-tripleo-heat-templates/environments/enable-swap-partition.yaml
       -e /usr/share/openstack-tripleo-heat-templates/environments/enable-swap.yaml
@@ -460,7 +463,7 @@ configured for the virtual environment.  To customize this, see the output of::
       rhel-7-server-openstack-6.0-rpms
 
 .. admonition:: SSL
-   :class: ssl
+   :class: optional
 
    To deploy an overcloud with SSL, see :doc:`../advanced_deployment/ssl`.
 
@@ -499,13 +502,14 @@ Post-Deployment
 ---------------
 
 .. admonition:: Validations
+   :class: validations
 
-  After the deployment finished, you can run the ``post-deployment``
-  validations::
+   After the deployment finished, you can run the ``post-deployment``
+   validations::
 
-    openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["post-deployment"]}'
+     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["post-deployment"]}'
 
-  Then verify the results as described in :ref:`running_validation_group`.
+   Then verify the results as described in :ref:`running_validation_group`.
 
 
 Access the Overcloud

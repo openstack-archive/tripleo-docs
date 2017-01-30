@@ -132,8 +132,9 @@ network.
 Certificate Details
 ~~~~~~~~~~~~~~~~~~~
 
+.. This admonition is intentionally left class-less because it is only used
+   on the SSL page.
 .. admonition:: Self-Signed SSL
-   :class: selfsigned
 
    It is not recommended that the self-signed certificate is trusted; So for
    this purpose, having a self-signed CA certificate is a better choice. In

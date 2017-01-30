@@ -69,11 +69,12 @@
 .virtual {background: #efe;}
 .ceph {background: #eff;}
 .source {background: #bbb;}
-.ssl {background: #ffe;}
-.selfsigned {background: #ffd;}
 .ltom {background: #dee;}
 .mton {background: #ded;}
 .ntoo {background: #edd;}
+.validations {background: #fdd;}
+.optional {background: #ffe;}
+
 /* admonition selector */
 #admonition_selector {
   color: white;

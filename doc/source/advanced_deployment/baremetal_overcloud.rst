@@ -252,16 +252,26 @@ cleaning. Use the following command to get the network UUID::
     openstack network show external -f value -c id
 
 If you plan on configuring provisioning network separation (beyond the scope
-of this guide), you need to also set ``provisioning_network_uuid`` the same
+of this guide), you need to also set ``provisioning_network`` the same
 way.
 
 Update the environment file you've created before to set
-``ironic::conductor::cleaning_network_uuid`` hieradata variable to the UUID of
-the provider network created above, for example::
+``ironic::conductor::cleaning_network`` hieradata variable to the UUID or name
+of the provider network created above, for example::
 
     parameter_defaults:
         ControllerExtraConfig:
-            ironic::conductor::cleaning_network_uuid: c71f4bfe-409b-4292-818f-21cdf910ee06
+            ironic::conductor::cleaning_network: c71f4bfe-409b-4292-818f-21cdf910ee06
+
+.. admonition:: Newton
+   :class: newton
+
+   In the Newton release this variable was called "cleaning_network_uuid" and
+   accepted only UUIDs.
+
+.. warning::
+   If you use a network name here, you should ensure that this name is and will
+   always be unique in the deployment.
 
 Finally, run the deploy command with exactly the same arguments as before
 (don't forget to include the environment file if it was not included
@@ -272,8 +282,13 @@ previously).
 
     * SSH into every controller node.
 
-    * Set  ``cleaning_network_uuid`` option in the ``neutron`` section of
+    * Set  ``cleaning_network`` option in the ``neutron`` section of
       ``/etc/ironic/ironic.conf`` to the UUID of this network.
+
+      .. admonition:: Newton
+         :class: newton
+
+         In the Newton release this variable was called "cleaning_network_uuid"
 
     * Restart the ``openstack-ironic-conductor`` service.
 

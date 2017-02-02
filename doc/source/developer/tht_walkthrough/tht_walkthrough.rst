@@ -7,7 +7,7 @@ Composable services tutorial
 
 This guide will be a walkthrough related to how to add new services to a TripleO
 deployment through additions to the tripleo-heat-templates and puppet-tripleo
-repositories, using part of the architecture defined in the `composable services architecture`_
+repositories, using part of the architecture defined in the `composable services architecture`_.
 
 .. note::
 

@@ -2,7 +2,7 @@
              be removed in a future release.
 
 Virtual Environment
------------------------------------
+-------------------
 
 |project| can be used in a virtual environment using virtual machines instead
 of actual baremetal. However, one baremetal machine is still
@@ -12,9 +12,9 @@ needed to act as the host for the virtual machines.
              purposes only.  This method cannot be used for production-ready
              deployments.
 
-
 Minimum System Requirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 By default, this setup creates 3 virtual machines:
 
 * 1 Undercloud
@@ -44,7 +44,7 @@ The baremetal machine should meet the following minimum system requirements:
 .. _preparing_virtual_environment:
 
 Preparing the Virtual Environment (Automated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Install RHEL 7.1 Server x86_64 or CentOS 7 x86_64 on your host machine.
 
@@ -52,7 +52,7 @@ Preparing the Virtual Environment (Automated)
   .. admonition:: RHEL Portal Registration
      :class: portal
 
-     Register the host machine using Subscription Management.::
+     Register the host machine using Subscription Management::
 
          sudo subscription-manager register --username="[your username]" --password="[your password]"
          # Find this with `subscription-manager list --available`
@@ -109,6 +109,7 @@ Preparing the Virtual Environment (Automated)
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
+
 5. Install instack-undercloud::
 
     sudo yum install -y instack-undercloud
@@ -240,6 +241,7 @@ Preparing the Virtual Environment (Automated)
      change the target for an existing volume pool with this method, so if
      you already have a 'default' pool and cannot remove it, you should also
      specify a new pool name to be created.
+
   ::
 
     instack-virt-setup

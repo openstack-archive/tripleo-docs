@@ -37,7 +37,7 @@ scheduler will be unable to match the capabilities correctly.
           profile matching ("compute", "control", etc).
 
 Create an environment file with Scheduler Hints
-----------------------------------------------
+-----------------------------------------------
 
 The next step is simply to create a heat environment file, which matches the
 per-node capabilities created for each node above::

@@ -1,5 +1,5 @@
 Updating tripleo-heat-templates
----------------------------------
+-------------------------------
 
 This section will describe the changes needed for tripleo-heat-templates.
 
@@ -56,7 +56,7 @@ Step 1 - Updating puppet references
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remove all puppet references for the composable service from the current
-manifests (*.pp). All the puppet logic will live in the puppet-tripleo
+manifests (\*.pp). All the puppet logic will live in the puppet-tripleo
 repository based on a configuration step, so it is mandatory to remove all the
 puppet references from tripleo-heat-templates.
 
@@ -77,7 +77,7 @@ The updated .pp files for the NTP example were:
 
 
 Step 2 - overcloud-resource-registry-puppet.j2.yaml resource registry changes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The resource ``OS::TripleO::Services::Ntp`` must be defined in the resource
 registry (``overcloud-resource-registry-puppet.j2.yaml``)

@@ -14,7 +14,7 @@ The puppet manifests used to configure services on overcloud nodes currently
 reside in the tripleo-heat-templates repository, in the folder `puppet/manifests`_.
 In order to properly organize and structure the code, all
 manifests will be re-defined in the puppet-tripleo repository, and adapted to
-the `composable services architecture`_
+the `composable services architecture`_.
 
 The use case for this example uses NTP as a service installed by default among
 the OpenStack deployment. In this particular case, NTP is installed and

@@ -245,7 +245,7 @@ Upgrading the Overcloud
        **Explicitly disable sahara services if so desired:**
        As discussed at bug1630247_  sahara services are disabled by default
        in the Newton overcloud deployment. This special case is handled for
-       the duration of the upgrade by defaulting to 'keep sahara-*'.
+       the duration of the upgrade by defaulting to 'keep sahara-\*'.
 
        That is by default sahara services are restarted after the mitaka to
        newton upgrade of controller nodes and sahara config is re-applied
@@ -310,7 +310,7 @@ Upgrading the Overcloud
        **Explicitly disable sahara services if so desired:**
        As discussed at bug1630247_  sahara services are disabled by default
        in the Newton overcloud deployment. This special case is handled for
-       the duration of the upgrade by defaulting to 'keep sahara-*'.
+       the duration of the upgrade by defaulting to 'keep sahara-\*'.
 
        That is by default sahara services are restarted after the mitaka to
        newton upgrade of controller nodes and sahara config is re-applied

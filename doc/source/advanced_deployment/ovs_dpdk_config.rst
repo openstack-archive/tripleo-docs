@@ -3,12 +3,14 @@ Deploying with OVS DPDK Support
 
 TripleO can deploy Overcloud nodes with OVS DPDK support. The following
 changes are required:
+
  - Environment File
  - Parameters
  - Network Config
 
 Environment File
 ----------------
+
 Deploy command should include the OVS DPDK environment file to override the
 default neutron-ovs-agent service with neutron-ovs-dpdk-agent service. All the
 required parameters are specified in this environment file as commented. The

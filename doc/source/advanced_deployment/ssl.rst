@@ -15,9 +15,9 @@ the ``generate_service_certificate`` option in ``undercloud.conf`` to
 ``True``. This will generate a certificate in ``/etc/pki/tls/certs`` with
 a file name that follows the following pattern::
 
-undercloud-[undercloud_public_vip].pem
+    undercloud-[undercloud_public_vip].pem
 
-This will be a PEM file in a format that HAProxy can understand (See the
+This will be a PEM file in a format that HAProxy can understand (see the
 HAProxy documentation for more information on this).
 
 This option for auto-generating certificates uses Certmonger to request
@@ -31,7 +31,7 @@ The default is to use Certmonger's ``local`` CA. So using this option has
 the side-effect of extracting Certmonger's local CA to a PEM file that is
 located in the following path::
 
-``/etc/pki/ca-trust/source/anchors/cm-local-ca.pem``
+    /etc/pki/ca-trust/source/anchors/cm-local-ca.pem
 
 This certificate will then be added to the trusted CA chain, since this is
 needed to be able to use the undercloud's endpoints with that certificate.
@@ -299,7 +299,7 @@ Self-signed DNS-based certificate::
    :class: stable
 
     In Mitaka and older releases, the EndpointMap was in enable-tls.yaml, so there
-    is no need to pass a tls-endpoints-*.yaml file.  However, this means that the
+    is no need to pass a tls-endpoints-\*.yaml file.  However, this means that the
     enable-tls.yaml file must be rebased when upgrading to reflect any new endpoints
     that may have been added.  Examples of the necessary parameters for different
     scenarios follow.

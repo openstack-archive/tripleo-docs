@@ -2,6 +2,7 @@ THT design patterns
 -------------------
 
 .. _duplicated-parameters:
+
 Duplicated parameters
 ~~~~~~~~~~~~~~~~~~~~~
 

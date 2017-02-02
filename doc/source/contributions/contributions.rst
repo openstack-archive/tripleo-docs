@@ -1,9 +1,9 @@
 How to Contribute
 =================
 
-|project| source code is available. You can contribute code to individual
-projects, documentation, report bugs and vulnerabilities, request features.
-
+|project| source code is publicly available. You can contribute code to
+individual projects, documentation, report bugs and vulnerabilities, request
+features.
 
 Contributing Code
 -----------------
@@ -16,17 +16,16 @@ wiki/How_To_Contribute>`_.
 See :doc:`../introduction/components` to find out how to contribute into
 individual projects.
 
-
 Contributing to this Documentation
 -----------------------------------
 
-|project| User Documentation lives on Github under |project|
-organization.
+|project| User Documentation lives on
+`git.openstack.org <http://git.openstack.org/cgit/openstack/tripleo-docs/>`_
+and is mirrored on
+`GitHub under the OpenStack organization <https://github.com/openstack/tripleo-docs>`_.
 
 Learn `how to contribute into TripleO Docs
-<https://git.openstack.org/openstack/tripleo-docs>`_.
-
-
+<http://git.openstack.org/cgit/openstack/tripleo-docs/tree/README.rst>`_.
 
 Reporting Bugs
 --------------
@@ -34,14 +33,14 @@ Reporting Bugs
 **OpenStack Upstream**: If you find bugs or vulnerabilities which affect
 upstream projects, please follow OpenStack's process of filing bugs.
 
-* Learn `how to create Bugs in OpenStack
+* Learn `how to report bugs in OpenStack
   <https://wiki.openstack.org/wiki/Bugs>`_.
 
 * If you want to file a bug against upstream project, you can find useful links
   in our list of :doc:`../introduction/components`.
 
 
-**|project|** If the bug impacts the |project| project as a whole, you can file a
+**TripleO** If the bug impacts the |project| project as a whole, you can file a
 bug in |bug_tracker|:
 
 #. Go to |bug_tracker_url|
@@ -50,7 +49,6 @@ bug in |bug_tracker|:
    its URL in advanced fields)
 
 #. Submit bug
-
 
 Requesting Features
 -------------------

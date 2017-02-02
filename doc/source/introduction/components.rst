@@ -194,8 +194,8 @@ virtual machines which act as bare metal nodes via special driver ``pxe_ssh``.
 **How to contribute**
 
 Ironic uses `tox <https://tox.readthedocs.org/en/latest/>`_ to manage the
-development environment, see `OpenStack's Documentation
-<http://docs.openstack.org/developer/ironic/dev/contributing.html>`_,
+development environment, see the `Developer Quick-Start
+<http://docs.openstack.org/developer/ironic/dev/dev-quickstart.html>`_,
 `Ironic Developer Guidelines
 <https://wiki.openstack.org/wiki/Ironic/Developer_guidelines>`_
 and `OpenStack Developer's Guide`_ for details.
@@ -300,7 +300,22 @@ are deployed via Heat.
 
 nova
 ^^^^
-TBD
+
+nova provides a cloud computing fabric controller.
+
+**How to contribute**
+
+* Read the
+  `Development Quickstart <http://docs.openstack.org/developer/nova/development.environment.html>`_
+  to set up a development environment. Submit your changes via OpenStack
+  Gerrit (see 
+  `OpenStack Developer's Guide <http://docs.openstack.org/infra/manual/developers.html>`_).
+
+**Useful links**
+
+* Git repository: https://git.openstack.org/cgit/openstack/nova
+* Bugs: https://bugs.launchpad.net/nova
+* Blueprints: https://blueprints.launchpad.net/nova
 
 puppet-\*
 ^^^^^^^^^

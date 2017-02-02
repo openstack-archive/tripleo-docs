@@ -1,8 +1,8 @@
 Troubleshooting instack-virt-setup Failures
------------------------------------
+-------------------------------------------
 
 Known Issues:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 * Due to a `bug in libvirt`_, it is possible for instack-virt-setup to fail
   with an error such as the following::

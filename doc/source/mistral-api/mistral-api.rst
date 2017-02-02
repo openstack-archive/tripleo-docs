@@ -22,7 +22,7 @@ When using the CLI, all of the TripleO workflows can be viewed with the
 command ``openstack workflow list``. All of the workflows provided by TripleO
 will have a name starting with ``tripleo.``
 
-.. code-block:: plain
+.. code-block:: console
 
     $ openstack workflow list
     +--------------------------------------+-----------------------------------------+------------------------------+
@@ -37,7 +37,7 @@ accept use the ``openstack workflow show`` command. This command will also
 show the default values for input parameters. If no default is given, then it
 is required.
 
-.. code-block:: plain
+.. code-block:: console
 
     $ openstack workflow show tripleo.plan_management.v1.create_default_deployment_plan
     +------------+-----------------------------------------------------------+
@@ -55,7 +55,7 @@ is required.
 This workflow can then be executed with the ``openstack workflow execution
 create`` command.
 
-.. code-block:: plain
+.. code-block:: console
 
     $ openstack workflow execution create tripleo.plan_management.v1.create_default_deployment_plan \
         '{"container": "my_cloud"}'
@@ -108,7 +108,7 @@ environment.
 
 The following command creates a plan called ``my_cloud``.
 
-.. code-block:: plain
+.. code-block:: console
 
     $ openstack workflow execution create tripleo.plan_management.v1.create_default_deployment_plan \
         '{"container": "my_cloud"}'
@@ -279,7 +279,7 @@ successful. These required parameters will depend on the Heat templates that
 are being used. Parameters can be set with the Mistral Action
 ``tripleo.parameters.update``.
 
-.. node::
+.. note::
 
     This action will merge the passed parameters with those already set on the
     plan. To set the parameters first use ``tripleo.parameters.reset`` to

@@ -152,6 +152,15 @@ environment file (``ironic-config.yaml`` in this guide):
       It is highly recommended to set this parameter to ``metadata``
       for virtual environments, as full cleaning can be extremely slow there.
 
+* ``IronicCleaningNetwork`` sets the name or UUID of the **overcloud** network
+  to use for node cleaning. Initially is set to ``provisioning`` and should be
+  set to an actual UUID later when `Configuring cleaning`_.
+
+  .. admonition:: Newton
+      :class: newton
+
+      In the Newton release this parameter was not available, and no default
+      value was set for the cleaning network.
 
 * ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
@@ -221,79 +230,64 @@ parameters::
 
     source overcloudrc
     openstack network create --share --provider-network-type flat \
-        --provider-physical-network datacentre --external external
-    openstack subnet create --network external \
+        --provider-physical-network datacentre --external provisioning
+    openstack subnet create --network provisioning \
         --subnet-range 192.168.24.0/24 --gateway 192.168.24.40 \
-        --allocation-pool start=192.168.24.41,end=192.168.24.100 external-subnet
+        --allocation-pool start=192.168.24.41,end=192.168.24.100 provisioning-subnet
 
 .. warning::
     Network types other than "flat" are not supported.
 
 We will use this network for bare metal instances (both for provisioning and
-as a tenant network). In a real situation you will only use it as external, and
-create a separate physical network for instances.
+as a tenant network), as well as an external network for virtual instances.
+In a real situation you will only use it as provisioning, and create a separate
+physical network as external.
 
 Now you can create a regular tenant network to use for virtual instances
-and a router between external and tenant networks::
+and a router between provisioning and tenant networks::
 
     openstack network create tenant-net
     openstack subnet create --network tenant-net --subnet-range 192.0.3.0/24 \
         --allocation-pool start=192.0.3.10,end=192.0.3.20 tenant-subnet
     openstack router create default-router
-    openstack router add subnet default-router external-subnet
+    openstack router add subnet default-router provisioning-subnet
     openstack router add subnet default-router tenant-subnet
 
 Configuring cleaning
 ~~~~~~~~~~~~~~~~~~~~
 
-You need to configure Ironic to use the newly created provider network for
-cleaning. Use the following command to get the network UUID::
+Starting with the Ocata release, Ironic is configured to use network called
+``provisioning`` for node cleaning. However, network names are not unique.
+A user creating another network with the same name will break bare metal
+provisioning. Thus, it's highly recommended to update the deployment,
+providing the provider network UUID.
 
-    openstack network show external -f value -c id
+Use the following command to get the UUID::
 
-If you plan on configuring provisioning network separation (beyond the scope
-of this guide), you need to also set ``provisioning_network`` the same
-way.
+    openstack network show provisioning -f value -c id
 
-Update the environment file you've created before to set
-``ironic::conductor::cleaning_network`` hieradata variable to the UUID or name
-of the provider network created above, for example::
+Update the environment file you've created, setting ``IronicCleaningNetwork``
+to the this UUID, for example::
 
     parameter_defaults:
-        ControllerExtraConfig:
-            ironic::conductor::cleaning_network: c71f4bfe-409b-4292-818f-21cdf910ee06
+        IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
 
 .. admonition:: Newton
    :class: newton
 
-   In the Newton release this variable was called "cleaning_network_uuid" and
-   accepted only UUIDs.
+   In the Newton release this parameter was not available, use
+   ``cleaning_network_uuid`` hieradata value instead, for example::
 
-.. warning::
-   If you use a network name here, you should ensure that this name is and will
-   always be unique in the deployment.
+        parameter_defaults:
+            ControllerExtraConfig:
+                ironic::conductor::cleaning_network_uuid: c71f4bfe-409b-4292-818f-21cdf910ee06
+
+   This variable does not support node names and does not have a default value
+   in this release.
 
 Finally, run the deploy command with exactly the same arguments as before
 (don't forget to include the environment file if it was not included
 previously).
-
-.. note::
-    Of course you can do the same manually:
-
-    * SSH into every controller node.
-
-    * Set  ``cleaning_network`` option in the ``neutron`` section of
-      ``/etc/ironic/ironic.conf`` to the UUID of this network.
-
-      .. admonition:: Newton
-         :class: newton
-
-         In the Newton release this variable was called "cleaning_network_uuid"
-
-    * Restart the ``openstack-ironic-conductor`` service.
-
-    This action has to be repeated every time you run puppet on controllers
-    (e.g. during a stack update).
 
 Adding deployment images
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -578,17 +572,17 @@ For example, using SSH public key from undercloud::
 Now you're ready to boot your first bare metal instance::
 
     openstack server create --image centos-image --flavor baremetal \
-        --nic net-id=$(openstack network show external -f value -c id) \
+        --nic net-id=$(openstack network show provisioning -f value -c id) \
         --key-name undercloud-key instance-0
 
 After some time (depending on the image), you will see the prepared instance::
 
     $ openstack server list
-    +--------------------------------------+------------+--------+------------------------+
-    | ID                                   | Name       | Status | Networks               |
-    +--------------------------------------+------------+--------+------------------------+
-    | 2022d237-e249-44bd-b864-e7f536a8e439 | instance-0 | ACTIVE | external=192.168.24.50  |
-    +--------------------------------------+------------+--------+------------------------+
+    +--------------------------------------+------------+--------+-----------------------------+
+    | ID                                   | Name       | Status | Networks                    |
+    +--------------------------------------+------------+--------+-----------------------------+
+    | 2022d237-e249-44bd-b864-e7f536a8e439 | instance-0 | ACTIVE | provisioning=192.168.24.50  |
+    +--------------------------------------+------------+--------+-----------------------------+
 
 .. note::
     If you encounter *"No valid host found"* error from Nova, make sure to read

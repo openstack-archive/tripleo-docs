@@ -71,15 +71,17 @@ ironic-inspector times out introspection process after some time (defaulting to
 1 hour) if it never gets response from the introspection ramdisk.  This can be
 a sign of a bug in the introspection ramdisk, but usually it happens due to
 environment misconfiguration, particularly BIOS boot settings. Please refer to
-`ironic-inspector troubleshooting documentation`_ for information on how to
-detect and fix such problems.
+`ironic-inspector troubleshooting documentation
+<http://docs.openstack.org/developer/ironic-inspector/troubleshooting.html>`_
+for information on how to detect and fix such problems.
 
 Accessing the ramdisk
 ~~~~~~~~~~~~~~~~~~~~~
 
-Note that the introspection ramdisk is by default built with `the
-dynamic-login element`_, so you can set up an SSH key and log into it for
-debugging.
+Note that the introspection ramdisk is by default built with the
+`dynamic-login element
+<http://docs.openstack.org/developer/diskimage-builder/elements/dynamic-login/README.html>`_,
+so you can set up an SSH key and log into it for debugging.
 
 First, think of a temporary root password. Generate a hash by feeding it
 into ``openssl passwd -1`` command. Edit ``/httpboot/inspector.ipxe``

@@ -374,7 +374,8 @@ command with consistent syntax and behaviour.
 **How to contribute**
 
 * python-openstackclient uses `tox <https://tox.readthedocs.org/en/latest/>`_
-  to manage the development environment, see `upstream documentation
+  to manage the development environment, see the
+  `python-openstackclient documentation
   <https://github.com/openstack/python-openstackclient/blob/master/README.rst>`_
   for details. Submit your changes via OpenStack Gerrit
   (see `OpenStack Developer's Guide`_).
@@ -395,7 +396,8 @@ like node introspection, overcloud image building and uploading, etc.
 **How to contribute**
 
 * python-tripleoclient uses `tox <https://tox.readthedocs.org/en/latest/>`_
-  to manage the development environment, see `documentation
+  to manage the development environment, see the
+  `python-tripleoclient documentation
   <http://git.openstack.org/cgit/openstack/python-tripleoclient/tree/CONTRIBUTING.rst>`_
   for details. Submit your changes via
   `Gerrit <https://review.openstack.org/#/q/project:openstack/python-tripleoclient,n,z>`_.

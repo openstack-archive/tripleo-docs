@@ -1,6 +1,8 @@
 Updating tripleo-heat-templates
 -------------------------------
 
+.. include:: ../../links.rst
+
 This section will describe the changes needed for tripleo-heat-templates.
 
 Folder structure convention for tripleo-heat-templates

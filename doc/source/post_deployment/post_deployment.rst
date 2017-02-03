@@ -15,4 +15,5 @@ In this chapter you will find advanced management of various |project| areas.
    package_update
    upgrade
    build_single_image
+   upload_single_image
    backup_restore_undercloud

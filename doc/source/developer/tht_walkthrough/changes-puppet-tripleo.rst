@@ -1,6 +1,8 @@
 Updating puppet-tripleo
 -----------------------
 
+.. include:: ../../links.rst
+
 The puppet manifests that currently define overcloud node configuration are
 moved from the tripleo-heat-templates to new puppet-tripleo class definitions
 as part of the composable services approach. In next iterations, all service

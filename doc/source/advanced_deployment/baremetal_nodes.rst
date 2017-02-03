@@ -4,9 +4,7 @@ Baremetal Node Configuration
 Documentation on how to do advanced configuration of baremetal nodes in
 |project|.
 
-
 .. toctree::
-
 
    node_states
    root_device

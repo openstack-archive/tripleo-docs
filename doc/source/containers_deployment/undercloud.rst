@@ -166,5 +166,5 @@ second one is `heat-all` which executes the templates and installs the services.
 The latter can be run on baremetal or in a container (tripleoclient will run it
 in a container by default).
 
-Checkout the `TripleO Containers Architecture`_ for more detailed info on how
+Checkout the :doc:`architecture` for more detailed info on how
 TripleO builds, creates and runs containers.

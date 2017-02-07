@@ -116,9 +116,8 @@ script is called from the `post.yaml` file and it takes a `json` file as
 configuration.
 
 The `docker-puppet.py` execution results in a oneshot container being executed
-(usually named `puppet-$service_name) to generate the configuration options or
+(usually named `puppet-$service_name`) to generate the configuration options or
 run other service specific operations. Example: Create Keystone endpoints.
-
 
 Anatomy of a containerized service template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,21 +242,30 @@ containers steps. These steps are executed sequentially:
 
 #. Containers config files generated per hiera settings.
 #. Load Balancer configuration baremetal
-  #. Step 1 baremetal
-  #. Step 1 containers
+
+   #. Step 1 baremetal
+   #. Step 1 containers
+
 #. Core Services (Database/Rabbit/NTP/etc.)
-  #. Step 2 baremetal
-  #. Step 2 containers
+
+   #. Step 2 baremetal
+   #. Step 2 containers
+
 #. Early Openstack Service setup (Ringbuilder, etc.)
-  #. Step 3 baremetal
-  #. Step 3 containers
+
+   #. Step 3 baremetal
+   #. Step 3 containers
+
 #. General OpenStack Services
-  #. Step 4 baremetal
-  #. Step 4 containers
-  #. Keystone containers post initialization (tenant, service, endpoint creation)
+
+   #. Step 4 baremetal
+   #. Step 4 containers
+   #. Keystone containers post initialization (tenant, service, endpoint creation)
+
 #. Service activation (Pacemaker)
-  #. Step 5 baremetal
-  #. Step 5 containers
+
+   #. Step 5 baremetal
+   #. Step 5 containers
 
 
 Service Bootstrap

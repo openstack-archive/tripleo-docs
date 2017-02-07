@@ -267,7 +267,7 @@ major-upgrade-composable-steps that comes first, as described above.
 .. _manifests: https://github.com/openstack/tripleo-heat-templates/tree/master/puppet/services
 
 Upgrading the Overcloud to Newton and earlier
------------------------
+---------------------------------------------
 
 .. note::
 

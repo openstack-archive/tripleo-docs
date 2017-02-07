@@ -12,6 +12,7 @@ Contents:
    environments/environments
    installation/installation
    basic_deployment/basic_deployment_cli
+   containers_deployment/index
    post_deployment/post_deployment
    advanced_deployment/features
    advanced_deployment/baremetal_nodes

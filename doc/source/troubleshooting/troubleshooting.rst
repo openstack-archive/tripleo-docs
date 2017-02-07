@@ -4,9 +4,11 @@ Troubleshooting
 At this chapter you will find answers for frequently asked questions and
 help with troubleshooting when using |project|.
 
+.. toctree::
+   :maxdepth: 2
 
-.. include:: troubleshooting-virt-setup.rst
-.. include:: troubleshooting-image-build.rst
-.. include:: troubleshooting-nodes.rst
-.. include:: troubleshooting-overcloud.rst
-.. include:: troubleshooting-tripleo-heat-templates.rst
+   troubleshooting-virt-setup
+   troubleshooting-image-build
+   troubleshooting-nodes
+   troubleshooting-overcloud
+   troubleshooting-tripleo-heat-templates

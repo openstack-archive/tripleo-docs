@@ -256,7 +256,7 @@ Load the images into the undercloud Glance::
 
     openstack overcloud image upload
 
-To upload a single image, see :doc:`../advanced_deployment/upload_single_image`.
+To upload a single image, see :doc:`../post_deployment/upload_single_image`.
 
 Register Nodes
 --------------

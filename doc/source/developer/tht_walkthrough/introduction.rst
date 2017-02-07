@@ -1,6 +1,8 @@
 Introduction
 ------------
 
+.. include:: ../../links.rst
+
 The initial scope of this tutorial is to create a brief walkthrough with some
 guidelines and naming conventions for future modules and features aligned with
 the composable services architecture. Regarding the example described in this

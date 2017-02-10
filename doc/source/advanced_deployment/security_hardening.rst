@@ -38,7 +38,7 @@ can do so using an enviroment file.
 Enforce Password Check
 ~~~~~~~~~~~~~~~~~~~~~~
 
-By setting ``ENFORCE_PASSWORD_CHECK`` to ``True`` within Horizons
+By setting ``ENFORCE_PASSWORD_CHECK`` to ``True`` within Horizon's
 ``local_settings.py``, it displays an ‘Admin Password’ field on the
 “Change Password” form to verify that it is the admin loggedin that wants to
 perform the password change.
@@ -96,7 +96,7 @@ enviroment file::
         ******************************************************************
 
 As with the previous Horizon Password Validation example, saving the above into
-a yaml file, will allow passing the aforementioned paramaters into the overcloud
+a yaml file, will allow passing the aforementioned parameters into the overcloud
 deploy command::
 
     openstack overcloud deploy --templates -e  ssh_banner.yaml

@@ -21,6 +21,7 @@ You can upgrade any packages that are installed on the undercloud machine.
     sudo systemctl stop openstack-*
     sudo systemctl stop neutron-*
     sudo systemctl stop openvswitch
+    sudo systemctl stop httpd
 
 #. Update the TripleO CLI package::
 

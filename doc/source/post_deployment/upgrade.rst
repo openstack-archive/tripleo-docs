@@ -100,6 +100,7 @@ Upgrading the Undercloud
 
       sudo systemctl stop openstack-*
       sudo systemctl stop neutron-*
+      sudo systemctl stop httpd
       sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient
       openstack undercloud upgrade
 

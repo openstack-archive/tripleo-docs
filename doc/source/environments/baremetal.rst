@@ -26,8 +26,10 @@ you need an additional baremetal machine.
 The baremetal machines must meet the following minimum specifications:
 
 * multi-core CPU
-* 4 GB memory
+* 8 GB memory
 * 60 GB free disk space
+
+Larger systems are recommended for production deployments, however.
 
 TripleO is supporting only the following operating systems:
 

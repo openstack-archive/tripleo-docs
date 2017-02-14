@@ -21,7 +21,7 @@ By default, this setup creates 3 virtual machines:
 * 1 Overcloud Controller
 * 1 Overcloud Compute
 
-Each virtual machine must consist of at least 4 GB of memory and 40 GB of disk
+Each virtual machine must consist of at least 8 GB of memory and 40 GB of disk
 space [#]_.
 
 .. note::

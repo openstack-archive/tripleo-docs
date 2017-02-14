@@ -69,15 +69,11 @@ Installing the Undercloud
 
     sudo yum install -y python-tripleoclient
 
+#. Copy in the sample configuration file and edit it to reflect your environment::
+
+    cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
 #. Run the command to install the undercloud:
-
-  .. admonition:: Baremetal
-     :class: baremetal
-
-     Copy in the sample configuration file and edit it to reflect your environment::
-
-        cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
   .. admonition:: Source
      :class: source

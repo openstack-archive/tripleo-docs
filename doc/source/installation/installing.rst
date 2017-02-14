@@ -73,6 +73,14 @@ Installing the Undercloud
 
     cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
+  .. TODO(bnemec): Find a more permanent location for this tool.
+  .. note:: There is a tool available that can help with writing a basic
+            undercloud.conf:
+            `Undercloud Configuration Wizard <http://ucw-bnemec.rhcloud.com/>`_
+            It takes some basic information about the intended overcloud
+            environment and generates sane values for a number of the important
+            options.
+
 #. Run the command to install the undercloud:
 
   .. admonition:: Source

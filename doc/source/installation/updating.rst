@@ -14,7 +14,11 @@ You can upgrade any packages that are installed on the undercloud machine.
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
 
-3. Stop services so that they are not restarted by packaging scripts
+3. Clean the yum cache to ensure only the new repos are used::
+
+    sudo yum clean all
+
+#. Stop services so that they are not restarted by packaging scripts
    when they are updated. The service restarts will be handled by the
    undercloud upgrade command after new configuration has been applied.::
 

@@ -247,17 +247,29 @@ The most up-to-date information about Ironic drivers is at
 http://docs.openstack.org/developer/ironic/deploy/drivers.html, but note that
 this page always targets Ironic git master, not the release we use.
 
-There are 2 generic drivers:
+This most generic driver is ``pxe_ipmitool``. It uses `ipmitool`_ utility
+to manage a bare metal node, and supports a vast variety of hardware.
 
-* ``pxe_ipmitool`` driver uses `ipmitool`_ utility to manage a bare metal
-  node, and supports vast variety of hardware.
+.. admonition:: Virtual
+   :class: virtual
 
-* ``pxe_ssh`` is a special driver for testing Ironic in the virtual
-  environment. This driver connects to the hypervisor to conduct management
-  operations on virtual nodes. In case of this driver, ``pm_addr`` is a
-  hypervisor address, ``pm_user`` is a SSH user name for accessing hypervisor,
-  ``pm_password`` is a private SSH key for accessing hypervisor. Note that
-  private key must not be encrypted.
+   When combined with :doc:`virtualbmc` this driver can be used for developing
+   and testing TripleO in a virtual environment as well.
+
+   .. admonition:: Stable Branch
+      :class: stable
+
+      Prior to the Ocata release, a special ``pxe_ssh`` driver was used for
+      testing Ironic in the virtual environment. This driver connects to the
+      hypervisor to conduct management operations on virtual nodes. In case of
+      this driver, ``pm_addr`` is a hypervisor address, ``pm_user`` is a SSH
+      user name for accessing hypervisor, ``pm_password`` is a private SSH
+      key for accessing hypervisor. Note that private key must not be
+      encrypted.
+
+      .. warning::
+        The ``pxe_ssh`` driver is deprecated and ``pxe_ipmitool`` +
+        :doc:`virtualbmc` should be used instead.
 
 Ironic also provides specific drivers for some types of hardware:
 

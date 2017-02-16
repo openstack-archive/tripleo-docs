@@ -277,3 +277,47 @@ restart the agent service.
 
 Once the script executes successfully, the deployed servers will start polling
 Heat for software deployments and the stack will continue creating.
+
+
+Scaling the Overcloud
+---------------------
+
+Scaling Up
+^^^^^^^^^^
+When scaling up the Overcloud, the heat agents on the new servers being added
+to the deployment need to be configured to correspond to the new nodes being
+added.
+
+For example, when scaling out compute nodes, the steps to be completed by the
+user are as follows:
+
+#. Prepare the new deployed server(s) as shown in `Deployed Server
+   Requirements`_.
+#. Start the scale out command. See :ref:`scale_roles` for reference.
+#. Once Heat has created the new resources for the new deployed server(s),
+   query Heat for the request metadata url for the new nodes, and configure the
+   remote agents as shown in `Manual configuration of Heat agents`_.
+
+Scaling Down
+^^^^^^^^^^^^
+When scaling down the Overcloud, follow the scale down instructions as normal
+as shown in :ref:`delete_nodes`.
+
+The physical deployed servers that have been removed from the deployment need
+to be powered off. In a deployment not using deployed servers, this would
+typically be done with Ironic. When using deployed servers, it must be done
+manually, or by whatever existing power management solution is already in
+place. If the nodes are not powered down, they will continue to be operational
+and could be part of the deployment, since there are no steps to unconfigure,
+uninstall software, or stop services on nodes when scaling down.
+
+Once the nodes are powered down and all needed data has been saved from the
+nodes, it is recommended that they be reprovisioned back to a base operating
+system configuration so that they do not unintentionally join the deployment in
+the future if they are powered back on.
+
+.. note::
+
+  Do not attempt to reuse nodes that were previously removed from the
+  deployment without first reprovisioning them using whatever provisioning tool
+  is in place.

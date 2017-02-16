@@ -1,3 +1,5 @@
+.. _scale_roles:
+
 Scaling overcloud roles
 =======================
 If you want to increase or decrease resource capacity of a running overcloud,

@@ -12,7 +12,7 @@ executed and what not. The puppet containers are created and removed
 automatically unless they fail. For all the other containers, it's enough to
 monitor the output of the command below::
 
-    $ watch docker ps -a --filter label=managed_by=docker-cmd
+    $ watch -n 0.5 docker ps -a --filter label=managed_by=docker-cmd
 
 .. _debug-containers:
 
@@ -60,14 +60,47 @@ The following commands are useful for debugging containers.
 
     $ docker export $CONTAINER_ID_OR_NAME | tar -C /tmp/$CONTAINER_ID_OR_NAME -xvf -
 
+Using docker-toool
+------------------
+
+In addition to the above, there is also now a json file that is generated
+that contains all the information for all the containers and how they
+are run.  This file is `/var/lib/docker-container-startup-configs.json`.
+
+`docker-toool` was written to read from this file and start containers
+for debugging purposes based on those commands.  For now this utility
+is in the tripleo-heat-templates repo in the `docker/` directory.
+
+By default this tool lists all the containers that are started and
+their start order.
+
+If you wish to see the command line used to start a given container,
+specify it by name using the --container (or -c) argument.  --run (or
+-r) can then be used with this to actually execute docker to run the
+container.  To see all available options use::
+
+    ./docker-toool --help
+
+Other options listed allow you to modify this command line for
+debugging purposes.  For example::
+
+    ./docker-toool -c swift-proxy -r -e /bin/bash -u root -i -n test
+
+will run the swift proxy container with all the volumes, permissions
+etc as used at runtime but as the root user, executing /bin/bash, named
+'test', and will run interactively (eg -ti).  This allows you to enter
+the container and run commands to see what is failing, perhaps install
+strace and strace the command etc.  You can also verify configurations
+or any other debugging task you may have.
 
 Debugging docker-puppet.py
 --------------------------
 
-The :ref:`docker-puppet.py` script manages the config file generation and puppet
-tasks for each service. When writing these tasks, it's useful to be able to run
-them manually instead of running them as part of the entire stack. To do so, one
-can run the script as shown below::
+The :ref:`docker-puppet.py` script manages the config file generation and
+puppet tasks for each service.  This also exists in the `docker` directory
+of tripleo-heat-templates.  When writing these tasks, it's useful to be
+able to run them manually instead of running them as part of the entire
+stack. To do so, one can run the script as shown below::
 
   CONFG=/path/to/task.json $THT_ROOT/docker/docker-puppet.py
 
@@ -123,6 +156,16 @@ As mentioned above, it's possible to create custom json files and call
 `docker-puppet.py` manually, which makes developing and debugging puppet steps
 easier.
 
+`docker-puppet.py` also supports the environment variable `SHOW_DIFF`,
+which causes it to print out a docker diff of the container before and
+after the configuration step has occurred.
+
+By default `docker-puppet.py` runs things in parallel.  This can make
+it hard to see the debug output of a given container so there is a
+`PROCESS_COUNT` variable that lets you override this.  A typical debug
+run for docker-puppet might look like::
+
+    SHOW_DIFF=True PROCESS_COUNT=1 ./docker-puppet.py
 
 Testing in CI
 -------------

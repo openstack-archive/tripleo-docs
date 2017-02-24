@@ -51,6 +51,14 @@ Upgrading the Undercloud
             export CURRENT_VERSION=mitaka
             export NEW_VERSION=newton
 
+  .. admonition:: Newton to Ocata
+     :class: ntoo
+
+      ::
+
+            export CURRENT_VERSION=newton
+            export NEW_VERSION=ocata
+
   Backup and disable current repos. Note that the repository files might be
   named differently depending on your installation::
 
@@ -118,8 +126,147 @@ Upgrading the Undercloud
    If you added custom OVS ports to the undercloud (e.g. in a virtual
    testing environment) you may need to re-add them at this point.
 
+Upgrading the Overcloud to Ocata and beyond
+-------------------------------------------
 
-Upgrading the Overcloud
+As of the Ocata release, the upgrades workflow in tripleo has changed
+significantly to accommodate the operators' new ability to deploy custom roles
+with the Newton release (see the Composable Service Upgrade spec_ for more
+info). The new workflow uses ansible upgrades tasks to define the upgrades
+workflow on a per-service level.
+
+The operator starts the upgrade with a ``openstack overcloud deploy`` that
+includes the major-upgrade-composable-steps.yaml_ environment file as well
+as all other environment files used on the initial deployment. This will
+collect the ansible upgrade tasks for all roles, except those that have the
+``disable_upgrade_deployment`` flag set ``True`` in roles_data.yaml_. The
+tasks will be executed in a series of steps, for example (and not limited to):
+step 0 for validations or other pre-upgrade tasks, step 1 to stop the
+pacemaker cluster, step 2 to stop services, step 3 for package updates,
+step 4 for cluster startup, step 5 for any special case db syncs or post
+package update migrations.
+
+After the ansible tasks have run the puppet configuration is also applied in
+the 'normal' manner we do on an initial deploy, to complete the upgrade and
+bring services back up.
+
+For those roles with the ``disable_upgrade_deployment`` flag set True, the
+operator will upgrade the corresponding nodes with the
+upgrade-non-controller.sh_. The operator uses that script to invoke the
+tripleo_upgrade_node.sh_ which is delivered during the
+major-upgrade-composable-steps that comes first, as described above.
+
+1. Run the major upgrade composable ansible steps
+
+   This step will upgrade the nodes of all roles that do not explicitly set the
+   ``disable_upgrade_deployment`` flag to ``True`` in the roles_data.yaml_
+   (this is an operator decision, and the current default is for the 'Compute'
+   and' ObjectStorage' roles to have this set).
+
+   The ansible upgrades tasks are collected from all service manifests_ and
+   executed in a series of steps as described in the introduction above.
+   Even before the invocation of these ansible tasks however, this upgrade
+   step also delivers the tripleo_upgrade_node.sh_ and role specific puppet
+   manifest to allow the operator to upgrade those nodes after this step has
+   completed.
+
+   Create an environment file with commands to switch OpenStack repositories to
+   a new release. This will likely be the same commands that were used to switch
+   repositories on the undercloud::
+
+      cat > overcloud-repos.yaml <<EOF
+      parameter_defaults:
+        UpgradeInitCommand: |
+          set -e
+          # REPOSITORY SWITCH COMMANDS GO HERE
+      EOF
+
+   And run `overcloud deploy`, passing in full set of environment
+   files plus `major-upgrade-composable-steps.yaml` and
+   `overcloud-repos.yaml`::
+
+      openstack overcloud deploy --templates \
+          -e <full environment> \
+          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps.yaml \
+          -e overcloud-repos.yaml
+
+.. note::
+
+     It is especially important to remember that you **must** include all
+     environment files that were used to deploy the overcloud that you are about
+     to upgrade.
+
+.. note::
+
+     The first step of the ansible tasks is to validate that the deployment is
+     in a good state before performing any other upgrade operations. Each
+     service manifest in the tripleo-heat-templates includes a check that it is
+     running and if any of those checks fail the upgrade will exit early at
+     ansible step 0.
+
+     If you are re-running the upgrade after an initial failed attempt, you may
+     need to disable these checks in order to allow the upgrade to proceed with
+     services down. This is done with the SkipUpgradeConfigTags parameter to
+     specify that tasks with the 'validation' tag should be skipped. You can
+     include this in any of the environment files you are using::
+
+        SkipUpgradeConfigTags: [validation]
+
+2. Upgrade remaining nodes for roles with ``disable_upgrade_deployment: True``
+
+   It is expected that the operator will want to upgrade the roles that have the
+   ``openstack-nova-compute`` and ``openstack-swift-object`` services deployed
+   to allow for pre-upgrade migration of workfloads. For this reason the default
+   ``Compute`` and ``ObjectStorage`` roles in the roles_data.yaml_ have the
+   ``disable_upgrade_deployment`` set ``True``.
+
+   Note that unlike in previous releases, this operator driven upgrade step
+   includes a full puppet configuration run as happens after the ansible
+   steps on the roles those are executed on. The significance is that nodes
+   are 'fully' upgraded after each step completes, rather than having to wait
+   for the final converge step as has previously been the case.
+
+   The tripleo_upgrade_node.sh_ script and puppet configuration are delivered to
+   the nodes with ``disable_upgrade_deployment`` set ``True`` during the initial
+   major upgrade composable steps in step 1 above.
+
+   To upgrade remaining roles (at your convenience)::
+
+      upgrade-non-controller.sh --upgrade overcloud-compute-0
+
+      for i in \$(seq 0 2); do
+        upgrade-non-controller.sh --upgrade overcloud-objectstorage-\$i &"
+      done
+
+3. Converge to unpin Nova RPC
+
+   The final step is required to unpin Nova RPC version. Unlike in previous
+   releases, for Ocata the puppet configuration has already been applied to nodes
+   as part of each upgrades step, i.e. after the ansible tasks or when invoking
+   the tripleo_upgrade_node.sh_ script to upgrade compute nodes. Thus the
+   significance of this step is somewhat diminished compared to previously.
+   However a re-application of puppet configuration across all nodes here will
+   also serve as a sanity check and hopefully show any issues that an operator
+   may have missed during any of the previous upgrade steps::
+
+
+      openstack overcloud deploy --templates \
+       -e <full environment> \
+       -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge.yaml
+
+.. note::
+
+     It is especially important to remember that you **must** include all
+     environment files that were used to deploy the overcloud.
+
+.. _spec: https://specs.openstack.org/openstack/tripleo-specs/specs/ocata/tripleo-composable-upgrades.html
+.. _major-upgrade-composable-steps.yaml: https://github.com/openstack/tripleo-heat-templates/blob/master/environments/major-upgrade-composable-steps.yaml
+.. _roles_data.yaml: https://github.com/openstack/tripleo-heat-templates/blob/master/roles_data.yaml
+.. _tripleo_upgrade_node.sh: https://github.com/openstack/tripleo-heat-templates/blob/master/extraconfig/tasks/tripleo_upgrade_node.sh
+.. _upgrade-non-controller.sh: https://github.com/openstack/tripleo-common/blob/master/scripts/upgrade-non-controller.sh
+.. _manifests: https://github.com/openstack/tripleo-heat-templates/tree/master/puppet/services
+
+Upgrading the Overcloud to Newton and earlier
 -----------------------
 
 .. note::

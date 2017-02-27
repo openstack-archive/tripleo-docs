@@ -1,6 +1,11 @@
 TripleO Containers Architecture
 ================================
 
+.. Warning::
+
+   The TripleO containers support is still under heavy development. Things
+   documented here may change during the Pike cycle.
+
 This document explains the details around TripleO's containers architecture. The
 document goes into the details of how the containers are created from TripleO,
 how the configuration files are generated and how the containers are eventually

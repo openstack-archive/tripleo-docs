@@ -6,90 +6,142 @@ maintain an OpenStack environment. The tools perform the following functions:
 
 - Availability Monitoring
 - Centralized Logging
+- Performance Monitoring
 
 This document will go through the presentation and installation of these tools.
 
 Architecture
 ------------
 
-#. Undercloud:
+#. Operational Tool Server:
 
    - Monitoring Relay/proxy (RabbitMQ_)
    - Monitoring Controller/Server (Sensu_)
+   - Data Store (Redis_)
    - API/Presentation Layer (Uchiwa_)
    - Log relay/transformer (Fluentd_)
    - Data store (Elastic_)
    - API/Presentation Layer (Kibana_)
+   - Performance receptor (Collectd_)
+   - Aggregator/Relay (Graphite_)
+   - An API/Presentation Layer (Grafana_)
+
+#. Undercloud:
+
+   - There is no operational tools installed by default on the undercloud
 
 #. Overcloud:
 
    - Monitoring Agent (Sensu_)
    - Log Collection Agent (Fluentd_)
+   - Performance Collector Agent (Collectd_)
 
 .. _RabbitMQ: https://www.rabbitmq.com
 .. _Sensu: http://sensuapp.org
+.. _Redis: https://redis.io
 .. _Uchiwa: https://uchiwa.io
 .. _Fluentd: http://www.fluentd.org
 .. _Elastic: https://www.elastic.co
 .. _Kibana: https://www.elastic.co/products/kibana
+.. _Collectd: https://collectd.org
+.. _Graphite: https://graphiteapp.org
+.. _Grafana: https://grafana.com
+
+Deploying the Operational Tool Server
+-------------------------------------
+
+There is an ansible project called opstools-ansible (OpsTools_) on github that helps to install the Operator Server, further documentation of the operational tool server instalation can be founded at (OpsToolsDoc_).
+
+.. _OpsTools: https://github.com/centos-opstools/opstools-ansible
+.. _OpsToolsDoc: https://github.com/centos-opstools/opstools-doc
 
 Deploying the Undercloud
 ------------------------
 
-#. Edit ``undercloud.conf`` before the deployment:
+As there is nothing to install on the undercloud nothing needs to be done.
 
-   - set ``enable_monitoring`` to true if you want to enable Availability
-     Monitoring.
-     You can also specify a password for ``undercloud_sensu_password``,
-     otherwise one will be automatically generated.
-   - set ``enable_logging`` to true if you want to enable Centralized Logging.
-     By default, the indexes will be closed after 7 days and deleted after
-     10 days by using Curator_. You can change that with the 2 parameters:
-     ``elastic_close_index_days`` and ``elastic_delete_index_days``.
-
-#. That's it, you're ready to deploy your undercloud!
-
-.. _Curator: https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html
-
-Deploying the Overcloud
------------------------
+Before deploying the Overcloud
+------------------------------
 
 .. note::
 
     The :doc:`template_deploy` document has a more detailed explanation of the
     following steps.
 
-#. As the ``stack`` user, copy the Operational tools configuration files to your
-   home directory:
 
-   - Availability Monitoring::
+1. Operational tools configuration files:
 
-      cp /usr/share/openstack-tripleo-heat-templates/environments/monitoring-sensu-config.yaml ~
+ The files have some documentation about the parameters that need to be configured
 
-   - Centralized Logging::
+  - Availability Monitoring::
 
-      cp /usr/share/openstack-tripleo-heat-templates/environments/logging-fluentd-config.yaml ~
+     /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml
 
-#. Edit the parameters in the Operational tools configuration files to fit your
-   requirements.
+  - Centralized Logging::
 
-#. Continue following the TripleO instructions for deploying an overcloud.
-   Before entering the command to deploy the overcloud, add the environment
-   file that you just configured as an argument::
+     /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml
 
-    openstack overcloud deploy --templates -e ~/monitoring-sensu-config.yaml -e ~/logging-fluentd-config.yaml
+  - Performance Monitoring::
 
-#. Wait for the completion of the overcloud deployment process.
+     /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml
+ 
+2. Configure the environment
 
-Accessing to the Dashboards
----------------------------
+ The easiest way to configure our environment will be to create a parameter file, let's called paramters.yaml with all the paramteres defined.
 
-#. Availability Monitoring: you can reach the Sensu dashboard (Uchiwa) on this
-   URL::
+ - Availability Monitoring::
 
-    http://<UNDERCLOUD_IP_ADDRESS>:3000
+    MonitoringRabbitHost: server_ip          # Server were the rabbitmq was installed
+    MonitoringRabbitPort: 5672               # Rabbitmq port
+    MonitoringRabbitUserName: sensu_user     # the rabbitmq user to be used by sensu
+    MonitoringRabbitPassword: sensu_password # The password of the sensu user
+    MonitoringRabbitUseSSL: false            # Set to false
+    MonitoringRabbitVhost: "/sensu_vhost"    # The virtual host of the rabbitmq
 
-#. Centralized Logging: you can reach the Elastic dashboard (Kibana) on this
-   URL::
+ - Centralized Logging::
 
-    http://<UNDERCLOUD_IP_ADDRESS>:8300/index.html#/dashboard/file/logstash.json
+    LoggingServers:        # The servers 
+      - host: server_ip    # The ip of the server
+        port: 24224        # Port to send the logs [ 24224 plain & 24284 SSL ] 
+    LoggingUsesSSL: false  # Plain or SSL connections
+                           # If LoggingUsesSSL is set to  false the following lines can 
+                           # be deleted 
+    LoggingSharedKey: secret           # The key
+    LoggingSSLCertificate: |           # The content of the SSL Certificate
+      -----BEGIN CERTIFICATE-----
+      ...contens of server.pem here...
+      -----END CERTIFICATE-----
+
+ - Performance Monitoring::
+
+    CollectdServer: collectd0.example.com   # Collectd server, where the data is going to be sent
+    CollectdServerPort: 25826               # Collectd port
+    # CollectdSecurityLevel: None           # Security by default None the other values are
+                                            #   Encrypt & Sign, but the two following parameters
+                                            #   need to be set too
+    # CollectdUsername: user                # User to connect to the server
+    # CollectdPassword: password            # Password to connect to the server
+
+                                            # Collectd, by default, comes with several plugins
+                                            #  extra plugins can added on this parameter
+    CollectdExtraPlugins:
+      - disk                                # disk plugin
+      - df                                  # df   plugin
+    ExtraConfig:                            # If the plugins need to be set, this is the location
+      collectd::plugin::disk::disks:
+        - "/^[vhs]d[a-f][0-9]?$/"
+      collectd::plugin::df::mountpoints:
+        - "/"
+      collectd::plugin::df::ignoreselected: false
+
+
+3. Continue following the TripleO instructions for deploying an overcloud::
+
+    openstack overcloud deploy --templates \
+       [-e /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml] \
+       [-e  /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml] \
+       [-e /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml] \
+       -e parameters.yaml
+
+
+4. Wait for the completion of the overcloud deployment process.

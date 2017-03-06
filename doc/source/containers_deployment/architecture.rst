@@ -171,9 +171,6 @@ are re-asserted when applying latter ones.
             owner: mongodb
             perm: '0600'
 
-
-* **docker_image**: The full name of the docker image that will be used.
-
 * **docker_config**: Data that is passed to the `heat-config-docker-cmd`_ hook to
   configure a container, or step of containers at each step. See the available
   steps below and the related docker-cmd hook documentation in the heat-agents

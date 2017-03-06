@@ -113,7 +113,9 @@ docker-puppet.py
 
 This script is responsible for generating the config files for each service. The
 script is called from the `post.yaml` file and it takes a `json` file as
-configuration.
+configuration. The json files passed to this script are built out of the
+`puppet_config` parameter set in every service template (explained in the
+`Docker specific settings`_ section).
 
 The `docker-puppet.py` execution results in a oneshot container being executed
 (usually named `puppet-$service_name`) to generate the configuration options or
@@ -177,38 +179,42 @@ are re-asserted when applying latter ones.
   steps below and the related docker-cmd hook documentation in the heat-agents
   project.
 
-* **puppet_tags**: Puppet resource tag names that are used to generate config
-  files with puppet. Only the named config resources are used to generate a
-  config file. Any service that specifies tags will have the default tags of
-  'file,concat,file_line' appended to the setting. For example::
+* puppet_config
 
-    puppet_tags: keystone_config
+  * **step_config**: Usually a reference to the one defined outside this section.
 
-  Some puppet modules do a bit more than just generating config files. Some have
-  custom resources with providers that execute commands. It's possible to
-  overwrite these providers by changing the `step_config` property. For example::
+  * **puppet_tags**: Puppet resource tag names that are used to generate config
+    files with puppet. Only the named config resources are used to generate a
+    config file. Any service that specifies tags will have the default tags of
+    'file,concat,file_line' appended to the setting. For example::
 
-    puppet_tags: keystone_config
-    step_config:
-      list_join:
-        - "\n"
-        - - "['Keystone_user', 'Keystone_endpoint', 'Keystone_domain', 'Keystone_tenant', 'Keystone_user_role', 'Keystone_role', 'Keystone_service'].each |String $val| { noop_resource($val) }"
-          - {get_attr: [KeystoneBase, role_data, step_config]}
+      puppet_tags: keystone_config
+
+    Some puppet modules do a bit more than just generating config files. Some have
+    custom resources with providers that execute commands. It's possible to
+    overwrite these providers by changing the `step_config` property. For example::
+
+      puppet_tags: keystone_config
+      step_config:
+        list_join:
+          - "\n"
+          - - "['Keystone_user', 'Keystone_endpoint', 'Keystone_domain', 'Keystone_tenant', 'Keystone_user_role', 'Keystone_role', 'Keystone_service'].each |String $val| { noop_resource($val) }"
+            - {get_attr: [KeystoneBase, role_data, step_config]}
 
 
-  The example above will overwrite the provider for all the `Keystone_*` puppet
-  tags (except `keystone_config`) using the `noop_resource` function that comes
-  with `puppet-tripleo`. This function dynamically configures the default
-  provider for each of the `puppet_tags` in the array.
+    The example above will overwrite the provider for all the `Keystone_*` puppet
+    tags (except `keystone_config`) using the `noop_resource` function that comes
+    with `puppet-tripleo`. This function dynamically configures the default
+    provider for each of the `puppet_tags` in the array.
 
-* **config_volume**: The name of the docker volume where config files will be
-  generated for this service. Use this as the location to bind mount into the
-  running Kolla container for configuration.
+  * **config_volume**: The name of the docker volume where config files will be
+    generated for this service. Use this as the location to bind mount into the
+    running Kolla container for configuration.
 
-* **config_image**: The name of the docker image that will be used for
-  generating configuration files. This is often the same value as 'docker_image'
-  above but some containers share a common set of config files which are
-  generated in a common base container.
+  * **config_image**: The name of the docker image that will be used for
+    generating configuration files. This is often the same container that the
+    runtime service uses. Some services share a common set of config files which
+    are generated in a common base container.
 
 * **docker_puppet_tasks**: This section provides data to drive the
   docker-puppet.py tool directly. The task is executed only once within the

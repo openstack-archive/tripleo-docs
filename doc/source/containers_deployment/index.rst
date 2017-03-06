@@ -13,5 +13,6 @@ the undercloud or the overcloud.
    :maxdepth: 1
 
    undercloud
+   overcloud
    architecture
    tips_tricks

@@ -1,3 +1,5 @@
+.. _basic-deployment-cli:
+
 Basic Deployment (CLI)
 ======================
 
@@ -409,6 +411,8 @@ subnet. If needed, define the nameserver to be used for the environment::
 
    In virtual environments, the libvirt default network DHCP server address,
    typically 192.168.122.1, can be used as the overcloud nameserver.
+
+.. _deploy-the-overcloud:
 
 Deploy the Overcloud
 --------------------

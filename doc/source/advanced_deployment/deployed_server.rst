@@ -21,6 +21,19 @@ Deployed Server Requirements
 Networking
 ^^^^^^^^^^
 
+Network interfaces
+__________________
+
+It's recommended that each server have a dedicated management NIC with
+externally configured connectivity so that the servers are reachable outside of
+any networking configuration done by the OpenStack deployment.
+
+A separate interface, or set of interfaces should then be used for the
+OpenStack deployment itself, configured in the typical fashion with a set of
+NIC config templates during the Overcloud deployment. See
+:ref:`network_isolation` for more information on configuring networking.
+
+
 Undercloud
 __________
 
@@ -33,13 +46,57 @@ tripleo-heat-templates.
 Network L3 connectivity is still a requirement between the Undercloud and
 Overcloud nodes. The Overcloud nodes will communicate over HTTP(s) to poll the
 Undercloud for software configuration to be applied by their local agents.
-Thus, the polling process requires that the Undercloud services are bound to an
-IP address that is on a L3 routed network that is accessible to the Overcloud
-nodes. This is the IP address that is configured via ``local_ip`` in the
-``undercloud.conf`` file used during Undercloud installation.
+
+The polling process requires L3 routable network connectivity from the deployed
+servers to the Undercloud OpenStack API's.
+
+If the ctlplane is a routable network from the deployed servers, then the
+deployed servers can connect directly to the IP address specified by
+``local_ip`` from ``undercloud.conf``. Alternatively, they could connect to the
+virtual IP address (VIP) specified by ``undercloud_public_host``, if VIP's are
+in use.
+
+In the scenario where the ctlplane is **not** routable from the deployed
+servers, then ``undercloud_public_host`` in ``undercloud.conf`` must be set to
+a hostname that resolves to a routable IP address for the deployed servers. SSL
+also must be configured on the Undercloud so that HAProxy is bound to that
+configured hostname. Specify either ``undercloud_service_certifcate`` or
+``generate_service_certificate`` to enable SSL during the Undercloud
+installation. See :ref:`ssl` for more information on configuring SSL.
+
+Additionally, when the ctlplane is not routable from the deployed
+servers, Heat on the Undercloud must be configured to use the public
+endpoints for OpenStack service communication during the polling process
+and be configured to use Swift temp URL's for signaling. Add the
+following hiera data to a new or existing hiera file::
+
+    heat_clients_endpoint_type: public
+    heat::engine::default_deployment_signal_transport: TEMP_URL_SIGNAL
+
+Specify the path to the hiera file with the ``hieradata_override``
+configuration in ``undercloud.conf``::
+
+    hieradata_override = /path/to/custom/hiera/file.yaml
+
+Overcloud
+_________
+
+Configure the deployed servers that will be used as nodes in the Overcloud with
+L3 connectivity to the Undercloud as needed. The configuration could be done
+via static or DHCP IP assignment.
+
+Further networking configuration of Overcloud nodes is the same as in a typical
+TripleO deployment, except for:
+
+* Initial configuration of L3 connectivity to the Undercloud
+* No requirement for dedicating a separate L2 network for provisioning
+
+Testing Connectivity
+____________________
 
 On each Overcloud node run the following commands that test connectivity to the
-Undercloud's IP address where OpenStack services are bound.
+Undercloud's IP address where OpenStack services are bound. Use either
+``local_ip`` or ``undercloud_public_host`` in the following examples.
 
 Test basic connectivity to the Undercloud::
 
@@ -67,18 +124,6 @@ The output from the above curl commands demonstrates successful connectivity to
 the web services bound at the Undercloud's ``local_ip`` IP address. It's
 important to verify this connectivity prior to starting the deployment,
 otherwise the deployment may be unsuccessful and difficult to debug.
-
-Overcloud
-_________
-
-Other than not having to be connected to a dedicated L2 network for
-provisioning by the Undercloud, networking requirements for deployed servers
-that will be used as nodes in the Overcloud remains unchanged.
-
-Depending on what networking configuration and if network isolation is
-in use determines the requirements around Overcloud network requirements, the
-same as in a typical TripleO deployment where already deployed servers are not
-used.
 
 Package repositories
 ^^^^^^^^^^^^^^^^^^^^
@@ -113,7 +158,7 @@ command.::
       <other cli arguments> \
       --disable-validations \
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-centos.yaml \
+      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-environment-centos.yaml \
       -r /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-server-roles-data.yaml
 
 The ``--disable-validations`` option disables the basic Nova, Ironic, and
@@ -149,6 +194,102 @@ looks like::
         - OS::TripleO::Services::CephRgw
         ... <additional services>
 
+Network Configuration
+_____________________
+
+The default network interface configuration mappings for the deployed-server
+roles are::
+
+  OS::TripleO::ControllerDeployedServer::Net::SoftwareConfig: net-config-static-bridge.yaml
+  OS::TripleO::ComputeDeployedServer::Net::SoftwareConfig: net-config-static.yaml
+  OS::TripleO::BlockStorageDeployedServer::Net::SoftwareConfig: net-config-static.yaml
+  OS::TripleO::ObjectStorageDeployedServer::Net::SoftwareConfig: net-config-static.yaml
+  OS::TripleO::CephStorageDeployedServer::Net::SoftwareConfig: net-config-static.yaml
+
+The default nic configs use static IP assignment instead of the default of
+DHCP. This is due to there being no requirement of L2 connectivity between the
+undercloud and overcloud.  However, the nic config templates can be overridden
+to use whatever configuration is desired (including DHCP).
+
+As is the case when not using deployed-servers, the following parameters need
+to also be specified::
+
+    parameter_defaults:
+      NeutronPublicInterface: eth1
+      ControlPlaneDefaultRoute: 192.168.24.1
+      EC2MetadataIp: 192.168.24.1
+
+``ControlPlaneDefaultRoute`` and ``EC2MetadataIp`` are not necessarily
+meaningful parameters depending on the network architecture in use with
+deployed servers. However, they still must be specified as they are required
+parameters for the template interface.
+
+The ``DeployedServerPortMap`` parameter can be used to assign fixed IP's
+from either the ctlplane network or the IP address range for the
+overcloud.
+
+If the deployed servers were preconfigured with IP addresses from the ctlplane
+newtork for the initial undercloud connectivity, then the same IP addresses can
+be reused during the overcloud deployment. Add the following to a new
+environment file and specify the environment file as part of the deployment
+command::
+
+    resource_registry:
+      OS::TripleO::DeployedServer::ControlPlanePort: ../deployed-server/deployed-neutron-port.yaml
+    parameter_defaults:
+      DeployedServerPortMap:
+        controller0-ctlplane:
+          fixed_ips:
+            - ip_address: 192.168.24.9
+          subnets:
+            - cidr: 24
+        compute0-ctlplane:
+          fixed_ips:
+            - ip_address: 192.168.24.8
+          subnets:
+            - cidr: 24
+
+The value of the DeployedServerPortMap variable is a map. The keys correspond
+to the ``<short hostname>-ctlplane`` of the deployed servers. Specify the ip
+addresses to be assigned under ``fixed_ips``.
+
+In the case where the ctlplane is not routable from the deployed
+servers, you can use ``DeployedServerPortMap`` to assign an IP address
+from any CIDR::
+
+    resource_registry:
+      OS::TripleO::DeployedServer::ControlPlanePort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+      OS::TripleO::Network::Ports::ControlPlaneVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+      OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+
+    parameter_defaults:
+      NeutronPublicInterface: eth1
+      EC2MetadataIp: 192.168.100.1
+      ControlPlaneDefaultRoute: 192.168.100.1
+
+      DeployedServerPortMap:
+        control_virtual_ip:
+          fixed_ips:
+            - ip_address: 192.168.100.1
+        controller0-ctlplane:
+          fixed_ips:
+            - ip_address: 192.168.100.2
+        compute0-ctlplane:
+          fixed_ips:
+            - ip_address: 192.168.100.3
+
+In the above example, notice how RedisVipPort is mapped to
+``network/ports/noop.yaml``. This mapping is due to the fact that the
+Redis VIP IP address comes from the ctlplane by default. The
+``EC2MetadataIp`` and ``ControlPlaneDefaultRoute`` parameters are set
+to the value of the control virtual IP address. These parameters are
+required to be set by the sample NIC configs, and must be set to a
+pingable IP address in order to pass the validations performed during
+deployment. Alternatively, the NIC configs could be further customized
+to not require these parameters.
+
+When using network isolation, refer to the documentation on using fixed
+IP addresses for further information at :ref:`predictable_ips`.
 
 Configuring Deployed Servers to poll Heat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

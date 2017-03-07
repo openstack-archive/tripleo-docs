@@ -1,3 +1,5 @@
+.. _ssl:
+
 Deploying with SSL
 ==================
 

@@ -54,6 +54,31 @@
                sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
                sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
 
+      .. admonition:: Ocata
+         :class: ocata ntoo
+
+         Enable latest RDO Ocata Delorean repository for all packages
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-ocata.repo https://trunk.rdoproject.org/centos7-oacata/current/delorean.repo
+
+         Enable the Ocata Delorean Deps repository
+
+         ::
+
+            sudo curl -L -o /etc/yum.repos.d/delorean-deps-ocata.repo http://trunk.rdoproject.org/centos7-ocata/delorean-deps.repo
+
+         .. admonition:: Ceph
+            :class: ceph
+
+            Enable the CentOS Storage SIG Ceph/Jewel repository if using Ceph
+
+            ::
+
+               sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
+               sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
+
 
    Enable last known good RDO Trunk Delorean repository for core openstack packages
 

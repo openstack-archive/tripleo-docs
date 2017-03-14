@@ -64,6 +64,7 @@
 .stable {background: #eed;}
 .mitaka {background: #dee;}
 .newton {background: #ede;}
+.ocata {background: #edd;}
 .centos {background: #fef;}
 .baremetal {background: #eef;}
 .virtual {background: #efe;}
@@ -74,6 +75,7 @@
 .ltom {background: #dee;}
 .mton {background: #ded;}
 .ntoo {background: #edd;}
+.otoo.{background: #dde;}
 /* admonition selector */
 #admonition_selector {
   color: white;

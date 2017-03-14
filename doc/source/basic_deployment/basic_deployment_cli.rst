@@ -137,6 +137,20 @@ created on the undercloud, one should use a non-root user.
 
                export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Jewel.repo"
 
+      .. admonition:: Ocata
+         :class: ocata
+
+         ::
+
+            STABLE_RELEASE="ocata"
+
+         .. admonition:: Ceph
+            :class: ceph
+
+            ::
+
+               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Jewel.repo"
+
 
 #. Build the required images:
 

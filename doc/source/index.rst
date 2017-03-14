@@ -89,6 +89,11 @@ Linux (RHEL). These steps are marked as follows:
 
    Step that should only be run when installing from the Newton stable branch.
 
+.. admonition:: Ocata
+   :class: ocata
+
+   Step that should only be run when installing from the Ocata stable branch.
+
 .. admonition:: SSL
    :class: ssl
 

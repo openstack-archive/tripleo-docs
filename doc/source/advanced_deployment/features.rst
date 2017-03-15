@@ -18,3 +18,4 @@ Documentation on how to enable and configure various features available in
    ovs_dpdk_config
    deployed_server
    security_hardening
+   api_policies

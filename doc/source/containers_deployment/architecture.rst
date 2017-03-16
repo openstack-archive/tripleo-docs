@@ -231,6 +231,13 @@ are re-asserted when applying latter ones.
             - '/'
             - [ {get_param: DockerNamespace}, {get_param: DockerKeystoneImage} ]
 
+* **host_prep_tasks**: Ansible tasks to execute on the host before any
+  containers are started. Useful e.g. for ensuring existence of
+  directories that we want bind mounted into the containers.
+
+* **upgrade_tasks**: Ansible tasks to execute during upgrade. First
+  these tasks are run on all nodes, and then the normal puppet/docker
+  operations happen the same way as during a fresh deployment.
 
 Docker steps
 ............

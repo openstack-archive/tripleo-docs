@@ -29,13 +29,13 @@ The following commands are useful for debugging containers.
 
   There's no shortcut for *rebuilding* the command that was used to run the
   container but, it's possible to do so by using the `docker inspect` command
-  and the format parameter:::
+  and the format parameter::
 
    $ docker inspect --format='{{range .Config.Env}} -e "{{.}}" {{end}} {{range .Mounts}} -v {{.Source}}:{{.Destination}}{{if .Mode}}:{{.Mode}}{{end}}{{end}} -ti {{.Config.Image}}' $CONTAINER_ID_OR_NAME
 
   Copy the output from the command above and append it to the one below, which
   will run the same container with a random name and remove it as soon as the
-  execution exits:::
+  execution exits::
 
     $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
 
@@ -86,12 +86,12 @@ debugging purposes.  For example::
 
     ./docker-toool -c swift-proxy -r -e /bin/bash -u root -i -n test
 
-will run the swift proxy container with all the volumes, permissions
-etc as used at runtime but as the root user, executing /bin/bash, named
-'test', and will run interactively (eg -ti).  This allows you to enter
-the container and run commands to see what is failing, perhaps install
-strace and strace the command etc.  You can also verify configurations
-or any other debugging task you may have.
+The above command will run the swift proxy container with all the volumes,
+permissions etc as used at runtime but as the root user, executing /bin/bash,
+named 'test', and will run interactively (eg -ti).  This allows you to enter
+the container and run commands to see what is failing, perhaps install strace
+and strace the command etc.  You can also verify configurations or any other
+debugging task you may have.
 
 Debugging docker-puppet.py
 --------------------------
@@ -102,55 +102,48 @@ of tripleo-heat-templates.  When writing these tasks, it's useful to be
 able to run them manually instead of running them as part of the entire
 stack. To do so, one can run the script as shown below::
 
-  CONFG=/path/to/task.json $THT_ROOT/docker/docker-puppet.py
+  CONFIG=/path/to/task.json /path/to/docker-puppet.py
 
 The json file must follow the following form::
 
     [
-        [
-            $CONFIG_VOLUME,
-            $PUPPET_TAGS,
-            $PUPPET_MANIFEST,
-            $DOCKER_IMAGE,
-            $DOCKER_VOLUMES
-        ]
+        {
+            "config_image": ...,
+            "config_volume": ...,
+            "puppet_tags": ...,
+            "step_config": ...
+        }
     ]
 
 
-Using a more realistic example. Given a `docker_puppet_task` section like this::
+Using a more realistic example. Given a `puppet_config` section like this::
 
-      docker_puppet_tasks:
-        step_2:
-          - 'mongodb_init_tasks'
-          - 'mongodb_database,mongodb_user,mongodb_replset'
-          - 'include ::tripleo::profile::base::database::mongodb'
-          - list_join:
+      puppet_config:
+        config_volume: glance_api
+        puppet_tags: glance_api_config,glance_api_paste_ini,glance_swift_config,glance_cache_config
+        step_config: {get_attr: [GlanceApiPuppetBase, role_data, step_config]}
+        config_image:
+          list_join:
             - '/'
-            - [ {get_param: DockerNamespace}, {get_param: DockerMongodbImage} ]
-          - - "mongodb:/var/lib/mongodb"
-            - "logs:/var/log/kolla:ro"
+            - [ {get_param: DockerNamespace}, {get_param: DockerGlanceApiImage} ]
 
 
 Would generated a json file called `/var/lib/docker-puppet-tasks2.json` that looks like::
 
     [
-        [
-            mongodb_init_tasks,
-            "mongodb_database,mongodb_user,mongodb_replset",
-            "include ::tripleo::profile::base::database::mongodb",
-            "tripleoupstream/centos-binary-mongodb:latest",
-            [
-                "mongodb:/var/lib/mongodb",
-                "logs:/var/log/kolla:ro"
-            ]
-        ]
+        {
+            "config_image": "tripleoupstream/centos-binary-glance-api:latest",
+            "config_volume": "glance_api",
+            "puppet_tags": "glance_api_config,glance_api_paste_ini,glance_swift_config,glance_cache_config",
+            "step_config": "include ::tripleo::profile::base::glance::api\n"
+        }
     ]
 
 
 Setting the path to the above json file as value to the `CONFIG` var passed to
 `docker-puppet.py` will create a container using the
-`centos-binary-mongodb:latest` image and it'll run the puppet puppet tags listed
-in the second item of the array.
+`centos-binary-glance-api:latest` image and it and run puppet on a catalog
+restricted to the given puppet `puppet_tags`.
 
 As mentioned above, it's possible to create custom json files and call
 `docker-puppet.py` manually, which makes developing and debugging puppet steps

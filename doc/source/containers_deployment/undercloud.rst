@@ -47,10 +47,7 @@ installation:
 
 * python-tripleoclient >= Pike
 * python-openstackclient >= Pike
-* python-heat-agent-hiera >= Pike
-* python-heat-agent-apply-config >= Pike
-* python-heat-agent-puppet >= Pike
-* python-heat-agent-docker-cmd >= Pike
+* openstack-heat-agents >= Pike
 * docker >= 1.12.5
 * openvswitch (minimum version supported by neutron)
 
@@ -102,11 +99,12 @@ The following command will install an undercloud with ironic, mistral and zaqar
       --templates=$THT_ROOT \
       --local-ip=$YOUR_SERVER_IP \
       --keep-running \
-      -e $THT_ROOT/environments/services/ironic.yaml \
-      -e $THT_ROOT/environments/services/mistral.yaml \
-      -e $THT_ROOT/environments/services/zaqar.yaml \
+      -e $THT_ROOT/environments/services-docker/ironic.yaml \
+      -e $THT_ROOT/environments/services-docker/mistral.yaml \
+      -e $THT_ROOT/environments/services-docker/zaqar.yaml \
       -e $THT_ROOT/environments/docker.yaml \
-      -e /home/stack/custom.yaml
+      -e $THT_ROOT/environments/mongodb-nojournal.yaml \
+      -e $HOME/custom.yaml
 
 
 The `keep-running` flag will keep the `openstack undercloud deploy` process
@@ -128,14 +126,12 @@ Cleaning up
 The following commands will help cleaning up your undercloud environment to
 start the deployment from scratch:
 
-To stop and remove all running containers (this will remove non-openstack
-containers too)::
+To stop and remove all running containers::
 
-    $ sudo docker stop $(sudo docker ps -a -q)
-    $ sudo docker rm $(sudo docker ps -a -q)
+    $ sudo docker ps -qa --filter label=managed_by=docker-cmd | xargs sudo docker rm -f
 
-To remove the existing volumes (bear in mind this will remove your database
-files too)::
+To remove the existing named volumes (bear in mind this will remove your
+database files too)::
 
     $ sudo docker volume rm $(sudo docker volume ls -q)
 

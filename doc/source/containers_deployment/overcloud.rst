@@ -30,7 +30,7 @@ layer.
 Manual overcloud deployment
 ----------------------------
 
-This section explains how to deploy a containerized undercloud manually. For an
+This section explains how to deploy a containerized overcloud manually. For an
 automated overcloud deployment, please follow the steps in the
 `Using TripleO Quickstart`_ section below.
 
@@ -41,6 +41,28 @@ To prepare your environment, you must follow all the steps described in the
 :ref:`basic-deployment-cli` documentation. Stop right at the
 :ref:`deploy-the-overcloud` section.
 
+Populate local docker registry
+..............................
+
+It's useful to run a local docker registry on the undercloud to speed up the
+overcloud deployment. A docker registry is normally already setup to listen on
+port 8787 as part of the undercloud install.
+
+To use the pre-built images coming from the `tripleoupstream` registry on the
+dockerhub, use the following command::
+
+    openstack overcloud container image upload
+
+Or use `kolla-build` to build the images yourself::
+
+    kolla-build --base centos --type binary --namespace tripleoupstream --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/contrib/tripleo_kolla_template_overrides.j2 --push
+
+Finally, point the heat templates to your local registry, for example in
+a `$HOME/docker_registry.yaml` file::
+
+    parameter_defaults:
+      DockerNamespace: 192.168.24.1:8787/tripleoupstream
+      DockerNamespaceIsRegistry: true
 
 Deploying the containerized Overcloud
 -------------------------------------
@@ -51,6 +73,10 @@ requires an extra environment file to be added to the `openstack overcloud
 deploy` command::
 
   -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml
+
+In case of a local docker registry, also add the path to the override file::
+
+  -e $HOME/docker_registry.yaml
 
 
 Using TripleO Quickstart

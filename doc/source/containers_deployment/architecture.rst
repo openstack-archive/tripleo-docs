@@ -1,5 +1,5 @@
 TripleO Containers Architecture
-================================
+===============================
 
 .. Warning::
 
@@ -16,7 +16,7 @@ of different projects to play together. The next section will cover each of the
 parts that allow for deploying OpenStack on containers using TripleO.
 
 Kolla Build
-------------
+-----------
 
 Kolla is an OpenStack team that aims to create tools to allow for deploying
 OpenStack on container technologies. Kolla (or Kolla Build) is one of the tools
@@ -40,12 +40,16 @@ of the services, like mariadb::
 .. note:: `parent_template` is the literal string to include. No need to replace
    it.
 
-Use the following commnand to build an image using kolla-build and the template
+Use the following command to build an image using kolla-build and the template
 above (`template-overrides.j2`)::
 
   $ kolla-build --base centos --template-override template-overrides.j2
 
+TripleO maintains its complete list of kolla customization in the
+`tripleo-common`_ project.
+
 .. _Kolla: https://docs.openstack.org/developer/kolla/image-building.html#dockerfile-customisation
+.. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/contrib/tripleo_kolla_template_overrides.j2
 
 heat-config-docker-cmd
 ----------------------
@@ -57,7 +61,8 @@ the keys are:
 
 * **net**: To specify what network to use. This is commonly set to host.
 
-* **privileged**: Whether to run the container with superuser privileges.
+* **privileged**: Whether to give full access to the host's devices to the
+  container, similar to what happens when the service runs directly on the host.
 
 * **volumes**: List of host path volumes, named volumes, or dynamic volumes to
   bind on the container.
@@ -148,7 +153,6 @@ are re-asserted when applying latter ones.
         - get_attr: [MongodbPuppetBase, role_data, config_settings]
         - mongodb::server::fork: false
 
-
 * **step_config**: This setting controls the manifest that is used to create
   docker config files via puppet. The puppet tags below are used along with
   this manifest to generate a config directory for this container.
@@ -176,7 +180,7 @@ are re-asserted when applying latter ones.
   steps below and the related docker-cmd hook documentation in the heat-agents
   project.
 
-* puppet_config
+* **puppet_config**:
 
   * **step_config**: Usually a reference to the one defined outside this section.
 
@@ -220,7 +224,6 @@ are re-asserted when applying latter ones.
   etc. See docker-puppet.py for formatting. Here's an example of Keystone's
   `docker_puppet_tasks`::
 
-
       docker_puppet_tasks:
         # Keystone endpoint creation occurs only on single node
         step_4:
@@ -244,7 +247,7 @@ Docker steps
 
 Similar to baremetal, docker containers are brought up in a stepwise manner. The
 current architecture supports bringing up baremetal services alongside of
-containers. Thefore, baremetal steps may be required depending on the service
+containers. Therefore, baremetal steps may be required depending on the service
 and they are always executed before the corresponding container step.
 
 The list below represents the correlation between the baremetal and the

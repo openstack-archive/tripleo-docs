@@ -41,7 +41,7 @@ Get Images
        delete the older images and restart the process from this step.
 
        Alternatively, images are available via RDO at
-       http://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/
+       https://buildlogs.centos.org/centos/7/cloud/x86_64/tripleo_images/
 
        The image files required are::
 

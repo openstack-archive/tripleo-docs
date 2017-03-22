@@ -19,4 +19,5 @@ repositories, using part of the architecture defined in the `composable services
    changes-tht
    changes-puppet-tripleo
    design-patterns
+   tls_for_services
    summary

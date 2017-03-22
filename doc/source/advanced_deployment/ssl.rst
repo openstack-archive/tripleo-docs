@@ -1,7 +1,8 @@
 Deploying with SSL
 ==================
 
-TripleO supports deploying with SSL on the public OpenStack endpoints.
+TripleO supports deploying with SSL on the public OpenStack endpoints as well
+as deploying SSL in the internal network for most services.
 
 This document will focus on deployments using network isolation.  For more
 details on deploying that way, see
@@ -322,6 +323,9 @@ Self-signed DNS-based certificate::
 
         -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/cloudname.yaml [-e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml]
 
+.. note:: It is also possible to get the public certificate from a CA. See
+          :doc:`../advanced_deployment/tls_everywhere`
+
 Getting the overcloud to trust CAs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -352,3 +356,5 @@ be stored in the ``/etc/pki/ca-trust/source/anchors/`` directory in each node
 of the overcloud and will be added to the trusted certificate chain of each of
 the nodes. You must be careful that the content is a block string in yaml and
 is in PEM format.
+
+.. include:: ./tls_everywhere.rst

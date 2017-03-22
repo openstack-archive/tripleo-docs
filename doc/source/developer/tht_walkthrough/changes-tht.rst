@@ -93,39 +93,49 @@ configure our resources. In the example case the created resource
 (puppet/services/time/ntp.yaml).
 
 
-Step 3 - overcloud.yaml initial changes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 3 - roles_data.yaml initial changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mandatory services should be added to the ControllerServices parameter default value,
-which defines all the services enabled by default in the controller(s).
+The default roles are defined here. They are then iterated and the respective
+values of each section are rendered into the overcloud.j2.yaml.
 
-From ``overcloud.yaml`` in the parameters section find:
-::
+Mandatory services should be added to the roles' ServicesDefault value,
+which defines all the services enabled by default in the role(s).
 
-  ControllerServices:
-    default:
-      - OS::TripleO::Services::Keystone
-      - OS::TripleO::Services::GlanceApi
-      - OS::TripleO::Services::GlanceRegistry
-      - OS::TripleO::Services::Ntp              ---> New service deployed in the controller overcloud
-    description: A list of service resources (configured in the Heat
-                 resource_registry) which represent nested stacks
-                 for each service that should get installed on the Controllers.
-    type: comma_delimited_list
+From ``roles_data.yaml`` find::
+
+    - name: Controller
+      CountDefault: 1
+      ServicesDefault:
+        - OS::TripleO::Services::CACerts
+        - OS::TripleO::Services::CertmongerUser
+        - OS::TripleO::Services::CephMds
+        - OS::TripleO::Services::Keystone
+        - OS::TripleO::Services::GlanceApi
+        - OS::TripleO::Services::GlanceRegistry
+        ...
+        - OS::TripleO::Services::Ntp              ---> New service deployed in the controller overcloud
 
 
 Update this section with your new service to be deployed to the controllers in
 the overcloud.
 
-The parameter ControllerServices will be used by the ControllerServiceChain
-resource as follows:
-::
+These values will be used by the controller roles' ServiceChain resource as
+follows::
 
-  ControllerServiceChain:
-    type: OS::TripleO::Services
-    properties:
-      Services: {get_param: ControllerServices}
-      EndpointMap: {get_attr: [EndpointMap, endpoint_map]}
+    {% for role in roles %}
+      # Resources generated for {{role.name}} Role
+      {{role.name}}ServiceChain:
+        type: OS::TripleO::Services
+        properties:
+          Services:
+            get_param: {{role.name}}Services
+          ServiceNetMap: {get_attr: [ServiceNetMap, service_net_map]}
+          EndpointMap: {get_attr: [EndpointMap, endpoint_map]}
+          DefaultPasswords: {get_attr: [DefaultPasswords, passwords]}
+
+    ...
+    {% endfor %}
 
 THT changes for all the different roles are covered in:
 
@@ -139,9 +149,10 @@ THT changes for all the different roles are covered in:
 
 .. note::
 
-  In the case of the controller services, they are defined as part of the ControllerServiceChain
-  resource. If it is needed to add optional services, they need to be appended to the current
-  services list defined by the default value of the ControllerServices parameter.
+  In the case of the controller services, they are defined as part of the
+  roles' ServiceChain resource. If it is needed to add optional services, they
+  need to be appended to the current services list defined by the default
+  value of the role's ServicesDefault parameter.
 
 
 Step 4 - Create the services yaml files
@@ -199,3 +210,23 @@ configured.
   duplicated parameters among different deployment environments
   (i.e. using pacemaker). To do this see
   section :ref:`duplicated-parameters`.
+
+  If your service has configuration that affects another service and should
+  only be run on nodes (roles) that contain that service, you can use
+  "service_config_settings". You then have to specify the hieradata inside this
+  section by using the name of the service as the key. So, if you want to
+  output hieradata related to your service, on nodes that deploy keystone, you
+  would do this::
+
+    role_data:
+      ...
+    step_config:
+      ...
+    ...
+    service_config_settings:
+      keystone:
+        # Here goes the hieradata
+
+  This is useful for things such as creating the keystone endpoints for your
+  service, since one usually wants these commands to only be run on the
+  keystone node.

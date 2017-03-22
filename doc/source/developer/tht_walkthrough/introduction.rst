@@ -19,15 +19,8 @@ manifests will be re-defined in the puppet-tripleo repository, and adapted to
 the `composable services architecture`_.
 
 The use case for this example uses NTP as a service installed by default among
-the OpenStack deployment. In this particular case, NTP is installed and
-configured based on the code from puppet manifests:
-
-``puppet/manifests/overcloud_cephstorage.pp``,
-``puppet/manifests/overcloud_volume.pp``,
-``puppet/manifests/overcloud_object.pp``,
-``puppet/manifests/overcloud_compute.pp``,
-``puppet/manifests/overcloud_controller.pp`` and
-``puppet/manifests/overcloud_controller_pacemaker.pp``
+the OpenStack deployment. So the profile needs to be added to all the roles in
+roles_data.yaml.
 
 Which means that NTP will be installed everywhere in the overcloud, so the
 tutorial will describe the process of refactoring the code from those files

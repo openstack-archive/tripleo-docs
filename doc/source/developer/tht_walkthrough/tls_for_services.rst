@@ -252,6 +252,8 @@ in subsequent sections.
 So, with this one can finally request certificates for the service and use
 them.
 
+.. _internal-tls-for-your-service:
+
 Enabling internal TLS for your service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -279,8 +281,8 @@ Alternative Name (SAN) for the certificate:
 The usual case for a RESTful service will be the first option. HAProxy will do
 TLS termination, listening on the cloud's VIPs, and will then forward the
 request to your service trying to access it via the node's internal network
-interface (not the VIP). So for this case, your service should be serving a TLS
-certificate with the nodes' interface as the SAN. RabbitMQ has a similar
+interface (not the VIP). So for this case (#1), your service should be serving
+a TLS certificate with the nodes' interface as the SAN. RabbitMQ has a similar
 situation even if it's not proxied by HAProxy. Services try to access the
 RabbitMQ cluster through the individual nodes, so each broker server has a
 certificate with the node's hostname for a specific network interface as the
@@ -291,6 +293,8 @@ VIP interface as the SAN. This way, the hostname validation works as expected.
 
 If you're not sure how to go forward with your service, consult the TripleO
 team.
+
+.. _services-over-httpd-internal-tls:
 
 Services that run over httpd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -386,6 +390,8 @@ sets the nova metadata, which in turn will be taken by the *novajoin* service
 (which was mentioned in the :doc:`../../advanced_deployment/tls_everywhere`
 section) to generate the service principals for httpd for the host.
 
+.. _configuring-haproxy-internal-tls:
+
 Configuring HAProxy to use TLS for your service
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -408,10 +414,481 @@ is enabled; if it's not enabled, then it won't use TLS.
 
 This was all the extra configuration you needed to do for HAProxy.
 
+Internal TLS for services that don't run over httpd
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If your service supports being run with TLS enabled, and it's not
+python/eventlet-based (see :ref:`internal-tls-via-proxy`). This section is for
+you.
+
+In `tripleo-heat-templates`_ we'll need to specify the specs for doing the
+certificate request, and we'll need to get the appropriate information to
+generate a service principal. In order to make this composable, one usually
+creates another template where this is done, this template is initialized to
+``OS::Heat::None`` and is only defined when internal TLS is enabled.
+
+This would be a template that we could use for this::
+
+    heat_template_version: ocata
+
+    description: >
+      My Service configurations for using TLS via certmonger.
+
+    parameters:
+      ServiceNetMap:
+        default: {}
+        description: Mapping of service_name -> network name. Typically set
+                     via parameter_defaults in the resource registry.  This
+                     mapping overrides those in ServiceNetMapDefaults.
+        type: json
+      # The following parameters are not needed by the template but are
+      # required to pass the pep8 tests
+      DefaultPasswords:
+        default: {}
+        type: json
+      EndpointMap:
+        default: {}
+        description: Mapping of service endpoint -> protocol. Typically set
+                     via parameter_defaults in the resource registry.
+        type: json
+
+    outputs:
+      role_data:
+        description: My Service configurations for using TLS via certmonger.
+        value:
+          service_name: my_service_internal_tls_certmonger
+          config_settings:
+            generate_service_certificates: true
+            my_service_certificate_specs:
+              service_certificate: '/etc/pki/tls/certs/my_service.crt'
+              service_key: '/etc/pki/tls/private/my_service.key'
+              hostname:
+                str_replace:
+                  template: "%{hiera('fqdn_NETWORK')}"
+                  params:
+                    NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+              principal:
+                str_replace:
+                  template: "myservice/%{hiera('fqdn_NETWORK')}"
+                  params:
+                    NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+          metadata_settings:
+            - service: myservice
+              network: {get_param: [ServiceNetMap, MyServiceNetwork]}
+              type: node
+
+* For this case, we are only requesting one certificate for the service.
+
+* The service will be terminated by HAProxy in a conventional way, which means
+  that the SAN will be case #1 as described in
+  :ref:`internal-tls-for-your-service`. So the SAN will point to the specific
+  node's network interface, and not the VIP.
+
+* The ``ServiceNetMap`` contains the references to the networks every service
+  is listening on, and the key to get the network is the name of your service
+  but using camelCase instead of underscores. This value is the name of the
+  network and if used under the ``config_settings`` section, it will be
+  replaced by the actual IP. Else, it will just be the network name.
+
+* tripleo-heat-templates generates automatically hieradata that contains the
+  different network-dependant hostnames. They keys are in the following
+  format::
+
+      fqdn_<network name>
+
+* The ``my_service_certificate_specs`` key will contain the specifications for
+  the certificate we'll request. They need to follow some conventions:
+
+  * ``service_certificate`` will specify the path to the certificate file. It
+    should be an absolute path.
+
+  * ``service_key`` will specify the path to the private key file that will be
+    used for the certificate. It should be an absolute path.
+
+  * ``hostname`` is the name that will be used both in the Common Name (CN) and
+    the Subject Alternative Name (SAN) of the certificate. We can get this
+    value by using the hiera key described above. So we first get the name of
+    the network the service is listening on from the ``ServiceNetMap`` and we
+    then use ``str_replace`` to place that in a hiera call in the appropriate
+    format.
+
+  * ``principal`` is the service principal that will be the one used for the
+    certificate request. We can get this in a similar manner as we got the
+    hostname, and prepending an identifying name for your service. The format
+    will be as follows::
+
+        < service identifier >/< network-based hostname >
+
+  * These are the names used by convention, and will eventually be passed to
+    the ``certmonger_certificate`` resource from `puppet-certmonger`_.
+
+* The ``metadata_settings`` section will pass some information to a metadata
+  hook that will create the service principal before the certificate request is
+  done. The format as as follows:
+
+  * ``service``: This contains the service identifier to be used in the
+    kerberos service principal. It should match the identifier you put in the
+    ``principal`` section of the certificate specs.
+
+  * ``network``: Tells the hook what network to use for the service. This will
+    be used for the hook and novajoin to use an appropriate hostname for the
+    kerberos principal.
+
+  * ``type``: Will tell the hook what type of case is this service. The
+    available options are ``node`` and ``vip``. These are the cases mentioned
+    in the :ref:`internal-tls-for-your-service` for the SANs.
+
+  Note that this is a list, which can be useful if we'll be creating several
+  service principals (which is not the case for our example).
+
+.. note:: **VIP-based hostname case**
+
+   If your service requires the certificate to contain a VIP-based hostname, as
+   is the case for MariaDB. It would instead look like the following::
+
+       config_settings:
+         generate_service_certificates: true
+         my_service_certificate_specs:
+           service_certificate: '/etc/pki/tls/certs/my_service.crt'
+           service_key: '/etc/pki/tls/private/my_service.key'
+           hostname:
+             str_replace:
+               template: "%{hiera('cloud_name_NETWORK')}"
+               params:
+                 NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+           principal:
+             str_replace:
+               template: "my_service/%{hiera('cloud_name_NETWORK')}"
+               params:
+                 NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+       metadata_settings:
+         - service: my_service
+           network: {get_param: [ServiceNetMap, MyServiceNetwork]}
+           type: vip
+
+   * One can get the hostname for the VIP in a similar fashion as we got the
+     hostname for the node. The VIP hostnames are also network based, and one
+     can get them from a hiera key as well. It has the following format::
+
+        cloud_name_< network name >
+
+   * The ``type`` in the ``metadata_settings`` entry is ``vip``.
+
+Now that we have template, lets add it to the default resource registry in
+**overcloud-resource-registry-puppet.j2.yaml**::
+
+    OS::TripleO::Services::MyServiceTLS: OS::Heat::None
+
+And add the override to the **enable-internal-tls.yaml** enable this when we
+deploy TLS everywhere::
+
+    resource_registry:
+      OS::TripleO::Services::MyServiceTLS: ../puppet/services/my-service-internal-tls-certmonger.yaml
+
+We can now use it in our service's base template. So we need to add the
+following::
+
+    parameters:
+      ...
+      EnableInternalTLS:
+        type: boolean
+        default: false
+
+    resources:
+      ...
+      MyServiceTLS:
+        type: OS::TripleO::Services::MyServiceTLS
+        properties:
+          ServiceNetMap: {get_param: ServiceNetMap}
+          DefaultPasswords: {get_param: DefaultPasswords}
+          EndpointMap: {get_param: EndpointMap}
+      ...
+
+* ``EnableInternalTLS`` is a parameter that's passed via ``parameter_defaults``
+  which tells the templates that we want to use TLS in the internal network.
+
+* ``MyServiceTLS`` is a resource where we'll get the ``config_settings`` which
+  contain the certificate specs, and the ``metadata_settings`` which contain
+  the entries to generate the kerberos principal. Note that the type has to
+  match what we set in the resource registry. We should make sure that we
+  combine our service's hieradata with the hieradata coming from this resource
+  by doing a ``map_merge`` with the ``config_settings``::
+
+      ...
+      config_settings:
+        map_merge:
+          - get_attr: [MyServiceTLS, role_data, config_settings]
+          - # Here goes our service's metadata
+            ...
+
+Remember to set any relevant flags or parameters that your service might
+need to be configured with TLS.
+
+In `puppet-tripleo`_ We'll create a class that does the actual certificate
+request and add it to the resource that gets the certificates for all the
+services.
+
+Lets create a class to do the request::
+
+    class tripleo::certmonger::my_service (
+      $hostname,
+      $service_certificate,
+      $service_key,
+      $certmonger_ca = hiera('certmonger_ca', 'local'),
+      $principal     = undef,
+    ) {
+      include ::my_service::params
+
+      $postsave_cmd  = "systemctl restart ${::my_service::params::service_name}"
+      certmonger_certificate { 'my_service' :
+        ensure       => 'present',
+        certfile     => $service_certificate,
+        keyfile      => $service_key,
+        hostname     => $hostname,
+        dnsname      => $hostname,
+        principal    => $principal,
+        postsave_cmd => $postsave_cmd,
+        ca           => $certmonger_ca,
+        wait         => true,
+        require      => Class['::certmonger'],
+      }
+
+      file { $service_certificate :
+        owner   => $::my_service::params::user,
+        group   => $::my_service::params::group,
+        require => Certmonger_certificate['my_service'],
+      }
+      file { $service_key :
+        owner   => $::my_service::params::user,
+        group   => $::my_service::params::group,
+        require => Certmonger_certificate['my_service'],
+      }
+
+      File[$service_certificate] ~> Service<| title == $::my_service::params::service_name |>
+      File[$service_key] ~> Service<| title == $::my_service::params::service_name |>
+    }
+
+* You'll note that the parameters mostly match the certificate specs that we
+  created before in tripleo-heat-templates.
+
+* By convention, we'll add this class in the **manifests/certmonger** folder.
+
+* ``certmonger_ca`` is a value that comes from tripleo-heat-templates and tells
+  certmonger which CA to use.
+
+* If it's available, by convention, many puppet modules contain a manifest
+  called *params*. This usually contains the name and group that the service
+  runs with, as well as the name of the service in a specific distribution.
+  So we include this.
+
+* We do then the actual certificate request by using the
+  ``certmonger_certificate`` provider and passing all the relevant data for the
+  request.
+
+  * The post-save command which is specified via the ``postsave_cmd`` is a
+    command that will be ran after the certificate is saved. This is useful for
+    when certmonger has to resubmit the request to get an updated certificate,
+    since this way we can reload or restart the service so it can serve the new
+    certificate.
+
+* Using the ``file`` resource from puppet, we set the appropriate user and
+  group for the certificate and keys. Fortunately, certmonger has sane defaults
+  for the file modes, so we didn't set those here.
+
+Having this class, we now need to add to the `certmonger_user`_ resource. This
+resource is in charge of making all the certificate requests and should be
+available on all roles (or at least it should be added). You would add the
+certificate specs as a parameter to this class::
+
+    class tripleo::profile::base::certmonger_user (
+      ...
+      $my_service_certificate_specs = hiera('my_service_certificate_specs', {}),
+      ...
+    ) {
+
+And finally, we call the class that does the request::
+
+  ...
+  unless empty($my_service_certificate_specs) {
+    ensure_resource('class', 'tripleo::certmonger::my_service', $my_service_certificate_specs)
+  }
+  ...
+
+.. note::
+   It is also possible to do several requests for your service. See the
+   `certmonger_user`_ source code for examples.
+
+Finally, you can do the same steps described in
+`configuring-haproxy-internal-tls`_ to make HAProxy connect to your service
+using TLS.
+
+.. _internal-tls-via-proxy:
+
+Internal TLS via a TLS-proxy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you have a RESTful service that runs over python (most likely using
+eventlet) or if your service requires a TLS proxy in order to have TLS in the
+internal network, there are extra steps to be done.
+
+For python-based services, due to performance issues with eventlet, the best
+thing you can do is try to move your service to run over httpd, and let it
+handle crypto instead. Then you'll be able to follow the instructions from the
+:ref:`services-over-httpd-internal-tls` section above. If for any reason this
+can't be done at the moment, we could still use httpd to service as a TLS proxy
+in the node. It would then listen on the service's port and forward all the
+requests to the service, which would then be listening on localhost.
+
+In `puppet-tripleo`_ you need to go to the manifest that deploys the API for
+your service, and add the following parameters::
+
+    class tripleo::profile::base::my_service::api (
+      ...
+      $certificates_specs  = hiera('apache_certificates_specs', {}),
+      $enable_internal_tls = hiera('enable_internal_tls', false),
+      $my_service_network  = hiera('my_service_api_network', undef),
+      $tls_proxy_bind_ip   = undef,
+      $tls_proxy_fqdn      = undef,
+      $tls_proxy_port      = 5123,
+      ...
+    ) {
+    ...
+
+* ``certificates_specs``, ``enable_internal_tls`` and ``my_service_network``
+  have already been mentioned in the :ref:`services-over-httpd-internal-tls`
+  section.
+
+* ``tls_proxy_bind_ip``, ``tls_proxy_fqdn`` and ``tls_proxy_port`` are
+  parameters that will be used by the httpd-based TLS proxy. They will tell it
+  where what IP to listen on, the FQDN (which will be used as the servername)
+  and the port it will use. Usually the port will match your service's port.
+  These values are expected to be set from tripleo-heat-templates.
+
+Next comes the code for the actual proxy::
+
+    ...
+    if $enable_internal_tls {
+      if !$my_service_network {
+        fail('my_service_network is not set in the hieradata.')
+      }
+      $tls_certfile = $certificates_specs["httpd-${my_service_network}"]['service_certificate']
+      $tls_keyfile = $certificates_specs["httpd-${my_service_network}"]['service_key']
+
+      ::tripleo::tls_proxy { 'my_service_proxy':
+        servername => $tls_proxy_fqdn,
+        ip         => $tls_proxy_bind_ip,
+        port       => $tls_proxy_port,
+        tls_cert   => $tls_certfile,
+        tls_key    => $tls_keyfile,
+        notify     => Class['::my_service::api'],
+      }
+    }
+    ...
+
+* The ``::tripleo::tls_proxy`` is the resource that will configure the TLS
+  proxy for your service. As you can see, it receives the certificates that
+  come from the ``certificates_specs`` which contain the specification
+  for the certificates, including the paths for the keys.
+
+* The notify is added here since we want the proxy to be set before the
+  service.
+
+In `tripleo-heat-templates`_, you should modify your service's template and add
+the following::
+
+    parameters:
+    ...
+      EnableInternalTLS:
+        type: boolean
+        default: false
+    ...
+    conditions:
+      ...
+      use_tls_proxy: {equals : [{get_param: EnableInternalTLS}, true]}
+    ...
+    resources:
+    ...
+      TLSProxyBase:
+        type: OS::TripleO::Services::TLSProxyBase
+        properties:
+          ServiceNetMap: {get_param: ServiceNetMap}
+          DefaultPasswords: {get_param: DefaultPasswords}
+          EndpointMap: {get_param: EndpointMap}
+          EnableInternalTLS: {get_param: EnableInternalTLS}
+
+
+* ``EnableInternalTLS`` is a parameter that's passed via ``parameter_defaults``
+  which tells the templates that we want to use TLS in the internal network.
+
+* ``use_tls_proxy`` is a condition that we'll use to modify the behaviour of
+  the template depending on whether TLS in the internal network is enabled or
+  not.
+
+* ``TLSProxyBase`` will make the default values from the proxy's template
+  available to where our service is deployed. We should make sure that we
+  combine our service's hieradata with the hieradata coming from that resource
+  by doing a ``map_merge`` with the ``config_settings``::
+
+      ...
+      config_settings:
+        map_merge:
+          - get_attr: [TLSProxyBase, role_data, config_settings]
+          - # Here goes our service's metadata
+            ...
+
+So, with this, we can tell the service to bind on localhost instead of the
+default interface depending if TLS in the internal network is enabled or not.
+Lets now set the hieradata that the puppet module needs in our service's
+hieradata, which is in the ``config_settings`` section::
+
+    tripleo::profile::base::my_service::api::tls_proxy_bind_ip:
+      get_param: [ServiceNetMap, MyServiceNetwork]
+    tripleo::profile::base::my_service::api::tls_proxy_fqdn:
+      str_replace:
+        template:
+          "%{hiera('fqdn_$NETWORK')}"
+        params:
+          $NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+    tripleo::profile::base::my_service::api::tls_proxy_port:
+      get_param: [EndpointMap, NeutronInternal, port]
+    my_service::bind_host:
+      if:
+      - use_tls_proxy
+      - 'localhost'
+      - {get_param: [ServiceNetMap, MyServiceNetwork]}
+
+* The ``ServiceNetMap`` contains the references to the networks every service
+  is listening on, and the key to get the network is the name of your service
+  but using camelCase instead of underscores. This value will be automatically
+  replaced by the actual IP.
+
+* tripleo-heat-templates generates automatically hieradata that contains the
+  different network-dependant hostnames. They keys are in the following
+  format::
+
+      fqdn_<network name>
+
+  So, to get it, we get the network name from the ``ServiceNetMap``, and do a
+  ``str_replace`` in heat that will use that network name and add it to a hiera
+  call that will then gets us the FQDN we need.
+
+* The port we can easily get from the ``EndpointMap``.
+
+* The conditional uses the actual IP if there's no TLS in the internal network
+  enabled and localhost if it is.
+
+Finally, we add the ``metadata_settings`` section to make sure we get a
+kerberos service principal::
+
+    metadata_settings:
+      get_attr: [TLSProxyBase, role_data, metadata_settings]
+
 .. References
 
-.. _tripleo-heat-templates: https://github.com/openstack/tripleo-heat-templates
+.. _certmonger_user: https://github.com/openstack/puppet-tripleo/blob/master/manifests/profile/base/certmonger_user.pp
+.. _haproxy documentation: http://www.haproxy.org/
 .. _manifests/haproxy.pp: https://github.com/openstack/puppet-tripleo/blob/master/manifests/haproxy.pp
 .. _network/service_net_map.j2.yaml: https://github.com/openstack/tripleo-heat-templates/blob/master/network/service_net_map.j2.yaml
-.. _haproxy documentation: http://www.haproxy.org/
+.. _puppet-certmonger: https://github.com/earsdown/puppet-certmonger
 .. _puppet-tripleo: https://github.com/openstack/puppet-tripleo
+.. _tripleo-heat-templates: https://github.com/openstack/tripleo-heat-templates

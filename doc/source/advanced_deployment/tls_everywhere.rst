@@ -140,7 +140,7 @@ To tell the overcloud deployment to deploy the keystone endpoints (and
 references) using DNS names instead of IPs, we need to add the following
 environment to our overcloud deployment::
 
-    ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml
+    ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml
 
 Finally, to enable TLS in the internal network, we need to use the following
 environment::
@@ -167,7 +167,7 @@ look like the following::
 
     openstack overcloud deploy \
         ...
-        -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml \
+        -e ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml \
         -e ~/ssl-heat-templates/environments/enable-tls.yaml \
         -e ~/ssl-heat-templates/environments/enable-internal-tls.yaml \
         -e ~/cloud-names.yaml
@@ -186,7 +186,7 @@ to the following::
 
     openstack overcloud deploy \
         ...
-        -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml \
+        -e ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml \
         -e ~/ssl-heat-templates/environments/services/haproxy-public-tls-certmonger.yaml \
         -e ~/ssl-heat-templates/environments/enable-internal-tls.yaml \
         -e ~/cloud-names.yaml

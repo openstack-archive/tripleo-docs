@@ -235,7 +235,7 @@ to be enrolled in order to authenticate to the CA. This is already being
 handled for us, so there's nothing you need to do for your service on this
 side.
 
-Now, In order to issue certificates, FreeIPA also needs to have registered a
+In order to issue certificates, FreeIPA also needs to have registered a
 Kerberos principal for the service (or service principal). This way it knows
 what service is using what certificate. The service principal will look
 something like this::
@@ -252,8 +252,8 @@ in subsequent sections.
 So, with this one can finally request certificates for the service and use
 them.
 
-Doing it for your service
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Enabling internal TLS for your service
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Aside from the actual certificate request, if your service is a RESTful
 service, getting TLS to work with the current solution requires usually two
@@ -343,8 +343,8 @@ If internal TLS is not enabled, we set the variables for the certificate and
 key to ``undef``, this way TLS won't be enabled. If it's enabled, we get the
 certificate and key from the hash.
 
-Now, having done this, we can add pass in the variables to the class that
-deploys your service over httpd::
+Now, having done this, we can pass in the variables to the class that deploys
+your service over httpd::
 
     class { '::my_service::wsgi::apache':
       ssl_cert => $tls_certfile,

@@ -13,7 +13,7 @@ this is not sustainable.
 
 For the aforementioned reasons, we decided to rely on `certmonger`_ to get the
 certificates from an actual CA. Certmonger will do the certificate requests and
-do the certificate renewals when it's needed. Thus reducing the maintenance
+do the certificate renewals when it's needed, thus reducing the maintenance
 burden.
 
 FreeIPA has been chosen as the default CA. Certmonger already has a plugin for
@@ -49,8 +49,9 @@ CA setup
 ~~~~~~~~
 
 The undercloud needs to be enrolled to FreeIPA, and we need to create some
-extra privileges/permissions. Assuming there's an already existing FreeIPA
-installation, we can use a script that comes with the python-novajoin package::
+extra privileges/permissions to be used by the novajoin services. Assuming
+there's an already existing FreeIPA installation, we can use a script that
+comes with the python-novajoin package::
 
     sudo /usr/libexec/novajoin-ipa-setup \
         --principal admin \
@@ -61,11 +62,11 @@ installation, we can use a script that comes with the python-novajoin package::
         --hostname < undercloud hostname > \
         --precreate
 
-This command will give us an OTP that we can then use for the undercloud
-enrollment. We can also specify the command to output the OTP into a file by
-using the ``--otp-file`` option.
+This command will give us a One-Time Password (OTP) that we can then use
+for the undercloud enrollment. We can also specify the command to output
+the OTP into a file by using the ``--otp-file`` option.
 
-.. note:: This can be ran from either the undercloud node itself or the FreeIPA
+.. note:: This can be run from either the undercloud node itself or the FreeIPA
           node. Just note that the example provided is using the FreeIPA admin
           credentials. This can be done using another principal if it has the
           approprite permissions.
@@ -73,22 +74,23 @@ using the ``--otp-file`` option.
 Undercloud setup
 ~~~~~~~~~~~~~~~~
 
-Now that we have an OTP, we can either deploy or update the undercloud. The
+Now that we have an OTP we can either deploy or update the undercloud. The
 following settings in **undercloud.conf** will get the undercloud to enroll
 to FreeIPA and deploy novajoin::
 
     enable_novajoin = True
     ipa_otp = < OTP provided by the novajoin-ipa-setup script >
 
-The undercloud hostname should also be set in **undercloud.conf**, since this
-is the host that will be used to enroll to FreeIPA, which should match the one
-provided in the novajoin-ipa-setup-script. We can set it like this::
+The undercloud fully-qualified hostname should also be set in
+**undercloud.conf**, since this is the host that will be used to enroll
+to FreeIPA. It should match the one provided in the novajoin-ipa setup
+script. We can set it like this::
 
     undercloud_hostname = < undercloud FQDN >
 
-Finally, it is useful to have FreeIPA set as the DNS, since this will
-automatically get the FreeIPA hostname, set up the kerberos
-realm/domain automatically, and furtherly, it will get the DNS entries of the
+It is useful to have FreeIPA set as the DNS server since this will
+automatically: discover the FreeIPA server hostname, set up the Kerberos
+realm/domain automatically, and it will set the DNS entries of the
 overcloud nodes once they're deployed. We can set it in **undercloud.conf**
 with the following setting::
 
@@ -105,13 +107,13 @@ and enable novajoin::
 Overcloud deployment
 ~~~~~~~~~~~~~~~~~~~~
 
-The TLS-everywhere setup only works with FQDNs, so we need to set the
+The TLS-everywhere setup only works with FQDNs so we need to set the
 appropriate entries for the overcloud endpoints as well as setting an
-appropriate domain for the nodes that matches the one we set for FreeIPA. This
-will be used as the kerberos realm. We can do this by overriding some
-parameters via ``parameter_defaults``. Assuming that the domain for our cloud
-is *example.com* We'll set the following in a file we'll call
-**cloud-names.yaml** which we'll include in our overcloud deploy command::
+appropriate domain for the nodes that matches the one we set for FreeIPA.
+We can do this by overriding some parameters via ``parameter_defaults``.
+Assuming that the domain for our cloud is *example.com* We'll set the
+following in a file we'll call **cloud-names.yaml** which we'll include
+in our overcloud deploy command::
 
     parameter_defaults:
       CloudDomain: example.com
@@ -134,7 +136,7 @@ like this::
       DnsServers: ["< FreeIPA IP >"]
       ...
 
-Remembering that optionally we can set other namesevers with this parameter.
+Remembering that optionally we can set other nameservers with this parameter.
 
 To tell the overcloud deployment to deploy the keystone endpoints (and
 references) using DNS names instead of IPs, we need to add the following
@@ -180,7 +182,7 @@ need to include the
 **environments/services/haproxy-public-tls-certmonger.yaml** environment
 file.
 
-So, to do a deployment with both public and internal endpoints using
+To do a deployment with both public and internal endpoints using
 certificates provided by certmonger, we would need to issue a command similar
 to the following::
 

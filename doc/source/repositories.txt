@@ -61,7 +61,7 @@
 
          ::
 
-            sudo curl -L -o /etc/yum.repos.d/delorean-ocata.repo https://trunk.rdoproject.org/centos7-oacata/current/delorean.repo
+            sudo curl -L -o /etc/yum.repos.d/delorean-ocata.repo https://trunk.rdoproject.org/centos7-ocata/current/delorean.repo
 
          Enable the Ocata Delorean Deps repository
 

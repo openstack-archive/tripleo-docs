@@ -333,32 +333,6 @@ Per-node Setup
 TBD - Puppet
 
 
-Overcloud Initialization
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-After the overcloud has been deployed, the initialization of OpenStack services
-(e.g Keystone, Neutron, etc) needs to occur. That is accomplished today by
-scripts in the `tripleo-incubator <https://github.com/openstack/
-tripleo-incubator>`_ source repository and it uses bits from `os-cloud-config
-<https://github.com/openstack/os-cloud-config>`_ which contains common code,
-the seed initialization logic, and the post heat completion initial
-configuration of a cloud. There are three primary steps to completing the
-initialization:
-
-* Initializing Identity Services (Keystone)
-* Registering service endpoints (e.g. Glance, Nova)
-* Specify a block of IP addresses for overcloud instances (Neutron)
-
-The first step initializes Keystone for use with normal authentication by
-creating the admin and service tenants, the admin and Member roles, the admin
-user, configure certificates and finally registers the initial identity
-endpoint. The next step registers image, orchestration, network and compute
-services running on the default ports on the control plane node. Finally,
-Neutron is given a starting IP address, ending IP address, and a CIDR notation
-to represent the subnet for the block of floating IP addresses that will be
-used within the overcloud.
-
-
 
 High Availability (HA)
 ----------------------

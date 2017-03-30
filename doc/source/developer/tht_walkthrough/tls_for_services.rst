@@ -423,59 +423,69 @@ you.
 
 In `tripleo-heat-templates`_ we'll need to specify the specs for doing the
 certificate request, and we'll need to get the appropriate information to
-generate a service principal. In order to make this composable, one usually
-creates another template where this is done, this template is initialized to
-``OS::Heat::None`` and is only defined when internal TLS is enabled.
-
-This would be a template that we could use for this::
-
-    heat_template_version: ocata
-
-    description: >
-      My Service configurations for using TLS via certmonger.
+generate a service principal. To make this optional, you should add the
+following to your service's base template::
 
     parameters:
-      ServiceNetMap:
-        default: {}
-        description: Mapping of service_name -> network name. Typically set
-                     via parameter_defaults in the resource registry.  This
-                     mapping overrides those in ServiceNetMapDefaults.
-        type: json
-      # The following parameters are not needed by the template but are
-      # required to pass the pep8 tests
-      DefaultPasswords:
-        default: {}
-        type: json
-      EndpointMap:
-        default: {}
-        description: Mapping of service endpoint -> protocol. Typically set
-                     via parameter_defaults in the resource registry.
-        type: json
+      ...
+      EnableInternalTLS:
+        type: boolean
+        default: false
 
-    outputs:
-      role_data:
-        description: My Service configurations for using TLS via certmonger.
-        value:
-          service_name: my_service_internal_tls_certmonger
-          config_settings:
-            generate_service_certificates: true
-            my_service_certificate_specs:
-              service_certificate: '/etc/pki/tls/certs/my_service.crt'
-              service_key: '/etc/pki/tls/private/my_service.key'
-              hostname:
-                str_replace:
-                  template: "%{hiera('fqdn_NETWORK')}"
-                  params:
-                    NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
-              principal:
-                str_replace:
-                  template: "myservice/%{hiera('fqdn_NETWORK')}"
-                  params:
-                    NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
-          metadata_settings:
-            - service: myservice
+    conditions:
+
+      internal_tls_enabled: {equals: [{get_param: EnableInternalTLS}, true]}
+      ...
+    ...
+
+* ``EnableInternalTLS`` is a parameter that's passed via ``parameter_defaults``
+  which tells the templates that we want to use TLS in the internal network.
+
+* ``internal_tls_enabled`` is a condition that we'll furtherly use to add the
+  relevant bits to the output.
+
+The next thing to do is to add the certificate specs, the relevant hieradata
+and the required metadata to the output. In the ``roles_data`` output, lets
+modify the ``config_settings`` to add what we need::
+
+      config_settings:
+        map_merge:
+          -
+            # The regular hieradata for your service goes here.
+            ...
+          -
+            if:
+            - internal_tls_enabled
+            - generate_service_certificates: true
+              my_service_certificate_specs:
+                service_certificate: '/etc/pki/tls/certs/my_service.crt'
+                service_key: '/etc/pki/tls/private/my_service.key'
+                hostname:
+                  str_replace:
+                    template: "%{hiera('fqdn_NETWORK')}"
+                    params:
+                      NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+                principal:
+                  str_replace:
+                    template: "my_service/%{hiera('fqdn_NETWORK')}"
+                    params:
+                      NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
+            - {}
+      ...
+      metadata_settings:
+        if:
+          - internal_tls_enabled
+          -
+            - service: my_service
               network: {get_param: [ServiceNetMap, MyServiceNetwork]}
               type: node
+          - null
+
+* The conditional mentioned above is used in the ``config_settings``. So, if
+  ``internal_tls_enabled`` evaluates to ``true``, the hieradata necessary to
+  enable TLS in the internal network for your service will be added. Else, we
+  output ``{}``, which won't affect the ``map_merge`` and won't add anything
+  to the regular hieradata for your service.
 
 * For this case, we are only requesting one certificate for the service.
 
@@ -490,7 +500,7 @@ This would be a template that we could use for this::
   network and if used under the ``config_settings`` section, it will be
   replaced by the actual IP. Else, it will just be the network name.
 
-* tripleo-heat-templates generates automatically hieradata that contains the
+* tripleo-heat-templates automatically generates hieradata that contains the
   different network-dependant hostnames. They keys are in the following
   format::
 
@@ -539,32 +549,27 @@ This would be a template that we could use for this::
     in the :ref:`internal-tls-for-your-service` for the SANs.
 
   Note that this is a list, which can be useful if we'll be creating several
-  service principals (which is not the case for our example).
+  service principals (which is not the case for our example). Also, if
+  ``internal_tls_enabled`` evaluates to ``false``, we then output ``null``.
+
+* Remember to set any relevant flags or parameters that your service might
+  need as hieradata in ``config_settings``. These might be things that
+  explicitly enable TLS such as flags or paths. But these details depend on the
+  puppet module that deploys your service.
 
 .. note:: **VIP-based hostname case**
 
    If your service requires the certificate to contain a VIP-based hostname, as
    is the case for MariaDB. It would instead look like the following::
 
-       config_settings:
-         generate_service_certificates: true
-         my_service_certificate_specs:
-           service_certificate: '/etc/pki/tls/certs/my_service.crt'
-           service_key: '/etc/pki/tls/private/my_service.key'
-           hostname:
-             str_replace:
-               template: "%{hiera('cloud_name_NETWORK')}"
-               params:
-                 NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
-           principal:
-             str_replace:
-               template: "my_service/%{hiera('cloud_name_NETWORK')}"
-               params:
-                 NETWORK: {get_param: [ServiceNetMap, MyServiceNetwork]}
-       metadata_settings:
-         - service: my_service
-           network: {get_param: [ServiceNetMap, MyServiceNetwork]}
-           type: vip
+      metadata_settings:
+        if:
+          - internal_tls_enabled
+          -
+            - service: my_service
+              network: {get_param: [ServiceNetMap, MyServiceNetwork]}
+              type: vip
+          - null
 
    * One can get the hostname for the VIP in a similar fashion as we got the
      hostname for the node. The VIP hostnames are also network based, and one
@@ -573,56 +578,6 @@ This would be a template that we could use for this::
         cloud_name_< network name >
 
    * The ``type`` in the ``metadata_settings`` entry is ``vip``.
-
-Now that we have template, lets add it to the default resource registry in
-**overcloud-resource-registry-puppet.j2.yaml**::
-
-    OS::TripleO::Services::MyServiceTLS: OS::Heat::None
-
-And add the override to the **enable-internal-tls.yaml** enable this when we
-deploy TLS everywhere::
-
-    resource_registry:
-      OS::TripleO::Services::MyServiceTLS: ../puppet/services/my-service-internal-tls-certmonger.yaml
-
-We can now use it in our service's base template. So we need to add the
-following::
-
-    parameters:
-      ...
-      EnableInternalTLS:
-        type: boolean
-        default: false
-
-    resources:
-      ...
-      MyServiceTLS:
-        type: OS::TripleO::Services::MyServiceTLS
-        properties:
-          ServiceNetMap: {get_param: ServiceNetMap}
-          DefaultPasswords: {get_param: DefaultPasswords}
-          EndpointMap: {get_param: EndpointMap}
-      ...
-
-* ``EnableInternalTLS`` is a parameter that's passed via ``parameter_defaults``
-  which tells the templates that we want to use TLS in the internal network.
-
-* ``MyServiceTLS`` is a resource where we'll get the ``config_settings`` which
-  contain the certificate specs, and the ``metadata_settings`` which contain
-  the entries to generate the kerberos principal. Note that the type has to
-  match what we set in the resource registry. We should make sure that we
-  combine our service's hieradata with the hieradata coming from this resource
-  by doing a ``map_merge`` with the ``config_settings``::
-
-      ...
-      config_settings:
-        map_merge:
-          - get_attr: [MyServiceTLS, role_data, config_settings]
-          - # Here goes our service's metadata
-            ...
-
-Remember to set any relevant flags or parameters that your service might
-need to be configured with TLS.
 
 In `puppet-tripleo`_ We'll create a class that does the actual certificate
 request and add it to the resource that gets the certificates for all the

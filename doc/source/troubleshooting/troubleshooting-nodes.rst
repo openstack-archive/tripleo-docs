@@ -101,6 +101,12 @@ or DHCP logs from
 
 SSH as a root user with the temporary password or the SSH key.
 
+.. note::
+    Some operating systems, such as RHEL and CentOS, require SELinux to be in permissive or disabled
+    mode so that you can log in to the image. This is achieved by building the
+    image with the selinux-permissive element for diskimage-builder or by
+    passing selinux=0 in the kernel command line.
+
 Accessing logs from the ramdisk
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

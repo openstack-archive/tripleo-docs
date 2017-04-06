@@ -231,6 +231,21 @@ for details.
 * Bugs: https://bugs.launchpad.net/ironic-inspector
 * Blueprints: https://blueprints.launchpad.net/ironic-inspector
 
+VirtualBMC
+^^^^^^^^^^
+
+A helper command to translate IPMI calls into libvirt calls. Used for testing
+bare metal provisioning on virtual environments.
+
+**How to contribute**
+
+VirtualBMC uses `tox <https://tox.readthedocs.org/en/latest/>`_ to manage the
+development environment in a similar way to Ironic.
+
+**Useful links**
+
+* Source: https://git.openstack.org/cgit/openstack/virtualbmc
+* Bugs: https://bugs.launchpad.net/virtualbmc
 
 
 Deployment & Orchestration

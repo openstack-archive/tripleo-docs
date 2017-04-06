@@ -40,18 +40,25 @@ three nodes in the ``instackenv.json``, you can split them::
 
 The format of the remaining nodes is TripleO-specific, so we need
 to convert it to something Ironic can understand without using
-TripleO workflows::
+TripleO workflows. E.g. for node using IPMI::
 
     jq '.nodes[2:3] | {nodes: map({driver: .pm_type, name: .name,
-        driver_info: {ssh_username: .pm_user, ssh_address: .pm_addr,
-                      ssh_key_contents: .pm_password, ssh_virt_type: "virsh"},
-        properties: {cpus: .cpu, cpu_arch: .arch, local_gb: .disk, memory_mb: .memory},
+        driver_info: {ipmi_username: .pm_user, ipmi_address: .pm_addr,
+                      ipmi_password: .pm_password},
+        properties: {cpus: .cpu, cpu_arch: .arch,
+                     local_gb: .disk, memory_mb: .memory},
         ports: .mac | map({address: .})})}' instackenv.json > overcloud-nodes.yaml
 
 .. note::
     This command intentionally omits the capabilities, as they are often
     TripleO-specific, e.g. they force local boot instead of network boot used
     by default in Ironic.
+
+.. note::
+    If you use :doc:`../environments/virtualbmc`, make sure to follow
+    :ref:`create-vbmc` for the overcloud nodes as well, and correctly populate
+    ``ipmi_port``. If needed, change ``ipmi_address`` to the address of the
+    virtual host, which is accessible from controllers.
 
 Then enroll only ``undercloud.json`` in your undercloud::
 
@@ -92,21 +99,27 @@ environment file (``ironic-config.yaml`` in this guide):
   .. admonition:: Virtual
       :class: virtual
 
-      Testing on a virtual environment requires the ``pxe_ssh`` driver to be
-      explicitly enabled, for example::
+      Starting with the Ocata release, testing on a virtual environment
+      requires using :doc:`../environments/virtualbmc`.
 
-          parameter_defaults:
-              IronicEnabledDrivers:
-                  - pxe_ssh
+      .. admonition:: Stable Branches
+         :class: stable
 
-      If you used **tripleo-quickstart** to build your environment, the
-      resulting configuration is a bit different::
+         Before the Ocata release, a separate ``pxe_ssh`` driver has to be
+         enabled for virtual testing, for example::
 
-          parameter_defaults:
-              IronicEnabledDrivers:
-                  - pxe_ssh
-              ControllerExtraConfig:
-                  ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
+              parameter_defaults:
+                  IronicEnabledDrivers:
+                      - pxe_ssh
+
+         If you used **tripleo-quickstart** to build your environment, the
+         resulting configuration is a bit different::
+
+              parameter_defaults:
+                  IronicEnabledDrivers:
+                      - pxe_ssh
+                  ControllerExtraConfig:
+                      ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
 
 * ``NovaSchedulerDefaultFilters`` configures available
   scheduler filters. For a hybrid deployment it's important to prepend

@@ -9,3 +9,4 @@ section contains instructions on how to setup your environments properly.
 
    virtual
    baremetal
+   virtualbmc

@@ -1,3 +1,5 @@
+.. _network_isolation:
+
 Configuring Network Isolation
 =============================
 

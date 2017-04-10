@@ -86,6 +86,8 @@ hostname that Heat would assign based on the HostnameFormat parameters. The
 second value (e.g. ``overcloud-controller-prod-123-0``) is the desired custom
 hostname for that node.
 
+.. _predictable_ips:
+
 Predictable IPs
 ---------------
 

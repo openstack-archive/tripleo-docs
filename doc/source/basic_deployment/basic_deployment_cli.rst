@@ -461,12 +461,25 @@ configured for the virtual environment.  To customize this, see the output of::
 .. admonition:: Ceph
   :class: ceph
 
-  When deploying Ceph it is necessary to specify the number of Ceph OSD nodes
+  When deploying Ceph with dedicated CephStorage nodes to host the CephOSD
+  service it is necessary to specify the number of CephStorage nodes
   to be deployed and to provide some additional parameters to enable usage
   of Ceph for Glance, Cinder, Nova or all of them. To do so, use the
   following arguments when deploying::
 
       --ceph-storage-scale <number of nodes> -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+
+  When deploying Ceph without dedicated CephStorage nodes, opting for an HCI
+  architecture instead, where the CephOSD service is colocated with the
+  NovaCompute service on the Compute nodes, use the following arguments::
+
+      -e /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+
+  The `hyperconverged-ceph.yaml` environment file will also enable a port on the
+  `StorageMgmt` network for the Compute nodes. This will be the Ceph private
+  network and the Compute NIC templates have to be configured to use that, see
+  :doc:`../advanced_deployment/network_isolation` for more details on how to do
+  it.
 
 .. admonition:: RHEL Satellite Registration
   :class: satellite

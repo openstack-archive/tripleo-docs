@@ -137,3 +137,20 @@ deploy command.  For example, if you copied tripleo-heat-templates to ~/my-templ
 the extra parameter would look like::
 
     -e ~/my-templates/environments/ips-from-pool-all.yaml
+
+Predictable Virtual IPs
+-----------------------
+
+You can also assign predictable Virtual IPs (VIPs) for services. To accomplish this,
+edit the network environment file and add the VIP parameters in the
+parameter_defaults section, for example::
+
+    ControlFixedIPs: [{'ip_address':'192.168.201.101'}]
+    InternalApiVirtualFixedIPs: [{'ip_address':'172.16.0.9'}]
+    PublicVirtualFixedIPs: [{'ip_address':'10.1.1.9'}]
+    StorageVirtualFixedIPs: [{'ip_address':'172.16.1.9'}]
+    StorageMgmtVirtualFixedIPs: [{'ip_address':'172.16.3.9'}]
+    RedisVirtualFixedIPs: [{'ip_address':'172.16.0.8'}]
+
+These IPs MUST come from outside their allocation range to prevent conflicts.
+Do not use these parameters if deploying with an external load balancer.

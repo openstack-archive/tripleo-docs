@@ -59,11 +59,11 @@ The parameters available are:
 
     If you set a configuration of a puppet class which is not being included
     yet, make sure you include it in the ExtraConfig definition, for example
-    if you want to change CPU allocation ratio::
+    if you want to change the Max IOPS per host setting::
 
        parameter_defaults:
          NovaComputeExtraConfig:
-           'nova::scheduler::filter::cpu_allocation_ratio': '11.0'
+           'nova::scheduler::filter::max_io_ops_per_host': '4.0'
            compute_classes:
            - '::nova::scheduler::filter'
 

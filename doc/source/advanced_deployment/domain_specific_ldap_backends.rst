@@ -240,6 +240,77 @@ role in the newly created domain.
 
     openstack user list --domain tripleodomain
 
+FreeIPA as an LDAP backend
+--------------------------
+
+Before configuring the domain, there needs to be a user that will query
+FreeIPA. In this case, we'll create an account called ``keystone`` in FreeIPA,
+and we'll use it's credentials on our configuration. On the FreeIPA side and
+with proper credentials loaded, we'll do the following::
+
+    ipa user-add keystone --cn="keystone user" --first="keystone" \
+        --last="user" --password
+
+This will create the user and we'll be prompted to write the password for it.
+
+Configuring FreeIPA as an LDAP backend for a domain can be done by using the
+following template as a configuration::
+
+    parameter_defaults:
+      KeystoneLDAPDomainEnable: true
+      KeystoneLDAPBackendConfigs:
+        freeipadomain:
+          url: ldaps://$FREEIPA_SERVER
+          user: uid=keystone,cn=users,cn=accounts,$SUFFIX
+          password: $SOME_PASSWORD
+          suffix: $SUFFIX
+          user_tree_dn: cn=users,cn=accounts,$SUFFIX
+          user_objectclass: inetOrgPerson
+          user_id_attribute: uid
+          user_name_attribute: uid
+          user_mail_attribute: mail
+          user_allow_create: false
+          user_allow_update: false
+          user_allow_delete: false
+          group_tree_dn: cn=groups,cn=accounts,$SUFFIX
+          group_objectclass: groupOfNames
+          group_id_attribute: cn
+          group_name_attribute: cn
+          group_member_attribute: member
+          group_desc_attribute: description
+          group_allow_create: false
+          group_allow_update: false
+          group_allow_delete: false
+          user_enabled_attribute: nsAccountLock
+          user_enabled_default: False
+          user_enabled_invert: true
+
+* $FREEIPA_SERVER will contain the FQDN that points to your FreeIPA server.
+  Remember that it needs to be available from some network (most likely the
+  ctlplane network) in TripleO
+
+* You should also make sure that the ldap ports need to be accessible. In this
+  case, we need port 636 available since we're using the ``ldaps`` scheme.
+  However, if you would be using the ``use_tls`` configuration option or if you
+  are not using TLS at all (not recommended), you might also need port 389.
+
+* To use TLS, the FreeIPA server's certificate must also be trusted by the
+  openldap client libraries. If you're using novajoin (and
+  :doc:`tls_everywhere`) this is easily achieved since all the nodes in your
+  overcloud are enrolled in FreeIPA. If you're not using this setup, you should
+  then follow the 'Getting the overcloud to trust CAs' section in the
+  :doc:`ssl` document.
+
+* $SUFFIX will be the domain for your users. Given a domain, the suffix DN can
+  be created withwith the following snippet::
+
+      suffix=`echo $DOMAIN | sed -e 's/^/dc=/' -e 's/\./,dc=/g'`
+
+  Given the domain ``example.com`` the suffix will be ``dc=example,dc=com``.
+
+* In this configuration, we configure this backend as read-only. So you'll need
+  to create your OpenStack users on the FreeIPA side.
+
 .. References
 
 .. _`OpenStack Identity documentation`: https://docs.openstack.org/admin-guide/identity-integrate-with-ldap.html

@@ -31,7 +31,7 @@ any networking configuration done by the OpenStack deployment.
 A separate interface, or set of interfaces should then be used for the
 OpenStack deployment itself, configured in the typical fashion with a set of
 NIC config templates during the Overcloud deployment. See
-:ref:`network_isolation` for more information on configuring networking.
+:doc:`network_isolation` for more information on configuring networking.
 
 
 Undercloud
@@ -62,7 +62,7 @@ a hostname that resolves to a routable IP address for the deployed servers. SSL
 also must be configured on the Undercloud so that HAProxy is bound to that
 configured hostname. Specify either ``undercloud_service_certifcate`` or
 ``generate_service_certificate`` to enable SSL during the Undercloud
-installation. See :ref:`ssl` for more information on configuring SSL.
+installation. See :doc:`ssl` for more information on configuring SSL.
 
 Additionally, when the ctlplane is not routable from the deployed
 servers, Heat on the Undercloud must be configured to use the public
@@ -229,7 +229,7 @@ from either the ctlplane network or the IP address range for the
 overcloud.
 
 If the deployed servers were preconfigured with IP addresses from the ctlplane
-newtork for the initial undercloud connectivity, then the same IP addresses can
+network for the initial undercloud connectivity, then the same IP addresses can
 be reused during the overcloud deployment. Add the following to a new
 environment file and specify the environment file as part of the deployment
 command::
@@ -278,7 +278,7 @@ from any CIDR::
           fixed_ips:
             - ip_address: 192.168.100.3
 
-In the above example, notice how RedisVipPort is mapped to
+In the above example, notice how ``RedisVipPort`` is mapped to
 ``network/ports/noop.yaml``. This mapping is due to the fact that the
 Redis VIP IP address comes from the ctlplane by default. The
 ``EC2MetadataIp`` and ``ControlPlaneDefaultRoute`` parameters are set
@@ -434,7 +434,7 @@ user are as follows:
 
 #. Prepare the new deployed server(s) as shown in `Deployed Server
    Requirements`_.
-#. Start the scale out command. See :ref:`scale_roles` for reference.
+#. Start the scale out command. See :doc:`../post_deployment/scale_roles` for reference.
 #. Once Heat has created the new resources for the new deployed server(s),
    query Heat for the request metadata url for the new nodes, and configure the
    remote agents as shown in `Manual configuration of Heat agents`_.
@@ -442,7 +442,7 @@ user are as follows:
 Scaling Down
 ^^^^^^^^^^^^
 When scaling down the Overcloud, follow the scale down instructions as normal
-as shown in :ref:`delete_nodes`.
+as shown in :doc:`../post_deployment/delete_nodes`.
 
 The physical deployed servers that have been removed from the deployment need
 to be powered off. In a deployment not using deployed servers, this would

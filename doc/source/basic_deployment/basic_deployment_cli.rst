@@ -300,7 +300,7 @@ used::
 
       For TripleO release Mitaka, the import command is::
 
-          openstack baremetal import instackenv.json
+          openstack baremetal import --json instackenv.json
 
       The following command must be run after registration to assign the
       deployment kernel and ramdisk to all nodes::

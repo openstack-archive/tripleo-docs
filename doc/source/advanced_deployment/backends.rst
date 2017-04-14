@@ -14,3 +14,4 @@ OpenStack projects.
    ceph_external
    neutron_midonet
    domain_specific_ldap_backends
+   swift_external

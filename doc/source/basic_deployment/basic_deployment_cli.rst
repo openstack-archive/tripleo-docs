@@ -114,7 +114,7 @@ created on the undercloud, one should use a non-root user.
 
          ::
 
-            STABLE_RELEASE="mitaka"
+            export STABLE_RELEASE="mitaka"
 
          .. admonition:: Ceph
             :class: ceph
@@ -128,7 +128,7 @@ created on the undercloud, one should use a non-root user.
 
          ::
 
-            STABLE_RELEASE="newton"
+            export STABLE_RELEASE="newton"
 
          .. admonition:: Ceph
             :class: ceph
@@ -142,7 +142,7 @@ created on the undercloud, one should use a non-root user.
 
          ::
 
-            STABLE_RELEASE="ocata"
+            export STABLE_RELEASE="ocata"
 
          .. admonition:: Ceph
             :class: ceph

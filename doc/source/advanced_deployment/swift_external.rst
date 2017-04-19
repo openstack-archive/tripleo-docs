@@ -1,4 +1,4 @@
-Use an external Ceph cluster with the Overcloud
+Use an external Swift Proxy with the Overcloud
 ===============================================
 
 |project| supports use of an external Swift proxy already available to the

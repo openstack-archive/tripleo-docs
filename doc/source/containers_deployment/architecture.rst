@@ -43,13 +43,15 @@ of the services, like mariadb::
 Use the following command to build an image using kolla-build and the template
 above (`template-overrides.j2`)::
 
-  $ kolla-build --base centos --template-override template-overrides.j2
+  $ kolla-build --base centos \
+    --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 \
+    --template-override template-overrides.j2
 
 TripleO maintains its complete list of kolla customization in the
 `tripleo-common`_ project.
 
 .. _Kolla: https://docs.openstack.org/developer/kolla/image-building.html#dockerfile-customisation
-.. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/contrib/tripleo_kolla_template_overrides.j2
+.. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/container-images/tripleo_kolla_template_overrides.j2
 
 heat-config-docker-cmd
 ----------------------

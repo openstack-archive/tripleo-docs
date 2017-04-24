@@ -55,7 +55,7 @@ dockerhub, use the following command::
 
 Or use `kolla-build` to build the images yourself::
 
-    kolla-build --base centos --type binary --namespace tripleoupstream --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/contrib/tripleo_kolla_template_overrides.j2 --push
+    kolla-build --base centos --type binary --namespace tripleoupstream --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
 
 Finally, point the heat templates to your local registry, for example in
 a `$HOME/docker_registry.yaml` file::

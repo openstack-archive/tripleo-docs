@@ -3,8 +3,20 @@
 Updating Packages on Overcloud Nodes
 ====================================
 
-You can update packages on all overcloud nodes with a command similar to the
-following::
+Updating packages on all overcloud nodes involves two steps. The first one
+makes sure that the overcloud plan is updated (a new tripleo-heat-templates rpm
+might have brought fixes/changes to the templates)::
+
+    openstack overcloud deploy --update-plan-only \
+    --templates \
+    -e <full environment>
+
+By using the parameter ``--update-plan-only`` we make sure we update only the
+stored overcloud plan and not the overcloud itself. Make sure you pass the
+exact same environment parameters that were used at deployment time.
+
+The second step consists in updating the packages themselves on all overcloud
+nodes with a command similar to the following::
 
     openstack overcloud update stack -i overcloud
 

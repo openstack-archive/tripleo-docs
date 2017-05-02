@@ -21,3 +21,4 @@ Documentation on how to enable and configure various features available in
    api_policies
    disable_telemetry
    server_blacklist
+   split_stack

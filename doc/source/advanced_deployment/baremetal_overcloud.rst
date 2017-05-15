@@ -92,9 +92,8 @@ environment file (``ironic-config.yaml`` in this guide):
   by default are ``pxe_ilo`` and ``pxe_drac`` drivers.
 
   Other drivers might require additional configuration to work properly.
-  See `Ironic drivers documentation
-  <http://docs.openstack.org/developer/ironic/deploy/drivers.html>`_ for
-  details.
+  Check `driver configuration guide`_ and `driver-specific documentation`_
+  for more details.
 
   .. admonition:: Virtual
       :class: virtual
@@ -120,6 +119,31 @@ environment file (``ironic-config.yaml`` in this guide):
                       - pxe_ssh
                   ControllerExtraConfig:
                       ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
+
+* ``IronicEnabledHardwareTypes`` is available since the Pike release, and
+  allows setting enabled hardware types - the new generation of Ironic drivers.
+  Check `driver configuration guide`_ and `driver-specific documentation`_
+  for more details.
+
+  By default, the ``ipmi`` hardware type is enabled, and its defaults roughly
+  correspond to ones of the ``pxe_ipmitool`` driver (more precisely, of the
+  ``pxe_ipmitool_socat`` driver).
+
+  When enabling hardware types, you usually have to enable more hardware
+  interfaces that these types are compatible with. For example, when enabling
+  the ``redfish`` hardware type, also enable ``redfish`` power and management
+  interfaces. For example::
+
+    parameter_defaults:
+        IronicEnabledHardwareTypes:
+            - ipmi
+            - redfish
+        IronicEnabledPowerInterfaces:
+            - ipmitool
+            - redfish
+        IronicEnabledManagementInterfaces:
+            - ipmitool
+            - redfish
 
 * ``NovaSchedulerDefaultFilters`` configures available
   scheduler filters. For a hybrid deployment it's important to prepend
@@ -190,7 +214,9 @@ Add the ironic environment file when deploying::
     so feel free to set ``ComputeCount: 0`` in your environment file, if you
     don't need them.
 
-Checking deployment
+.. _driver configuration guide: https://docs.openstack.org/project-install-guide/baremetal/draft/enabling-drivers.html
+.. _driver-specific documentation: https://docs.openstack.org/developer/ironic/deploy/drivers.html
+
 ~~~~~~~~~~~~~~~~~~~
 
 Check that Ironic works by connecting to the overcloud and trying to list the
@@ -205,6 +231,7 @@ You can also check the enabled driver list::
     +---------------------+-------------------------+
     | Supported driver(s) | Active host(s)          |
     +---------------------+-------------------------+
+    | ipmi                | overcloud-controller-0. |
     | pxe_drac            | overcloud-controller-0. |
     | pxe_ilo             | overcloud-controller-0. |
     | pxe_ipmitool        | overcloud-controller-0. |
@@ -216,6 +243,7 @@ For HA configuration you should see all three controllers::
     +---------------------+------------------------------------------------------------------------------------------------------------+
     | Supported driver(s) | Active host(s)                                                                                             |
     +---------------------+------------------------------------------------------------------------------------------------------------+
+    | ipmi                | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     | pxe_drac            | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     | pxe_ilo             | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     | pxe_ipmitool        | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
@@ -414,9 +442,9 @@ In the future some of this data will be provided by the introspection process,
 which is not currently available in the overcloud.
 
 This guide uses inventory files to enroll nodes. Alternatively, you can enroll
-nodes directly from CLI, see `Ironic enrollment documentation
-<http://docs.openstack.org/developer/ironic/deploy/install-guide.html#enrollment>`_
-for details.
+nodes directly from CLI, see `Ironic enrollment documentation`_ for details.
+
+.. _Ironic enrollment documentation: https://docs.openstack.org/project-install-guide/baremetal/draft/enrollment.html
 
 Preparing inventory
 ~~~~~~~~~~~~~~~~~~~
@@ -426,7 +454,7 @@ environment`_, do it now in the following format::
 
     nodes:
         - name: node-0
-          driver: pxe_ipmitool
+          driver: ipmi
           driver_info:
             ipmi_address: <BMC HOST>
             ipmi_username: <BMC USER>
@@ -441,8 +469,15 @@ environment`_, do it now in the following format::
           ports:
             - address: <PXE NIC MAC>
 
-The ``driver`` field must be one of ``IronicEnabledDrivers``, which we set
-when `Configuring and deploying overcloud`_.
+The ``driver`` field must be one of ``IronicEnabledDrivers`` or
+``IronicEnabledHardwareTypes``, which we set when `Configuring and deploying
+overcloud`_.
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   Hardware types are only available since the Pike release. In the example
+   above use ``pxe_ipmitool`` instead of ``ipmi`` for older releases.
 
 The ``root_device`` property is optional, but it's highly recommended
 to set it if the bare metal node has more than one hard drive.

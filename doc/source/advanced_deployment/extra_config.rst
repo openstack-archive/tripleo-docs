@@ -225,7 +225,7 @@ Below is an example of a post-deployment configuration template::
                 _APARAM_: {get_param: some_extraparam}
 
       ExtraDeployments:
-        type: OS::Heat::SoftwareDeployments
+        type: OS::Heat::SoftwareDeploymentGroup
         properties:
           servers:  {get_param: servers}
           config: {get_resource: ExtraConfig}
@@ -246,7 +246,7 @@ environment which enables the configuration.
     unintended reuse of parameter names between multiple templates, because
     parameter_defaults is applied globally.
 
-The "actions" property of the `OS::Heat::SoftwareDeployments` resource may be
+The "actions" property of the `OS::Heat::SoftwareDeploymentGroup` resource may be
 used to specify when the configuration should be applied, e.g only on CREATE,
 only on DELETE etc.  If this is omitted, the heat default is to apply the
 config on CREATE and UPDATE, e.g on initial deployment and every subsequent

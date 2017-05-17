@@ -15,6 +15,11 @@ Overcloud::
     -e /usr/share/openstack-tripleo-heat-templates/environments/services/ceph-mds.yaml \
     -e /usr/share/openstack-tripleo-heat-templates/environments/manila-cephfsnative-config.yaml
 
+.. note::
+   These and any other environment files or options passed to the overcloud
+   deploy command, are referenced below as the "full environment". We assumed
+   the ``--plan`` flag is not what we want to use for this example.
+
 Network Isolation
 ~~~~~~~~~~~~~~~~~
 When mounting a ceph share from a user instance, the user instance needs access
@@ -145,9 +150,10 @@ Deploying the Overcloud with an External Backend
 
 #. Continue following the TripleO instructions for deploying an overcloud.
    Before entering the command to deploy the overcloud, add the environment
-   file that you just configured as an argument::
+   file that you just configured as an argument. For example::
 
-    openstack overcloud deploy --templates -e ~/manila-[generic or netapp]-config.yaml
+    openstack overcloud deploy --templates \
+      -e <full environment> -e ~/manila-[generic or netapp]-config.yaml
 
 #. Wait for the completion of the overcloud deployment process.
 

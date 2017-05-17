@@ -13,7 +13,14 @@ first an environment file should be created::
 
 Then following command can be used to deploy it::
 
-    openstack overcloud deploy --templates [templates dir] -e ~/environment.yaml
+    openstack overcloud deploy --templates [templates dir] \
+      -e <full environment> -e ~/environment.yaml
+
+.. note::
+   It is especially important to remember that you **must** include all
+   environment files that were used to deploy the overcloud. Make sure
+   you pass those in addition to your customization environments at the
+   end (`environment.yaml`).
 
 .. note::
    Scaling out assumes that newly added nodes has already been

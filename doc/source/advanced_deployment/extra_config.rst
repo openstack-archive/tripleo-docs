@@ -221,7 +221,7 @@ Below is an example of a post-deployment configuration template::
               template: |
                 #!/bin/sh
                 echo "extra _APARAM_" > /root/extra
-              parameters:
+              params:
                 _APARAM_: {get_param: some_extraparam}
 
       ExtraDeployments:

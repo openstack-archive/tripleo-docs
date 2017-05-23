@@ -462,3 +462,19 @@ the future if they are powered back on.
   Do not attempt to reuse nodes that were previously removed from the
   deployment without first reprovisioning them using whatever provisioning tool
   is in place.
+
+
+Deleting the Overcloud
+----------------------
+
+When deleting the Overcloud, the Overcloud nodes need to be manually powered
+off, otherwise, the cloud will still be active and accepting any user requests.
+
+After archiving any data that needs to be saved from the deployment, it is
+recommended to reprovision the nodes to a clean base operating system. The
+reprovision will ensure that they do not start serving user requests, or
+interfere with future deployments in the case where they are powered back on in
+the future.
+
+As with scaling down, do not attempt to reuse nodes from a previous deployment
+as part of a new deployment.

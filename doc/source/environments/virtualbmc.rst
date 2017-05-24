@@ -102,7 +102,31 @@ their drivers and certain driver properties:
         --driver-info ipmi_username="admin" \
         --driver-info ipmi_password="password"
 
-Then check that everything is populated properly:
+In the case of bare metal service in the overcloud, you will first have to
+configure the deployment to include the pxe_ipmitool driver, then rerun the
+deployment command,
+for example:
+
+.. code-block:: yaml
+
+ parameter_defaults:
+   IronicEnabledDrivers:
+       - pxe_ipmitool
+       - pxe_ssh
+
+
+Before updating to Pike release, make sure to remove the pxe_ssh driver from the
+deployment configuration, as it will be removed from Ironic, then rerun
+the deployment command,
+for example:
+
+.. code-block:: yaml
+
+ parameter_defaults:
+   IronicEnabledDrivers:
+       - pxe_ipmitool
+
+To validate after updating deployment and verify everything is populated properly:
 
 .. code-block:: bash
 

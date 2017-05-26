@@ -9,3 +9,4 @@ Documentation of developer-specific options in |project|.
    tripleo.sh
    in_progress_review
    tht_walkthrough/tht_walkthrough
+   release

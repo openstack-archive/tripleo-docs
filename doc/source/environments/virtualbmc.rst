@@ -72,7 +72,7 @@ For example:
   {
       "nodes": [
           {
-              "pm_type": "pxe_ipmitool",
+              "pm_type": "ipmi",
               "mac": [
                   "00:0a:f2:88:12:aa"
               ],
@@ -89,18 +89,23 @@ Migrating from pxe_ssh to VirtualBMC
 ------------------------------------
 
 If you already have a virtual cloud deployed and want to migrate from the
-deprecated ``pxe_ssh`` driver to ``pxe_ipmitool`` using VirtualBMC,
+deprecated ``pxe_ssh`` driver to ``ipmi`` using VirtualBMC,
 follow `Creating virtual BMC`_, then update the existing nodes to change
 their drivers and certain driver properties:
 
 .. code-block:: bash
 
     openstack baremetal node set $NODE_UUID_OR_NAME \
-        --driver pxe_ipmitool \
+        --driver ipmi \
         --driver-info ipmi_address=<IP address of the virthost> \
         --driver-info ipmi_port=<Virtual BMC port> \
         --driver-info ipmi_username="admin" \
         --driver-info ipmi_password="password"
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   For the Ocata release, use ``pxe_ipmitool`` driver instead of ``ipmi``.
 
 In the case of bare metal service in the overcloud, you will first have to
 configure the deployment to include the pxe_ipmitool driver, then rerun the

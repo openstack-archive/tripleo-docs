@@ -198,7 +198,7 @@ For example::
     {
         "nodes": [
             {
-                "pm_type":"pxe_ipmitool",
+                "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:2a:0e:36"
                 ],
@@ -211,7 +211,7 @@ For example::
                 "pm_addr":"10.0.0.8"
             },
             {
-                "pm_type":"pxe_ipmitool",
+                "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:da:39:c9"
                 ],
@@ -224,7 +224,7 @@ For example::
                 "pm_addr":"10.0.0.15"
             },
             {
-                "pm_type":"pxe_ipmitool",
+                "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:51:9b:68"
                 ],
@@ -247,8 +247,14 @@ The most up-to-date information about Ironic drivers is at
 http://docs.openstack.org/developer/ironic/deploy/drivers.html, but note that
 this page always targets Ironic git master, not the release we use.
 
-This most generic driver is ``pxe_ipmitool``. It uses `ipmitool`_ utility
+This most generic driver is ``ipmi``. It uses `ipmitool`_ utility
 to manage a bare metal node, and supports a vast variety of hardware.
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   This driver is supported starting with the Pike release. For older releases
+   use functionally equivalent ``pxe_ipmitool`` driver.
 
 .. admonition:: Virtual
    :class: virtual
@@ -271,14 +277,26 @@ to manage a bare metal node, and supports a vast variety of hardware.
         The ``pxe_ssh`` driver is deprecated and ``pxe_ipmitool`` +
         :doc:`virtualbmc` should be used instead.
 
+Another generic driver is ``redfish``. It provides support for the quite new
+Redfish_ protocol, which aims to replace IPMI eventually as a generic
+protocol for managing hardware. In addition to the ``pm_*`` fields mentioned
+above, this driver also requires setting ``pm_system_id`` to the full
+identifier of the node in the controller (e.g. ``/redfish/v1/Systems/42``).
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   Redfish support was introduced in the Pike release.
+
 Ironic also provides specific drivers for some types of hardware:
 
 * ``pxe_ilo`` targets HP Proliant Gen 8 and Gen 9 systems, and is recommended
-  for these systems instead of ``pxe_ipmitool``. Please refer to the `current
-  iLO driver documentation`_ or `detailed iLO documentation for Kilo version`_.
+  for these systems instead of ``ipmi`` or ``pxe_ipmitool``. Please refer
+  to the `current iLO driver documentation`_ or `detailed iLO documentation
+  for Kilo version`_.
 
 * ``pxe_drac`` targets DELL 11G and newer systems, and is recommended for these
-  systems instead of ``pxe_ipmitool``.
+  systems instead of ``ipmi`` or ``pxe_ipmitool``.
 
 There are also 2 testing drivers:
 
@@ -290,5 +308,6 @@ There are also 2 testing drivers:
   hardware at all.
 
 .. _ipmitool: http://sourceforge.net/projects/ipmitool/
+.. _Redfish: https://www.dmtf.org/standards/redfish
 .. _current iLO driver documentation: http://docs.openstack.org/developer/ironic/drivers/ilo.html
 .. _detailed iLO documentation for Kilo version: https://wiki.openstack.org/wiki/Ironic/Drivers/iLODrivers/Kilo

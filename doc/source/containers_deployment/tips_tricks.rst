@@ -16,6 +16,19 @@ monitor the output of the command below::
 
 .. _debug-containers:
 
+Viewing container logs
+----------------------
+
+You can view the output of the main process running in a container by running::
+
+    $ docker logs $CONTAINER_ID_OR_NAME
+
+Ideally all containerized processes would log everything to
+stdout/stderr and the above command would suffice. Not all services
+are quite there yet, so we export traditional logs from containers
+into the `/var/log/containers` directory on the host, where you can
+look at them.
+
 Debugging container failures
 ----------------------------
 

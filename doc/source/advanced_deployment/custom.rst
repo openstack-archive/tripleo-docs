@@ -13,3 +13,4 @@ Documentation on how to deploy custom configurations with |project|.
    extra_config
    template_deploy
    deploy_swift
+   role_specific_parameters

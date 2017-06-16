@@ -82,11 +82,6 @@ Linux (RHEL). These steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
-.. admonition:: Mitaka
-   :class: mitaka
-
-   Step that should only be run when installing from the Mitaka stable branch.
-
 .. admonition:: Newton
    :class: newton
 

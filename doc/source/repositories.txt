@@ -4,31 +4,6 @@
       Enable the appropriate repos for the desired release, as indicated below.
       Do not enable any other repos not explicitly marked for that release.
 
-      .. admonition:: Mitaka
-         :class: mitaka ltom
-
-         Enable latest RDO Mitaka Delorean repository for all packages
-
-         ::
-
-            sudo curl -L -o /etc/yum.repos.d/delorean-mitaka.repo https://trunk.rdoproject.org/centos7-mitaka/current/delorean.repo
-
-         Enable the Mitaka Delorean Deps repository
-
-         ::
-
-            sudo curl -L -o /etc/yum.repos.d/delorean-deps-mitaka.repo https://trunk.rdoproject.org/centos7-mitaka/delorean-deps.repo
-
-         .. admonition:: Ceph
-            :class: ceph
-
-            Enable the CentOS Storage SIG Ceph/Hammer repository if using Ceph
-
-            ::
-
-               sudo yum -y install --enablerepo=extras centos-release-ceph-hammer
-               sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Hammer.repo
-
       .. admonition:: Newton
          :class: newton mton
 

@@ -112,20 +112,6 @@ created on the undercloud, one should use a non-root user.
    .. admonition:: Stable Branch
       :class: stable
 
-      .. admonition:: Mitaka
-         :class: mitaka
-
-         ::
-
-            export STABLE_RELEASE="mitaka"
-
-         .. admonition:: Ceph
-            :class: ceph
-
-            ::
-
-               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/CentOS-Ceph-Hammer.repo"
-
       .. admonition:: Newton
          :class: newton
 
@@ -195,14 +181,6 @@ created on the undercloud, one should use a non-root user.
            rhel-7-server-rhceph-2-osd-rpms
            rhel-7-server-rhceph-2-tools-rpms
 
-        .. admonition:: Mitaka
-           :class: mitaka
-
-           ::
-
-              rhel-7-server-rhceph-1.3-mon-rpms
-              rhel-7-server-rhceph-1.3-osd-rpms
-              rhel-7-server-rhceph-1.3-tools-rpms
 
   .. admonition:: RHEL Satellite Registration
      :class: satellite
@@ -295,21 +273,6 @@ used::
 
     openstack overcloud node import --introspect --provide instackenv.json
 
-.. admonition:: Stable Branch
-   :class: stable
-
-   .. admonition:: Mitaka
-      :class: mitaka
-
-      For TripleO release Mitaka, the import command is::
-
-          openstack baremetal import --json instackenv.json
-
-      The following command must be run after registration to assign the
-      deployment kernel and ramdisk to all nodes::
-
-          openstack baremetal configure boot
-
 Starting with the Newton release you can take advantage of the ``enroll``
 provisioning state - see :doc:`../advanced_deployment/node_states` for details.
 
@@ -358,16 +321,6 @@ making the nodes available for deployment.
 ::
 
    openstack overcloud node introspect --all-manageable --provide
-
-.. admonition:: Stable Branch
-   :class: stable
-
-   .. admonition:: Mitaka
-      :class: mitaka
-
-      For TripleO release Mitaka, the introspection command is::
-
-          openstack baremetal introspection bulk start
 
 .. note:: **Introspection has to finish without errors.**
    The process can take up to 5 minutes for VM / 15 minutes for baremetal. If

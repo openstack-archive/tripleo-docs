@@ -225,9 +225,7 @@ be added as in the other values to indicate that this is a multi-line value.
 .. admonition:: Stable Branch
    :class: stable
 
-    In Newton, the EndpointMap and SSL certificates have been decoupled,
-    but in Mitaka it may be necessary to modify the EndpointMap
-    in enable-tls.yaml
+    From Newton, the EndpointMap and SSL certificates have been decoupled.
 
     When the certificate's common name is set to the public VIP, all instances
     of ``CLOUDNAME`` in enable-tls.yaml must be replaced with ``IP_ADDRESS``.

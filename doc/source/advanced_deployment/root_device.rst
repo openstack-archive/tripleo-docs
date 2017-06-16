@@ -38,16 +38,6 @@ accept a device list in the order of preference, for example::
 
     openstack overcloud node configure --all-manageable --root-device=sdb,sdc,vda
 
-.. admonition:: Stable Branch
-   :class: stable
-
-   .. admonition:: Mitaka
-      :class: mitaka
-
-      For TripleO release Mitaka, the boot configuration command is::
-
-          openstack baremetal configure boot --root-device=sdb,sdc,vda
-
 It can also accept one of two strategies: ``smallest`` will pick the smallest
 device, ``largest`` will pick the largest one. By default only disk devices
 larger than 4 GiB are considered at all, set the ``--root-device-minimum-size``

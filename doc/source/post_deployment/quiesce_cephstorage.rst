@@ -42,15 +42,6 @@ CRUSH map, from the OSDs map and delete the authentication keys::
       ceph osd rm $OSD_ID
     done
 
-.. admonition:: Mitaka
-   :class: mitaka
-
-   TripleO/Mitaka uses and supports Ceph/Hammer, not Jewel, which does not
-   use systemd but sysv init scripts. For Mitaka the systemctl command above
-   which stops the OSD should be replaced by::
-
-       service ceph stop osd.$OSD_ID
-
 You are now free to reboot or shut down the node (using the Ironic API), or
 even remove it from the overcloud altogether by scaling down the overcloud
 deployment, see :ref:`delete_nodes`.

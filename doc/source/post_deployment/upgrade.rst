@@ -6,11 +6,6 @@ first upgrading the undercloud, and then upgrading the overcloud.
 
 Note that there are version specific caveats and notes which are pointed out as below:
 
-.. admonition:: Liberty to Mitaka
-   :class: ltom
-
-   liberty to mitaka specific note
-
 .. admonition:: Mitaka to Newton
    :class: mton
 
@@ -34,14 +29,6 @@ Upgrading the Undercloud
 
 1. Disable the old OpenStack release repositories and enable new
    release repositories on the undercloud:
-
-  .. admonition:: Liberty to Mitaka
-     :class: ltom
-
-      ::
-
-            export CURRENT_VERSION=liberty
-            export NEW_VERSION=mitaka
 
   .. admonition:: Mitaka to Newton
      :class: mton
@@ -70,21 +57,6 @@ Upgrading the Undercloud
 .. include:: ../repositories.txt
 
 2. Run undercloud upgrade:
-
-   .. admonition:: Liberty to Mitaka
-      :class: ltom
-
-       For liberty to mitaka upgrades we need to manually update
-       mariadb including a database backup/restore::
-
-          mysqldump -u root --flush-privileges --single-transaction --all-databases > /home/stack/backup.sql
-          sudo systemctl stop mariadb
-          sudo mv /var/lib/mysql /home/stack/mysql-backup
-
-          sudo yum -y update mariadb
-
-          sudo systemctl start mariadb
-          mysql -u root < /home/stack/backup.sql
 
    .. admonition:: Mitaka to Newton
       :class: mton
@@ -275,60 +247,6 @@ Upgrading the Overcloud to Newton and earlier
    non-blocking. Make sure that the overcloud is `UPDATE_COMPLETE` in
    `openstack stack list` and `sudo pcs status` on a controller
    reports everything running fine before proceeding to the next step.
-
-.. admonition:: Liberty to Mitaka
-   :class: ltom
-
-    **Create the new CephClientKey**
-
-    If using a TripleO managed Ceph deployment, a new key for the
-    "client.openstack" CephX user needs to be provided. A sample
-    environment file would look like the following::
-
-      parameter_defaults:
-        CephClientKey: 'my_cephx_key'
-
-    A proper value for the key parameter can be generated from any of
-    the overcloud nodes with::
-
-      $ ceph-authtool --gen-print-key
-
-.. admonition:: Liberty to Mitaka
-   :class: ltom
-
-
-    **Deliver the aodh migration.**
-
-    For Liberty to Mitaka we need to run an extra step in the upgrades workflow
-    after the upgrade initialisation.
-
-    This is to deliver the migration from ceilometer-alarms to aodh. To execute
-    this step run `overcloud deploy`, passing in the full set of environment
-    files plus `major-upgrade-aodh.yaml`. Note that the `--force-postconfig`
-    switch is needed in order to add the newly created aodh endpoint::
-
-      openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-aodh.yaml \
-          --force-postconfig
-
-.. admonition:: Liberty to Mitaka
-   :class: ltom
-
-
-    **Deliver the migration for keystone to run under httpd.**
-
-    For Liberty to Mitaka we need to run an extra step in the upgrades workflow
-    after the aodh migration.
-
-    This is to deliver the migration for keystone to be run under httpd (apache)
-    rather than eventlet as was the case before. To execute this step run
-    `overcloud deploy`, passing in the full set of environment files plus
-    `major-upgrade-keystone-liberty-mitaka.yaml`::
-
-      openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-keystone-liberty-mitaka.yaml
 
 .. admonition:: Mitaka to Newton
    :class: mton

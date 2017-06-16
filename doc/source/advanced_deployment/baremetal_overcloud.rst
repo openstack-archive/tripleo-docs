@@ -65,16 +65,6 @@ Then enroll only ``undercloud.json`` in your undercloud::
     source stackrc
     openstack overcloud node import --provide undercloud.json
 
-.. admonition:: Stable Branch
-   :class: stable
-
-   .. admonition:: Mitaka
-      :class: mitaka
-
-      For TripleO release Mitaka, the nodes should be imported with::
-
-          openstack baremetal import undercloud.json
-
 .. admonition:: Virtual
     :class: virtual
 

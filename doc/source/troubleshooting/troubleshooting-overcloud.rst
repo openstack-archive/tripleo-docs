@@ -250,3 +250,21 @@ If you're using advanced profile matching with multiple flavors, make sure
 you have enough nodes corresponding to each flavor/profile. Watch
 ``capabilities`` key in ``properties`` field for ``ironic node-show``.
 It should contain e.g. ``profile:compute``.
+
+
+Debugging OpenStack services
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Since Pike release, TripleO now offers an easy way to enable per-service debug
+without relying on knowledge of the puppet interfaces.
+Each OpenStack service has now its own Debug parameter.
+
+* Operators who want to enable Debug everywhere will set ``Debug`` to ``true``.
+* Operators who want to disable Debug everywhere will set ``Debug`` to ``false``.
+* Operators who want to disable Debug everywhere except for Glance will set ``Debug`` to
+  ``false`` and ``GlanceDebug`` to ``true``.
+* Operators who want to enable Debug everywhere except for Glance will set ``Debug`` to
+  ``true`` and ``GlanceDebug`` to ``false``.
+
+Glance was an example, but all OpenStack services are supported. You can find their Debug
+in the TripleO Heat Templates composable services.

@@ -51,7 +51,7 @@ port 8787 as part of the undercloud install.
 To use the pre-built images coming from the `tripleoupstream` registry on the
 dockerhub, use the following command::
 
-    openstack overcloud container image upload
+    openstack overcloud container image upload --config-file /usr/share/openstack-tripleo-common/container-images/overcloud_containers.yaml
 
 Or use `kolla-build` to build the images yourself::
 

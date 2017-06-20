@@ -12,3 +12,4 @@ help with troubleshooting when using |project|.
    troubleshooting-nodes
    troubleshooting-overcloud
    troubleshooting-tripleo-heat-templates
+   troubleshooting-log-and-status-capture

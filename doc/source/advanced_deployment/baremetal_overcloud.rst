@@ -522,15 +522,6 @@ command to get the last error::
 
     openstack baremetal node show <UUID> -f value -c last_error
 
-With the switch to cell_v2 in Ocata (and on), it's now needed to search for cells, or a single cell,
-and map found hosts, which are not currently mapped. The following command needs to run once on one
-controller node::
-
-    sudo nova-manage cell_v2 discover_hosts --verbose
-
-.. note::
-    More information about cells is available here: https://docs.openstack.org/developer/nova/cells.html
-
 Checking available resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

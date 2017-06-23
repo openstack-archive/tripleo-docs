@@ -4,6 +4,11 @@ Node Discovery
 As an alternative to creating an inventory file (``instackenv.json``) and
 enrolling nodes from it, you can discover and enroll the nodes automatically.
 
+TripleO supports two approaches to the discovery process:
+
+* `Automatic enrollment of new nodes`_
+* `Scanning BMC range`_
+
 Automatic enrollment of new nodes
 ---------------------------------
 
@@ -111,3 +116,32 @@ the discovery process:
 See :doc:`profile_matching` for more examples on introspection rules.
 
 .. _ironic-inspector discovery documentation: https://docs.openstack.org/developer/ironic-inspector/usage.html#discovery
+
+Scanning BMC range
+------------------
+
+You can discover new nodes by scanning an IP range for accessible BMCs.
+You need to provide a set of credentials to try, and optionally a list of
+ports. Use the following command to run the scan:
+
+.. code-block:: console
+
+    openstack overcloud node discover --range <RANGE> \
+        --credentials <USER1:PASSWORD1> --credentials <USER2:PASSWORD2>
+
+Here, ``<RANGE>`` is an IP range, e.g. ``10.0.0.0/24``. Credentials are
+provided separated by a colon, e.g. ``root:calvin``.
+
+With this approach, new nodes end up in ``manageable`` state, and will already
+have the deploy properties, such as deploy kernel/ramdisk, assigned.
+
+You can use the same command to introspect the nodes and make them available
+for deployment:
+
+.. code-block:: console
+
+    openstack overcloud node discover --range <RANGE> \
+        --credentials <USER1:PASSWORD1> --credentials <USER2:PASSWORD2> \
+        --introspect --provide
+
+The resulting node UUIDs will be printed on the screen.

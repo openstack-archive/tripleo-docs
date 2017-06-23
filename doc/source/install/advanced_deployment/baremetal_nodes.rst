@@ -7,6 +7,7 @@ Documentation on how to do advanced configuration of baremetal nodes in
 .. toctree::
 
    node_states
+   node_discovery
    root_device
    introspect_single_node
    profile_matching

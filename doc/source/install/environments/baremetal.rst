@@ -239,6 +239,10 @@ For example::
         ]
     }
 
+.. note::
+    You don't need to create this file, if you plan on using
+    :doc:`../advanced_deployment/node_discovery`.
+
 Ironic Drivers
 ^^^^^^^^^^^^^^
 

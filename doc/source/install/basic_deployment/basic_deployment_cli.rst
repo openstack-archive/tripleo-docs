@@ -297,6 +297,9 @@ as a root device. Please see :ref:`root_device` for details.
    with nodes after registration, please follow
    :ref:`node_registration_problems`.
 
+Another approach to enrolling node is
+:doc:`../advanced_deployment/node_discovery`.
+
 .. _introspection:
 
 Introspect Nodes

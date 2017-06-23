@@ -10,7 +10,7 @@
 # serve to show the default.
 
 import sys, os
-import sphinx_rtd_theme
+import openstackdocstheme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -99,6 +99,12 @@ templates_path = ['../../_templates']
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
 
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = 'openstackdocs'
+
+# Add any paths that contain custom themes here, relative to this directory.
+html_theme_path = [openstackdocstheme.get_html_theme_path()]
 
 # -- Options for LaTeX output --------------------------------------------------
 

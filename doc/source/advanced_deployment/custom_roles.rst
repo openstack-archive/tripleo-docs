@@ -69,6 +69,12 @@ For example the following role would deploy a pacemaker managed galera cluster::
      parameter_defaults:
        OvercloudGaleraFlavor: oooq_galera
 
+.. warning::
+   When scaling your deployment out, you need as well set the role counts in the
+   "parameter_defaults" section. The ``--control-scale`` and ``--compute-scale``
+   CLI args are hardcoded to the "Control" and "Compute" role names, so they're in
+   fact ignored when using custom roles.
+
 
 3. Pass the modified roles_data on deployment as follows::
 

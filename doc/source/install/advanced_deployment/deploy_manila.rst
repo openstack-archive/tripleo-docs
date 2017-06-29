@@ -69,6 +69,21 @@ provider networks to the storage bridge::
           NeutronBridgeMappings: datacentre:br-ex,storage:br-storage
           NeutronFlatNetworks: datacentre,storage
 
+If the storage network uses VLAN, include storage network in
+``NeutronNetworkVLANRanges`` parameter. For example::
+
+    NeutronNetworkVLANRanges: 'datacentre:100:1000,storage:30:30'
+
+.. warning::
+    If network isolation is used, make sure that storage provider network
+    subnet doesn't overlap with IP allocation pool used for Overcloud storage
+    nodes (controlled by ``StorageAllocationPools`` heat parameter).
+    ``StorageAllocationPools`` is by default set to
+    ``[{'start': '172.16.1.4', 'end': '172.16.1.250'}]``. It may be neccessary
+    to shrink this pool, for example::
+
+        StorageAllocationPools: [{'start': '172.16.1.4', 'end': '172.16.1.99'}]
+
 When Overcloud is deployed, create a provider network which can be used to
 access storage network.
 

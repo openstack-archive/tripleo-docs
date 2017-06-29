@@ -58,6 +58,16 @@ Upgrading the Undercloud
 
 2. Run undercloud upgrade:
 
+   .. note::
+
+      It is strongly recommended that you validate the state of your undercloud
+      before starting any upgrade operations. The tripleo-validations_ repo has
+      some 'pre-upgrade' validations that you can execute by following the
+      instructions at validations_ to execute the "pre-upgrade" group::
+
+          openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-upgrade"]}'
+          mistral execution-get-output $id_returned_above
+
    .. admonition:: Mitaka to Newton
       :class: mton
 
@@ -97,6 +107,9 @@ Upgrading the Undercloud
 
    If you added custom OVS ports to the undercloud (e.g. in a virtual
    testing environment) you may need to re-add them at this point.
+
+.. _validations: ../validations/validations.html#running-a-group-of-validations
+.. _tripleo-validations: https://github.com/openstack/tripleo-validations/tree/master/validations
 
 Upgrading the Overcloud to Ocata and beyond
 -------------------------------------------

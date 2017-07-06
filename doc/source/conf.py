@@ -10,7 +10,6 @@
 # serve to show the default.
 
 import sys, os
-import openstackdocstheme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -27,7 +26,7 @@ import openstackdocstheme
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'oslosphinx'
+    'openstackdocstheme'
 ]
 
 
@@ -103,9 +102,6 @@ htmlhelp_basename = '%sdoc' % project
 # a list of builtin themes.
 html_theme = 'openstackdocs'
 
-# Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [openstackdocstheme.get_html_theme_path()]
-
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
@@ -124,3 +120,8 @@ rst_prolog = """
 .. |bug_tracker| replace:: %s
 .. |bug_tracker_url| replace:: %s
 """ % (project, bug_tracker, bug_tracker_url)
+
+# openstackdocstheme options
+repository_name = 'openstack/tripleo-docs'
+bug_project = 'tripleo'
+bug_tag = 'documentation'

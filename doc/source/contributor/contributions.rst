@@ -13,7 +13,7 @@ development is happening in OpenStack upstream.
 Learn `how to contribute into OpenStack's upstream <https://wiki.openstack.org/
 wiki/How_To_Contribute>`_.
 
-See :doc:`../introduction/components` to find out how to contribute into
+See :doc:`../install/introduction/components` to find out how to contribute into
 individual projects.
 
 Contributing to this Documentation
@@ -37,7 +37,7 @@ upstream projects, please follow OpenStack's process of filing bugs.
   <https://wiki.openstack.org/wiki/Bugs>`_.
 
 * If you want to file a bug against upstream project, you can find useful links
-  in our list of :doc:`../introduction/components`.
+  in our list of :doc:`../install/introduction/components`.
 
 
 **TripleO** If the bug impacts the |project| project as a whole, you can file a
@@ -59,4 +59,4 @@ all the features are being requested upstream via Blueprints.
   <https://wiki.openstack.org/wiki/Blueprints>`_.
 
 * If you want to file a bug against upstream project, you can find useful links
-  in our list of :doc:`../introduction/components`.
+  in our list of :doc:`../install/introduction/components`.

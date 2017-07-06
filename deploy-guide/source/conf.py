@@ -10,7 +10,6 @@
 # serve to show the default.
 
 import sys, os
-import sphinx_rtd_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -27,7 +26,7 @@ import sphinx_rtd_theme
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'oslosphinx'
+    'openstackdocstheme'
 ]
 
 
@@ -99,6 +98,9 @@ templates_path = ['../../_templates']
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
 
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = 'openstackdocs'
 
 # -- Options for LaTeX output --------------------------------------------------
 
@@ -118,3 +120,8 @@ rst_prolog = """
 .. |bug_tracker| replace:: %s
 .. |bug_tracker_url| replace:: %s
 """ % (project, bug_tracker, bug_tracker_url)
+
+# openstackdocstheme options
+repository_name = 'openstack/tripleo-docs'
+bug_project = 'tripleo'
+bug_tag = 'documentation'

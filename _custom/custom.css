@@ -84,8 +84,6 @@
 }
 
 .trigger {
-  display: block;
-  font-size: 110%;
   color: rgba(255, 255, 255, 0.75);
   line-height: 2.5;
   position: relative;
@@ -95,12 +93,7 @@
 
 .trigger:after {
   content: '▾';
-  display: block;
   font-family: FontAwesome;
-  font-size: 70%;
-  position: absolute;
-  right: 1.618em;
-  top: 6px;
 }
 
 .trigger:hover {

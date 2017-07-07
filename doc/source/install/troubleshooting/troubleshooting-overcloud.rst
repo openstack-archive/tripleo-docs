@@ -244,7 +244,7 @@ This in turn usually means some mismatch between resources that Nova expects
 to find and resources that Ironic advertised to Nova.
 
 Start with checking `Ironic troubleshooting guide on this topic
-<http://docs.openstack.org/developer/ironic/deploy/troubleshooting.html#nova-returns-no-valid-host-was-found-error>`_.
+<https://docs.openstack.org/ironic/latest/admin/troubleshooting.html#nova-returns-no-valid-host-was-found-error>`_.
 
 If you're using advanced profile matching with multiple flavors, make sure
 you have enough nodes corresponding to each flavor/profile. Watch

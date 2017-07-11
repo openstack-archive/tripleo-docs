@@ -89,19 +89,16 @@ Linux (RHEL). These steps are marked as follows:
 
    Step that should only be run when installing from the Ocata stable branch.
 
-.. admonition:: SSL
-   :class: ssl
-
-   Step that should only be run when deploying with SSL OpenStack endpoints
-
-.. admonition:: Self-Signed SSL
-   :class: selfsigned
-
-   Step that should only be run when deploying with SSL and a self-signed certificate.
-
 .. admonition:: Validations
+   :class: validations
 
    Steps that will run the pre and post-deployment validations
+
+.. admonition:: Optional Feature
+   :class: optional
+
+   Step that is optional.  A deployment can be done without these steps, but they
+   may provide useful additional functionality.
 
 Any such steps should *not* be run if the target environment does not match
 the section marking.

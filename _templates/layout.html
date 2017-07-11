@@ -24,6 +24,7 @@
       <ul>
         <li><input type="checkbox" id="stable" checked=""><label for="stable" title="Step that should only be run when choosing to use components from their stable branches rather than using packages/source based on current master.">Install from stable branch</label></li>
         <li><input type="checkbox" id="newton" checked=""><label for="newton" title="Step that should only be run when installing from the Newton stable branch.">Install from Newton branch</label></li>
+        <li><input type="checkbox" id="ocata" checked=""><label for="ocata" title="Step that should only be run when installing from the Ocata stable branch.">Install from Ocata branch</label></li>
       </ul>
 
       <span class="title">RHEL Registration Types</span>
@@ -36,8 +37,12 @@
       <ul>
         <li><input type="checkbox" id="baremetal" checked="checked"><label for="baremetal" title="Step that should only be run when deploying to baremetal.">Baremetal</label></li>
         <li><input type="checkbox" id="virtual" checked="checked"><label for="virtual" title="Step that should only be run when deploying to virtual machines.">Virtual</label></li>
-        <li><input type="checkbox" id="ssl" checked="checked"><label for="ssl" title="Step that should only be run when deploying with SSL OpenStack endpoints.">SSL</label></li>
-        <li><input type="checkbox" id="selfsigned" checked="checked"><label for="selfsigned" title="Step that should only be run when deploying with SSL and a self-signed certificate.">Self-Signed SSL</label></li>
+      </ul>
+
+      <span class="title">Features</span>
+      <ul>
+        <li><input type="checkbox" id="validations" checked="checked"><label for="validations" title="Step that should only be run when deploying with validations.">Validations</label></li>
+        <li><input type="checkbox" id="optional" checked="checked"><label for="optional" title="Step that is optional.  A deployment can be done without these steps, but they may provide useful additional functionality.">Optional</label></li>
       </ul>
 
       <span class="title">Additional Overcloud Roles</span>

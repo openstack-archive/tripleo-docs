@@ -96,11 +96,12 @@ Installing the Undercloud
      :doc:`../developer/in_progress_review` for details.
 
   .. admonition:: SSL
-     :class: ssl
+     :class: optional
 
      To deploy an undercloud with SSL, see :doc:`../advanced_deployment/ssl`.
 
   .. admonition:: Validations
+     :class: validations
 
      :doc:`../validations/validations` will be installed and
      configured during undercloud installation. You can set

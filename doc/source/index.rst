@@ -7,8 +7,8 @@ Nova, Ironic, Neutron and Heat to automate cloud management at datacenter
 scale.
 
 
-Contribute Guide
-----------------
+Contributor Guide
+-----------------
 
 .. toctree::
   :maxdepth: 3

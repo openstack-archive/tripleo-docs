@@ -9,6 +9,7 @@ TripleO Install Guide
   environments/environments
   installation/installation
   basic_deployment/basic_deployment_cli
+  basic_deployment/basic_deployment_ui
   containers_deployment/index
   post_deployment/post_deployment
   advanced_deployment/features

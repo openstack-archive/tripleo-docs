@@ -26,6 +26,7 @@ Prepare Your Environment
 
     source stackrc
 
+.. _basic-deployment-cli-get-images:
 
 Get Images
 ----------
@@ -245,6 +246,8 @@ created on the undercloud, one should use a non-root user.
 .. note::
 
        If you want to use whole disk images with TripleO, please see :doc:`../advanced_deployment/whole_disk_images`.
+
+.. _basic-deployment-cli-upload-images:
 
 Upload Images
 -------------

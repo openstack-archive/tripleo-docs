@@ -19,3 +19,4 @@ Documentation on how to enable and configure various features available in
    deployed_server
    security_hardening
    api_policies
+   disable_telemetry

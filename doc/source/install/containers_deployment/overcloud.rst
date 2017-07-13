@@ -74,6 +74,12 @@ deploy` command::
 
   -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml
 
+If deploying with highly available controller nodes, include the
+following extra environment file in addition to the above and in place
+of the `environments/puppet-pacemaker.yaml` file::
+
+  -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml
+
 In case of a local docker registry, also add the path to the override file::
 
   -e $HOME/docker_registry.yaml

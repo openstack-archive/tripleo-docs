@@ -11,9 +11,12 @@ refers to the individual services or configurations e.g "Nova API").
 Deploying with custom service lists
 -----------------------------------
 
-Each role defines a default list of services, which can be viewed in the
-`roles_data.yaml` file (see `/usr/share/openstack-tripleo-heat-templates`, or
-the tripleo-heat-templates_ git repository.)
+Each role to be used in the deployment is defined in a `roles_data.yaml` file.
+There is a sample file in `/usr/share/openstack-tripleo-heat-templates`, or the
+tripleo-heat-templates_ git repository. Additional example roles are located in
+the `/usr/share/openstack-tripleo-heat-templates/roles` directory and can be used
+to create a custom `roles_data.yaml` file. See :doc:`custom_roles` for additional
+usage details.
 
 The data in `roles_data.yaml` is used to set the defaults for per-role parameters
 e.g `CustomControllerServices`.  These defaults can be overridden via environment

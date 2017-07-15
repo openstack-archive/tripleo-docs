@@ -15,6 +15,10 @@ nodes in the Overcloud.
    using deployed servers with servers provisioned with Nova and Ironic is not
    currently possible.
 
+Benefits to using this feature include not requiring a dedicated provisioning
+network, and being able to use a custom partitioning scheme on the already
+deployed servers.
+
 Deployed Server Requirements
 ----------------------------
 
@@ -32,6 +36,14 @@ A separate interface, or set of interfaces should then be used for the
 OpenStack deployment itself, configured in the typical fashion with a set of
 NIC config templates during the Overcloud deployment. See
 :doc:`network_isolation` for more information on configuring networking.
+
+.. note::
+
+  When configuring network isolation be sure that the configuration does not
+  result in a loss of network connectivity from the deployed servers to the
+  undercloud. The interface(s) that are being used for this connectivity should
+  be excluded from the NIC config templates so that the configuration does not
+  unintentionally drop all networking access to the deployed servers.
 
 
 Undercloud
@@ -144,6 +156,21 @@ each server intending to be used as part of the Overcloud::
 
     sudo yum -y install python-heat-agent*
 
+Certificate Authority Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If SSL is enabled on the Undercloud endpoints, the deployed servers need to be
+configured to trust the Certificate Authority (CA) that signed the SSL
+certificates.
+
+On a default Undercloud install with SSL where the CA is automatically
+generated, the CA file will be at
+``/etc/pki/ca-trust/source/anchors/cm-local-ca.pem``.  Copy this CA file to the
+``/etc/pki/ca-trust/source/anchors/`` directory on each deployed server. Then
+run the following command on each server to update the CA trust::
+
+  sudo update-ca-trust extract
+
 Deploying the Overcloud
 -----------------------
 
@@ -206,9 +233,9 @@ roles are::
   OS::TripleO::ObjectStorageDeployedServer::Net::SoftwareConfig: net-config-static.yaml
   OS::TripleO::CephStorageDeployedServer::Net::SoftwareConfig: net-config-static.yaml
 
-The default nic configs use static IP assignment instead of the default of
+The default NIC configs use static IP assignment instead of the default of
 DHCP. This is due to there being no requirement of L2 connectivity between the
-undercloud and overcloud.  However, the nic config templates can be overridden
+undercloud and overcloud.  However, the NIC config templates can be overridden
 to use whatever configuration is desired (including DHCP).
 
 As is the case when not using deployed-servers, the following parameters need
@@ -437,7 +464,10 @@ user are as follows:
 #. Start the scale out command. See :doc:`../post_deployment/scale_roles` for reference.
 #. Once Heat has created the new resources for the new deployed server(s),
    query Heat for the request metadata url for the new nodes, and configure the
-   remote agents as shown in `Manual configuration of Heat agents`_.
+   remote agents as shown in `Manual configuration of Heat agents`_. The manual
+   configuration of the agents should be used when scaling up because the
+   automated script method will reconfigure all nodes, not just the new nodes
+   being added to the deployment.
 
 Scaling Down
 ^^^^^^^^^^^^
@@ -463,18 +493,20 @@ the future if they are powered back on.
   deployment without first reprovisioning them using whatever provisioning tool
   is in place.
 
-
 Deleting the Overcloud
 ----------------------
 
 When deleting the Overcloud, the Overcloud nodes need to be manually powered
 off, otherwise, the cloud will still be active and accepting any user requests.
 
-After archiving any data that needs to be saved from the deployment, it is
-recommended to reprovision the nodes to a clean base operating system. The
-reprovision will ensure that they do not start serving user requests, or
-interfere with future deployments in the case where they are powered back on in
-the future.
+After archiving important data (log files, saved configurations, database
+files), that needs to be saved from the deployment, it is recommended to
+reprovision the nodes to a clean base operating system. The reprovision will
+ensure that they do not start serving user requests, or interfere with future
+deployments in the case where they are powered back on in the future.
 
-As with scaling down, do not attempt to reuse nodes from a previous deployment
-as part of a new deployment.
+.. note::
+
+  As with scaling down, do not attempt to reuse nodes that were previously part
+  of a now deleted deployment in a new deployment without first reprovisioning
+  them using whatever provisioning tool is in place.

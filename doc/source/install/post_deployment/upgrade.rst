@@ -86,12 +86,29 @@ Upgrading the Undercloud
        you are using a later newton release you don't need to explicitly enable
        this option.
 
+   .. admonition:: Ocata to Pike
+      :class: mton
+
+       Prior to Pike, TripleO deployed Ceph with puppet-ceph. With the
+       Pike release it is possible to use TripleO to deploy Ceph with
+       either ceph-ansible or puppet-ceph, though puppet-ceph is
+       deprecated. To use ceph-ansible, the CentOS Storage SIG Ceph
+       repository must be enabled on the undercloud and the
+       ceph-ansible package must then be installed::
+
+          sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
+          sudo yum -y install ceph-ansible
+
+       It is not yet possible to migrate an existing puppet-ceph
+       deployment to a ceph-ansible deployment. Only new deployments
+       are currently possible with ceph-ansible.
+
    The following command will upgrade the undercloud::
 
       sudo systemctl stop openstack-*
       sudo systemctl stop neutron-*
       sudo systemctl stop httpd
-      sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient
+      sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient ceph-ansible
       openstack undercloud upgrade
 
    Once the undercloud upgrade is fully completed you may
@@ -110,6 +127,11 @@ Upgrading the Undercloud
 
 .. _validations: ../validations/validations.html#running-a-group-of-validations
 .. _tripleo-validations: https://github.com/openstack/tripleo-validations/tree/master/validations
+
+.. note::
+
+   It is not necessary to update ceph-ansible if Ceph is not used in
+   the overcloud.
 
 Upgrading the Overcloud to Ocata and beyond
 -------------------------------------------

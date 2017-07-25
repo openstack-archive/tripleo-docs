@@ -69,6 +69,13 @@ Installing the Undercloud
 
     sudo yum install -y python-tripleoclient
 
+   .. admonition:: Ceph
+      :class: ceph
+
+      If you intend to deploy Ceph in the overcloud and are running Pike or newer, then install ceph-ansible on the undercloud::
+
+          sudo yum install -y ceph-ansible
+
 #. Copy in the sample configuration file and edit it to reflect your environment::
 
     cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf

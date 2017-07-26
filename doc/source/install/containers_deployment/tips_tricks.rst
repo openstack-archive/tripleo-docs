@@ -73,38 +73,86 @@ The following commands are useful for debugging containers.
 
     $ docker export $CONTAINER_ID_OR_NAME | tar -C /tmp/$CONTAINER_ID_OR_NAME -xvf -
 
-Using docker-toool
-------------------
 
-In addition to the above, there is also now a json file that is generated
-that contains all the information for all the containers and how they
-are run.  This file is `/var/lib/docker-container-startup-configs.json`.
+Debugging with Paunch
+---------------------
 
-`docker-toool` was written to read from this file and start containers
-for debugging purposes based on those commands.  For now this utility
-is in the tripleo-heat-templates repo in the `docker/` directory.
+The ``paunch debug`` command allows you to perform specific actions on a given
+container.  This can be used to:
 
-By default this tool lists all the containers that are started and
-their start order.
+* Run a container with a specific configuration.
+* Dump the configuration of a given container in either json or yaml.
+* Output the docker command line used to start the container.
+* Run a container with any configuration additions you wish such that you can
+  run it with a shell as any user etc.
 
-If you wish to see the command line used to start a given container,
-specify it by name using the --container (or -c) argument.  --run (or
--r) can then be used with this to actually execute docker to run the
-container.  To see all available options use::
+The configuration options you will likely be interested in here include:
 
-    ./docker-toool --help
+::
 
-Other options listed allow you to modify this command line for
-debugging purposes.  For example::
+  --file <file>         YAML or JSON file containing configuration data
+  --action <name>       Action can be one of: "dump-json", "dump-yaml",
+                        "print-cmd", or "run"
+  --container <name>    Name of the container you wish to manipulate
+  --interactive         Run container in interactive mode - modifies config
+                        and execution of container
+  --shell               Similar to interactive but drops you into a shell
+  --user <name>         Start container as the specified user
+  --overrides <name>    JSON configuration information used to override
+                        default config values
 
-    ./docker-toool -c swift-proxy -r -e /bin/bash -u root -i -n test
+``file`` is the name of the configuration file to use
+containing the configuration for the container you wish to use.
+TripleO creates configuration files for starting containers in
+``/var/lib/tripleo-config/``.  If you look in this directory
+you will see a number of files corresponding with the steps in
+TripleO heat templates.  Most of the time, you will likely want to use
+``/var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json``
+as it contains most of the final startup configurations for the running
+containers.
 
-The above command will run the swift proxy container with all the volumes,
-permissions etc as used at runtime but as the root user, executing /bin/bash,
-named 'test', and will run interactively (eg -ti).  This allows you to enter
-the container and run commands to see what is failing, perhaps install strace
-and strace the command etc.  You can also verify configurations or any other
-debugging task you may have.
+To make sure you get the right container you can use the ``paunch list``
+command to see what containers are running and which config id they
+are using.  This config id corresponds to which file you will find the
+container configuration in.
+
+Here is an example of using ``paunch debug`` to start a root shell inside the
+heat api container:
+
+::
+
+  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --interactive --shell --user root --container heat_api --action run
+
+This will drop you an interactive session inside the heat api container
+starting /bin/bash running as root.
+
+To see how this container is started by TripleO:
+
+::
+
+  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --container heat_api --action print-cmd
+
+  docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleoupstream/centos-binary-heat-api:latest
+
+You can also dump the configuration of this to a file so you can edit
+it and rerun it with different a different configuration:
+
+::
+
+  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --container heat_api --action dump-json > heat_api.json
+
+You can then use ``heat_api.json`` as your ``--file`` argument after
+editing it to your liking.
+
+You can also add any configuration elements you wish on the command line
+to test paunch or debug containers etc.  In this example I'm adding a
+health check to the container:
+
+::
+
+  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --overrides '{"health-cmd": "/usr/bin/curl -f http://localhost:8004/v1/", "health-interval": "30s"}' --container heat_api --action run
+  172ed68eb44ab20551a70a3e33c90a02014f530e42cd7b30255da4577c8ed80c
+
 
 Debugging docker-puppet.py
 --------------------------

@@ -20,3 +20,4 @@ Documentation on how to enable and configure various features available in
    security_hardening
    api_policies
    disable_telemetry
+   server_blacklist

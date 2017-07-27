@@ -1,17 +1,26 @@
 Deploying with OVS DPDK Support
 ===============================
 
-TripleO can deploy Overcloud nodes with OVS DPDK support. The following
-changes are required:
+TripleO can deploy Overcloud nodes with OVS DPDK support. A new role
+``ComputeOvsDpdk`` has been added to create a custom ``roles_data.yaml`` with
+composable OVS DPDK role.
 
- - Environment File
+Execute below command to create the ``roles_data.yaml``::
+
+  openstack overcloud roles generate -o roles_data.yaml Controller ComputeOvsDpdk
+
+Once a roles file is created, the following changes are required:
+
+ - Deploy Command
  - Parameters
  - Network Config
 
-Environment File
+Deploy Command
 ----------------
+Deploy command should include the generated roles data file from the above
+command.
 
-Deploy command should include the OVS DPDK environment file to override the
+Deploy command should also include the OVS DPDK environment file to override the
 default neutron-ovs-agent service with neutron-ovs-dpdk-agent service. All the
 required parameters are specified in this environment file as commented. The
 parameters has to be configured according to the baremetal on which OVS DPDK
@@ -25,31 +34,41 @@ config-pre-network environment file has to be added for the deploy command.
 Adding the following arguments to the ``openstack overcloud deploy`` command
 will do the trick::
 
-  -e /usr/share/openstack-tripleo-heat-templates/environments/neutron-ovs-dpdk.yaml \
-  -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-pre-network.yaml \
-
+  openstack overcloud deploy --templates \
+    -r roles_data.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/neutron-ovs-dpdk.yaml \
+    ...
 
 Parameters
 ----------
-The parameters ``NeutronDpdkCoreList`` and ``NeutronDpdkMemoryChannels`` are
-mandatory for OVS-DPDK deployment. And other optional parameter to be
-considered is ``NeutronDpdkSocketMemory``.::
+Following are the list of parameters which need to be provided for deploying
+with OVS DPDK support.
 
-  NeutronDpdkCoreList: "'1,2,18,19'"
-  NeutronDpdkMemoryChannels: "4"
-  NeutronDpdkSocketMemory: "'1024,1024'"
+  * OvsPmdCoreList:  List of Logical CPUs to be allocated for Poll Mode Driver
+  * OvsDpdkCoreList: List of Logical CPUs to be allocated for the openvswitch
+    host process (lcore list)
+  * OvsDpdkMemoryChannels: Number of memory channels
+  * OvsDpdkSocketMemory: Socket memory list per NUMA node
 
 
-The parameter ``ComputeKernelArgs`` should be provided in the deployment
-environment file, with the set of kernel boot parameters to be applied on the
-``Compute`` role where OVS DPDK is enabled::
+Example::
 
- ComputeKernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=64 intel_iommu=on"
+  parameter_defaults:
+    OvsPmdCoreList: "2,3,18,19"
+    OvsDpdkCoreList: "0,1,16,17"
+    OvsDpdkMemoryChannels: "4"
+    OvsDpdkSocketMemory: "1024,1024"
 
-.. note::
-    The parameter ``ComputeKernelArgs`` is specific to a role. In case of
-    introducing a new role like ``ComputeOvsDpdk``, the kernel args should be
-    given as ``ComputeOvsDpdkKernelArgs`` parameter.
+
+The parameter ``KernelArgs`` should be provided in the deployment environment
+file, with the set of kernel boot parameters to be applied on the
+``ComputeOvsDpdk`` role where OVS DPDK is enabled::
+
+  parameter_defaults:
+    ComputeOvsDpdkParameters:
+      KernelArgs: "default_hugepagesz=1GB hugepagesz=1G hugepages=64 intel_iommu=on iommu=pt"
+
 
 Network Config
 --------------
@@ -72,12 +91,9 @@ Example::
                 -
                   type: ovs_dpdk_port
                   name: dpdk0
+                  mtu: 2000
+                  rx_queu: 2
                   members:
                     -
                       type: interface
                       name: nic3
-
-By default, the interface will be bound to ``vfio-pci`` DPDK driver. In case
-of binding to a diffrenet driver, network config types ``ovs_dpdk_port`` and
-``ovs_dpdk_bond`` each take an additional parameter ``driver`` to specify the
-driver name.

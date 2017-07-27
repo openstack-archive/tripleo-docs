@@ -221,6 +221,39 @@ looks like::
         - OS::TripleO::Services::CephRgw
         ... <additional services>
 
+Optionally include an environment to set the ``DeploymentSwiftDataMap``
+paramter called ``deployment-swift-data-map.yaml``::
+
+    # Append to deploy command
+    -e deployment-swift-data-map.yaml \
+
+This environment sets the Swift container and object names for the deployment
+metadata for each deployed server. This environment file must be written
+entirely by the user. Example contents are as follows::
+
+    parameter_defaults:
+      DeploymentSwiftDataMap:
+        overcloud-controller-0:
+          container: overcloud-controller
+          object: 0
+        overcloud-controller-1:
+          container: overcloud-controller
+          object: 1
+        overcloud-controller-2:
+          container: overcloud-controller
+          object: 2
+        overcloud-novacompute-0:
+          container: overcloud-compute
+          object: 0
+
+The ``DeploymentSwiftDataMap`` parameter's value is a dict. The keys are the
+Heat assigned names for each server resource. The values are another dict of
+the Swift container and object name Heat should use for storing the deployment
+data for that server resource. These values should match the container and
+object names as described in the
+:ref:`pre-configuring-metadata-agent-configuration` section.
+
+
 Network Configuration
 _____________________
 
@@ -321,6 +354,116 @@ IP addresses for further information at :ref:`predictable_ips`.
 Configuring Deployed Servers to poll Heat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. _pre-configuring-metadata-agent-configuration:
+
+Pre-configuring metadata agent configuration
+____________________________________________
+
+Beginning with the Pike release of TripleO, the deployed server's agents can be
+configured for polling of the Heat deployment data independently of creating the
+overcloud stack.
+
+This is accomplished using the ``DeploymentSwiftDataMap`` parameter as shown in
+the previous section. Once the Swift container and object names are chosen for
+each deployed server, create Swift temporary url's that correspond to each
+container/object and configure the temporary url in the agent configuration for
+the respective deployed server.
+
+For this example, the following ``DeploymentSwiftDataMap`` parameter value is
+assumed to be::
+
+    parameter_defaults:
+      DeploymentSwiftDataMap:
+        overcloud-controller-0:
+          container: overcloud-controller
+          object: 0
+        overcloud-controller-1:
+          container: overcloud-controller
+          object: 1
+        overcloud-controller-2:
+          container: overcloud-controller
+          object: 2
+        overcloud-novacompute-0:
+          container: overcloud-compute
+          object: 0
+
+Start by showing the Swift account and temporary URL key::
+
+    swift stat
+
+Sample output looks like::
+
+    Account: AUTH_aa7784aae1ae41c38e6e01fd76caaa7c
+    Containers: 5
+    Objects: 706
+    Bytes: 3521748
+    Containers in policy "policy-0": 5
+    Objects in policy "policy-0": 706
+    Bytes in policy "policy-0": 3521748
+    Meta Temp-Url-Key: 25ad317c25bb89c62f5730f3b8cf8fca
+    X-Account-Project-Domain-Id: default
+    X-Openstack-Request-Id: txedaadba016cd474dac37f-00595ea5af
+    X-Timestamp: 1499288311.20888
+    X-Trans-Id: txedaadba016cd474dac37f-00595ea5af
+    Content-Type: text/plain; charset=utf-8
+    Accept-Ranges: bytes
+
+Record the value of ``Account`` and ``Meta Temp-Url-Key`` from the output from
+the above command.
+
+If ``Meta Temp-Url-Key`` is not set, it can be set by running the following
+command (choose a unique value for the actual key value)::
+
+    swift post -m "Temp-URL-Key:b3968d0207b54ece87cccc06515a89d4"
+
+Create temporary URL's for each Swift object specified in
+``DeploymentSwiftDataMap``::
+
+    swift tempurl GET 600000000 /v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-controller/0 25ad317c25bb89c62f5730f3b8cf8fca
+    swift tempurl GET 600000000 /v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-controller/1 25ad317c25bb89c62f5730f3b8cf8fca
+    swift tempurl GET 600000000 /v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-controller/2 25ad317c25bb89c62f5730f3b8cf8fca
+    swift tempurl GET 600000000 /v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-compute/0 25ad317c25bb89c62f5730f3b8cf8fca
+
+See ``swift tempurl --help`` for a detailed explanation of each argument.
+
+The above commands output URL paths which need to be joined with the Swift
+public api endpoint to construct the full metadata URL. In a default TripleO
+deployment, this value is ``http://192.168.24.1:8080`` but is likely different
+for any real deployment.
+
+Joining the output from one of the above commands with the Swift public
+endpoint results in a URL that looks like::
+
+    http://192.168.24.1:8080/v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-controller/0?temp_url_sig=92de8e4c66b77c54630dede8150b3ebcd46a1fca&temp_url_expires=700000000
+
+Once each URL is obtained, configure the agent on each deployed server with its
+respective metadata URL (e.g., use the metadata URL for controller 0 on the
+deployed server intended to be controller 0, etc). Create the following file
+(and ``local-data`` directory if necessary). Both should be root owned::
+
+    mkdir -p /var/lib/os-collect-config/local-data
+    /var/lib/os-collect-config/local-data/deployed-server.json
+
+Example file contents::
+
+    {
+      "os-collect-config": {
+        "collectors": ["request", "local"],
+        "request": {
+          "metadata_url": "http://192.168.24.1:8080/v1/AUTH_aa7784aae1ae41c38e6e01fd76caaa7c/overcloud-controller/0?temp_url_sig=92de8e4c66b77c54630dede8150b3ebcd46a1fca&temp_url_expires=700000000"
+        }
+      }
+    }
+
+The deployed server's agent is now configured.
+
+
+Reading metadata configuration from Heat
+________________________________________
+
+If not using ``DeploymentSwiftDataMap``, the metadata configuration will have
+to be read directly from Heat once the stack starts to create.
+
 Upon executing the deployment command, Heat will begin creating the
 ``overcloud`` stack. The stack events are shown in the terminal as the stack
 operation is in progress.
@@ -346,7 +489,7 @@ configured in the ``/etc/os-collect-config.conf`` configuration file on the
 corresponding deployed servers.
 
 Manual configuration of Heat agents
-___________________________________
+"""""""""""""""""""""""""""""""""""
 
 These steps can be used to manually configure the Heat agents
 (``os-collect-config``) on the deployed servers.
@@ -406,7 +549,7 @@ continue creating. If the deployment is successful, the Heat stack will
 eventually go to the ``CREATE_COMPLETE`` state.
 
 Automatic configuration of Heat agents
-______________________________________
+""""""""""""""""""""""""""""""""""""""
 
 A script is included with ``tripleo-heat-templates`` that can be used to do
 automatic configuration of the Heat agent on the deployed servers instead of

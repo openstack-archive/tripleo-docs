@@ -4,6 +4,12 @@ Security Hardening
 TripleO can deploy Overcloud nodes with various Security Hardening values
 passed in as environment files to the ``openstack overcloud deploy`` command.
 
+.. note::
+   It is especially important to remember that you **must** include all
+   environment files needed to deploy the overcloud. Make sure
+   you pass the full environment in addition to your customization environments
+   at the end of each of the ``openstack overcloud deploy`` command.
+
 Horizon Password Validation
 ---------------------------
 
@@ -23,7 +29,8 @@ characters in length::
 If the above yaml was saved as ``horizon_password.yaml`` we can then pass this
 into the overcloud deploy command as follows::
 
-    openstack overcloud deploy --templates -e  horizon_password.yaml
+    openstack overcloud deploy --templates \
+      -e <full environment> -e  horizon_password.yaml
 
 Default Security Values in Horzion
 ----------------------------------
@@ -99,7 +106,8 @@ As with the previous Horizon Password Validation example, saving the above into
 a yaml file, will allow passing the aforementioned parameters into the overcloud
 deploy command::
 
-    openstack overcloud deploy --templates -e  ssh_banner.yaml
+    openstack overcloud deploy --templates \
+      -e <full environment> -e  ssh_banner.yaml
 
 Audit
 -----

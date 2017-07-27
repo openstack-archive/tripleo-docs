@@ -84,11 +84,18 @@ via a heat environment file::
 
 You may then deploy your overcloud referencing the additional environment file::
 
-    openstack overcloud deploy --templates -e userdata_env.yaml
+    openstack overcloud deploy --templates \
+      -e <full environment> -e userdata_env.yaml
 
 .. note::
 
-    The userdata is applied to *all* nodes in the deployment.  If you need role
+    Make sure you pass the same environment parameters that were used at
+    deployment time in addition to your customization environments at the
+    end (`userdata_env.yaml`).
+
+.. note::
+
+    The userdata is applied to *all* nodes in the deployment. If you need role
     specific logic, the userdata scripts can contain conditionals which use
     e.g the node hostname to determine the role.
 
@@ -96,7 +103,9 @@ You may then deploy your overcloud referencing the additional environment file::
 
     OS::TripleO::NodeUserData is only applied on initial node deployment,
     not on any subsequent stack update, because cloud-init only processes the
-    nova user-data once, on first boot.
+    nova user-data once, on first boot. If you need to add custom configuration
+    that runs on all stack creates and updates, see the
+    `Post-Deploy extra configuration`_ section below.
 
 For a more complete example, which creates an additional user and configures
 SSH keys by accessing the nova metadata server, see
@@ -108,7 +117,7 @@ on the undercloud node or the tripleo-heat-templates_ repo.
 Per-node extra configuration
 ----------------------------
 
-This configuration happens after after any "firstboot" configuration is applied,
+This configuration happens after any "firstboot" configuration is applied,
 but before any Post-Deploy configuration takes place.
 
 Typically these interfaces are suitable for preparing each node for service
@@ -263,4 +272,5 @@ The extra config may be enabled via an environment file::
 
 You may then deploy your overcloud referencing the additional environment file::
 
-    openstack overcloud deploy --templates -e post_config_env.yaml
+    openstack overcloud deploy --templates \
+      -e <full environment> -e post_config_env.yaml

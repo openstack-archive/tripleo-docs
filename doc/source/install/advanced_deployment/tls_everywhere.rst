@@ -99,6 +99,16 @@ with the following setting::
 .. note:: This takes a comma-separated list, so we can set another nameserver
           with this configuration option.
 
+The undercloud's neutron must also use the appropriate domain that it will
+advertise to the overcloud nodes. Assuming we're using *example.com* as the
+domain for the overcloud nodes. We must set the following::
+
+    overcloud_domain_name = example.com
+
+.. note:: The value for ``overcloud_domain_name`` in **undercloud.conf** must
+          match the value for ``CloudDomain`` that we'll set for the overcloud
+          deployment in the following section.
+
 With these settings, do the following command to set the desired configurations
 and enable novajoin::
 
@@ -122,6 +132,9 @@ in our overcloud deploy command::
       CloudNameStorage: overcloud.storage.example.com
       CloudNameStorageManagement: overcloud.storagemgmt.example.com
       CloudNameCtlplane: overcloud.ctlplane.example.com
+
+.. note:: The value for ``CloudDomain`` must match the value for
+          ``overcloud_domain_name`` that was configured in **undercloud.conf**
 
 As with our undercloud, we also want the overcloud nodes' name server to point
 to FreeIPA. We can do this by setting the ``DnsServers`` parameter via

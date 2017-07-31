@@ -18,14 +18,21 @@ You can upgrade any packages that are installed on the undercloud machine.
 
     sudo yum clean all
 
-#. Stop services so that they are not restarted by packaging scripts
-   when they are updated. The service restarts will be handled by the
-   undercloud upgrade command after new configuration has been applied.::
+#. Stop all OpenStack-related services if upgrading to Ocata or an older release.
+   In Pike and later releases this step is handled by the undercloud upgrade
+   process and should not be done by the user.
 
-    sudo systemctl stop openstack-*
-    sudo systemctl stop neutron-*
-    sudo systemctl stop openvswitch
-    sudo systemctl stop httpd
+   .. admonition:: Stable Branch
+      :class: stable
+
+         Stop services so that they are not restarted by packaging scripts
+         when they are updated. The service restarts will be handled by the
+         undercloud upgrade command after new configuration has been applied.::
+
+            sudo systemctl stop openstack-*
+            sudo systemctl stop neutron-*
+            sudo systemctl stop openvswitch
+            sudo systemctl stop httpd
 
 #. Update the TripleO CLI package::
 

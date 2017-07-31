@@ -41,49 +41,82 @@ To prepare your environment, you must follow all the steps described in the
 :ref:`basic-deployment-cli` documentation. Stop right at the
 :ref:`deploy-the-overcloud` section.
 
+It is necessary to generate a heat environment file which specifies the
+container image parameters. These parameters will deploy the overcloud with
+images from a specific repository with specific tags.
+
+The ``openstack overcloud container image prepare`` command is used to generate
+these parameters. The following command will generate a heat environment file
+`~/docker_registry.yaml` to deploy an overcloud with images from the
+`Docker Hub`_::
+
+    openstack overcloud container image prepare \
+      --namespace tripleoupstream \
+      --tag latest \
+      --env-file ~/docker_registry.yaml
+
+The options ``--namespace tripleoupstream`` and ``--tag latest`` will typically
+be replaced with values specific to the environment. Run with ``--help`` to see
+the other options available for controlling what is generated.
+
+For production deployments (or for testing upgrades and rollbacks) stable tags
+like `latest` should never be used, instead explicit versioned tags are
+required to specify the exact images which will be deployed.
+
 Populate local docker registry
 ..............................
 
-It's useful to run a local docker registry on the undercloud to speed up the
-overcloud deployment. A docker registry is normally already setup to listen on
-port 8787 as part of the undercloud install.
+Serving container images from a local registry is optional, but it can make
+overcloud deployment faster and more reliable. For development purposes an
+insecure docker registry is already setup to listen on port 8787 as part of the
+undercloud install.
 
-To use the pre-built images coming from the `tripleoupstream` registry on the
-dockerhub, use the following command::
+To copy the images from one registry to another, the `prepare` command is run
+to generate the `overcloud_containers.yaml` file. This describes the source and
+destination image locations consumed by the `upload` command.
 
-    openstack overcloud container image upload --config-file /usr/share/openstack-tripleo-common/container-images/overcloud_containers.yaml
+To copy the pre-built images coming from the `tripleoupstream` registry on
+`Docker Hub`_ to the local repository, the following commands are run::
 
-Or use `kolla-build` to build the images yourself::
+    openstack overcloud container image prepare \
+      --namespace tripleoupstream \
+      --tag latest \
+      --push-destination 192.168.24.1:8787
+      --images-file overcloud_containers.yaml \
+    openstack overcloud container image upload --config-file overcloud_containers.yaml
+
+Or use ``kolla-build`` to build and push the images yourself::
 
     kolla-build --base centos --type binary --namespace tripleoupstream --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
 
-Finally, point the heat templates to your local registry, for example in
-a `$HOME/docker_registry.yaml` file::
+The command ``openstack overcloud container image prepare`` then needs to be
+called again to generate the `~/docker_registry.yaml` file that specifies the
+containers available in the local registry::
 
-    parameter_defaults:
-      DockerNamespace: 192.168.24.1:8787/tripleoupstream
-      DockerNamespaceIsRegistry: true
+    openstack overcloud container image prepare \
+      --namespace 192.168.24.1:8787/tripleoupstream \
+      --tag latest \
+      --env-file ~/docker_registry.yaml
+
+    echo "  DockerInsecureRegistryAddress: 192.168.24.1:8787" >> \
+      ~/docker_registry.yaml
 
 Deploying the containerized Overcloud
 -------------------------------------
 
 A containerized overcloud deployment follows all the steps described in the
 baremetal :ref:`deploy-the-overcloud` documentation with the exception that it
-requires an extra environment file to be added to the `openstack overcloud
-deploy` command::
+requires extra environment files to be added to the ``openstack overcloud
+deploy`` command::
 
   -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml
+  -e ~/docker_registry.yaml
 
 If deploying with highly available controller nodes, include the
 following extra environment file in addition to the above and in place
 of the `environments/puppet-pacemaker.yaml` file::
 
   -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml
-
-In case of a local docker registry, also add the path to the override file::
-
-  -e $HOME/docker_registry.yaml
-
 
 Using TripleO Quickstart
 ------------------------
@@ -98,3 +131,4 @@ The command below will deploy a containerized overcloud on top of a baremetal un
     bash quickstart.sh --config=~/.quickstart/config/general_config/containers_minimal.yml $VIRTHOST
 
 ..  _TripleO Quickstart: https://docs.openstack.org/developer/tripleo-quickstart/
+..  _Docker Hub: https://hub.docker.com/

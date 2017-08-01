@@ -193,11 +193,22 @@ boot options at registration time:
 
     "capabilities": "profile:compute,boot_option:local"
 
+There are also two additional and optional fields that can be used to help a
+user identifying machines inside ``instackenv.json`` file:
+
+* ``name`` - name associated to the node, it will appear in the ``Name``
+  column while listing nodes
+
+* ``_comment`` to associate a comment to the node (like position, long
+  description and so on). Note that this field will not be considered by
+  Ironic during the import
+
 For example::
 
     {
         "nodes": [
             {
+                "name":"node-a",
                 "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:2a:0e:36"
@@ -208,9 +219,11 @@ For example::
                 "arch":"x86_64",
                 "pm_user":"admin",
                 "pm_password":"password",
-                "pm_addr":"10.0.0.8"
+                "pm_addr":"10.0.0.8",
+                "_comment": "Room 1 - Rack A - Unit 22/24"
             },
             {
+                "name":"node-b",
                 "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:da:39:c9"
@@ -221,9 +234,11 @@ For example::
                 "arch":"x86_64",
                 "pm_user":"admin",
                 "pm_password":"password",
-                "pm_addr":"10.0.0.15"
+                "pm_addr":"10.0.0.15",
+                "_comment": "Room 1 - Rack A - Unit 26/28"
             },
             {
+                "name":"node-n",
                 "pm_type":"ipmi",
                 "mac":[
                     "fa:16:3e:51:9b:68"
@@ -234,7 +249,8 @@ For example::
                 "arch":"x86_64",
                 "pm_user":"admin",
                 "pm_password":"password",
-                "pm_addr":"10.0.0.16"
+                "pm_addr":"10.0.0.16",
+                "_comment": "Room 1 - Rack B - Unit 10/12"
             }
         ]
     }

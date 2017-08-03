@@ -86,7 +86,7 @@ container.  This can be used to:
 * Run a container with any configuration additions you wish such that you can
   run it with a shell as any user etc.
 
-The configuration options you will likely be interested in here include:
+The configuration options you will likely be interested in include:
 
 ::
 
@@ -111,10 +111,17 @@ TripleO heat templates.  Most of the time, you will likely want to use
 as it contains most of the final startup configurations for the running
 containers.
 
+``shell``, ``user`` and ``interactive`` are available as shortcuts that
+modify the configuration to easily allow you to run an interactive session
+in a given container.
+
 To make sure you get the right container you can use the ``paunch list``
 command to see what containers are running and which config id they
 are using.  This config id corresponds to which file you will find the
 container configuration in.
+
+Note that if you wish to replace a currently running container you will
+want to ``docker rm`` the running container before starting a new one.
 
 Here is an example of using ``paunch debug`` to start a root shell inside the
 heat api container:
@@ -123,7 +130,7 @@ heat api container:
 
   # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --interactive --shell --user root --container heat_api --action run
 
-This will drop you an interactive session inside the heat api container
+This will drop you into an interactive session inside the heat api container,
 starting /bin/bash running as root.
 
 To see how this container is started by TripleO:
@@ -134,8 +141,8 @@ To see how this container is started by TripleO:
 
   docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleoupstream/centos-binary-heat-api:latest
 
-You can also dump the configuration of this to a file so you can edit
-it and rerun it with different a different configuration:
+You can also dump the configuration of a container to a file so you can
+edit it and rerun it with different a different configuration:
 
 ::
 
@@ -144,9 +151,9 @@ it and rerun it with different a different configuration:
 You can then use ``heat_api.json`` as your ``--file`` argument after
 editing it to your liking.
 
-You can also add any configuration elements you wish on the command line
-to test paunch or debug containers etc.  In this example I'm adding a
-health check to the container:
+To add configuration elements on the command line you can use the
+``overrides`` option.  In this example I'm adding a health check to
+the container:
 
 ::
 
@@ -201,14 +208,14 @@ Would generated a json file called `/var/lib/docker-puppet-tasks2.json` that loo
     ]
 
 
-Setting the path to the above json file as value to the `CONFIG` var passed to
-`docker-puppet.py` will create a container using the
-`centos-binary-glance-api:latest` image and it and run puppet on a catalog
-restricted to the given puppet `puppet_tags`.
+Setting the path to the above json file as the `CONFIG` environment
+variable passed to `docker-puppet.py` will create a container using
+the `centos-binary-glance-api:latest` image and it and run puppet on a
+catalog restricted to the given puppet `puppet_tags`.
 
 As mentioned above, it's possible to create custom json files and call
-`docker-puppet.py` manually, which makes developing and debugging puppet steps
-easier.
+`docker-puppet.py` manually, which makes developing and debugging puppet
+steps easier.
 
 `docker-puppet.py` also supports the environment variable `SHOW_DIFF`,
 which causes it to print out a docker diff of the container before and
@@ -219,12 +226,12 @@ it hard to see the debug output of a given container so there is a
 `PROCESS_COUNT` variable that lets you override this.  A typical debug
 run for docker-puppet might look like::
 
-    SHOW_DIFF=True PROCESS_COUNT=1 ./docker-puppet.py
+    SHOW_DIFF=True PROCESS_COUNT=1 CONFIG=glance_api.json ./docker-puppet.py
 
 Testing in CI
 -------------
 
-When new service containers are added, ensure to update the image names in
+When new service containers are added, be sure to update the image names in
 `container-images/overcloud_containers.yaml` tripleo-common repo. These service
 images are pulled in and available in the local docker registry that the
 containers ci job uses::

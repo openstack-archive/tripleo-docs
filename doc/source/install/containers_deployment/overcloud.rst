@@ -81,8 +81,8 @@ To copy the pre-built images coming from the `tripleoupstream` registry on
     openstack overcloud container image prepare \
       --namespace tripleoupstream \
       --tag latest \
-      --push-destination 192.168.24.1:8787
-      --images-file overcloud_containers.yaml \
+      --push-destination 192.168.24.1:8787 \
+      --images-file overcloud_containers.yaml
     openstack overcloud container image upload --config-file overcloud_containers.yaml
 
 Or use ``kolla-build`` to build and push the images yourself::

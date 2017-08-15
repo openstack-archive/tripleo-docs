@@ -193,6 +193,8 @@ Example::
     ExternalNetworkVlanID: 100
     # May set to br-ex if using floating IPs only on native VLAN on bridge br-ex
     NeutronExternalNetworkBridge: "''"
+    NeutronNetworkType: 'vxlan,vlan'
+    NeutronTunnelTypes: 'vxlan'
     # Customize bonding options if required (ignored if bonds are not used)
     BondInterfaceOvsOptions:
         "lacp=active other-config:lacp-fallback-ab=true"
@@ -846,34 +848,35 @@ be specified, along with the tunneling or VLAN parameters. Specify the libvirt
 type if on bare metal, so that hardware virtualization will be used.
 
 To deploy with network isolation and include the network environment file, use
-the ``-e`` parameters with the ``openstack overcloud deploy`` command. For
-instance, to deploy VXLAN mode, the deployment command might be::
+the ``-e`` parameters with the ``openstack overcloud deploy`` command. The
+following deploy command should work for all of the subsequent examples::
 
     openstack overcloud deploy --templates \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
     -e /home/stack/templates/network-environment.yaml \
-    --ntp-server pool.ntp.org \
-    --neutron-network-type vxlan \
-    --neutron-tunnel-types vxlan
+    --ntp-server pool.ntp.org
+
+To deploy VXLAN mode ``network-environment.yaml`` should contain the
+following parameter values::
+
+    NeutronNetworkType: vxlan
+    NeutronTunnelTypes: vxlan
 
 To deploy with VLAN mode, you should specify the range of VLANs that will be
-used for tenant networks::
+used for tenant networks.  ``network-environment.yaml`` might contain the
+following parameter values::
 
-    openstack overcloud deploy --templates \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
-    -e /home/stack/templates/network-environment.yaml \
-    --ntp-server pool.ntp.org \
-    --neutron-network-type vlan \
-    --neutron-bridge-mappings datacentre:br-ex \
-    --neutron-network-vlan-ranges datacentre:30:100
+    NeutronNetworkType: vlan
+    NeutronBridgeMappings: 'datacentre:br-ex'
+    NeutronNetworkVLANRanges: 'datacentre:30:100'
 
 If a dedicated interface or bridge is used for tenant VLANs or provider
 networks, it should be included in the bridge mappings. For instance, if the
-tenant VLANs were on a bridge named ``br-vlan``, then use these values in the
-deployment command above::
+tenant VLANs were on a bridge named ``br-vlan``, then use these values in
+``network-environment.yaml``::
 
-    --neutron-bridge-mappings datacentre:br-ex,tenant:br-vlan \
-    --neutron-network-vlan-ranges tenant:30:100
+    NeutronBridgeMappings: 'datacentre:br-ex,tenant:br-vlan'
+    NeutronNetworkVLANRanges: 'tenant:30:100'
 
 .. note::
 

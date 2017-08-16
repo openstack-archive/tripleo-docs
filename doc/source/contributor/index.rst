@@ -6,3 +6,4 @@ TripleO Contributor Guide
   :includehidden:
 
   contributions
+  check_gates

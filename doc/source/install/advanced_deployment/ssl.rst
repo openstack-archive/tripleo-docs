@@ -195,8 +195,17 @@ of the templates::
 
 Then edit the enable-tls.yaml environment file.  If using the location from the
 previous command, the correct file would be in
-``~/ssl-heat-templates/environments/enable-tls.yaml``.  Insert the contents of
+``~/ssl-heat-templates/environments/ssl/enable-tls.yaml``.  Insert the contents of
 the private key and certificate files in their respective locations.
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   In the Pike release the SSL environment files in the top-level environments
+   directory were deprecated and moved to the ``ssl`` subdirectory as
+   shown in the example paths.  For Ocata and older the paths will still need
+   to refer to the top-level environments.  The filenames are all the same, but
+   the ``ssl`` directory must be removed from the path.
 
 .. note:: The certificate and key will be multi-line values, and all of the lines
           must be indented to the same level.
@@ -226,7 +235,7 @@ be added as in the other values to indicate that this is a multi-line value.
 When using a self-signed certificate or a signer whose certificate is
 not in the default trust store on the overcloud image it will be necessary
 to inject the certificate as part of the deploy process.  This can be done
-with the environment file ``~/ssl-heat-templates/environments/inject-trust-anchor.yaml``.
+with the environment file ``~/ssl-heat-templates/environments/ssl/inject-trust-anchor.yaml``.
 Insert the contents of the signer's root CA certificate in the appropriate
 location, in a similar fashion to what was done for the certificate and key
 above.
@@ -266,19 +275,19 @@ follow.
 
 IP-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-ip.yaml
+    -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml -e ~/ssl-heat-templates/environments/ssl/tls-endpoints-public-ip.yaml
 
 Self-signed IP-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-ip.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+    -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml -e ~/ssl-heat-templates/environments/ssl/tls-endpoints-public-ip.yaml -e ~/ssl-heat-templates/environments/ssl/inject-trust-anchor.yaml
 
 DNS-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml
+    -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml -e ~/ssl-heat-templates/environments/ssl/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml
 
 Self-signed DNS-based certificate::
 
-    -e ~/ssl-heat-templates/environments/enable-tls.yaml -e ~/ssl-heat-templates/environments/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml -e ~/ssl-heat-templates/environments/inject-trust-anchor.yaml
+    -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml -e ~/ssl-heat-templates/environments/ssl/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml -e ~/ssl-heat-templates/environments/ssl/inject-trust-anchor.yaml
 
 .. note:: It is also possible to get the public certificate from a CA. See
           :doc:`../advanced_deployment/tls_everywhere`
@@ -287,10 +296,10 @@ Getting the overcloud to trust CAs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As mentioned above, it is possible to get the overcloud to trust a CA by using
-the ``~/ssl-heat-templates/environments/inject-trust-anchor.yaml`` environment
+the ``~/ssl-heat-templates/environments/ssl/inject-trust-anchor.yaml`` environment
 and adding the necessary details there. However, that environment has the
 restriction that it will only allow you to inject one CA. However, the
-file ``~/ssl-heat-templates/environments/inject-trust-anchor-hiera.yaml`` is an
+file ``~/ssl-heat-templates/environments/ssl/inject-trust-anchor-hiera.yaml`` is an
 alternative that actually supports as many CA certificates as you need.
 
 .. note:: This is only available since Newton. Older versions of TripleO don't

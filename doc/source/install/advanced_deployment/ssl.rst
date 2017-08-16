@@ -182,6 +182,13 @@ Certificate Details
              -CA overcloud-cacert.pem -CAkey overcloud-ca-privkey.pem \
              -set_serial 01 -out server-cert.pem
 
+   The following is a list of which files generated in the previous steps
+   map to which parameters in the SSL environment files::
+
+       overcloud-cacert.pem: SSLRootCertificate
+       server-key.pem: SSLKey
+       server-cert.pem: SSLCertificate
+
 The contents of the private key and certificate files must be provided
 to Heat as part of the deployment command.  To do this, there is a sample
 environment file in tripleo-heat-templates with fields for the file contents.

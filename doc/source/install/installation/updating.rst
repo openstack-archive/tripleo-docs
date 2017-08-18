@@ -38,6 +38,14 @@ You can upgrade any packages that are installed on the undercloud machine.
 
     sudo yum -y update python-tripleoclient
 
+   .. admonition:: Ceph
+      :class: ceph
+
+      If you are using Pike or newer and Ceph was deployed in the
+      overcloud, update ceph-ansible on the undercloud::
+
+          sudo yum -y update ceph-ansible
+
 #. Run the undercloud upgrade command. This command will upgrade all packages
    and use puppet to apply new configuration and restart all OpenStack
    services.::

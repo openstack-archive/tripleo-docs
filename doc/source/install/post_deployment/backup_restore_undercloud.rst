@@ -66,6 +66,12 @@ Finally we rerun the undercloud installation from the stack user, making sure to
   # Double check hostname is correctly set in /etc/hosts
   openstack install undercloud
 
+If you are using Pike and Ceph will be used in the overcloud, install
+ceph-ansible on the undercloud::
+
+  sudo yum install -y ceph-ansible
+
+
 Reconnect the restored undercloud to the overcloud
 --------------------------------------------------
 Having completed the steps above, the undercloud can be expected to automatically

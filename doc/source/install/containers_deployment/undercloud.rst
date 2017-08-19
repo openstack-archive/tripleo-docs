@@ -157,7 +157,7 @@ section will run all the OpenStack services in a container runtime (docker)
 unless the default settings are overwritten.
 
 This command requires 2 services to be running at all times. The first one is a
-basic keystone service, which is currently mocked by `tripleclient` itself, the
+basic keystone service, which is currently mocked by `tripleoclient` itself, the
 second one is `heat-all` which executes the templates and installs the services.
 The latter can be run on baremetal or in a container (tripleoclient will run it
 in a container by default).

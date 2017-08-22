@@ -110,7 +110,14 @@ For example::
 
 **Note** the example does **not** append ``-nv`` as a suffix to the job name
 
+Troubleshooting a failed job
+----------------------------
 
+When your newly added job fails, you may want to download its logs for a local
+inspection and root cause analysis. Use the
+`tripleo-ci gethelogs script
+<https://github.com/openstack-infra/tripleo-ci/blob/master/scripts/getthelogs>`_
+for that.
 
 
 

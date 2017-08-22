@@ -3,6 +3,67 @@
 Updating Packages on Overcloud Nodes
 ====================================
 
+The update of overcloud packages to the latest version of the current release
+is referred to as the 'minor update' in TripleO (distinguishing it from the
+'major upgrade' to the next release). In the Pike cycle the minor update
+workflow has changed significantly compared to previous cycles. There are
+thus version specific sections below.
+
+Updating your Overcloud - Pike and beyond
+-------------------------------------------
+
+.. note::
+   The minor update workflow described below is generally not well tested for
+   *non* containerized Pike environments. The main focus for the TripleO
+   upgrades engineering and QE teams has been on testing the minor update
+   within a containerized Pike environment.
+
+   In particular there are currently no pacemaker update_tasks for the non
+   containerized cluster services (i.e., `puppet/services/pacemaker`_) and
+   those will need to be considered and added. You should reach out to the
+   TripleO community if this is an important feature for you and you'd like
+   to contribute to it.
+
+For the Pike cycle the minor update workflow is significantly different to
+previous cycles. In particular, rather than using a static yum_update.sh_
+we now use service specific ansible update_tasks_ (similar to the upgrade_tasks
+used for the major upgrade worklow since Ocata). Furthermore, these are not
+executed directly via a Heat stack update, but rather, together with the
+docker/puppet config, collected and written to ansible playbooks. The operator
+then invokes these to deliver the minor update to particular nodes.
+
+There are essentially two steps: first perform a (relatively short) Heat stack
+update against the overcloud to generate the "config" ansible playbooks, and
+then execute these. See bug 1715557_ for more information about this mechanism
+and its implementation.
+
+
+1. You must first re-run the `openstack overcloud container image prepare`
+command to generate a docker registry file with the latest images see
+:doc:`../containers_deployment/overcloud` for more information.
+
+
+2. Perform a heat stack update to generate the ansible playbooks, specifying
+the registry file generated from the first step above::
+
+    openstack overcloud update --init-minor-update --container-registry-file latest-images.yaml
+
+3. Invoke the minor update on the nodes specified with the --nodes
+parameter::
+
+    openstack overcloud update --nodes controller-0
+
+You can specify a role name, e.g. 'Compute', to execute the minor update on
+all nodes of that role in a rolling fashion (serial:1 is used on the playbooks).
+
+.. _yum_update.sh: https://github.com/openstack/tripleo-heat-templates/blob/53db241cfbfc1b6a237b7f33486a051aa6934579/extraconfig/tasks/yum_update.sh
+.. _update_tasks: https://github.com/openstack/tripleo-heat-templates/blob/e1a9638732290c247e5dac10392bc8702b531981/puppet/services/tripleo-packages.yaml#L59
+.. _1715557: https://bugs.launchpad.net/tripleo/+bug/1715557
+.. _puppet/services/pacemaker: https://github.com/openstack/tripleo-heat-templates/tree/2e182bffeeb099cb5e0b1747086fb0e0f57b7b5d/puppet/services/pacemaker
+
+Updating your Overcloud - Ocata and earlier
+-------------------------------------------
+
 Updating packages on all overcloud nodes involves two steps. The first one
 makes sure that the overcloud plan is updated (a new tripleo-heat-templates rpm
 might have brought fixes/changes to the templates)::

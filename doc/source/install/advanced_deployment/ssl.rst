@@ -217,11 +217,6 @@ the private key and certificate files in their respective locations.
 .. note:: The certificate and key will be multi-line values, and all of the lines
           must be indented to the same level.
 
-.. note:: In Newton the certificate parameters have been decoupled from the
-          other parameters required to enable SSL, so the certificate
-          parameters can be set in any environment file, not just
-          ``enable-tls.yaml``.
-
 An abbreviated version of how the file should look::
 
     parameter_defaults:

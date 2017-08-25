@@ -241,8 +241,8 @@ major-upgrade-composable-steps that comes first, as described above.
 
       upgrade-non-controller.sh --upgrade overcloud-compute-0
 
-      for i in \$(seq 0 2); do
-        upgrade-non-controller.sh --upgrade overcloud-objectstorage-\$i &"
+      for i in $(seq 0 2); do
+        upgrade-non-controller.sh --upgrade overcloud-objectstorage-$i &
       done
 
 3. Converge to unpin Nova RPC

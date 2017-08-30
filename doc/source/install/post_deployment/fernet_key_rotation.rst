@@ -8,7 +8,7 @@ stored as part of the deployment plan in mistral. The overcloud deplotment's
 fernet keys can be rotated with the following command::
 
     mistral execution-create tripleo.fernet_keys.v1.rotate_fernet_keys \
-        '{"container": "overcloud"}
+        '{"container": "overcloud"}'
 
 Where the value for "container" is the name of the plan (which defaults to
 "overcloud").

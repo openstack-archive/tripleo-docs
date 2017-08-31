@@ -308,7 +308,7 @@ alternative that actually supports as many CA certificates as you need.
           support this.
 
 This file is a template of how you should fill the ``CAMap`` parameter which is
-passed via parameter defaults. It looks like this:
+passed via parameter defaults. It looks like this::
 
     CAMap:
       first-ca-name:

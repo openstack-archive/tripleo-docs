@@ -1,5 +1,5 @@
 TLS everywhere for the overcloud
-================================
+--------------------------------
 
 It is possible to deploy most of the services to use TLS for communications in
 the internal network as well. This, however, needs several more certificates
@@ -39,9 +39,6 @@ receive extra entries from nova metadata to create extra principals that the
 services will need. These create service principals for services such as httpd,
 mysql and haproxy, and are used to requests the certificates for the specific
 service users with the correct SubjectAltNames.
-
-Deployment workflow
--------------------
 
 The following are instructions assuming the default CA, which is FreeIPA.
 

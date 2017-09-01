@@ -173,6 +173,16 @@ file "~/my-ceph-settings.yaml" and added to the deploy commandline::
 
 .. note::
 
+   Both puppet-ceph and ceph-ansible do not reformat the OSD disks and
+   expect them to be clean to complete successfully. Consequently, when reusing
+   the same nodes (or disks) for new deployments, it is necessary to clean the
+   disks before every new attempt. One option is to enable the automated
+   cleanup functionality in Ironic, which will zap the disks every time that a
+   node is released. The same process can be executed manually or only for some
+   target nodes, see `cleaning instructions in the Ironic doc`.
+
+.. note::
+
     The :doc:`extra_config` doc has a more details on the usage of the different
     ExtraConfig interfaces.
 
@@ -185,3 +195,4 @@ file "~/my-ceph-settings.yaml" and added to the deploy commandline::
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible
 .. _`ceph.yaml static hieradata`: https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/hieradata/ceph.yaml
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars
+.. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html

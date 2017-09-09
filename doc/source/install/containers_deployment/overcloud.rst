@@ -83,6 +83,14 @@ To copy the pre-built images coming from the `tripleoupstream` registry on
       --tag latest \
       --push-destination 192.168.24.1:8787 \
       --images-file overcloud_containers.yaml
+
+It is possible to limit the output to only the images that are going to be used
+in the deployment by specifying the heat environment files with the
+``--service-environment-file`` option and the roles file with the
+``--roles-file`` option.
+
+Then upload the images to the local registry using the generated file::
+
     openstack overcloud container image upload --config-file overcloud_containers.yaml
 
 Or use ``kolla-build`` to build and push the images yourself::

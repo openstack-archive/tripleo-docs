@@ -31,8 +31,8 @@ Next, there are a few layers on which the deployment can fail:
 * Post-deploy configuration (Puppet)
 
 As Ironic service is in the middle layer, you can use its shell to guess the
-failed layer. Issue ``ironic node-list`` command to see all registered nodes
-and their current status, you will see something like::
+failed layer. Issue ``openstack baremetal node list`` command to see all
+registered nodes and their current status, you will see something like::
 
     +--------------------------------------+------+---------------+-------------+-----------------+-------------+
     | UUID                                 | Name | Instance UUID | Power State | Provision State | Maintenance |
@@ -45,12 +45,20 @@ Pay close attention to **Provision State** and **Maintenance** columns
 in the resulting table.
 
 * If the command shows empty table or less nodes that you expect, or
-  **Maintenance** is ``True``, or **Provision State** is ``manageable``,
-  there was a problem during node enrolling and introspection.
-  Please go back to these steps.
+  **Maintenance** is ``True``, or **Provision State** is ``manageable``
+  or ``enroll``, there was a problem during node enrolling and introspection.
+
+  You can check the actual cause using the following command::
+
+    openstack baremetal node show <UUID> -f value -c maintenance_reason
 
   For example, **Maintenance** goes to ``True`` automatically, if wrong power
   credentials are provided.
+
+  Fix the cause of the failure, then move the node out of the maintenance
+  mode::
+
+    openstack baremetal node maintenance unset <NODE UUID>
 
 * If **Provision State** is ``available`` then the problem occurred before
   bare metal deployment has even started. Proceed with `Debugging Using Heat`_.
@@ -65,16 +73,12 @@ in the resulting table.
   changes.
 
 * If **Provision State** is ``error`` or ``deploy failed``, then bare metal
-  deployment has failed for this node. Issue
-  ::
+  deployment has failed for this node. Look at the **last_error** field::
 
-    ironic node-show <UUID>
+    openstack baremetal node show <UUID> -f value -c last_error
 
-  and look for **last_error** field. It will contain error description.
-
-  If the error message is vague, you can use logs to clarify it::
-
-    sudo journalctl -u openstack-ironic-conductor -u openstack-ironic-api
+  If the error message is vague, you can use logs to clarify it, see
+  :ref:`ironic_logs` for details.
 
   If you see wait timeout error, and node **Power State** is ``power on``,
   then try to connect to the virtual console of the failed machine. Use
@@ -248,8 +252,13 @@ Start with checking `Ironic troubleshooting guide on this topic
 
 If you're using advanced profile matching with multiple flavors, make sure
 you have enough nodes corresponding to each flavor/profile. Watch
-``capabilities`` key in ``properties`` field for ``ironic node-show``.
-It should contain e.g. ``profile:compute``.
+``capabilities`` key in the output of
+
+::
+
+    openstack baremetal node show <UUID> --fields properties
+
+It should contain e.g. ``profile:compute`` for compute nodes.
 
 
 Debugging OpenStack services

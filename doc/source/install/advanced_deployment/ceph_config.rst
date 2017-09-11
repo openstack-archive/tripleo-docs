@@ -155,16 +155,25 @@ a variation of the following::
         - /dev/sdb
         - /dev/sdc
         - /dev/sdd
-      raw_journal_devices:
+      dedicated_devices:
         - /dev/sde
         - /dev/sde
         - /dev/sde
-      journal_collocation: false
-      raw_multi_journal: true
+      osd_scenario: non-collocated
 
 The above will produce three OSDs which run on `/dev/sdb`, `/dev/sdc`,
 and `/dev/sdd` which all journal to `/dev/sde`. This same setup will
 be duplicated per Ceph storage node and assumes uniform hardware.
+If the journals will reside on the same disks as the OSDs then the
+above should be changed to the following::
+
+  parameter_defaults:
+    CephAnsibleDisksConfig:
+      devices:
+        - /dev/sdb
+        - /dev/sdc
+        - /dev/sdd
+      osd_scenario: collocated
 
 The `parameter_defaults` like the above may be saved in an environment
 file "~/my-ceph-settings.yaml" and added to the deploy commandline::

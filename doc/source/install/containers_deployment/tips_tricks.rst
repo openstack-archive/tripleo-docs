@@ -228,6 +228,52 @@ run for docker-puppet might look like::
 
     SHOW_DIFF=True PROCESS_COUNT=1 CONFIG=glance_api.json ./docker-puppet.py
 
+Testing a code fix in a container
+---------------------------------
+Let's assume that we need to test a code patch or an updated package in a
+container. We will look at a few steps that can be taken to test a fix
+in a container on an existing deployment.
+
+For example let's update packages for the mariadb container::
+
+    (undercloud) [stack@undercloud ~]$ docker images | grep mariadb
+    192.168.24.1:8787/tripleoupstream/centos-binary-mariadb    latest     035a8237c376    2 weeks ago    723.5 MB
+
+So docker image `035a8237c376` is the one we need to base our work on. Since
+docker images are supposed to be immutable we will base our work off of
+`035a8237c376` and create a new one::
+
+    mkdir -p galera-workaround
+    cat > galera-workaround/Dockerfile <<EOF
+    FROM 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:latest
+    USER root
+    RUN yum-config-manager --add-repo http://people.redhat.com/mbaldess/rpms/container-repo/pacemaker-bundle.repo && yum clean all && rm -rf /var/cache/yum
+    RUN yum update -y pacemaker pacemaker-remote pcs libqb resource-agents && yum clean all && rm -rf /var/cache/yum
+    USER mysql
+    EOF
+
+To determine which user is the default one being used in a container you can run  `docker run -it 035a8237c376 whoami`.
+Then we build the new image and tag it with `:workaround1`::
+
+    docker build --rm -t 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1 ~/galera-workaround
+
+Then we push it in our docker registry on the undercloud::
+
+    docker push 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1
+
+At this stage we can either point THT to use
+`192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1` as the
+container image by tweaking the necessary environment files and we redeploy the overcloud.
+If we only want to test a tweaked image, the following steps can be used:
+First, determine if the containers are managed by pacemaker (those will typically have a `:pcmklatest` tag) or by paunch.
+For the paunch-managed containers see `Debugging with Paunch`_.
+For the pacemaker-managed containers you can (best done on your staging env, as it might be an invasive operation) do the following::
+
+    1. `pcs cluster cib cib.xml`
+    2. Edit the cib.xml with the changes around the bundle you are tweaking
+    3. `pcs cluster cib-push --config cib.xml`
+
+
 Testing in CI
 -------------
 

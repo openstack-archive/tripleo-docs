@@ -132,6 +132,16 @@ The first Ceph node would have two addresses: 172.16.1.100 and 172.16.3.100.  Th
 second would have 172.16.1.101 and 172.16.3.101, and the third would have
 172.16.1.102 and 172.16.3.102.  The same pattern applies to the other node types.
 
+.. important::
+    Even if an overcloud node is deleted, its entry in the IP lists should
+    *not* be removed.  The IP list is based on the underlying Heat indices,
+    which do not change even if nodes are deleted.  To indicate that a given
+    entry in the list is no longer used, the IP value can be replaced with a
+    value such as "DELETED" or "UNUSED".
+
+    In short, entries should never be removed from the IP lists, only changed
+    or added.
+
 To apply this configuration during a deployment, pass the environment file to the
 deploy command.  For example, if you copied tripleo-heat-templates to ~/my-templates,
 the extra parameter would look like::

@@ -119,6 +119,15 @@ inspection and root cause analysis. Use the
 <https://github.com/openstack-infra/tripleo-ci/blob/master/scripts/getthelogs>`_
 for that.
 
+Enabling tempest tests notification
+-----------------------------------
 
+There is a way to get notifications by email when a job finishes to running
+tempest.
+People interested to receive these notifications can submit a patch to add
+their email address in `this config file
+<https://github.com/openstack/tripleo-quickstart-extras/blob/master/roles/validate-tempest/files/tempestmail/config.yaml>`_.
+Instructions can be found `here
+<https://github.com/openstack/tripleo-quickstart-extras/blob/master/roles/validate-tempest/files/tempestmail/README.md>`_.
 
 

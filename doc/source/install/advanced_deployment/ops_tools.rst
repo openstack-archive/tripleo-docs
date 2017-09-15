@@ -71,7 +71,7 @@ Before deploying the Overcloud
 
 1. Install client packages on overcloud-full image:
 
-  - Prepare installation script::
+   - Prepare installation script::
 
       cat >install.sh<<EOF
       #!/usr/bin/sh
@@ -79,90 +79,90 @@ Before deploying the Overcloud
       yum install -y sensu fluentd collectd
       EOF
 
-  - Run the script using virt-customize::
+   - Run the script using virt-customize::
 
       LIBGUESTFS_BACKEND=direct virt-customize -a /path/to/overcloud-full.qcow2 \
         --upload install.sh:/tmp/install.sh \
         --run-command "sh /tmp/install.sh" \
         --selinux-relabel
 
-  - Upload new image to undercloud image registry::
+   - Upload new image to undercloud image registry::
 
       openstack overcloud image upload --update-existing
 
 2. Operational tools configuration files:
 
- The files have some documentation about the parameters that need to be configured
+   The files have some documentation about the parameters that need to be configured
 
-  - Availability Monitoring::
+   - Availability Monitoring::
 
-     /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml
+        /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml
 
-  - Centralized Logging::
+   - Centralized Logging::
 
-     /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml
+        /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml
 
-  - Performance Monitoring::
+   - Performance Monitoring::
 
-     /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml
+        /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml
 
 3. Configure the environment
 
- The easiest way to configure our environment will be to create a parameter file, let's called paramters.yaml with all the paramteres defined.
+   The easiest way to configure our environment will be to create a parameter file, let's called paramters.yaml with all the paramteres defined.
 
- - Availability Monitoring::
+   - Availability Monitoring::
 
-    MonitoringRabbitHost: server_ip          # Server were the rabbitmq was installed
-    MonitoringRabbitPort: 5672               # Rabbitmq port
-    MonitoringRabbitUserName: sensu_user     # the rabbitmq user to be used by sensu
-    MonitoringRabbitPassword: sensu_password # The password of the sensu user
-    MonitoringRabbitUseSSL: false            # Set to false
-    MonitoringRabbitVhost: "/sensu_vhost"    # The virtual host of the rabbitmq
+         MonitoringRabbitHost: server_ip          # Server were the rabbitmq was installed
+         MonitoringRabbitPort: 5672               # Rabbitmq port
+         MonitoringRabbitUserName: sensu_user     # the rabbitmq user to be used by sensu
+         MonitoringRabbitPassword: sensu_password # The password of the sensu user
+         MonitoringRabbitUseSSL: false            # Set to false
+         MonitoringRabbitVhost: "/sensu_vhost"    # The virtual host of the rabbitmq
 
- - Centralized Logging::
+   - Centralized Logging::
 
-    LoggingServers:        # The servers
-      - host: server_ip    # The ip of the server
-        port: 24224        # Port to send the logs [ 24224 plain & 24284 SSL ]
-    LoggingUsesSSL: false  # Plain or SSL connections
-                           # If LoggingUsesSSL is set to  false the following lines can
-                           # be deleted
-    LoggingSharedKey: secret           # The key
-    LoggingSSLCertificate: |           # The content of the SSL Certificate
-      -----BEGIN CERTIFICATE-----
-      ...contens of server.pem here...
-      -----END CERTIFICATE-----
+         LoggingServers:        # The servers
+           - host: server_ip    # The ip of the server
+             port: 24224        # Port to send the logs [ 24224 plain & 24284 SSL ]
+         LoggingUsesSSL: false  # Plain or SSL connections
+                                # If LoggingUsesSSL is set to  false the following lines can
+                                # be deleted
+         LoggingSharedKey: secret           # The key
+         LoggingSSLCertificate: |           # The content of the SSL Certificate
+           -----BEGIN CERTIFICATE-----
+           ...contens of server.pem here...
+           -----END CERTIFICATE-----
 
- - Performance Monitoring::
+   - Performance Monitoring::
 
-    CollectdServer: collectd0.example.com   # Collectd server, where the data is going to be sent
-    CollectdServerPort: 25826               # Collectd port
-    # CollectdSecurityLevel: None           # Security by default None the other values are
-                                            #   Encrypt & Sign, but the two following parameters
-                                            #   need to be set too
-    # CollectdUsername: user                # User to connect to the server
-    # CollectdPassword: password            # Password to connect to the server
+         CollectdServer: collectd0.example.com   # Collectd server, where the data is going to be sent
+         CollectdServerPort: 25826               # Collectd port
+         # CollectdSecurityLevel: None           # Security by default None the other values are
+                                                 #   Encrypt & Sign, but the two following parameters
+                                                 #   need to be set too
+         # CollectdUsername: user                # User to connect to the server
+         # CollectdPassword: password            # Password to connect to the server
 
-                                            # Collectd, by default, comes with several plugins
-                                            #  extra plugins can added on this parameter
-    CollectdExtraPlugins:
-      - disk                                # disk plugin
-      - df                                  # df   plugin
-    ExtraConfig:                            # If the plugins need to be set, this is the location
-      collectd::plugin::disk::disks:
-        - "/^[vhs]d[a-f][0-9]?$/"
-      collectd::plugin::df::mountpoints:
-        - "/"
-      collectd::plugin::df::ignoreselected: false
+                                                 # Collectd, by default, comes with several plugins
+                                                 #  extra plugins can added on this parameter
+         CollectdExtraPlugins:
+           - disk                                # disk plugin
+           - df                                  # df   plugin
+         ExtraConfig:                            # If the plugins need to be set, this is the location
+           collectd::plugin::disk::disks:
+             - "/^[vhs]d[a-f][0-9]?$/"
+           collectd::plugin::df::mountpoints:
+             - "/"
+           collectd::plugin::df::ignoreselected: false
 
 
 4. Continue following the TripleO instructions for deploying an overcloud::
 
-    openstack overcloud deploy --templates \
-       [-e /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml] \
-       [-e  /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml] \
-       [-e /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml] \
-       -e parameters.yaml
+        openstack overcloud deploy --templates \
+           [-e /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml] \
+           [-e  /usr/share/openstack-tripleo-heat-templates/environments/logging-environment.yaml] \
+           [-e /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml] \
+           -e parameters.yaml
 
 
 5. Wait for the completion of the overcloud deployment process.

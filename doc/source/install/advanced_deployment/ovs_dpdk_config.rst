@@ -11,9 +11,9 @@ Execute below command to create the ``roles_data.yaml``::
 
 Once a roles file is created, the following changes are required:
 
- - Deploy Command
- - Parameters
- - Network Config
+- Deploy Command
+- Parameters
+- Network Config
 
 Deploy Command
 ----------------
@@ -45,11 +45,11 @@ Parameters
 Following are the list of parameters which need to be provided for deploying
 with OVS DPDK support.
 
-  * OvsPmdCoreList:  List of Logical CPUs to be allocated for Poll Mode Driver
-  * OvsDpdkCoreList: List of Logical CPUs to be allocated for the openvswitch
-    host process (lcore list)
-  * OvsDpdkMemoryChannels: Number of memory channels
-  * OvsDpdkSocketMemory: Socket memory list per NUMA node
+* OvsPmdCoreList:  List of Logical CPUs to be allocated for Poll Mode Driver
+* OvsDpdkCoreList: List of Logical CPUs to be allocated for the openvswitch
+  host process (lcore list)
+* OvsDpdkMemoryChannels: Number of memory channels
+* OvsDpdkSocketMemory: Socket memory list per NUMA node
 
 
 Example::
@@ -76,9 +76,9 @@ DPDK supported network interfaces should be specified in the network config
 templates to configure OVS DPDK on the node. The following new network config
 types have been added to support DPDK.
 
- - ovs_user_bridge
- - ovs_dpdk_port
- - ovs_dpdk_bond
+- ovs_user_bridge
+- ovs_dpdk_port
+- ovs_dpdk_bond
 
 Example::
 

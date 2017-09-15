@@ -31,12 +31,12 @@ value for compute nodes::
 
 The parameters available are:
 
-  * `ExtraConfig`: Apply the data to all nodes, e.g all roles
-  * `ComputeExtraConfig`: Apply the data only to Compute nodes
-  * `ControllerExtraConfig`: Apply the data only to Controller nodes
-  * `BlockStorageExtraConfig`: Apply the data only to BlockStorage nodes
-  * `ObjectStorageExtraConfig`: Apply the data only to ObjectStorage nodes
-  * `CephStorageExtraConfig`: Apply the data only to CephStorage nodes
+* `ExtraConfig`: Apply the data to all nodes, e.g all roles
+* `ComputeExtraConfig`: Apply the data only to Compute nodes
+* `ControllerExtraConfig`: Apply the data only to Controller nodes
+* `BlockStorageExtraConfig`: Apply the data only to BlockStorage nodes
+* `ObjectStorageExtraConfig`: Apply the data only to ObjectStorage nodes
+* `CephStorageExtraConfig`: Apply the data only to CephStorage nodes
 
 For any custom roles (defined via roles_data.yaml) the parameter name will
 be RoleNameExtraConfig where RoleName is the name specified in roles_data.yaml.

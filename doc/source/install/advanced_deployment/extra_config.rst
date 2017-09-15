@@ -137,10 +137,10 @@ integration points for additional third-party services, drivers or plugins.
 
 The following interfaces are available:
 
-  * `OS::TripleO::ControllerExtraConfigPre`: Controller node additional configuration
-  * `OS::TripleO::ComputeExtraConfigPre`: Compute node additional configuration
-  * `OS::TripleO::CephStorageExtraConfigPre` : CephStorage node additional configuration
-  * `OS::TripleO::NodeExtraConfig`: additional configuration applied to all nodes (all roles).
+* `OS::TripleO::ControllerExtraConfigPre`: Controller node additional configuration
+* `OS::TripleO::ComputeExtraConfigPre`: Compute node additional configuration
+* `OS::TripleO::CephStorageExtraConfigPre` : CephStorage node additional configuration
+* `OS::TripleO::NodeExtraConfig`: additional configuration applied to all nodes (all roles).
 
 Below is an example of a per-node configuration template that shows additional node configuration
 via standard heat SoftwareConfig_ resources::

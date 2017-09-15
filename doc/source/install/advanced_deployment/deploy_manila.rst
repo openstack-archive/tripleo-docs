@@ -141,11 +141,11 @@ Deploying the Overcloud with an External Backend
 
 #. Copy the Manila driver-specific configuration file to your home directory:
 
-     - Generic driver::
+   - Generic driver::
 
           sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-generic-config.yaml ~
 
-     - NetApp driver::
+   - NetApp driver::
 
          sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-netapp-config.yaml ~
 

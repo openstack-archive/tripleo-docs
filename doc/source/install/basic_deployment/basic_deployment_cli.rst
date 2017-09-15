@@ -99,7 +99,7 @@ created on the undercloud, one should use a non-root user.
 
 3. Export environment variables
 
-    ::
+   ::
 
         export DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean*"
 
@@ -145,21 +145,21 @@ created on the undercloud, one should use a non-root user.
 #. Build the required images:
 
 
-  .. admonition:: RHEL
-     :class: rhel
+   .. admonition:: RHEL
+      :class: rhel
 
-     Download the RHEL 7.3 cloud image or copy it over from a different location,
-     for example:
-     ``https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.3/x86_64/product-downloads``,
-     and define the needed environment variables for RHEL 7.3 prior to running
-     ``tripleo-build-images``::
+      Download the RHEL 7.3 cloud image or copy it over from a different location,
+      for example:
+      ``https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.3/x86_64/product-downloads``,
+      and define the needed environment variables for RHEL 7.3 prior to running
+      ``tripleo-build-images``::
 
           export DIB_LOCAL_IMAGE=rhel-guest-image-7.3-35.x86_64.qcow2
 
-  .. admonition:: RHEL Portal Registration
-     :class: portal
+   .. admonition:: RHEL Portal Registration
+      :class: portal
 
-     To register the image builds to the Red Hat Portal define the following variables::
+      To register the image builds to the Red Hat Portal define the following variables::
 
             export REG_METHOD=portal
             export REG_USER="[your username]"
@@ -169,27 +169,27 @@ created on the undercloud, one should use a non-root user.
             export REG_REPOS="rhel-7-server-rpms rhel-7-server-extras-rpms rhel-ha-for-rhel-7-server-rpms \
                 rhel-7-server-optional-rpms rhel-7-server-openstack-6.0-rpms"
 
-     .. admonition:: Ceph
-        :class: ceph
+      .. admonition:: Ceph
+         :class: ceph
 
-        If using Ceph, additional channels need to be added to `REG_REPOS`.
-        Enable the appropriate channels for the desired release, as indicated below.
-        Do not enable any other channels not explicitly marked for that release.
+         If using Ceph, additional channels need to be added to `REG_REPOS`.
+         Enable the appropriate channels for the desired release, as indicated below.
+         Do not enable any other channels not explicitly marked for that release.
 
-        ::
+         ::
 
            rhel-7-server-rhceph-2-mon-rpms
            rhel-7-server-rhceph-2-osd-rpms
            rhel-7-server-rhceph-2-tools-rpms
 
 
-  .. admonition:: RHEL Satellite Registration
-     :class: satellite
+   .. admonition:: RHEL Satellite Registration
+      :class: satellite
 
-     To register the image builds to a Satellite define the following
-     variables. Only using an activation key is supported when registering to
-     Satellite, username/password is not supported for security reasons. The
-     activation key must enable the repos shown::
+      To register the image builds to a Satellite define the following
+      variables. Only using an activation key is supported when registering to
+      Satellite, username/password is not supported for security reasons. The
+      activation key must enable the repos shown::
 
             export REG_METHOD=satellite
             # REG_SAT_URL should be in the format of:
@@ -206,25 +206,27 @@ created on the undercloud, one should use a non-root user.
             # rhel-7-server-rhceph-{2,1.3}-tools-rpms
             export REG_ACTIVATION_KEY="[activation key]"
 
-  ::
+   ::
 
-    openstack overcloud image build
+       openstack overcloud image build
 
-  .. admonition:: RHEL
-     :class: rhel
+   ..
 
-     ::
+   .. admonition:: RHEL
+      :class: rhel
+
+      ::
 
         openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml --config-file $OS_YAML
 
 
-  See the help for ``openstack overcloud image build`` for further options.
+   See the help for ``openstack overcloud image build`` for further options.
 
-  The YAML files are cumulative. Order on the command line is important. The
-  packages, elements, and options sections will append. All others will overwrite
-  previously read values.
+   The YAML files are cumulative. Order on the command line is important. The
+   packages, elements, and options sections will append. All others will overwrite
+   previously read values.
 
-  .. note::
+   .. note::
     This command will build **overcloud-full** images (\*.qcow2, \*.initrd,
     \*.vmlinuz) and **ironic-python-agent** images (\*.initramfs, \*.kernel)
 
@@ -363,8 +365,8 @@ subnet. If needed, define the nameserver to be used for the environment::
 .. admonition:: Stable Branch
    :class: stable
 
-    For Mitaka release and older, the subnet commands are executed within the
-    `neutron` command::
+   For Mitaka release and older, the subnet commands are executed within the
+   `neutron` command::
 
         neutron subnet-list
         neutron subnet-update <subnet-uuid> --dns-nameserver <nameserver-ip>

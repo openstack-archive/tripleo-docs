@@ -30,31 +30,31 @@ Upgrading the Undercloud
 1. Disable the old OpenStack release repositories and enable new
    release repositories on the undercloud:
 
-  .. admonition:: Mitaka to Newton
-     :class: mton
+   .. admonition:: Mitaka to Newton
+      :class: mton
 
       ::
 
             export CURRENT_VERSION=mitaka
             export NEW_VERSION=newton
 
-  .. admonition:: Newton to Ocata
-     :class: ntoo
+   .. admonition:: Newton to Ocata
+      :class: ntoo
 
       ::
 
             export CURRENT_VERSION=newton
             export NEW_VERSION=ocata
 
-  Backup and disable current repos. Note that the repository files might be
-  named differently depending on your installation::
+   Backup and disable current repos. Note that the repository files might be
+   named differently depending on your installation::
 
         mkdir /home/stack/REPOBACKUP
         sudo mv /etc/yum.repos.d/delorean* /home/stack/REPOBACKUP/
 
-  Get and enable new repos for `NEW_VERSION`:
+   Get and enable new repos for `NEW_VERSION`:
 
-  .. include:: ../repositories.txt
+   .. include:: ../repositories.txt
 
 2. Run undercloud upgrade:
 
@@ -71,37 +71,37 @@ Upgrading the Undercloud
    .. admonition:: Mitaka to Newton
       :class: mton
 
-       In the first release of instack-undercloud newton(5.0.0), the undercloud
-       telemetry services are **disabled** by default. In order to maintain the
-       telemetry services during the mitaka to newton upgrade the operator must
-       explicitly enable them **before** running the undercloud upgrade. This
-       is done by adding::
+      In the first release of instack-undercloud newton(5.0.0), the undercloud
+      telemetry services are **disabled** by default. In order to maintain the
+      telemetry services during the mitaka to newton upgrade the operator must
+      explicitly enable them **before** running the undercloud upgrade. This
+      is done by adding::
 
           enable_telemetry = true
 
-       in the [DEFAULT] section of the undercloud.conf configuration file.
+      in the [DEFAULT] section of the undercloud.conf configuration file.
 
-       If you are using any newer newton release, this option is switched back
-       to **enabled** by default to make upgrade experience better. Hence, if
-       you are using a later newton release you don't need to explicitly enable
-       this option.
+      If you are using any newer newton release, this option is switched back
+      to **enabled** by default to make upgrade experience better. Hence, if
+      you are using a later newton release you don't need to explicitly enable
+      this option.
 
    .. admonition:: Ocata to Pike
       :class: mton
 
-       Prior to Pike, TripleO deployed Ceph with puppet-ceph. With the
-       Pike release it is possible to use TripleO to deploy Ceph with
-       either ceph-ansible or puppet-ceph, though puppet-ceph is
-       deprecated. To use ceph-ansible, the CentOS Storage SIG Ceph
-       repository must be enabled on the undercloud and the
-       ceph-ansible package must then be installed::
+      Prior to Pike, TripleO deployed Ceph with puppet-ceph. With the
+      Pike release it is possible to use TripleO to deploy Ceph with
+      either ceph-ansible or puppet-ceph, though puppet-ceph is
+      deprecated. To use ceph-ansible, the CentOS Storage SIG Ceph
+      repository must be enabled on the undercloud and the
+      ceph-ansible package must then be installed::
 
           sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
           sudo yum -y install ceph-ansible
 
-       It is not yet possible to migrate an existing puppet-ceph
-       deployment to a ceph-ansible deployment. Only new deployments
-       are currently possible with ceph-ansible.
+      It is not yet possible to migrate an existing puppet-ceph
+      deployment to a ceph-ansible deployment. Only new deployments
+      are currently possible with ceph-ansible.
 
    The following commands will upgrade the undercloud:
 
@@ -298,12 +298,12 @@ Upgrading the Overcloud to Newton and earlier
    :class: mton
 
 
-    **Deliver the migration for ceilometer to run under httpd.**
+   **Deliver the migration for ceilometer to run under httpd.**
 
-    This is to deliver the migration for ceilometer to be run under httpd (apache)
-    rather than eventlet as was the case before. To execute this step run
-    `overcloud deploy`, passing in the full set of environment files plus
-    `major-upgrade-ceilometer-wsgi-mitaka-newton.yaml`::
+   This is to deliver the migration for ceilometer to be run under httpd (apache)
+   rather than eventlet as was the case before. To execute this step run
+   `overcloud deploy`, passing in the full set of environment files plus
+   `major-upgrade-ceilometer-wsgi-mitaka-newton.yaml`::
 
       openstack overcloud deploy --templates \
           -e <full environment> \
@@ -354,19 +354,19 @@ Upgrading the Overcloud to Newton and earlier
    .. admonition:: Mitaka to Newton
       :class: mton
 
-       **Explicitly disable sahara services if so desired:**
-       As discussed at bug1630247_  sahara services are disabled by default
-       in the Newton overcloud deployment. This special case is handled for
-       the duration of the upgrade by defaulting to 'keep sahara-\*'.
+      **Explicitly disable sahara services if so desired:**
+      As discussed at bug1630247_  sahara services are disabled by default
+      in the Newton overcloud deployment. This special case is handled for
+      the duration of the upgrade by defaulting to 'keep sahara-\*'.
 
-       That is by default sahara services are restarted after the mitaka to
-       newton upgrade of controller nodes and sahara config is re-applied
-       during the final upgrade converge step.
+      That is by default sahara services are restarted after the mitaka to
+      newton upgrade of controller nodes and sahara config is re-applied
+      during the final upgrade converge step.
 
-       If an operator wishes to **disable** sahara services as part of the mitaka
-       to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
-       environment file during the controller upgrade step as well as during
-       the converge step later::
+      If an operator wishes to **disable** sahara services as part of the mitaka
+      to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
+      environment file during the controller upgrade step as well as during
+      the converge step later::
 
           openstack overcloud deploy --templates \
            -e <full environment> \
@@ -419,19 +419,19 @@ Upgrading the Overcloud to Newton and earlier
    .. admonition:: Mitaka to Newton
       :class: mton
 
-       **Explicitly disable sahara services if so desired:**
-       As discussed at bug1630247_  sahara services are disabled by default
-       in the Newton overcloud deployment. This special case is handled for
-       the duration of the upgrade by defaulting to 'keep sahara-\*'.
+      **Explicitly disable sahara services if so desired:**
+      As discussed at bug1630247_  sahara services are disabled by default
+      in the Newton overcloud deployment. This special case is handled for
+      the duration of the upgrade by defaulting to 'keep sahara-\*'.
 
-       That is by default sahara services are restarted after the mitaka to
-       newton upgrade of controller nodes and sahara config is re-applied
-       during the final upgrade converge step.
+      That is by default sahara services are restarted after the mitaka to
+      newton upgrade of controller nodes and sahara config is re-applied
+      during the final upgrade converge step.
 
-       If an operator wishes to **disable** sahara services as part of the mitaka
-       to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
-       environment file during the controller upgrade earlier and converge
-       step here::
+      If an operator wishes to **disable** sahara services as part of the mitaka
+      to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
+      environment file during the controller upgrade earlier and converge
+      step here::
 
           openstack overcloud deploy --templates \
            -e <full environment> \
@@ -461,13 +461,13 @@ Upgrading the Overcloud to Newton and earlier
    :class: mton
 
 
-    **Deliver the data migration for aodh.**
+   **Deliver the data migration for aodh.**
 
-    This is to deliver the data migration for aodh. In Newton, aodh uses its
-    own mysql backend. This step migrates all the existing alarm data from
-    mongodb to the new mysql backend. To execute this step run
-    `overcloud deploy`, passing in the full set of environment files plus
-    `major-upgrade-aodh-migration.yaml`::
+   This is to deliver the data migration for aodh. In Newton, aodh uses its
+   own mysql backend. This step migrates all the existing alarm data from
+   mongodb to the new mysql backend. To execute this step run
+   `overcloud deploy`, passing in the full set of environment files plus
+   `major-upgrade-aodh-migration.yaml`::
 
       openstack overcloud deploy --templates \
           -e <full environment> \

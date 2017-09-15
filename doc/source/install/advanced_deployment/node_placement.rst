@@ -51,11 +51,11 @@ deploy command.
 
 The same approach is possible for each role via these parameters:
 
-  * ControllerSchedulerHints
-  * ComputeSchedulerHints
-  * BlockStorageSchedulerHints
-  * ObjectStorageSchedulerHints
-  * CephStorageSchedulerHints
+* ControllerSchedulerHints
+* ComputeSchedulerHints
+* BlockStorageSchedulerHints
+* ObjectStorageSchedulerHints
+* CephStorageSchedulerHints
 
 For custom roles (defined via roles_data.yaml) the parameter will be named
 RoleNameSchedulerHints, where RoleName is the name specified in roles_data.yaml.

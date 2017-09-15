@@ -131,55 +131,55 @@ Each service may define output variable(s) which control config file generation,
 initialization, and stepwise deployment of all the containers for this service.
 The following sections are available:
 
- * config_settings: This setting is generally inherited from the
-   puppet/services templates and may be appended to if required
-   to support the docker specific config settings.
+* config_settings: This setting is generally inherited from the
+  puppet/services templates and may be appended to if required
+  to support the docker specific config settings.
 
- * step_config: This setting controls the manifest that is used to
-   create docker config files via puppet. The puppet tags below are
-   used along with this manifest to generate a config directory for
-   this container.
+* step_config: This setting controls the manifest that is used to
+  create docker config files via puppet. The puppet tags below are
+  used along with this manifest to generate a config directory for
+  this container.
 
- * kolla_config: Contains YAML that represents how to map config files
-   into the kolla container. This config file is typically mapped into
-   the container itself at the /var/lib/kolla/config_files/config.json
-   location and drives how kolla's external config mechanisms work.
+* kolla_config: Contains YAML that represents how to map config files
+  into the kolla container. This config file is typically mapped into
+  the container itself at the /var/lib/kolla/config_files/config.json
+  location and drives how kolla's external config mechanisms work.
 
- * docker_config: Data that is passed to the docker-cmd hook to configure
-   a container, or step of containers at each step. See the available steps
-   below and the related docker-cmd hook documentation in the heat-agents
-   project.
+* docker_config: Data that is passed to the docker-cmd hook to configure
+  a container, or step of containers at each step. See the available steps
+  below and the related docker-cmd hook documentation in the heat-agents
+  project.
 
- * puppet_config: This section is a nested set of key value pairs
-   that drive the creation of config files using puppet.
-   Required parameters include:
+* puppet_config: This section is a nested set of key value pairs
+  that drive the creation of config files using puppet.
+  Required parameters include:
 
-     * puppet_tags: Puppet resource tag names that are used to generate config
-       files with puppet. Only the named config resources are used to generate
-       a config file. Any service that specifies tags will have the default
-       tags of 'file,concat,file_line,augeas,cron' appended to the setting.
-       Example: keystone_config
+  * puppet_tags: Puppet resource tag names that are used to generate config
+    files with puppet. Only the named config resources are used to generate
+    a config file. Any service that specifies tags will have the default
+    tags of 'file,concat,file_line,augeas,cron' appended to the setting.
+    Example: keystone_config
 
-     * config_volume: The name of the volume (directory) where config files
-       will be generated for this service. Use this as the location to
-       bind mount into the running Kolla container for configuration.
+  * config_volume: The name of the volume (directory) where config files
+    will be generated for this service. Use this as the location to
+    bind mount into the running Kolla container for configuration.
 
-     * config_image: The name of the docker image that will be used for
-       generating configuration files. This is often the same container
-       that the runtime service uses. Some services share a common set of
-       config files which are generated in a common base container.
+  * config_image: The name of the docker image that will be used for
+    generating configuration files. This is often the same container
+    that the runtime service uses. Some services share a common set of
+    config files which are generated in a common base container.
 
-     * step_config: This setting controls the manifest that is used to
-       create docker config files via puppet. The puppet tags below are
-       used along with this manifest to generate a config directory for
-       this container.
+  * step_config: This setting controls the manifest that is used to
+    create docker config files via puppet. The puppet tags below are
+    used along with this manifest to generate a config directory for
+    this container.
 
- * docker_puppet_tasks: This section provides data to drive the
-   docker-puppet.py tool directly. The task is executed only once
-   within the cluster (not on each node) and is useful for several
-   puppet snippets we require for initialization of things like
-   keystone endpoints, database users, etc. See docker-puppet.py
-   for formatting.
+* docker_puppet_tasks: This section provides data to drive the
+  docker-puppet.py tool directly. The task is executed only once
+  within the cluster (not on each node) and is useful for several
+  puppet snippets we require for initialization of things like
+  keystone endpoints, database users, etc. See docker-puppet.py
+  for formatting.
 
 
 Docker steps

@@ -68,9 +68,9 @@ the following command on the undercloud::
        ssh -Nf user@virthost -L 0.0.0.0:443:192.168.24.2:443 # If SSL
        ssh -Nf user@virthost -L 0.0.0.0:3000:192.168.24.1:3000 # If no SSL
 
-     .. note:: Quickstart started creating the tunnel automatically
-        during Pike. If using an older version you will have to create
-        the tunnel manually, for example::
+      .. note:: Quickstart started creating the tunnel automatically
+         during Pike. If using an older version you will have to create
+         the tunnel manually, for example::
 
           ssh -F /root/.quickstart/ssh.config.ansible undercloud -L 0.0.0.0:443:192.168.24.2:443
 
@@ -189,10 +189,10 @@ deployment in general, as well as for each individual environment.
    .. admonition:: Newton
       :class: newton
 
-       In Newton it was not possible to configure individual
-       environments. The environment templates should be updated
-       directly with the required parameters before uploading a new
-       plan.
+      In Newton it was not possible to configure individual
+      environments. The environment templates should be updated
+      directly with the required parameters before uploading a new
+      plan.
 
 Individual roles can also be configured by clicking on the Pencil icon
 beside the role name on each card.
@@ -203,8 +203,8 @@ beside the role name on each card.
    .. admonition:: Newton
       :class: newton
 
-       In Newton, you may need to assign at least one node to the role
-       before the related configuration options are loaded.
+      In Newton, you may need to assign at least one node to the role
+      before the related configuration options are loaded.
 
 
 Assign Nodes

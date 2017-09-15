@@ -43,7 +43,7 @@ be modified or removed.
 
 The steps to define your custom roles configuration are:
 
-1. Copy the default roles provided by `tripleo-heat-templates`:
+1. Copy the default roles provided by `tripleo-heat-templates`::
 
     mkdir ~/roles
     cp /usr/share/openstack-tripleo-heat-templates/roles/* ~/roles
@@ -57,18 +57,18 @@ match the name of the role. For example if adding a new role named `Galera`,
 the role file name should be `Galera.yaml`. The file should at least contain
 the following items:
 
-    * name: Name of the role e.g "CustomController", mandatory
-    * ServicesDefault: List of services, optional, defaults to an empty list
-      See the default roles_data.yaml or overcloud-resource-registry-puppet.j2.yaml
-      for the list of supported services. Both files can be found in the top
-      tripleo-heat-templates folder
+* name: Name of the role e.g "CustomController", mandatory
+* ServicesDefault: List of services, optional, defaults to an empty list
+  See the default roles_data.yaml or overcloud-resource-registry-puppet.j2.yaml
+  for the list of supported services. Both files can be found in the top
+  tripleo-heat-templates folder
 
 Additional items like the ones below should be included as well:
 
-    * CountDefault: Default number of nodes, defaults to zero
-    * HostnameFormatDefault: Format string for hostname, optional
-    * Description: A few sentences describing the role and information
-      pertaining to the usage of the role.
+* CountDefault: Default number of nodes, defaults to zero
+* HostnameFormatDefault: Format string for hostname, optional
+* Description: A few sentences describing the role and information
+  pertaining to the usage of the role.
 
 The role file format is a basic yaml structure. The expectation is that there
 is a single role per file. See the roles `README.rst` for additional details. For

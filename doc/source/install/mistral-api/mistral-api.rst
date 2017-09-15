@@ -142,12 +142,12 @@ it can be changed if they are all consistent. This will be the plan name.
 
 1. Create the Swift container.
 
-    .. code-block:: bash
+   .. code-block:: bash
 
         openstack action execution run tripleo.plan.create_container \
             '{"container":"my_cloud"}'
 
-    .. note::
+   .. note::
 
         Creating a swift container directly isn't sufficient, as this Mistral
         action also sets metadata on the container and may include further
@@ -155,7 +155,7 @@ it can be changed if they are all consistent. This will be the plan name.
 
 2. Upload the files to Swift.
 
-    .. code-block:: bash
+   .. code-block:: bash
 
         swift upload my_cloud path/to/tripleo/templates
 
@@ -163,7 +163,7 @@ it can be changed if they are all consistent. This will be the plan name.
    for the uploaded templates, do some initial template processing and generate
    the passwords.
 
-    .. code-block:: bash
+   .. code-block:: bash
 
         openstack workflow execution create tripleo.plan_management.v1.create_deployment_plan \
             '{"container":"my_cloud"}'

@@ -48,15 +48,15 @@ Installing the Undercloud
 
 #. Enable needed repositories:
 
-  .. admonition:: RHEL
-     :class: rhel
+   .. admonition:: RHEL
+      :class: rhel
 
-     Enable optional repo::
+      Enable optional repo::
 
-         sudo yum install -y yum-utils
-         sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
+          sudo yum install -y yum-utils
+          sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
-.. include:: ../repositories.txt
+   .. include:: ../repositories.txt
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
@@ -80,45 +80,46 @@ Installing the Undercloud
 
     cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
-  .. TODO(bnemec): Find a more permanent location for this tool.
-  .. note:: There is a tool available that can help with writing a basic
-            undercloud.conf:
-            `Undercloud Configuration Wizard <http://ucw-bnemec.rhcloud.com/>`_
-            It takes some basic information about the intended overcloud
-            environment and generates sane values for a number of the important
-            options.
+   .. TODO(bnemec): Find a more permanent location for this tool.
+
+   .. note:: There is a tool available that can help with writing a basic
+             undercloud.conf:
+             `Undercloud Configuration Wizard <http://ucw-bnemec.rhcloud.com/>`_
+             It takes some basic information about the intended overcloud
+             environment and generates sane values for a number of the important
+             options.
 
 #. Run the command to install the undercloud:
 
-  .. admonition:: Source
-     :class: source
+   .. admonition:: Source
+      :class: source
 
-     Git checkouts of the puppet modules can be used instead of packages. Export the
-     following environment variable::
+      Git checkouts of the puppet modules can be used instead of packages. Export the
+      following environment variable::
 
-       export DIB_INSTALLTYPE_puppet_modules=source
+        export DIB_INSTALLTYPE_puppet_modules=source
 
-     It is also possible to use this functionality to use an in-progress review
-     as part of the undercloud install.  See
-     :doc:`../developer/in_progress_review` for details.
+      It is also possible to use this functionality to use an in-progress review
+      as part of the undercloud install.  See
+      :doc:`../developer/in_progress_review` for details.
 
-  .. admonition:: SSL
-     :class: optional
+   .. admonition:: SSL
+      :class: optional
 
-     To deploy an undercloud with SSL, see :doc:`../advanced_deployment/ssl`.
+      To deploy an undercloud with SSL, see :doc:`../advanced_deployment/ssl`.
 
-  .. admonition:: Validations
-     :class: validations
+   .. admonition:: Validations
+      :class: validations
 
-     :doc:`../validations/validations` will be installed and
-     configured during undercloud installation. You can set
-     ``enable_validations = false`` in ``undercloud.conf`` to prevent
-     that.
+      :doc:`../validations/validations` will be installed and
+      configured during undercloud installation. You can set
+      ``enable_validations = false`` in ``undercloud.conf`` to prevent
+      that.
 
 
-  Install the undercloud::
+   Install the undercloud::
 
-      openstack undercloud install
+       openstack undercloud install
 
 
 Once the install has completed, you should take note of the files ``stackrc`` and

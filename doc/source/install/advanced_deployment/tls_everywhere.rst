@@ -148,6 +148,9 @@ like this::
 
 Remembering that optionally we can set other nameservers with this parameter.
 
+You'll also need to add set the DNS server for the ctlplane network to point to
+FreeIPA as described in :ref:`basic-deployment-cli-configure-namserver`.
+
 To tell the overcloud deployment to deploy the keystone endpoints (and
 references) using DNS names instead of IPs, we need to add the following
 environment to our overcloud deployment::

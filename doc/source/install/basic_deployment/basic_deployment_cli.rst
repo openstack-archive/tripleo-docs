@@ -359,6 +359,8 @@ In addition, there are profile-specific flavors created which can be used with
 the profile-matching feature.  For more details on deploying with profiles,
 see :doc:`../advanced_deployment/profile_matching`.
 
+.. _basic-deployment-cli-configure-namserver:
+
 Configure a nameserver for the Overcloud
 ----------------------------------------
 

@@ -1,13 +1,8 @@
 Containers based Overcloud Deployment
 ======================================
 
-.. Warning::
-
-   The TripleO containers support is still under heavy development. Things
-   documented here may change during the Pike cycle.
-
 This documentation explains how to deploy a fully containerized overcloud on
-Docker. This feature is supported starting with Pike.
+Docker. This feature is now the default in Queens.
 
 The requirements for a containerized overcloud are the same as for any other
 overcloud deployment. The real difference is in where the overcloud services
@@ -20,11 +15,11 @@ The docker-based overcloud architecture is not very different from the
 baremetal/VM based one. The services deployed in the traditional baremetal
 overcloud are also deployed in the docker-based one.
 
-One obvious difference between these 2 types of deployments is that the
-openstack services are deployed as containers in a container runtime rather than
-in the host operating system. This reduces the required packages in the host to
-the bare minimum for running the container runtime and managing the base network
-layer.
+One obvious difference between these two types of deployments is that the
+Openstack services are deployed as containers in a container runtime rather
+than directly on the host operating system. This reduces the required packages
+in the host to the bare minimum for running the container runtime and managing
+the base network layer.
 
 
 Manual overcloud deployment
@@ -45,22 +40,25 @@ It is necessary to generate a heat environment file which specifies the
 container image parameters. These parameters will deploy the overcloud with
 images from a specific repository with specific tags.
 
-The ``openstack overcloud container image prepare`` command is used to generate
-these parameters. The following command will generate a heat environment file
-`~/docker_registry.yaml` to deploy an overcloud with images from the
-`Docker Hub`_::
+The ``openstack overcloud container image prepare`` command is an easy
+way to generate these parameters. The following command will generate
+a heat environment file `~/docker_registry.yaml` to deploy an overcloud
+with container images from RDO docker registry::
 
     openstack overcloud container image prepare \
-      --namespace tripleoupstream \
-      --tag latest \
+      --namespace master \
+      --tag tripleo-ci-testing \
+      --pull-source trunk.registry.rdoproject.org \
       --env-file ~/docker_registry.yaml
 
-The options ``--namespace tripleoupstream`` and ``--tag latest`` will typically
-be replaced with values specific to the environment. Run with ``--help`` to see
-the other options available for controlling what is generated.
+The options ``--namespace master`` and ``--tag tripleo-ci-testing``
+will typically be replaced with values specific to the environment. You
+may wish to use ``tripleo-passed-ci`` for a more stable set of containers.
+Run with ``--help`` to see the other options available for controlling
+what is generated.
 
 For production deployments (or for testing upgrades and rollbacks) stable tags
-like `latest` should never be used, instead explicit versioned tags are
+like `passed-ci` should never be used, instead explicit versioned tags are
 required to specify the exact images which will be deployed.
 
 Populate local docker registry
@@ -75,12 +73,15 @@ To copy the images from one registry to another, the `prepare` command is run
 to generate the `overcloud_containers.yaml` file. This describes the source and
 destination image locations consumed by the `upload` command.
 
-To copy the pre-built images coming from the `tripleoupstream` registry on
-`Docker Hub`_ to the local repository, the following commands are run::
+To copy the pre-built images coming from the `rdoproject` registry to
+the local repository, the following commands are run.  The first sets
+up the ``overcloud_containers.yaml`` configuration file containing the
+pull and push diestinations::
 
     openstack overcloud container image prepare \
-      --namespace tripleoupstream \
-      --tag latest \
+      --namespace master \
+      --tag tripleo-ci-testing \
+      --pull-source trunk.registry.rdoproject.org \
       --push-destination 192.168.24.1:8787 \
       --images-file overcloud_containers.yaml
 
@@ -93,21 +94,26 @@ Then upload the images to the local registry using the generated file::
 
     openstack overcloud container image upload --config-file overcloud_containers.yaml
 
-Or use ``kolla-build`` to build and push the images yourself::
+Or use ``kolla-build`` to build and push the images yourself.  This is useful
+if you wish to build a new container or modify an existing one::
 
-    kolla-build --base centos --type binary --namespace tripleoupstream --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
+    kolla-build --base centos --type binary --namespace master --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
 
 The command ``openstack overcloud container image prepare`` then needs to be
 called again to generate the `~/docker_registry.yaml` file that specifies the
 containers available in the local registry::
 
     openstack overcloud container image prepare \
-      --namespace 192.168.24.1:8787/tripleoupstream \
+      --namespace 192.168.24.1:8787/master \
       --tag latest \
       --env-file ~/docker_registry.yaml
 
+For development we also set the registry as insecure so we do not need to deal
+with TLS configurations::
+
     echo "  DockerInsecureRegistryAddress: 192.168.24.1:8787" >> \
       ~/docker_registry.yaml
+
 
 Deploying the containerized Overcloud
 -------------------------------------
@@ -139,4 +145,3 @@ The command below will deploy a containerized overcloud on top of a baremetal un
     bash quickstart.sh --config=~/.quickstart/config/general_config/containers_minimal.yml $VIRTHOST
 
 ..  _TripleO Quickstart: https://docs.openstack.org/developer/tripleo-quickstart/
-..  _Docker Hub: https://hub.docker.com/

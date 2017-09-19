@@ -1,27 +1,23 @@
 TripleO Containers Architecture
 ===============================
 
-.. Warning::
-
-   The TripleO containers support is still under heavy development. Things
-   documented here may change during the Pike cycle.
-
 This document explains the details around TripleO's containers architecture. The
-document goes into the details of how the containers are created from TripleO,
+document goes into the details of how the containers are built for TripleO,
 how the configuration files are generated and how the containers are eventually
 run.
 
 Like other areas of TripleO, the containers based deployment requires a couple
 of different projects to play together. The next section will cover each of the
-parts that allow for deploying OpenStack on containers using TripleO.
+parts that allow for deploying OpenStack in containers using TripleO.
 
-Kolla Build
------------
+Building Containers
+-------------------
 
-Kolla is an OpenStack team that aims to create tools to allow for deploying
-OpenStack on container technologies. Kolla (or Kolla Build) is one of the tools
-produced by this team and it allows for building and customizing container
-images for OpenStack services and their dependencies.
+The containers used for TripleO are sourced from Kolla.  Kolla is an OpenStack
+team that aims to create tools to allow for deploying OpenStack on container
+technologies. Kolla (or Kolla Build) is one of the tools produced by this team
+and it allows for building and customizing container images for OpenStack
+services and their dependencies.
 
 TripleO consumes these images and takes advantage of the customization
 capabilities provided by the `Kolla`_ build tool to install some packages that
@@ -53,13 +49,13 @@ TripleO maintains its complete list of kolla customization in the
 .. _Kolla: https://docs.openstack.org/developer/kolla/image-building.html#dockerfile-customisation
 .. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/container-images/tripleo_kolla_template_overrides.j2
 
-heat-config-docker-cmd
-----------------------
 
-The `heat-config-docker-cmd`_ hook is used to manage containers. This hook takes json as
-input and uses it to create and run containers on demand. The `docker-cmd`
-accepts different keys that allow for configuring the container process. Some of
-the keys are:
+Paunch
+------
+
+The `paunch`_ hook is used to manage containers. This hook takes json
+as input and uses it to create and run containers on demand. The json
+describes how the container will be started.  Some example keys are:
 
 * **net**: To specify what network to use. This is commonly set to host.
 
@@ -72,22 +68,14 @@ the keys are:
 * **environment**: List of environment variables to set on the container.
 
 .. note:: The list above is not exhaustive and you should refer to the
-   `heat-config-docker-cmd` docs for the complete list.
+   `paunch` docs for the complete list.
 
 The json file passed to this hook is built out of the `docker_config` attribute
 defined in the service's yaml file. Refer to the `Docker specific settings`_
 section for more info on this.
 
-.. _heat-config-docker-cmd: https://github.com/openstack/heat-agents/tree/master/heat-config-docker-cmd
+.. _paunch: https://github.com/openstack/paunch
 
-heat-json-config-file
----------------------
-
-The `heat-json-config-file`_ takes a json config as input and dumps it onto disk
-in the specified directory. This is used to write on disk the json required to
-run the kolla images and the docker-puppet-tasks.
-
-.. _heat-json-config-file: https://github.com/openstack/heat-agents/blob/master/heat-config-json-file/README.rst
 
 TripleO Heat Templates
 ----------------------
@@ -106,8 +94,8 @@ The docker templates can be found under the `docker` sub directory in the
 the `docker` directory contains a bit more than just service files and some of
 them are worth diving into:
 
-post.yaml.j2
-............
+deploy-steps.j2
+...............
 
 This file is a jinja template and it's rendered before the deployment is
 started. This file defines the resources that are executed before and after the
@@ -119,14 +107,14 @@ docker-puppet.py
 ................
 
 This script is responsible for generating the config files for each service. The
-script is called from the `post.yaml` file and it takes a `json` file as
+script is called from the `deploy-steps.j2` file and it takes a `json` file as
 configuration. The json files passed to this script are built out of the
 `puppet_config` parameter set in every service template (explained in the
 `Docker specific settings`_ section).
 
 The `docker-puppet.py` execution results in a oneshot container being executed
 (usually named `puppet-$service_name`) to generate the configuration options or
-run other service specific operations. Example: Create Keystone endpoints.
+run other service specific initialization tasks. Example: Create Keystone endpoints.
 
 Anatomy of a containerized service template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,110 +127,60 @@ section.
 Docker specific settings
 ........................
 
-Each service may define an output variable which returns a puppet manifest
-snippet that will run at each of the following steps. Earlier manifests
-are re-asserted when applying latter ones.
+Each service may define output variable(s) which control config file generation,
+initialization, and stepwise deployment of all the containers for this service.
+The following sections are available:
 
-* **service_name**: This setting is inherited from the puppet service templates
-  and it shouldn't be modified as some of the hiera tasks depend on this.
+ * config_settings: This setting is generally inherited from the
+   puppet/services templates and may be appended to if required
+   to support the docker specific config settings.
 
-* **config_settings**: This setting is generally inherited from the
-  puppet/services templates and only need to be appended to on occasion if
-  docker specific config settings are required. For example::
+ * step_config: This setting controls the manifest that is used to
+   create docker config files via puppet. The puppet tags below are
+   used along with this manifest to generate a config directory for
+   this container.
 
-    config_settings:
-      map_merge:
-        - get_attr: [MongodbPuppetBase, role_data, config_settings]
-        - mongodb::server::fork: false
+ * kolla_config: Contains YAML that represents how to map config files
+   into the kolla container. This config file is typically mapped into
+   the container itself at the /var/lib/kolla/config_files/config.json
+   location and drives how kolla's external config mechanisms work.
 
-* **step_config**: This setting controls the manifest that is used to create
-  docker config files via puppet. The puppet tags below are used along with
-  this manifest to generate a config directory for this container.
+ * docker_config: Data that is passed to the docker-cmd hook to configure
+   a container, or step of containers at each step. See the available steps
+   below and the related docker-cmd hook documentation in the heat-agents
+   project.
 
-* **kolla_config**: Contains YAML that represents how to map config files into
-  the kolla container. This config file is typically mapped into the container
-  itself at the /var/lib/kolla/config_files/config.json location and drives how
-  kolla's external config mechanisms work. Example::
+ * puppet_config: This section is a nested set of key value pairs
+   that drive the creation of config files using puppet.
+   Required parameters include:
 
-      kolla_config:
-        /var/lib/kolla/config_files/mongodb.json:
-          command: /usr/bin/mongod --unixSocketPrefix=/var/run/mongodb --config /etc/mongod.conf run
-          config_files:
-          - dest: /etc/mongod.conf
-            source: /var/lib/kolla/config_files/src/etc/mongod.conf
-            owner: mongodb
-            perm: '0600'
-          - dest: /etc/mongos.conf
-            source: /var/lib/kolla/config_files/src/etc/mongos.conf
-            owner: mongodb
-            perm: '0600'
+     * puppet_tags: Puppet resource tag names that are used to generate config
+       files with puppet. Only the named config resources are used to generate
+       a config file. Any service that specifies tags will have the default
+       tags of 'file,concat,file_line,augeas,cron' appended to the setting.
+       Example: keystone_config
 
-* **docker_config**: Data that is passed to the `heat-config-docker-cmd`_ hook to
-  configure a container, or step of containers at each step. See the available
-  steps below and the related docker-cmd hook documentation in the heat-agents
-  project.
+     * config_volume: The name of the volume (directory) where config files
+       will be generated for this service. Use this as the location to
+       bind mount into the running Kolla container for configuration.
 
-* **puppet_config**:
+     * config_image: The name of the docker image that will be used for
+       generating configuration files. This is often the same container
+       that the runtime service uses. Some services share a common set of
+       config files which are generated in a common base container.
 
-  * **step_config**: Usually a reference to the one defined outside this section.
+     * step_config: This setting controls the manifest that is used to
+       create docker config files via puppet. The puppet tags below are
+       used along with this manifest to generate a config directory for
+       this container.
 
-  * **puppet_tags**: Puppet resource tag names that are used to generate config
-    files with puppet. Only the named config resources are used to generate a
-    config file. Any service that specifies tags will have the default tags of
-    'file,concat,file_line' appended to the setting. For example::
+ * docker_puppet_tasks: This section provides data to drive the
+   docker-puppet.py tool directly. The task is executed only once
+   within the cluster (not on each node) and is useful for several
+   puppet snippets we require for initialization of things like
+   keystone endpoints, database users, etc. See docker-puppet.py
+   for formatting.
 
-      puppet_tags: keystone_config
-
-    Some puppet modules do a bit more than just generating config files. Some have
-    custom resources with providers that execute commands. It's possible to
-    overwrite these providers by changing the `step_config` property. For example::
-
-      puppet_tags: keystone_config
-      step_config:
-        list_join:
-          - "\n"
-          - - "['Keystone_user', 'Keystone_endpoint', 'Keystone_domain', 'Keystone_tenant', 'Keystone_user_role', 'Keystone_role', 'Keystone_service'].each |String $val| { noop_resource($val) }"
-            - {get_attr: [KeystoneBase, role_data, step_config]}
-
-
-    The example above will overwrite the provider for all the `Keystone_*` puppet
-    tags (except `keystone_config`) using the `noop_resource` function that comes
-    with `puppet-tripleo`. This function dynamically configures the default
-    provider for each of the `puppet_tags` in the array.
-
-  * **config_volume**: The name of the docker volume where config files will be
-    generated for this service. Use this as the location to bind mount into the
-    running Kolla container for configuration.
-
-  * **config_image**: The name of the docker image that will be used for
-    generating configuration files. This is often the same container that the
-    runtime service uses. Some services share a common set of config files which
-    are generated in a common base container.
-
-* **docker_puppet_tasks**: This section provides data to drive the
-  docker-puppet.py tool directly. The task is executed only once within the
-  cluster (not on each node) and is useful for several puppet snippets we
-  require for initialization of things like keystone endpoints, database users,
-  etc. See docker-puppet.py for formatting. Here's an example of Keystone's
-  `docker_puppet_tasks`::
-
-      docker_puppet_tasks:
-        # Keystone endpoint creation occurs only on single node
-        step_4:
-          - 'keystone_init_tasks'
-          - 'keystone_config,keystone_domain_config,keystone_endpoint,keystone_identity_provider,keystone_paste_ini,keystone_role,keystone_service,keystone_tenant,keystone_user,keystone_user_role,keystone_domain'
-          - 'include ::tripleo::profile::base::keystone'
-          - list_join:
-            - '/'
-            - [ {get_param: DockerNamespace}, {get_param: DockerKeystoneImage} ]
-
-* **host_prep_tasks**: Ansible tasks to execute on the host before any
-  containers are started. Useful e.g. for ensuring existence of
-  directories that we want bind mounted into the containers.
-
-* **upgrade_tasks**: Ansible tasks to execute during upgrade. First
-  these tasks are run on all nodes, and then the normal puppet/docker
-  operations happen the same way as during a fresh deployment.
 
 Docker steps
 ............

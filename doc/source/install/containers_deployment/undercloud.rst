@@ -1,13 +1,12 @@
 Containers based Undercloud Deployment
 ======================================
 
-.. Warning::
-
-   The TripleO containers support is still under heavy development. Things
-   documented here may change during the Pike cycle.
-
 This documentation explains how to deploy a fully containerized undercloud on
 Docker. This feature is supported starting with Pike.
+
+While this is not currently used to deploy the overcloud, it is a great
+development tool as it uses the same templates and infrastructure as the
+overcloud.  This lets you do faster iterations for development.
 
 The requirements for a containerized undercloud are the same as for any other
 undercloud deployment. The real difference is in where the undercloud services
@@ -20,19 +19,19 @@ The docker based undercloud architecture is not very different from the
 baremetal/VM based one. The services deployed in the traditional baremetal
 undercloud are also deployed in the docker based one.
 
-One obvious difference between these 2 types of deployments is that the
+One obvious difference between these two types of deployments is that the
 openstack services are deployed as containers in a container runtime rather than
-in the host operating system. This reduces the required packages in the host to
-the bare minimum for running the container runtime and managing the base network
-layer.
+directly on the host operating system. This reduces the required packages in
+the host to the bare minimum for running the container runtime and managing the
+base network layer.
 
 
 Manual undercloud deployment
 ----------------------------
 
 This section explains how to deploy a containerized undercloud manually. For an
-automated undercloud deployment, please follow the steps in the
-`Using TripleO Quickstart`_ section below.
+automated undercloud deployment.  A Quickstart version also exists and is
+documented here https://docs.openstack.org/developer/tripleo-quickstart/
 
 Preparing the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,12 +140,6 @@ also remove them by running::
     $ sudo rm -Rf /var/lib/docker-puppet
     $ sudo rm -Rf /var/lib/config-data
     $ sudo rm -Rf /var/lib/kolla
-
-
-Using TripleO Quickstart
-------------------------
-
-TBW
 
 
 How does the undercloud deploy work?

@@ -232,9 +232,6 @@ Testing in CI
 -------------
 
 When new service containers are added, be sure to update the image names in
-`container-images/overcloud_containers.yaml` tripleo-common repo. These service
+`container-images` in the tripleo-common repo. These service
 images are pulled in and available in the local docker registry that the
-containers ci job uses::
-
-    uploads:
-        - imagename: tripleoupstream/centos-binary-example:latest
+containers ci job uses.

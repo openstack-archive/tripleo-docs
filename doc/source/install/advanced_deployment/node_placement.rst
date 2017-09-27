@@ -52,10 +52,24 @@ deploy command.
 The same approach is possible for each role via these parameters:
 
   * ControllerSchedulerHints
-  * NovaComputeSchedulerHints
+  * ComputeSchedulerHints
   * BlockStorageSchedulerHints
   * ObjectStorageSchedulerHints
   * CephStorageSchedulerHints
+
+For custom roles (defined via roles_data.yaml) the parameter will be named
+RoleNameSchedulerHints, where RoleName is the name specified in roles_data.yaml.
+
+.. note::
+
+    Previously the parameter for Compute nodes was named
+    `NovaComputeSchedulerHints`. If
+    you are updating a deployment which used the old parameter, all
+    values previously passed to `NovaComputeSchedulerHints` should be
+    passed to `ComputeSchedulerHints` instead, and
+    `NovaComputeSchedulerHints: {}` should be explicitly set in
+    `parameter_defaults`, to ensure that values from the old parameter
+    will not be used anymore.
 
 Custom Hostnames
 ----------------
@@ -108,7 +122,7 @@ from the environment file.
 
 The second section is parameter_defaults, where the actual IP addresses are
 assigned.  Each node type has an associated parameter - ControllerIPs for
-controller nodes, NovaComputeIPs for compute nodes, etc.  Each parameter is
+Controller nodes, ComputeIPs for Compute nodes, etc.  Each parameter is
 a map of network names to a list of addresses.  Each network type must have
 at least as many addresses as there will be nodes on that network.  The
 addresses will be assigned in order, so the first node of each type will get

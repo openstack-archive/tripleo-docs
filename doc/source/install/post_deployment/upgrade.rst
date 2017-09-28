@@ -54,7 +54,7 @@ Upgrading the Undercloud
 
   Get and enable new repos for `NEW_VERSION`:
 
-.. include:: ../repositories.txt
+  .. include:: ../repositories.txt
 
 2. Run undercloud upgrade:
 

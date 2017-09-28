@@ -9,7 +9,7 @@ You can upgrade any packages that are installed on the undercloud machine.
 
 #. Enable new Delorean repositories:
 
-.. include:: ../repositories.txt
+   .. include:: ../repositories.txt
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
@@ -25,14 +25,14 @@ You can upgrade any packages that are installed on the undercloud machine.
    .. admonition:: Stable Branch
       :class: stable
 
-         Stop services so that they are not restarted by packaging scripts
-         when they are updated. The service restarts will be handled by the
-         undercloud upgrade command after new configuration has been applied.::
+      Stop services so that they are not restarted by packaging scripts
+      when they are updated. The service restarts will be handled by the
+      undercloud upgrade command after new configuration has been applied.::
 
-            sudo systemctl stop openstack-*
-            sudo systemctl stop neutron-*
-            sudo systemctl stop openvswitch
-            sudo systemctl stop httpd
+         sudo systemctl stop openstack-*
+         sudo systemctl stop neutron-*
+         sudo systemctl stop openvswitch
+         sudo systemctl stop httpd
 
 #. Update the TripleO CLI package::
 

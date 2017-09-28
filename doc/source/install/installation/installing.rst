@@ -91,18 +91,6 @@ Installing the Undercloud
 
 #. Run the command to install the undercloud:
 
-   .. admonition:: Source
-      :class: source
-
-      Git checkouts of the puppet modules can be used instead of packages. Export the
-      following environment variable::
-
-        export DIB_INSTALLTYPE_puppet_modules=source
-
-      It is also possible to use this functionality to use an in-progress review
-      as part of the undercloud install.  See
-      :doc:`../developer/in_progress_review` for details.
-
    .. admonition:: SSL
       :class: optional
 

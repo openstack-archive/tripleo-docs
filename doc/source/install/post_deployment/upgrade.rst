@@ -103,12 +103,23 @@ Upgrading the Undercloud
        deployment to a ceph-ansible deployment. Only new deployments
        are currently possible with ceph-ansible.
 
-   The following command will upgrade the undercloud::
+   The following commands will upgrade the undercloud:
 
-      sudo systemctl stop openstack-*
-      sudo systemctl stop neutron-*
-      sudo systemctl stop httpd
-      sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient ceph-ansible
+   .. admonition:: Stable Branch
+      :class: stable
+
+      When upgrading to a release Ocata or older, it is necessary to do a few more
+      steps.  These are not needed on Pike and above and should not be run::
+
+         sudo systemctl stop openstack-*
+         sudo systemctl stop neutron-*
+         sudo systemctl stop httpd
+         sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common python-tripleoclient ceph-ansible
+
+
+   Upgrade the client package and run the upgrade command::
+
+      sudo yum -y update python-tripleoclient
       openstack undercloud upgrade
 
    Once the undercloud upgrade is fully completed you may

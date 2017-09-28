@@ -32,9 +32,13 @@ Installing the Undercloud
       :class: baremetal
 
       Ensure that there is a FQDN hostname set and that the $HOSTNAME environment
-      variable matches that value.
+      variable matches that value.  The easiest way to do this is to set the
+      ``undercloud_hostname`` option in undercloud.conf before running the
+      install.  This will allow the installer to configure all of the hostname-
+      related settings appropriately.
 
-      Use ``hostnamectl`` to set a hostname if needed::
+      Alternatively the hostname settings can be configured manually, but
+      this is strongly discouraged.  The manual steps are as follows::
 
           sudo hostnamectl set-hostname myhost.mydomain
           sudo hostnamectl set-hostname --transient myhost.mydomain

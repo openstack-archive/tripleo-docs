@@ -8,3 +8,4 @@ update components after installation.
 
 .. include:: updating.rst
 
+#. Proceed with :ref:`package_update`

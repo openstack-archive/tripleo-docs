@@ -17,13 +17,13 @@ Making configuration changes
 If you want to make a configuration change, either prior to initial deployment,
 or subsequently via an update, you can pass additional data to puppet via hiera
 data, using either the global "ExtraConfig" parameter, or one of the role-specific
-parameters, e.g using `NovaComputeExtraConfig` to set the reserved_host_memory
+parameters, e.g using `ComputeExtraConfig` to set the reserved_host_memory
 value for compute nodes::
 
 
     cat > compute_params.yaml << EOF
     parameter_defaults:
-        NovaComputeExtraConfig:
+        ComputeExtraConfig:
           nova::compute::reserved_host_memory: some_value
     EOF
 
@@ -32,11 +32,14 @@ value for compute nodes::
 The parameters available are:
 
   * `ExtraConfig`: Apply the data to all nodes, e.g all roles
-  * `NovaComputeExtraConfig`: Apply the data only to Compute nodes
+  * `ComputeExtraConfig`: Apply the data only to Compute nodes
   * `ControllerExtraConfig`: Apply the data only to Controller nodes
   * `BlockStorageExtraConfig`: Apply the data only to BlockStorage nodes
   * `ObjectStorageExtraConfig`: Apply the data only to ObjectStorage nodes
   * `CephStorageExtraConfig`: Apply the data only to CephStorage nodes
+
+For any custom roles (defined via roles_data.yaml) the parameter name will
+be RoleNameExtraConfig where RoleName is the name specified in roles_data.yaml.
 
 .. note::
 
@@ -47,7 +50,9 @@ The parameters available are:
     passed to `ControllerExtraConfig` instead, and
     `controllerExtraConfig: {}` should be explicitly set in
     `parameter_defaults`, to ensure that values from the old parameter
-    will not be used anymore.
+    will not be used anymore.  Also ComputeExtraConfig was previously
+    named NovaComputeExtraConfig, so a similar update should be performed
+    where the old naming is used.
 
 .. note::
 
@@ -62,7 +67,7 @@ The parameters available are:
     if you want to change the Max IOPS per host setting::
 
        parameter_defaults:
-         NovaComputeExtraConfig:
+         ComputeExtraConfig:
            'nova::scheduler::filter::max_io_ops_per_host': '4.0'
            compute_classes:
            - '::nova::scheduler::filter'

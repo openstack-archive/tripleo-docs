@@ -126,25 +126,19 @@ by the TripleO Pike release to drive `puppet-ceph` continue to work
 and are translated, when possible, into their equivalent
 `ceph-ansible` variable.
 
-Global settings in the `ceph.conf` may be set using
-`ceph_conf_overrides` like the following::
-
-  CephAnsibleExtraConfig:
-    ceph_conf_overrides:
-      global:
-        journal_size: 2048
-        max_open_files: 131072
-        osd_pool_default_size: 3
-        osd_pool_default_pg_num: 256
-
-`CephAnsibleExtraConfig` isn't just for `ceph.conf` overrides. For
-example, to encrypt the data stored on OSDs use the following::
+For example, to encrypt the data stored on OSDs use the following::
 
   CephAnsibleExtraConfig:
     dmcrypt: true
 
 The above overrides the defaults found in the
 `ceph-ansible/group_vars`_.
+
+Global settings in the `ceph.conf` may be set using
+`CephConfigOverrides` like the following::
+
+  CephConfigOverrides:
+    max_open_files: 131072
 
 To specify a set of dedicated block devices to use as Ceph OSDs use
 a variation of the following::

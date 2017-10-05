@@ -46,9 +46,8 @@ a heat environment file `~/docker_registry.yaml` to deploy an overcloud
 with container images from RDO docker registry::
 
     openstack overcloud container image prepare \
-      --namespace master \
+      --namespace trunk.registry.rdoproject.org/master \
       --tag tripleo-ci-testing \
-      --pull-source trunk.registry.rdoproject.org \
       --env-file ~/docker_registry.yaml
 
 The options ``--namespace master`` and ``--tag tripleo-ci-testing``
@@ -79,9 +78,8 @@ up the ``overcloud_containers.yaml`` configuration file containing the
 pull and push diestinations::
 
     openstack overcloud container image prepare \
-      --namespace master \
+      --namespace trunk.registry.rdoproject.org/master \
       --tag tripleo-ci-testing \
-      --pull-source trunk.registry.rdoproject.org \
       --push-destination 192.168.24.1:8787 \
       --images-file overcloud_containers.yaml
 

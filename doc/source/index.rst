@@ -67,12 +67,6 @@ Linux (RHEL). These steps are marked as follows:
 
    Step that should only be run when deploying Ceph for use by the Overcloud
 
-.. admonition:: Source
-   :class: source
-
-   Step that should only be run when choosing to use some components directly
-   from their git source code repositories instead of packages.
-
 .. admonition:: Stable Branch
    :class: stable
 

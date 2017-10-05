@@ -206,18 +206,6 @@ created on the undercloud, one should use a non-root user.
             # rhel-7-server-rhceph-{2,1.3}-tools-rpms
             export REG_ACTIVATION_KEY="[activation key]"
 
-  .. admonition:: Source
-     :class: source
-
-     Git checkouts of the puppet modules can be used instead of packages. Export the
-     following environment variable::
-
-       export DIB_INSTALLTYPE_puppet_modules=source
-
-     It is also possible to use this functionality to use an in-progress review
-     as part of the overcloud image build.  See
-     :doc:`../developer/in_progress_review` for details.
-
   ::
 
     openstack overcloud image build

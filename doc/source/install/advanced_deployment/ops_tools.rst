@@ -69,7 +69,28 @@ Before deploying the Overcloud
     following steps.
 
 
-1. Operational tools configuration files:
+1. Install client packages on overcloud-full image:
+
+  - Prepare installation script::
+
+      cat >install.sh<<EOF
+      #!/usr/bin/sh
+      yum install -y centos-release-opstools
+      yum install -y sensu fluentd collectd
+      EOF
+
+  - Run the script using virt-customize::
+
+      LIBGUESTFS_BACKEND=direct virt-customize -a /path/to/overcloud-full.qcow2 \
+        --upload install.sh:/tmp/install.sh \
+        --run-command "sh /tmp/install.sh" \
+        --selinux-relabel
+
+  - Upload new image to undercloud image registry::
+
+      openstack overcloud image upload --update-existing
+
+2. Operational tools configuration files:
 
  The files have some documentation about the parameters that need to be configured
 
@@ -84,8 +105,8 @@ Before deploying the Overcloud
   - Performance Monitoring::
 
      /usr/share/openstack-tripleo-heat-templates/environments/collectd-environment.yaml
- 
-2. Configure the environment
+
+3. Configure the environment
 
  The easiest way to configure our environment will be to create a parameter file, let's called paramters.yaml with all the paramteres defined.
 
@@ -100,12 +121,12 @@ Before deploying the Overcloud
 
  - Centralized Logging::
 
-    LoggingServers:        # The servers 
+    LoggingServers:        # The servers
       - host: server_ip    # The ip of the server
-        port: 24224        # Port to send the logs [ 24224 plain & 24284 SSL ] 
+        port: 24224        # Port to send the logs [ 24224 plain & 24284 SSL ]
     LoggingUsesSSL: false  # Plain or SSL connections
-                           # If LoggingUsesSSL is set to  false the following lines can 
-                           # be deleted 
+                           # If LoggingUsesSSL is set to  false the following lines can
+                           # be deleted
     LoggingSharedKey: secret           # The key
     LoggingSSLCertificate: |           # The content of the SSL Certificate
       -----BEGIN CERTIFICATE-----
@@ -135,7 +156,7 @@ Before deploying the Overcloud
       collectd::plugin::df::ignoreselected: false
 
 
-3. Continue following the TripleO instructions for deploying an overcloud::
+4. Continue following the TripleO instructions for deploying an overcloud::
 
     openstack overcloud deploy --templates \
        [-e /usr/share/openstack-tripleo-heat-templates/environments/monitoring-environment.yaml] \
@@ -144,4 +165,4 @@ Before deploying the Overcloud
        -e parameters.yaml
 
 
-4. Wait for the completion of the overcloud deployment process.
+5. Wait for the completion of the overcloud deployment process.

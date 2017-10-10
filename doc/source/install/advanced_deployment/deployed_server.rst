@@ -311,7 +311,7 @@ command::
 
 The value of the DeployedServerPortMap variable is a map. The keys correspond
 to the ``<short hostname>-ctlplane`` of the deployed servers. Specify the ip
-addresses to be assigned under ``fixed_ips``.
+addresses and subnet CIDR to be assigned under ``fixed_ips``.
 
 In the case where the ctlplane is not routable from the deployed
 servers, you can use ``DeployedServerPortMap`` to assign an IP address
@@ -331,12 +331,18 @@ from any CIDR::
         control_virtual_ip:
           fixed_ips:
             - ip_address: 192.168.100.1
+          subnets:
+            - cidr: 24
         controller0-ctlplane:
           fixed_ips:
             - ip_address: 192.168.100.2
+          subnets:
+            - cidr: 24
         compute0-ctlplane:
           fixed_ips:
             - ip_address: 192.168.100.3
+          subnets:
+            - cidr: 24
 
 In the above example, notice how ``RedisVipPort`` is mapped to
 ``network/ports/noop.yaml``. This mapping is due to the fact that the

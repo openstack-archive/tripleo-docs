@@ -31,6 +31,12 @@ The baremetal machines must meet the following minimum specifications:
 
 Larger systems are recommended for production deployments, however.
 
+For instance, the undercloud needs a bit more capacity, especially regarding RAM (minimum of 16G is advised)
+and is pretty intense for the I/O - fast disks (SSD, SAS) are strongly advised.
+
+Please also note the undercloud needs space in order to store twice the "overcloud-full" image (one time
+in its glance, one time in /var/lib subdirectories for PXE/TFTP).
+
 TripleO is supporting only the following operating systems:
 
 * RHEL 7.1 x86_64 or

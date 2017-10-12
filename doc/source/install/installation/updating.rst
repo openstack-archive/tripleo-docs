@@ -67,6 +67,12 @@ You can upgrade any packages that are installed on the undercloud machine.
             sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
             sudo yum -y install ceph-ansible
 
+         Ceph clusters deployed with Ocata via puppet-ceph will be migrated
+         so that all of the existing Ceph services are run inside of containers.
+         This migration will be managed not by puppet-ceph, but by ceph-ansible,
+         which TripleO will use to control updates to the same ceph cluster after
+         the Ocata to Pike upgrade.
+
 
    Update TripleO CLI package::
 

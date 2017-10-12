@@ -179,6 +179,28 @@ major-upgrade-composable-steps that comes first, as described above.
    From Ocata to Pike, the Overcloud will be upgraded to a containerized
    environment. All the services will run under Docker.
 
+   If you deploy TripleO with custom roles, you want to synchronize
+   them with roles_data.yaml visible in default roles and make sure
+   parameters and new services are present in your roles.
+
+   .. admonition:: Newton
+      :class: newton
+
+      Newton roles_data.yaml is available here:
+      https://github.com/openstack/tripleo-heat-templates/blob/stable/newton/roles_data.yaml
+
+   .. admonition:: Ocata
+      :class: ocata
+
+      Ocata roles_data.yaml is available here:
+      https://github.com/openstack/tripleo-heat-templates/blob/stable/ocata/roles_data.yaml
+
+   .. admonition:: Pike
+      :class: pike
+
+      Pike roles_data.yaml is available here:
+      https://github.com/openstack/tripleo-heat-templates/blob/stable/pike/roles_data.yaml
+
    Create an environment file with commands to switch OpenStack repositories to
    a new release. This will likely be the same commands that were used to switch
    repositories on the undercloud::

@@ -54,6 +54,31 @@
            sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
            sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
 
+  .. admonition:: Pike
+     :class: pike otop
+
+     Enable latest RDO Pike Delorean repository for all packages
+
+     ::
+
+        sudo curl -L -o /etc/yum.repos.d/delorean-pike.repo https://trunk.rdoproject.org/centos7-pike/current/delorean.repo
+
+     Enable the Pike Delorean Deps repository
+
+     ::
+
+        sudo curl -L -o /etc/yum.repos.d/delorean-deps-pike.repo https://trunk.rdoproject.org/centos7-pike/delorean-deps.repo
+
+     .. admonition:: Ceph
+        :class: ceph
+
+        Enable the CentOS Storage SIG Ceph/Jewel repository if using Ceph
+
+        ::
+
+           sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
+           sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
+
 
 Enable last known good RDO Trunk Delorean repository for core openstack packages
 

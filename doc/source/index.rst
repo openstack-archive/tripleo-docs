@@ -83,6 +83,11 @@ Linux (RHEL). These steps are marked as follows:
 
    Step that should only be run when installing from the Ocata stable branch.
 
+.. admonition:: Pike
+   :class: pike
+
+   Step that should only be run when installing from the Pike stable branch.
+
 .. admonition:: Validations
    :class: validations
 

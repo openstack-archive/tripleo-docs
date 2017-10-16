@@ -129,3 +129,9 @@ so it is not necessary to copy them to ``undercloud.conf``.
     ``openstack undercloud install`` can be rerun to reapply changes from
     undercloud.conf to the undercloud. Note that this should **not** be done if an
     overcloud has already been deployed or is in progress.
+
+.. note::
+   If running ``docker`` commands as a stack user after an undercloud install fail
+   with a permission error, log out and log in again. The stack user does get added
+   to the docker group during install, but that change gets reflected only after a
+   new login.

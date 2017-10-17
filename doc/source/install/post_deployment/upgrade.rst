@@ -136,6 +136,12 @@ mechanism and the steps are invoked with the same cli. A big difference however
 is that after upgrading to Pike most of the overcloud services will be running
 in containers.
 
+.. note::
+
+   Upgrades to Pike or Queens will only be tested with containers. Baremetal
+   deployments, which don't use containers, will be deprecated in Queens and
+   have full support removed in Rocky.
+
 The operator starts the upgrade with a ``openstack overcloud deploy`` that
 includes the major-upgrade-composable-steps.yaml_ environment file (or the
 docker variant for the `containerized upgrade to Pike`__)

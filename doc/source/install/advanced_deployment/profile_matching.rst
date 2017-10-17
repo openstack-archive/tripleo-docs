@@ -27,17 +27,17 @@ Manual profile tagging
 
 To assign a profile to a node directly, issue the following command::
 
-    ironic node-update <UUID OR NAME> replace properties/capabilities=profile:<PROFILE>,boot_option:local
+    openstack baremetal node set <UUID OR NAME> --property capabilities=profile:<PROFILE>,boot_option:local
 
 Alternatively, you can provide a number of profiles as capabilities in form of
 ``<PROFILE>_profile:1``, which later can be automatically converted to one
 assigned profile (see `Use the flavors to deploy`_ for details). For example::
 
-    ironic node-update <UUID OR NAME> replace properties/capabilities=compute_profile:1,control_profile:1,boot_option:local
+    openstack baremetal node set <UUID OR NAME> --property capabilities=compute_profile:1,control_profile:1,boot_option:local
 
 Finally, to clean all profile information from a node use::
 
-    ironic node-update <UUID OR NAME> replace properties/capabilities=boot_option:local
+    openstack baremetal node set <UUID OR NAME> --property capabilities=boot_option:local
 
 .. note::
     We can not update only a single key from the capabilities dictionary, so we

@@ -48,7 +48,7 @@ and use that to collect a list of node mac addresses::
     export IRONIC_INSPECTOR_PASSWORD=xxxxxx
 
     # Download the extra introspection data from swift:
-    for node in $(ironic node-list | grep -v UUID | awk '{print $2}');
+    for node in $(openstack baremetal node list -f value -c UUID);
       do swift -U service:ironic -K $IRONIC_INSPECTOR_PASSWORD download ironic-inspector extra_hardware-$node;
     done
 

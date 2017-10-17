@@ -37,8 +37,7 @@ Nodes get into ``manageable`` state automatically. The ``manage`` action
 can be used to bring nodes already moved to available_ state back to
 ``manageable`` for configuration::
 
-    ironic node-set-provision-state <NAME OR UUID> manage
-
+    openstack baremetal node manage <NAME OR UUID>
 
 available
 ---------
@@ -55,4 +54,4 @@ in this state.
    which failed introspection stay in ``manageable`` state and must be
    reintrospected or made ``available`` manually::
 
-    ironic node-set-provision-state <NAME OR UUID> provide
+    openstack baremetal node provide <NAME OR UUID>

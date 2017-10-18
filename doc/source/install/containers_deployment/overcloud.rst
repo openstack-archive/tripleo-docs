@@ -29,6 +29,8 @@ This section explains how to deploy a containerized overcloud manually. For an
 automated overcloud deployment, please follow the steps in the
 `Using TripleO Quickstart`_ section below.
 
+.. _prepare-environment-containers:
+
 Preparing the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

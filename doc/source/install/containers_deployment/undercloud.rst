@@ -37,9 +37,10 @@ Preparing the environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Prepare a host (either baremetal or VM) following the normal undercloud
-provisioning steps and stop right before the undercloud install command. This
-should leave you with an updated base operating system with no openstack
-packages installed.
+provisioning steps (see :doc:`../installation/installing`) and stop right before
+the undercloud install command. This should leave you with an updated base
+operating system with no openstack packages installed but required repositories
+configured.
 
 Make sure these packages are installed before proceeding with the undercloud
 installation:
@@ -50,10 +51,17 @@ installation:
 * docker >= 1.12.5
 * openvswitch (minimum version supported by neutron)
 
+See also
+`Docker installation documentation <https://docs.docker.com/engine/installation/>`_.
+
+Start the required host services::
+
+    $ sudo systemctl start openvswitch
+    $ sudo systemctl start docker
+
 Verify that your docker environment is up and that your user can use sudo::
 
-    $ sudo docker ps -a
-
+    $ sudo docker info
 
 .. note:: Check the :ref:`debug-containers` section for more tips and tricks for
           debugging containers.
@@ -87,12 +95,24 @@ right path)::
       UndercloudNameserver: 8.8.8.8
       NeutronServicePlugins: ""
 
+Preparing container images
+--------------------------
+
+Images for undercloud services should be prepared with the
+``openstack overcloud container image prepare`` command. The process is very
+similar to the containerized overcloud case, see
+:ref:`prepare-environment-containers`. The simplified command looks like::
+
+    $ openstack overcloud container image prepare \
+      --env-file $HOME/docker_registry.yaml
 
 Deploying the undercloud
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following command will install an undercloud with ironic, mistral and zaqar
-(substitute $THT_ROOT with the right path)::
+(substitute $THT_ROOT with the right path, which is normally
+`/usr/share/openstack-tripleo-heat-templates`, and $YOUR_SERVER_IP with your
+server's private IP)::
 
     $ sudo openstack undercloud deploy \
       --templates=$THT_ROOT \
@@ -103,7 +123,8 @@ The following command will install an undercloud with ironic, mistral and zaqar
       -e $THT_ROOT/environments/services-docker/zaqar.yaml \
       -e $THT_ROOT/environments/docker.yaml \
       -e $THT_ROOT/environments/mongodb-nojournal.yaml \
-      -e $HOME/custom.yaml
+      -e $HOME/custom.yaml \
+      -e $HOME/docker_registry.yaml
 
 
 The `keep-running` flag will keep the `openstack undercloud deploy` process

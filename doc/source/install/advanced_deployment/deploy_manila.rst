@@ -11,8 +11,8 @@ Ceph, Ceph MDS and Manila Ceph environment files are included when deploying the
 Overcloud::
 
     openstack overcloud deploy --templates \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/services/ceph-mds.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-mds.yaml \
     -e /usr/share/openstack-tripleo-heat-templates/environments/manila-cephfsnative-config.yaml
 
 .. note::

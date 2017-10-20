@@ -424,13 +424,13 @@ configured for the virtual environment.  To customize this, see the output of::
   of Ceph for Glance, Cinder, Nova or all of them. To do so, use the
   following arguments when deploying::
 
-      --ceph-storage-scale <number of nodes> -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+      --ceph-storage-scale <number of nodes> -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml
 
   When deploying Ceph without dedicated CephStorage nodes, opting for an HCI
   architecture instead, where the CephOSD service is colocated with the
   NovaCompute service on the Compute nodes, use the following arguments::
 
-      -e /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/storage-environment.yaml
+      -e /usr/share/openstack-tripleo-heat-templates/environments/hyperconverged-ceph.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml
 
   The `hyperconverged-ceph.yaml` environment file will also enable a port on the
   `StorageMgmt` network for the Compute nodes. This will be the Ceph private

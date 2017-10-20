@@ -94,7 +94,7 @@ Enable latest RDO Trunk Delorean repository only for the |project| packages
  sudo sed -i 's/\[delorean\]/\[delorean-current\]/' /etc/yum.repos.d/delorean-current.repo
  sudo /bin/bash -c "cat <<EOF>>/etc/yum.repos.d/delorean-current.repo
 
- includepkgs=diskimage-builder,instack,instack-undercloud,os-apply-config,os-collect-config,os-net-config,os-refresh-config,python-tripleoclient,openstack-tripleo-*,openstack-puppet-modules,puppet-*
+ includepkgs=diskimage-builder,instack,instack-undercloud,os-apply-config,os-collect-config,os-net-config,os-refresh-config,python-tripleoclient,openstack-tripleo-*,puppet-*
  EOF"
 
 Enable the Delorean Deps repository

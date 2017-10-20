@@ -204,9 +204,6 @@ Add the ironic environment file when deploying::
     so feel free to set ``ComputeCount: 0`` in your environment file, if you
     don't need them.
 
-.. _driver configuration guide: https://docs.openstack.org/project-install-guide/baremetal/draft/enabling-drivers.html
-.. _driver-specific documentation: https://docs.openstack.org/developer/ironic/deploy/drivers.html
-
 ~~~~~~~~~~~~~~~~~~~
 
 Check that Ironic works by connecting to the overcloud and trying to list the
@@ -342,8 +339,9 @@ Creating flavors and host aggregates
 As usual with OpenStack, you need to create at least one flavor to be used
 during deployment. As bare metal resources are inherently not divisible,
 the flavor will set minimum requirements (CPU count, RAM and disk sizes) that
-a node must fulfil. Creating a single flavor is sufficient for the
-simplest case::
+a node must fulfil, see `bare metal flavor documentation`_ for details.
+
+Creating a single flavor is sufficient for the simplest case::
 
     source overcloudrc
     openstack flavor create --ram 1024 --disk 20 --vcpus 1 baremetal
@@ -388,8 +386,7 @@ on the undercloud, for example::
 This command creates a so called *partition image*, i.e. an image containing
 only root partition. Ironic also supports *whole disk images*, i.e. images
 with the whole partition table embedded. This may be the only option when
-running non-Linux images. Please check `Ironic images documentation
-<http://docs.openstack.org/developer/ironic/deploy/install-guide.html#image-requirements>`_
+running non-Linux images. Please check the bare metal `images documentation`_
 for more details on building and using images.
 
 Three components are created for every partition image: the main image with
@@ -432,9 +429,7 @@ In the future some of this data will be provided by the introspection process,
 which is not currently available in the overcloud.
 
 This guide uses inventory files to enroll nodes. Alternatively, you can enroll
-nodes directly from CLI, see `Ironic enrollment documentation`_ for details.
-
-.. _Ironic enrollment documentation: https://docs.openstack.org/project-install-guide/baremetal/draft/enrollment.html
+nodes directly from CLI, see the `enrollment documentation`_ for details.
 
 Preparing inventory
 ~~~~~~~~~~~~~~~~~~~
@@ -472,8 +467,7 @@ overcloud`_.
 The ``root_device`` property is optional, but it's highly recommended
 to set it if the bare metal node has more than one hard drive.
 There are several properties that can be used instead of the serial number
-to designate the root device, see `Ironic root device hints documentation
-<http://docs.openstack.org/developer/ironic/deploy/install-guide.html#specifying-the-disk-for-deployment>`_
+to designate the root device, see the `root device hints documentation`_
 for details.
 
 Enrolling nodes
@@ -660,3 +654,11 @@ This instance gets scheduled on a virtual host::
     | OS-EXT-SRV-ATTR:host                | overcloud-novacompute-0.localdomain |
     | OS-EXT-SRV-ATTR:hypervisor_hostname | overcloud-novacompute-0.localdomain |
     +-------------------------------------+-------------------------------------+
+
+
+.. _driver configuration guide: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html
+.. _driver-specific documentation: https://docs.openstack.org/ironic/latest/admin/drivers.html
+.. _bare metal flavor documentation: https://docs.openstack.org/ironic/latest/install/configure-nova-flavors.html
+.. _enrollment documentation: https://docs.openstack.org/ironic/latest/install/enrollment.html
+.. _root device hints documentation: https://docs.openstack.org/ironic/latest/install/advanced.html#specifying-the-disk-for-deployment-root-device-hints
+.. _images documentation: https://docs.openstack.org/ironic/latest/install/configure-glance-images.html

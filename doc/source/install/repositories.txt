@@ -79,6 +79,9 @@
            sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
            sudo sed -i -e 's%gpgcheck=.*%gpgcheck=0%' /etc/yum.repos.d/CentOS-Ceph-Jewel.repo
 
+.. warning::
+   The remaining repositories configuration steps below should not be done for stable
+   releases!
 
 Enable last known good RDO Trunk Delorean repository for core openstack packages
 

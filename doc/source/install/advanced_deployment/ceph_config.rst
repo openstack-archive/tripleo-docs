@@ -32,11 +32,14 @@ like the following::
 
     openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml
 
-When using ceph-ansible to deploy Ceph in containers, it is also
-necessary to set the URL for the docker image to use. For example::
+When using ceph-ansible to deploy Ceph in containers, the process
+described in the :ref:`prepare-environment-containers` documentation
+will configure the deployment to use the appropriate Ceph docker
+image. However, it is also possible to override the default docker
+image. For example::
 
   parameter_defaults:
-    DockerCephDaemonImage: ceph/daemon:tag-build-master-jewel-centos-7
+    DockerCephDaemonImage: ceph/daemon:tag-stable-3.0-jewel-centos-7
 
 In both the puppet-ceph and ceph-ansible examples above, at least one
 Ceph storage node is required. The following example will configure

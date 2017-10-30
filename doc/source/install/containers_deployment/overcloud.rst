@@ -50,13 +50,13 @@ with container images from RDO docker registry::
     openstack overcloud container image prepare \
       --namespace trunk.registry.rdoproject.org/master \
       --tag tripleo-ci-testing \
-      --env-file ~/docker_registry.yaml
+      --output-env-file ~/docker_registry.yaml
 
-The options ``--namespace master`` and ``--tag tripleo-ci-testing``
-will typically be replaced with values specific to the environment. You
-may wish to use ``tripleo-passed-ci`` for a more stable set of containers.
-Run with ``--help`` to see the other options available for controlling
-what is generated.
+The options ``--namespace trunk.registry.rdoproject.org/master`` and ``--tag
+tripleo-ci-testing`` will typically be replaced with values specific to the
+environment. You may wish to use ``tripleo-passed-ci`` for a more stable set of
+containers.  Run with ``--help`` to see the other options available for
+controlling what is generated.
 
 For production deployments (or for testing upgrades and rollbacks) stable tags
 like `passed-ci` should never be used, instead explicit versioned tags are
@@ -83,21 +83,19 @@ pull and push diestinations::
       --namespace trunk.registry.rdoproject.org/master \
       --tag tripleo-ci-testing \
       --push-destination 192.168.24.1:8787 \
-      --images-file overcloud_containers.yaml
+      --output-images-file overcloud_containers.yaml
 
 It is possible to limit the output to only the images that are going to be used
 in the deployment by specifying the heat environment files with the
-``--service-environment-file`` option and the roles file with the
-``--roles-file`` option.
+``--environment-file`` option and the roles file with the ``--roles-file``
+option.
 
 Then upload the images to the local registry using the generated file::
 
     openstack overcloud container image upload --config-file overcloud_containers.yaml
 
-Or use ``kolla-build`` to build and push the images yourself.  This is useful
-if you wish to build a new container or modify an existing one::
-
-    kolla-build --base centos --type binary --namespace master --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
+Or :ref:`build and push the images <build_container_images>` yourself.  This is
+useful if you wish to customize the containers or modify an existing one.
 
 The command ``openstack overcloud container image prepare`` then needs to be
 called again to generate the `~/docker_registry.yaml` file that specifies the
@@ -105,8 +103,8 @@ containers available in the local registry::
 
     openstack overcloud container image prepare \
       --namespace 192.168.24.1:8787/master \
-      --tag latest \
-      --env-file ~/docker_registry.yaml
+      --tag tripleo-ci-testing \
+      --output-env-file ~/docker_registry.yaml
 
 For development we also set the registry as insecure so we do not need to deal
 with TLS configurations::

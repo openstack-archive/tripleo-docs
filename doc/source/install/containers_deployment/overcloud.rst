@@ -108,12 +108,6 @@ containers available in the local registry::
       --tag latest \
       --env-file ~/docker_registry.yaml
 
-For development we also set the registry as insecure so we do not need to deal
-with TLS configurations::
-
-    echo "  DockerInsecureRegistryAddress: 192.168.24.1:8787" >> \
-      ~/docker_registry.yaml
-
 
 Deploying the containerized Overcloud
 -------------------------------------

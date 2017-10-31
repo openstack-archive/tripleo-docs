@@ -104,7 +104,7 @@ similar to the containerized overcloud case, see
 :ref:`prepare-environment-containers`. The simplified command looks like::
 
     $ openstack overcloud container image prepare \
-      --env-file $HOME/docker_registry.yaml
+      --output-env-file $HOME/docker_registry.yaml
 
 Deploying the undercloud
 ~~~~~~~~~~~~~~~~~~~~~~~~

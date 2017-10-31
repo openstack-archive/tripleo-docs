@@ -1,6 +1,8 @@
 Integrating 3rd Party Containers in TripleO
 ===========================================
 
+.. _build_container_images:
+
 Building Containers
 -------------------
 

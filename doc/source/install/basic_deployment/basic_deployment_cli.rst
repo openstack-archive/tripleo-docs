@@ -279,6 +279,9 @@ as a root device. Please see :ref:`root_device` for details.
    across rebuilds. Make sure to wipe the previous installation before
    rebuilding in this case.
 
+Finally, if you want your nodes to boot in the UEFI mode, additional steps may
+have to be taken - see :doc:`../advanced_deployment/uefi_boot` for details.
+
 .. warning::
    It's not recommended to delete nodes and/or rerun this command after
    you have proceeded to the next steps. Particularly, if you start introspection

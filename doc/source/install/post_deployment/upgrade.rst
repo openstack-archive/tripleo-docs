@@ -491,6 +491,20 @@ Upgrading the Overcloud to Newton and earlier
       into one of the controllers and running `sudo pcs cluster start
       --all`.
 
+   .. note::
+
+      After this step, or if this step failed with the error: `ERROR:
+      upgrade cannot start with some cluster nodes being
+      offlineAfter`, it's possible that some pacemaker resources needs
+      to be clean.  Check the failed actions and clean them by running
+      on *only one* controller node as root::
+
+          pcs status
+          pcs resource cleanup
+
+      It can take few minutes for the cluster to go back to a “normal”
+      state as displayed by `crm_mon`.  This is expected.
+
 #. Upgrade ceph storage nodes
 
    If the deployment has any ceph storage nodes, upgrade them
@@ -548,6 +562,19 @@ Upgrading the Overcloud to Newton and earlier
       openstack overcloud deploy --templates \
           -e <full environment> \
           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
+
+
+   .. note::
+
+    After the converge step, it's possible that some pacemaker
+    resources needs to be cleaned.  Check the failed actions and clean
+    them by running on *only one* controller as root::
+
+      pcs status
+      pcs resource cleanup
+
+    It can take few minutes for the cluster to go back to a “normal”
+    state as displayed by `crm_mon`.  This is expected.
 
 
 .. admonition:: Mitaka to Newton

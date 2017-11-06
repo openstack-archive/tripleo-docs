@@ -8,4 +8,5 @@ Documentation of developer-specific options in |project|.
 
    tripleo.sh
    tht_walkthrough/tht_walkthrough
+   upgrades/upgrades
    release

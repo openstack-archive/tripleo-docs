@@ -5,15 +5,23 @@ This documentation explains installing Ironic for providing bare metal
 instances in the overcloud to end users. This feature is supported starting
 with Newton.
 
-You need at least 3 nodes to use bare metal provisioning: one for the
-undercloud, one for the controller and one for the actual instance.
-This guide assumes using both virtual and bare metal computes, so to follow it
-you need at least one more node, 4 in total.
+Architecture and requirements
+-----------------------------
+
+By default, TripleO installs ironic API and conductor services on the
+controller nodes. In an HA configuration the 3 conductor services form a hash
+ring and balance the nodes across it. For a really big bare metal cloud it's
+highly recommended to move ironic-conductor services to separate roles, use
+the `IronicConductor role shipped with TripleO`_ as an example.
+
+.. note::
+    Ironic services and API in the overcloud and in the undercloud are
+    completely independent.
 
 It is recommended to have at least 12 GiB of RAM on the undercloud and
-at least 8 GiB of RAM on the controllers. The controllers should have enough
-disk space to keep a cache of user instance images, at least 50 GiB is
-recommended.
+controllers. The controllers (or separate ironic-conductor roles) should have
+enough disk space to keep a cache of user instance images, at least 50 GiB
+is recommended.
 
 It's also highly recommended that you use at least two networks:
 
@@ -22,15 +30,8 @@ It's also highly recommended that you use at least two networks:
 * Overcloud provisioning network (connects overcloud nodes and tenant bare
   metal instances)
 
-This guide, however, uses one network for simplicity. If you encounter weird
-DHCP, PXE or networking issues with such a single-network configuration, try
-shutting down the introspection DHCP server on the undercloud after the initial
-introspection is finished::
-
-        sudo systemctl stop openstack-ironic-inspector-dnsmasq
-
-Preparing environment
----------------------
+Preparing undercloud
+--------------------
 
 If you already have an ``instackenv.json`` file with all nodes prepared, you
 might want to leave some of the nodes for overcloud instances. E.g. if you have
@@ -44,7 +45,7 @@ TripleO workflows. E.g. for node using IPMI::
 
     jq '.nodes[2:3] | {nodes: map({driver: .pm_type, name: .name,
         driver_info: {ipmi_username: .pm_user, ipmi_address: .pm_addr,
-                      ipmi_password: .pm_password},
+                      ipmi_password: .pm_password, ipmi_port: .pm_port},
         properties: {cpus: .cpu, cpu_arch: .arch,
                      local_gb: .disk, memory_mb: .memory},
         ports: .mac | map({address: .})})}' instackenv.json > overcloud-nodes.yaml
@@ -71,53 +72,29 @@ Then enroll only ``undercloud.json`` in your undercloud::
     If you used **tripleo-quickstart**, you may have to delete the nodes that
     did not end up in undercloud.json.
 
-Configuring and deploying overcloud
------------------------------------
+Configuring and deploying ironic
+--------------------------------
 
-A few things can be configured in advance for overcloud Ironic in an
-environment file (``ironic-config.yaml`` in this guide):
+Ironic can be installed by including one of the environment files shipped with
+TripleO, however, in most of the cases you'll want to tweak certain parameters.
+This section assumes that a custom environment file called
+``ironic-config.yaml`` exists. Please pay particular attention to parameters
+described in `Essential configuration`_.
 
-* ``IronicEnabledDrivers`` parameter sets the list of enabled drivers.
-  The most often used bare metal driver is ``pxe_ipmitool``. Also enabled
-  by default are ``pxe_ilo`` and ``pxe_drac`` drivers.
+Essential configuration
+~~~~~~~~~~~~~~~~~~~~~~~
 
-  Other drivers might require additional configuration to work properly.
-  Check `driver configuration guide`_ and `driver-specific documentation`_
-  for more details.
+The following parameters should be configured in advance for overcloud Ironic
+in an environment file:
 
-  .. admonition:: Virtual
-      :class: virtual
+* ``IronicEnabledHardwareTypes`` configures which hardware types will be
+  supported in Ironic.
 
-      Starting with the Ocata release, testing on a virtual environment
-      requires using :doc:`../environments/virtualbmc`.
-
-      .. admonition:: Stable Branches
-         :class: stable
-
-         Before the Ocata release, a separate ``pxe_ssh`` driver has to be
-         enabled for virtual testing, for example::
-
-              parameter_defaults:
-                  IronicEnabledDrivers:
-                      - pxe_ssh
-
-         If you used **tripleo-quickstart** to build your environment, the
-         resulting configuration is a bit different::
-
-              parameter_defaults:
-                  IronicEnabledDrivers:
-                      - pxe_ssh
-                  ControllerExtraConfig:
-                      ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
-
-* ``IronicEnabledHardwareTypes`` is available since the Pike release, and
-  allows setting enabled hardware types - the new generation of Ironic drivers.
-  Check `driver configuration guide`_ and `driver-specific documentation`_
-  for more details.
-
-  By default, the ``ipmi`` hardware type is enabled, and its defaults roughly
-  correspond to ones of the ``pxe_ipmitool`` driver (more precisely, of the
-  ``pxe_ipmitool_socat`` driver).
+  .. note::
+    Hardware types are the new generation of Ironic drivers. For example,
+    the ``ipmi`` hardware type roughly corresponds to the ``pxe_ipmitool``
+    driver. Check `driver configuration guide`_ and `driver-specific
+    documentation`_ for more details.
 
   When enabling hardware types, you usually have to enable more hardware
   interfaces that these types are compatible with. For example, when enabling
@@ -135,38 +112,41 @@ environment file (``ironic-config.yaml`` in this guide):
             - ipmitool
             - redfish
 
-* ``NovaSchedulerDefaultFilters`` configures available
-  scheduler filters. For a hybrid deployment it's important to prepend
-  ``AggregateInstanceExtraSpecsFilter`` to the default list::
+  Some drivers might require additional configuration to work properly. Check
+  `driver configuration guide`_ and `driver-specific documentation`_ for more
+  details.
 
-        parameter_defaults:
-            NovaSchedulerDefaultFilters:
-                - RetryFilter
-                - AggregateInstanceExtraSpecsFilter
-                - AvailabilityZoneFilter
-                - RamFilter
-                - DiskFilter
-                - ComputeFilter
-                - ComputeCapabilitiesFilter
-                - ImagePropertiesFilter
+  By default, the ``ipmi`` hardware type is enabled.
 
-  For a deployment with **only** bare metal hosts you might want to replace
-  some filters with their ``Exact`` counterparts. In such case the scheduler
-  will require a strict match between bare metal nodes and flavors. Otherwise,
-  any bare metal node with higher or equal specs would match.
+  .. admonition:: Stable Branches
+     :class: stable
 
-  ::
+     The ``IronicEnabledDrivers`` option can also be used before the Queens
+     release. It sets the list of enabled classic drivers. The most often used
+     bare metal driver is ``pxe_ipmitool``. Also enabled by default are
+     ``pxe_ilo`` and ``pxe_drac`` drivers.
 
-        parameter_defaults:
-            NovaSchedulerDefaultFilters:
-                - RetryFilter
-                - AvailabilityZoneFilter
-                - ExactRamFilter
-                - ExactDiskFilter
-                - ExactCoreFilter
-                - ComputeFilter
-                - ComputeCapabilitiesFilter
-                - ImagePropertiesFilter
+     .. admonition:: Virtual
+         :class: virtual
+
+         Starting with the Ocata release, testing on a virtual environment
+         requires using :doc:`../environments/virtualbmc`.
+
+         Before the Ocata release, a separate ``pxe_ssh`` driver has to be
+         enabled for virtual testing, for example::
+
+              parameter_defaults:
+                  IronicEnabledDrivers:
+                      - pxe_ssh
+
+         If you used **tripleo-quickstart** to build your environment, the
+         resulting configuration is a bit different::
+
+              parameter_defaults:
+                  IronicEnabledDrivers:
+                      - pxe_ssh
+                  ControllerExtraConfig:
+                      ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
 
 * ``IronicCleaningDiskErase`` configures erasing hard drives
   before the first and after every deployment. There are two recommended
@@ -179,6 +159,61 @@ environment file (``ironic-config.yaml`` in this guide):
       It is highly recommended to set this parameter to ``metadata``
       for virtual environments, as full cleaning can be extremely slow there.
 
+* ``NovaSchedulerDefaultFilters`` configures available scheduler filters.
+  For a hybrid deployment it's important to prepend
+  ``AggregateInstanceExtraSpecsFilter`` to the default list::
+
+        parameter_defaults:
+            NovaSchedulerDefaultFilters:
+                - RetryFilter
+                - AggregateInstanceExtraSpecsFilter
+                - AvailabilityZoneFilter
+                - ComputeFilter
+                - ComputeCapabilitiesFilter
+                - ImagePropertiesFilter
+
+  .. admonition:: Stable Branches
+     :class: stable
+
+     Before the Pike release, this list had to also contain ``RamFilter`` and
+     ``DiskFilter``::
+
+        parameter_defaults:
+            NovaSchedulerDefaultFilters:
+                - RetryFilter
+                - AggregateInstanceExtraSpecsFilter
+                - AvailabilityZoneFilter
+                - RamFilter
+                - DiskFilter
+                - ComputeFilter
+                - ComputeCapabilitiesFilter
+                - ImagePropertiesFilter
+
+     For a deployment with **only** bare metal hosts you might want
+     to replace the filters with their ``Exact`` counterparts. In such case
+     the scheduler will require a strict match between bare metal nodes
+     and flavors. Otherwise, any bare metal node with higher or equal specs
+     would match.
+
+     ::
+
+           parameter_defaults:
+               NovaSchedulerDefaultFilters:
+                   - RetryFilter
+                   - AvailabilityZoneFilter
+                   - ExactRamFilter
+                   - ExactDiskFilter
+                   - ExactCoreFilter
+                   - ComputeFilter
+                   - ComputeCapabilitiesFilter
+                   - ImagePropertiesFilter
+
+     The ``Exact`` filters are deprecated as of the Pike release and will be
+     removed in Queens.
+
+Additional configuration
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 * ``IronicCleaningNetwork`` sets the name or UUID of the **overcloud** network
   to use for node cleaning. Initially is set to ``provisioning`` and should be
   set to an actual UUID later when `Configuring cleaning`_.
@@ -189,9 +224,46 @@ environment file (``ironic-config.yaml`` in this guide):
       In the Newton release this parameter was not available, and no default
       value was set for the cleaning network.
 
+* ``IronicDefaultBootOption`` specifies whether the instances will boot from
+  local disk (``local``) or from PXE or iPXE (``netboot``). This parameter was
+  introduced in the Pike release with the default value of ``local``. Before
+  that ``netboot`` was used by default.
+
+  .. note::
+    This value can be overriden per node by setting the ``boot_option``
+    capability on both the node and a flavor.
+
+* ``IronicDefaultNetworkInterface`` specifies the network management
+  implementation for bare metal nodes. The default value of ``flat`` means
+  that the provisioning network is shared between all nodes, and will also be
+  available to tenants.
+
+  If you configure an ML2 mechanism driver that supports bare metal port
+  binding (networking-fujitsu, networking-cisco and some others), then you can
+  use the ``neutron`` implementation. In that case, Ironic and Neutron will
+  fully manage networking for nodes, including plugging and unplugging
+  the provision and cleaning network. The ``IronicProvisioningNetwork``
+  parameter has to be configured in a similar way to ``IronicCleaningNetwork``
+  (and in most cases to the same value). See the `multi-tenant networking
+  documentation`_ for more details.
+
+  .. note::
+    Please check with your switch vendor to learn if your switch and its
+    ML2 driver support bare metal port binding.
+
+    Alternatively, you can use the networking-generic-switch_ ML2 plugin. It
+    supports a large variety of switch vendors and models, but it's not
+    currently supported by TripleO out-of-box.
+
+  This parameter was introduced in the Pike release, and only the ``flat``
+  networking is covered in this guide.
+
 * ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
   it's on by default. Also iPXE is required for UEFI boot support.
+
+Deployment
+~~~~~~~~~~
 
 Add the ironic environment file when deploying::
 
@@ -199,12 +271,17 @@ Add the ironic environment file when deploying::
         -e /usr/share/openstack-tripleo-heat-templates/environments/services/ironic.yaml \
         -e ironic-config.yaml
 
+To deploy Ironic in containers (starting with the Pike release), use
+``/usr/share/openstack-tripleo-heat-templates/environments/services-docker/ironic.yaml``
+instead.
+
 .. note::
     We don't require any virtual compute nodes for the bare metal only case,
     so feel free to set ``ComputeCount: 0`` in your environment file, if you
     don't need them.
 
-~~~~~~~~~~~~~~~~~~~
+Validation
+~~~~~~~~~~
 
 Check that Ironic works by connecting to the overcloud and trying to list the
 nodes (you should see an empty response, but not an error)::
@@ -222,7 +299,11 @@ You can also check the enabled driver list::
     | pxe_drac            | overcloud-controller-0. |
     | pxe_ilo             | overcloud-controller-0. |
     | pxe_ipmitool        | overcloud-controller-0. |
+    | redfish             | overcloud-controller-0. |
     +---------------------+-------------------------+
+
+.. note::
+    This commands shows both hardware types and classic drivers combined.
 
 For HA configuration you should see all three controllers::
 
@@ -239,6 +320,25 @@ For HA configuration you should see all three controllers::
 If this list is empty or does not show any of the controllers, then the
 ``openstack-ironic-conductor`` service on this controller failed to start.
 The likely cause is missing dependencies for vendor drivers.
+
+Post-deployment configuration
+-----------------------------
+
+In this section we configure OpenStack for both bare metal and virtual
+machines provisioning.
+
+You need at least 3 nodes to use bare metal provisioning: one for the
+undercloud, one for the controller and one for the actual instance.
+This guide assumes using both virtual and bare metal computes, so to follow it
+you need at least one more node, 4 in total for a non-HA configuration or 6
+for HA.
+
+This guide uses one network for simplicity. If you encounter weird DHCP, PXE
+or networking issues with such a single-network configuration, try shutting
+down the introspection DHCP server on the undercloud after the initial
+introspection is finished::
+
+        sudo systemctl stop openstack-ironic-inspector-dnsmasq
 
 Preparing networking
 ~~~~~~~~~~~~~~~~~~~~
@@ -264,7 +364,9 @@ parameters::
         --allocation-pool start=192.168.24.41,end=192.168.24.100 provisioning-subnet
 
 .. warning::
-    Network types other than "flat" are not supported.
+    Network types other than "flat" are not supported when using ``flat``
+    bare metal networking implementation (see `Additional configuration`_
+    above for more details).
 
 We will use this network for bare metal instances (both for provisioning and
 as a tenant network), as well as an external network for virtual instances.
@@ -333,9 +435,8 @@ You can use the same images you already have on the undercloud::
     These commands assume that the images are in the home directory, which is
     often the case for TripleO.
 
-Creating flavors and host aggregates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+Creating flavors
+~~~~~~~~~~~~~~~~
 As usual with OpenStack, you need to create at least one flavor to be used
 during deployment. As bare metal resources are inherently not divisible,
 the flavor will set minimum requirements (CPU count, RAM and disk sizes) that
@@ -346,7 +447,19 @@ Creating a single flavor is sufficient for the simplest case::
     source overcloudrc
     openstack flavor create --ram 1024 --disk 20 --vcpus 1 baremetal
 
-If you don't plan on using virtual instances, this is where you can stop.
+.. note::
+    The ``disk`` argument will be used to determine the size of the root
+    partition.
+
+Optionally associate the flavor with an architecture, for example::
+
+    openstack flavor set baremetal --property cpu_arch=x86_64
+
+Creating host aggregates
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+    If you don't plan on using virtual instances, you can skip this step.
 
 For a hybrid bare metal and virtual environment, you have to set up *host
 aggregates* for virtual and bare metal hosts. We will use a property
@@ -358,7 +471,7 @@ called ``baremetal`` to link flavors to host aggregates::
 
 .. warning::
     This association won't work without ``AggregateInstanceExtraSpecsFilter``
-    enabled as described in `Configuring and deploying overcloud`_.
+    enabled as described in `Essential configuration`_.
 
 Then for all flavors you've created for virtual instances set the same
 ``baremetal`` property to ``false``, for example::
@@ -434,8 +547,8 @@ nodes directly from CLI, see the `enrollment documentation`_ for details.
 Preparing inventory
 ~~~~~~~~~~~~~~~~~~~
 
-If you have not prepared ``overcloud-nodes.yaml`` while `Preparing
-environment`_, do it now in the following format::
+Your inventory file (e.g. ``overcloud-nodes.yaml`` from `Preparing
+undercloud`_) should be in the following format::
 
     nodes:
         - name: node-0
@@ -456,7 +569,7 @@ environment`_, do it now in the following format::
 
 The ``driver`` field must be one of ``IronicEnabledDrivers`` or
 ``IronicEnabledHardwareTypes``, which we set when `Configuring and deploying
-overcloud`_.
+ironic`_.
 
 .. admonition:: Stable Branch
    :class: stable
@@ -476,7 +589,6 @@ Enrolling nodes
 The ``overcloud-nodes.yaml`` file prepared in the previous steps can now be
 imported in Ironic::
 
-    export OS_BAREMETAL_API_VERSION=1.11
     source overcloudrc
     openstack baremetal create overcloud-nodes.yaml
 
@@ -570,7 +682,7 @@ Assigning host aggregates
 
 For hybrid bare metal and virtual case you need to specify which host belongs
 to which host aggregates (``virtual`` or ``baremetal`` as created in
-`Creating flavors and host aggregates`_).
+`Creating host aggregates`_).
 
 When the default host names are used, we can take advantage of the fact
 that every virtual host will have ``compute`` in its name. All bare metal
@@ -656,9 +768,12 @@ This instance gets scheduled on a virtual host::
     +-------------------------------------+-------------------------------------+
 
 
+.. _IronicConductor role shipped with TripleO: https://git.openstack.org/cgit/openstack/tripleo-heat-templates/plain/roles/IronicConductor.yaml
 .. _driver configuration guide: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html
 .. _driver-specific documentation: https://docs.openstack.org/ironic/latest/admin/drivers.html
 .. _bare metal flavor documentation: https://docs.openstack.org/ironic/latest/install/configure-nova-flavors.html
 .. _enrollment documentation: https://docs.openstack.org/ironic/latest/install/enrollment.html
 .. _root device hints documentation: https://docs.openstack.org/ironic/latest/install/advanced.html#specifying-the-disk-for-deployment-root-device-hints
 .. _images documentation: https://docs.openstack.org/ironic/latest/install/configure-glance-images.html
+.. _multi-tenant networking documentation: https://docs.openstack.org/ironic/latest/admin/multitenancy.html
+.. _networking-generic-switch: https://github.com/openstack/networking-generic-switch

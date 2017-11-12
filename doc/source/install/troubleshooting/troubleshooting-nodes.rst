@@ -65,7 +65,7 @@ For example, a wrong MAC can be fixed in two steps:
 * Update the MAC address by running
   ::
 
-    openstack baremetal port set --address=<NEW MAC> <PORT UUID>
+    openstack baremetal port set --address <NEW MAC> <PORT UUID>
 
 A Wrong IPMI address can be fixed with the following command::
 
@@ -103,7 +103,7 @@ power management, and it gets stuck in an abnormal state.
 Ironic requires that nodes that cannot be operated normally are put in the
 maintenance mode. It is done by the following command::
 
-    openstack baremetal node maintenance set <NODE UUID> --reason="<EXPLANATION>"
+    openstack baremetal node maintenance set <NODE UUID> --reason "<EXPLANATION>"
 
 Ironic will stop checking power and health state for such nodes, and Nova will
 not pick them for deployment. Power command will still work on them, though.

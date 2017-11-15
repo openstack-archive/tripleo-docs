@@ -362,6 +362,8 @@ parameters::
     openstack subnet create --network provisioning \
         --subnet-range 192.168.24.0/24 --gateway 192.168.24.40 \
         --allocation-pool start=192.168.24.41,end=192.168.24.100 provisioning-subnet
+    openstack router create provisioning-router
+    openstack router add subnet provisioning-router provisioning-subnet
 
 .. warning::
     Network types other than "flat" are not supported when using ``flat``
@@ -767,6 +769,48 @@ This instance gets scheduled on a virtual host::
     | OS-EXT-SRV-ATTR:hypervisor_hostname | overcloud-novacompute-0.localdomain |
     +-------------------------------------+-------------------------------------+
 
+Booting a bare metal instance from a cinder volume
+--------------------------------------------------
+
+Cinder volumes can be used to back a baremetal node over iSCSI, in order to
+do this each baremetal node must first be configured to boot from a volume.
+The connector ID for each node should be unique, below we achieve this by
+incrementing the value of <NUM>::
+
+    $ openstack baremetal node set --property capabilities=iscsi_boot:true --storage-interface cinder <NODEID>
+    $ openstack baremetal volume connector create --node <NODEID> --type iqn --connector-id iqn.2010-10.org.openstack.node<NUM>
+
+The image used should be configured to boot from a iSCSI root disk, on Centos
+7 this is achieved by ensuring that the `iscsi` module is added to the ramdisk
+and passing `rd.iscsi.firmware=1` to the kernel in the grub config::
+
+    $ mkdir /tmp/mountpoint
+    $ guestmount -i -a /tmp/CentOS-7-x86_64-GenericCloud.qcow2 /tmp/mountpoint
+    $ chroot /tmp/mountpoint /bin/bash
+    chroot> mv /etc/resolv.conf /etc/resolv.conf_
+    chroot> echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    chroot> yum install -y iscsi-initiator-utils
+    chroot> mv /etc/resolv.conf_ /etc/resolv.conf
+    # Be careful here to update the correct ramdisk (check/boot/grub2/grub.cfg)
+    chroot> dracut --force --add "network iscsi" /boot/initramfs-3.10.0-693.5.2.el7.x86_64.img 3.10.0-693.5.2.el7.x86_64
+    # Edit the file /etc/default/grub and add rd.iscsi.firmware=1 to GRUB_CMDLINE_LINUX=...
+    chroot> vi /etc/default/grub
+    chroot> exit
+    $ guestunmount /tmp/mountpoint
+    $ guestfish -a /tmp/CentOS-7-x86_64-GenericCloud.qcow2 -m /dev/sda1 sh "/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
+
+.. note::
+    This image can no longer be used to do regular local boot, a situation
+    that should be fixed in future versions.
+
+This image can then be added to glance and a volume created from it::
+
+    $ openstack image create --disk-format qcow2 --container-format bare --file /tmp/CentOS-7-x86_64-GenericCloud.qcow2 centos-bfv
+    $ openstack volume create --size 10 --image centos-bfv --bootable centos-test-volume
+
+Finally this volume can be used to back a baremetal instance::
+
+    $ openstack server create --flavor baremetal --volume centos-test-volume --key default centos-test
 
 .. _IronicConductor role shipped with TripleO: https://git.openstack.org/cgit/openstack/tripleo-heat-templates/plain/roles/IronicConductor.yaml
 .. _driver configuration guide: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html

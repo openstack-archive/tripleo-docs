@@ -131,8 +131,9 @@ and are translated, when possible, into their equivalent
 
 For example, to encrypt the data stored on OSDs use the following::
 
-  CephAnsibleExtraConfig:
-    dmcrypt: true
+  parameter_defaults:
+    CephAnsibleExtraConfig:
+      dmcrypt: true
 
 The above overrides the defaults found in the
 `ceph-ansible/group_vars`_.
@@ -140,8 +141,9 @@ The above overrides the defaults found in the
 Global settings in the `ceph.conf` may be set using
 `CephConfigOverrides` like the following::
 
-  CephConfigOverrides:
-    max_open_files: 131072
+  parameter_defaults:
+    CephConfigOverrides:
+      max_open_files: 131072
 
 To specify a set of dedicated block devices to use as Ceph OSDs use
 a variation of the following::

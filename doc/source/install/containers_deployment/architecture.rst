@@ -23,30 +23,10 @@ TripleO consumes these images and takes advantage of the customization
 capabilities provided by the `Kolla`_ build tool to install some packages that
 are required by other parts of TripleO.
 
-The following template is an example of the template used for building the base
-images that are consumed by TripleO. Further customization is required for some
-of the services, like mariadb::
-
-
-    {% extends parent_template %}
-    {% set base_centos_binary_packages_append = ['puppet'] %}
-    {% set nova_scheduler_packages_append = ['openstack-tripleo-common'] %}
-
-
-.. note:: `parent_template` is the literal string to include. No need to replace
-   it.
-
-Use the following command to build an image using kolla-build and the template
-above (`template-overrides.j2`)::
-
-  $ kolla-build --base centos \
-    --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 \
-    --template-override template-overrides.j2
-
 TripleO maintains its complete list of kolla customization in the
 `tripleo-common`_ project.
 
-.. _Kolla: https://docs.openstack.org/developer/kolla/image-building.html#dockerfile-customisation
+.. _Kolla: https://docs.openstack.org/kolla/latest/admin/image-building.html#dockerfile-customisation
 .. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/container-images/tripleo_kolla_template_overrides.j2
 
 

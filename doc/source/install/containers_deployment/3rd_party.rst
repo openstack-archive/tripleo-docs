@@ -54,21 +54,38 @@ Building new containers with kolla-build
 To create new containers, or modify existing ones, you can use ``kolla-build``
 from the `Kolla`_ project to build and push the images yourself.  The command
 to build a new containers is below.  Note that this assumes you are on an
-undercloud host where the registry IP address is 192.168.24.1::
+undercloud host where the registry IP address is 192.168.24.1.
 
-    kolla-build --base centos --type binary --namespace master --registry 192.168.24.1:8787 --tag latest --template-override /usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2 --push
+Configure Kolla to build images for TripleO, in `/etc/kolla/kolla-build.conf`::
+
+  [DEFAULT]
+  base=centos
+  type=binary
+  namespace=master
+  registry=192.168.24.1:8787
+  tag=latest
+  template_override=/usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2
+  rpm_setup_config=http://trunk.rdoproject.org/centos7/current-tripleo/delorean.repo,http://trunk.rdoproject.org/centos7/delorean-deps.repo
+  push=True
+
+Use the following command to build all of the container images used in TripleO::
+
+  openstack overcloud container image build \
+        --config-file /usr/share/tripleo-common/container-images/overcloud_images.yaml
+
+Or use `kolla-build` to build the images yourself, which provides more
+flexibility and allows you to rebuild selectively just the images matching
+a given name, for example to build only the heat images with the TripleO
+customization::
+
+  kolla-build heat
 
 Notice that TripleO already uses the
 ``/usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2``
-to add or change specific aspects of the containers.  This file can be copied
-and modified to create custom containers.  The original copy of this file can
-be found in the `tripleo-common`_ repository.
-
-To build specific containers you can add a `custom` section to the kolla
-configuration.  For example, to build the cron containers you would add::
-
-    [profiles]
-    custom=cron
+to add or change specific aspects of the containers using the `kolla template
+override mechanism`_.  This file can be copied and modified to create custom
+containers.  The original copy of this file can be found in the
+`tripleo-common`_ repository.
 
 The following template is an example of the template used for building the base
 images that are consumed by TripleO. In this case we are adding the `puppet`
@@ -76,9 +93,9 @@ RPM to the base image::
 
     {% extends parent_template %}
     {% set base_centos_binary_packages_append = ['puppet'] %}
-    {% set nova_scheduler_packages_append = ['openstack-tripleo-common'] %}
 
-.. _Kolla: https://docs.openstack.org/developer/kolla/image-building.html#dockerfile-customisation
+.. _Kolla: https://github.com/openstack/kolla
+.. _kolla template override mechanism: https://docs.openstack.org/kolla/latest/admin/image-building.html#dockerfile-customisation
 .. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/container-images/tripleo_kolla_template_overrides.j2
 
 

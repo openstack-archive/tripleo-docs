@@ -394,86 +394,142 @@ Example::
     OsNetConfigImpl:
       type: OS::Heat::StructuredConfig
       properties:
+        group: script
+        config:
+          str_replace:
+            template:
+              get_file: ../../scripts/run-os-net-config.sh
+            params:
+              $network_config:
+                network_config:
+                  -
+                    type: interface
+                    name: nic1
+                    use_dhcp: false
+                    addresses:
+                      -
+                        ip_netmask:
+                          list_join:
+                            - '/'
+                            - - {get_param: ControlPlaneIp}
+                              - {get_param: ControlPlaneSubnetCidr}
+                    routes:
+                      -
+                        ip_netmask: 169.254.169.254/32
+                        next_hop: {get_param: EC2MetadataIp}
+                  -
+                    type: ovs_bridge
+                    name: bridge_name
+                    dns_servers: {get_param: DnsServers}
+                    members:
+                      -
+                        type: ovs_bond
+                        name: bond1
+                        ovs_options: {get_param: BondInterfaceOvsOptions}
+                        members:
+                          -
+                            type: interface
+                            name: nic3
+                            primary: true
+                          -
+                            type: interface
+                            name: nic4
+                      -
+                        type: vlan
+                        device: bond1
+                        vlan_id: {get_param: ExternalNetworkVlanID}
+                        addresses:
+                          -
+                            ip_netmask: {get_param: ExternalIpSubnet}
+                        routes:
+                          -
+                            ip_netmask: 0.0.0.0/0
+                            next_hop: {get_param: ExternalInterfaceDefaultRoute}
+                      -
+                        type: vlan
+                        device: bond1
+                        vlan_id: {get_param: InternalApiNetworkVlanID}
+                        addresses:
+                        -
+                          ip_netmask: {get_param: InternalApiIpSubnet}
+                      -
+                        type: vlan
+                        device: bond1
+                        vlan_id: {get_param: StorageNetworkVlanID}
+                        addresses:
+                        -
+                          ip_netmask: {get_param: StorageIpSubnet}
+                      -
+                        type: vlan
+                        device: bond1
+                        vlan_id: {get_param: StorageMgmtNetworkVlanID}
+                        addresses:
+                        -
+                          ip_netmask: {get_param: StorageMgmtIpSubnet}
+                      -
+                        type: vlan
+                        device: bond1
+                        vlan_id: {get_param: TenantNetworkVlanID}
+                        addresses:
+                        -
+                          ip_netmask: {get_param: TenantIpSubnet}
+
+      outputs:
+        OS::stack_id:
+          description: The OsNetConfigImpl resource.
+          value: {get_resource: OsNetConfigImpl}
+
+.. note::
+  If you are using network interface configuration templates from versions
+  prior to Ocata, you may need to make updates to the templates. See below.
+
+Updating Existing Network Interface Configuration Templates
+-----------------------------------------------------------
+
+  Prior to the Ocata release, the network interface configuration files used
+  a different mechanism for running os-net-config. Ocata introduced the
+  run-os-net-config.sh script, and the old mechanism was deprecated. The
+  deprecated mechanism was removed in Queens, so older templates must be
+  updated. The resource definition must be changed, and {get_input: bridge_name} is
+  replaced with the special token "bridge_name", which will be replaced with
+  the value of the NeutronPhysicalBridge.
+
+Old Header::
+
+    resources:
+    OsNetConfigImpl:
+      type: OS::Heat::StructuredConfig
+      properties:
         group: os-apply-config
         config:
           os_net_config:
             network_config:
-              -
-                type: interface
-                name: nic1
-                use_dhcp: false
-                addresses:
-                  -
-                    ip_netmask:
-                      list_join:
-                        - '/'
-                        - - {get_param: ControlPlaneIp}
-                          - {get_param: ControlPlaneSubnetCidr}
-                routes:
-                  -
-                    ip_netmask: 169.254.169.254/32
-                    next_hop: {get_param: EC2MetadataIp}
-              -
-                type: ovs_bridge
-                name: {get_input: bridge_name}
-                dns_servers: {get_param: DnsServers}
-                members:
-                  -
-                    type: ovs_bond
-                    name: bond1
-                    ovs_options: {get_param: BondInterfaceOvsOptions}
-                    members:
-                      -
-                        type: interface
-                        name: nic3
-                        primary: true
-                      -
-                        type: interface
-                        name: nic4
-                  -
-                    type: vlan
-                    device: bond1
-                    vlan_id: {get_param: ExternalNetworkVlanID}
-                    addresses:
-                      -
-                        ip_netmask: {get_param: ExternalIpSubnet}
-                    routes:
-                      -
-                        ip_netmask: 0.0.0.0/0
-                        next_hop: {get_param: ExternalInterfaceDefaultRoute}
-                  -
-                    type: vlan
-                    device: bond1
-                    vlan_id: {get_param: InternalApiNetworkVlanID}
-                    addresses:
-                    -
-                      ip_netmask: {get_param: InternalApiIpSubnet}
-                  -
-                    type: vlan
-                    device: bond1
-                    vlan_id: {get_param: StorageNetworkVlanID}
-                    addresses:
-                    -
-                      ip_netmask: {get_param: StorageIpSubnet}
-                  -
-                    type: vlan
-                    device: bond1
-                    vlan_id: {get_param: StorageMgmtNetworkVlanID}
-                    addresses:
-                    -
-                      ip_netmask: {get_param: StorageMgmtIpSubnet}
-                  -
-                    type: vlan
-                    device: bond1
-                    vlan_id: {get_param: TenantNetworkVlanID}
-                    addresses:
-                    -
-                      ip_netmask: {get_param: TenantIpSubnet}
 
-  outputs:
-    OS::stack_id:
-      description: The OsNetConfigImpl resource.
-      value: {get_resource: OsNetConfigImpl}
+New Header::
+
+  resources:
+  OsNetConfigImpl:
+    type: OS::Heat::SoftwareConfig
+      properties:
+      group: script
+      config:
+        str_replace:
+          template:
+            # This filename can be relative to template root or absolute
+            get_file: ../../scripts/run-os-net-config.sh
+          params:
+            $network_config:
+              network_config:
+
+Old Bridge Definition::
+
+  - type: ovs_bridge
+    name: {get_input: bridge_name}
+
+New Bridge Definition::
+
+  - type: ovs_bridge
+    name: bridge_name
 
 Configuring Interfaces
 ----------------------
@@ -493,7 +549,7 @@ Example::
               defroute: false
             -
               type: ovs_bridge
-              name: {get_input: bridge_name}
+              name: bridge_name
               members:
                 -
                   type: ovs_bond
@@ -629,7 +685,7 @@ Example::
 
               -
                 type: ovs_bridge
-                name: {get_input: bridge_name}
+                name: bridge_name
                 dns_servers: {get_param: DnsServers}
                 addresses:
                   -
@@ -777,61 +833,6 @@ Example::
   that service will be placed on the Provisioning network. To avoid that,
   make sure that each entry points to a valid network.
 
-Updating Existing Configuration Templates To Support New Parameters
--------------------------------------------------------------------
-
-The most recent versions of TripleO include support for static Provisioning IPs.
-The systems will boot via DHCP during deployment, and the DHCP address assigned
-is converted to a static IP. The following parameters have been added to support
-static IP addressing on the provisioning network:
-
-* ControlPlaneIp
-* ControlPlaneSubnetCidr
-* DnsServers
-* EC2MetadataIp
-
-These changes require additional parameters for setting static IPs, routes,
-and DNS servers. When using static Provisioning IPs, the network environment
-file now needs to contain additional resource defaults (customize to match
-the environment)::
-
-  parameter_defaults:
-    # CIDR subnet mask length for provisioning network
-    ControlPlaneSubnetCidr: '24'
-    # Gateway router for the provisioning network (or Undercloud IP)
-    ControlPlaneDefaultRoute:10.8.146.254
-    # Generally the IP of the Undercloud
-    EC2MetadataIp: 10.8.146.1
-    # Define the DNS servers (maximum 2) for the overcloud nodes
-    DnsServers:['8.8.8.8','8.8.4.4']
-
-The NIC config templates for each role now include additional parameters in the
-parameters section. Whether the provisioning interface will use DHCP or static
-IPs, these parameters are needed in any case::
-
-  parameters:
-    ControlPlaneIp:
-      default: ''
-      description: IP address/subnet on the ctlplane network
-      type: string
-    ControlPlaneSubnetCidr: # Override this via parameter_defaults
-      default: '24'
-      description: The subnet CIDR of the control plane network.
-      type: string
-    DnsServers: # Override this via parameter_defaults
-      default: []
-      description: A list of DNS servers (2 max) to add to resolv.conf.
-      type: json
-    EC2MetadataIp: # Override this via parameter_defaults
-      description: The IP address of the EC2 metadata server.
-      type: string
-
-If you are customizing the templates in the ``network/config`` subdirectory of
-the TripleO Heat Templates, you will find that they have been updated with
-these parameters. If you have NIC configuration templates from an older version
-of TripleO Heat Templates, then you will need to add these parameters and
-modify the provisioning network to take advantage of static IP addresses.
-
 Deploying the Overcloud With Network Isolation
 ----------------------------------------------
 
@@ -863,7 +864,7 @@ following parameter values::
 
     NeutronNetworkType: vlan
     NeutronBridgeMappings: 'datacentre:br-ex'
-    NeutronNetworkVLANRanges: 'datacentre:30:100'
+    NeutronNetworkVLANRanges: 'datacentre:100:199'
 
 If a dedicated interface or bridge is used for tenant VLANs or provider
 networks, it should be included in the bridge mappings. For instance, if the
@@ -871,7 +872,7 @@ tenant VLANs were on a bridge named ``br-vlan``, then use these values in
 ``network-environment.yaml``::
 
     NeutronBridgeMappings: 'datacentre:br-ex,tenant:br-vlan'
-    NeutronNetworkVLANRanges: 'tenant:30:100'
+    NeutronNetworkVLANRanges: 'tenant:200:299'
 
 .. note::
 
@@ -922,9 +923,9 @@ name that was created in the previous step (``ext-net``)::
 
     neutron subnet-create --name ext-subnet \
     --enable_dhcp=False \
-    --allocation-pool start=10.8.148.50,end=10.8.148.100 \
-    --gateway 10.8.148.254 \
-    ext-net 10.8.148.0/24
+    --allocation-pool start=10.0.2.50,end=10.0.2.100 \
+    --gateway 10.0.2.254 \
+    ext-net 10.0.2.0/24
 
 Creating Provider Networks
 --------------------------
@@ -955,6 +956,6 @@ to a provider network if Neutron is to provide DHCP services to tenant VMs::
 
     neutron subnet-create --name provider-subnet \
     --enable_dhcp=True \
-    --allocation-pool start=10.9.101.50,end=10.9.101.100 \
-    --gateway 10.9.101.254 \
-    provider_network 10.9.101.0/24
+    --allocation-pool start=10.0.3.50,end=10.0.3.100 \
+    --gateway 10.0.3.254 \
+    provider_network 10.0.3.0/24

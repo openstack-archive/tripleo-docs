@@ -8,3 +8,5 @@ TripleO Contributor Guide
   new_developers
   contributions
   check_gates
+  dlrn-promoter-overview
+  stages-overview

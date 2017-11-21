@@ -19,20 +19,18 @@ to create a custom `roles_data.yaml` file. See :doc:`custom_roles` for additiona
 usage details.
 
 The data in `roles_data.yaml` is used to set the defaults for per-role parameters
-e.g `CustomControllerServices`.  These defaults can be overridden via environment
+e.g `ControllerServices`.  These defaults can be overridden via environment
 files, e.g::
 
     cat > keystone_only_params.yaml << EOF
 
     parameter_defaults:
-      CustomControllerServices:
+      ControllerServices:
         - OS::TripleO::Services::Keystone
         - OS::TripleO::Services::RabbitMQ
         - OS::TripleO::Services::HAproxy
         - OS::TripleO::Services::MySQL
       ComputeCount: 0
-      OvercloudCustomControllerFlavor: customcontroller
-
     EOF
 
 The example above overrides the default list of services, and instead deploys

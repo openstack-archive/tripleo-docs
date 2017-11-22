@@ -621,7 +621,31 @@ user are as follows:
 Scaling Down
 ^^^^^^^^^^^^
 When scaling down the Overcloud, follow the scale down instructions as normal
-as shown in :doc:`../post_deployment/delete_nodes`.
+as shown in :doc:`../post_deployment/delete_nodes`, however use the following
+command to get the uuid values to pass to `openstack overcloud node delete`
+instead of using `nova list`::
+
+    openstack stack resource list overcloud -n5 --filter type=OS::TripleO::<RoleName>Server
+
+Replace `<RoleName>` in the above command with the actual name of the role that
+you are scaling down. The `stack_name` column in the command output can be used
+to identify the uuid associated with each node. The `stack_name` will include
+the integer value of the index of the node in the Heat resource group. For
+example, in the following sample output::
+
+    $ openstack stack resource list overcloud -n5 --filter type=OS::TripleO::ComputeDeployedServerServer
+    +-----------------------+--------------------------------------+------------------------------------------+-----------------+----------------------+-------------------------------------------------------------+
+    | resource_name         | physical_resource_id                 | resource_type                            | resource_status | updated_time         | stack_name                                                  |
+    +-----------------------+--------------------------------------+------------------------------------------+-----------------+----------------------+-------------------------------------------------------------+
+    | ComputeDeployedServer | 66b1487c-51ee-4fd0-8d8d-26e9383207f5 | OS::TripleO::ComputeDeployedServerServer | CREATE_COMPLETE | 2017-10-31T23:45:18Z | overcloud-ComputeDeployedServer-myztzg7pn54d-0-pixawichjjl3 |
+    | ComputeDeployedServer | 01cf59d7-c543-4f50-95df-6562fd2ed7fb | OS::TripleO::ComputeDeployedServerServer | CREATE_COMPLETE | 2017-10-31T23:45:18Z | overcloud-ComputeDeployedServer-myztzg7pn54d-1-ooCahg1vaequ |
+    | ComputeDeployedServer | 278af32c-c3a4-427e-96d2-3cda7e706c50 | OS::TripleO::ComputeDeployedServerServer | CREATE_COMPLETE | 2017-10-31T23:45:18Z | overcloud-ComputeDeployedServer-myztzg7pn54d-2-xooM5jai2ees |
+    +-----------------------+--------------------------------------+------------------------------------------+-----------------+----------------------+-------------------------------------------------------------+
+
+The index 0, 1, or 2 can be seen in the `stack_name` column. These indices
+correspond to the order of the nodes in the Heat resource group. Pass the
+corresponding uuid value from the `physical_resource_id` column to `openstack
+overcloud node delete` command.
 
 The physical deployed servers that have been removed from the deployment need
 to be powered off. In a deployment not using deployed servers, this would

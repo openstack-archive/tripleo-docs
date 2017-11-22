@@ -38,9 +38,27 @@ To prepare your environment, you must follow all the steps described in the
 :ref:`basic-deployment-cli` documentation. Stop right at the
 :ref:`deploy-the-overcloud` section.
 
+A tag needs to be specified which is unique to the images being deployed.  This
+makes it possible to later update the overcloud to newer image versions. It
+also makes it easier to determine what images you are running in the overcloud.
+This unique tag can be discovered by running the command ``openstack overcloud
+container image tag discover`` with a known stable tag such as ``latest``. The
+following command will return the tag from the RDO docker registry using the
+stable tag ``current-tripleo-rdo``::
+
+    openstack overcloud container image tag discover \
+      --image trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo \
+      --tag-from-label rdo_version
+
+The option ``--image
+trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo``
+will typically be replaced with a value specific to the environment. You may
+wish to use stable tag ``tripleo-passed-ci`` for a more stable set of
+containers.
+
 It is necessary to generate a heat environment file which specifies the
 container image parameters. These parameters will deploy the overcloud with
-images from a specific repository with specific tags.
+images from a specific repository with the discovered ``<tag>``.
 
 The ``openstack overcloud container image prepare`` command is an easy
 way to generate these parameters. The following command will generate
@@ -49,18 +67,13 @@ with container images from RDO docker registry::
 
     openstack overcloud container image prepare \
       --namespace trunk.registry.rdoproject.org/master \
-      --tag tripleo-ci-testing \
+      --tag <tag> \
       --output-env-file ~/docker_registry.yaml
 
-The options ``--namespace trunk.registry.rdoproject.org/master`` and ``--tag
-tripleo-ci-testing`` will typically be replaced with values specific to the
-environment. You may wish to use ``tripleo-passed-ci`` for a more stable set of
-containers.  Run with ``--help`` to see the other options available for
+The option ``--namespace trunk.registry.rdoproject.org/master``
+will typically be replaced with a value specific to the
+environment. Run with ``--help`` to see the other options available for
 controlling what is generated.
-
-For production deployments (or for testing upgrades and rollbacks) stable tags
-like `passed-ci` should never be used, instead explicit versioned tags are
-required to specify the exact images which will be deployed.
 
 Populate local docker registry
 ..............................
@@ -81,7 +94,7 @@ pull and push diestinations::
 
     openstack overcloud container image prepare \
       --namespace trunk.registry.rdoproject.org/master \
-      --tag tripleo-ci-testing \
+      --tag <tag> \
       --push-destination 192.168.24.1:8787 \
       --output-images-file overcloud_containers.yaml
 
@@ -103,7 +116,7 @@ containers available in the local registry::
 
     openstack overcloud container image prepare \
       --namespace 192.168.24.1:8787/master \
-      --tag tripleo-ci-testing \
+      --tag <tag> \
       --output-env-file ~/docker_registry.yaml
 
 

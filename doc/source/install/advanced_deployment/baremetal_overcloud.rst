@@ -315,11 +315,25 @@ For HA configuration you should see all three controllers::
     | pxe_drac            | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     | pxe_ilo             | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     | pxe_ipmitool        | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
+    | redfish             | overcloud-controller-0.localdomain, overcloud-controller-1.localdomain, overcloud-controller-2.localdomain |
     +---------------------+------------------------------------------------------------------------------------------------------------+
 
 If this list is empty or does not show any of the controllers, then the
 ``openstack-ironic-conductor`` service on this controller failed to start.
 The likely cause is missing dependencies for vendor drivers.
+
+Finally, check that Nova recognizes both virtual and bare metal compute
+services. In HA case there should be at least 4 services in total::
+
+    $ openstack compute service list --service nova-compute
+    +----+--------------+-------------------------------------+------+---------+-------+----------------------------+
+    | ID | Binary       | Host                                | Zone | Status  | State | Updated At                 |
+    +----+--------------+-------------------------------------+------+---------+-------+----------------------------+
+    | 21 | nova-compute | overcloud-novacompute-0.localdomain | nova | enabled | up    | 2017-10-11T13:57:21.000000 |
+    | 30 | nova-compute | overcloud-controller-2.localdomain  | nova | enabled | up    | 2017-10-11T13:57:16.000000 |
+    | 33 | nova-compute | overcloud-controller-1.localdomain  | nova | enabled | up    | 2017-10-11T13:57:16.000000 |
+    | 54 | nova-compute | overcloud-controller-0.localdomain  | nova | enabled | up    | 2017-10-11T13:57:14.000000 |
+    +----+--------------+-------------------------------------+------+---------+-------+----------------------------+
 
 Post-deployment configuration
 -----------------------------
@@ -339,6 +353,15 @@ down the introspection DHCP server on the undercloud after the initial
 introspection is finished::
 
         sudo systemctl stop openstack-ironic-inspector-dnsmasq
+
+Resource classes
+~~~~~~~~~~~~~~~~
+
+Starting with the Pike release, bare metal instances are scheduled based on
+*custom resource classes*. In case of Ironic, a resource class will correspond
+to a flavor. When planning your bare metal cloud, think of a way to split all
+nodes into classes, and create flavors accordingly. See `bare metal flavor
+documentation`_ for more details.
 
 Preparing networking
 ~~~~~~~~~~~~~~~~~~~~
@@ -439,6 +462,7 @@ You can use the same images you already have on the undercloud::
 
 Creating flavors
 ~~~~~~~~~~~~~~~~
+
 As usual with OpenStack, you need to create at least one flavor to be used
 during deployment. As bare metal resources are inherently not divisible,
 the flavor will set minimum requirements (CPU count, RAM and disk sizes) that
@@ -451,17 +475,25 @@ Creating a single flavor is sufficient for the simplest case::
 
 .. note::
     The ``disk`` argument will be used to determine the size of the root
-    partition.
+    partition. The ``ram`` and ``vcpus`` arguments are ignored for bare metal,
+    starting with the Pike release, if the flavor is configured as explained
+    below.
 
-Optionally associate the flavor with an architecture, for example::
+Starting with the Pike release, switch to scheduling based on resource
+classes, as explained in the `bare metal flavor documentation`_::
 
-    openstack flavor set baremetal --property cpu_arch=x86_64
+    openstack flavor set baremetal --property resources:CUSTOM_BAREMETAL=1
+    openstack flavor set baremetal --property resources:VCPU=0
+    openstack flavor set baremetal --property resources:MEMORY_MB=0
+    openstack flavor set baremetal --property resources:DISK_GB=0
 
 Creating host aggregates
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
     If you don't plan on using virtual instances, you can skip this step.
+    It also won't be required in the Queens release, once bare metal nodes
+    stop report CPU, memory and disk properties.
 
 For a hybrid bare metal and virtual environment, you have to set up *host
 aggregates* for virtual and bare metal hosts. We will use a property
@@ -474,6 +506,10 @@ called ``baremetal`` to link flavors to host aggregates::
 .. warning::
     This association won't work without ``AggregateInstanceExtraSpecsFilter``
     enabled as described in `Essential configuration`_.
+
+.. warning::
+    Any property you set on flavors has to be duplicated on aggregates,
+    otherwise scheduling will fail.
 
 Then for all flavors you've created for virtual instances set the same
 ``baremetal`` property to ``false``, for example::
@@ -501,7 +537,7 @@ on the undercloud, for example::
 This command creates a so called *partition image*, i.e. an image containing
 only root partition. Ironic also supports *whole disk images*, i.e. images
 with the whole partition table embedded. This may be the only option when
-running non-Linux images. Please check the bare metal `images documentation`_
+running non-Linux images. Please check the `images documentation`_
 for more details on building and using images.
 
 Three components are created for every partition image: the main image with
@@ -559,31 +595,53 @@ undercloud`_) should be in the following format::
             ipmi_address: <BMC HOST>
             ipmi_username: <BMC USER>
             ipmi_password: <BMC PASSWORD>
+            ipmi_port: <BMC PORT>
+          resource_class: baremetal
           properties:
             cpus: <CPU COUNT>
             cpu_arch: <CPU ARCHITECTURE>
-            memory_mb: <MEMORY IN MIB>
+            memory_mb: <RAM SIZE IN MIB>
             local_gb: <ROOT DISK IN GIB>
             root_device:
                 serial: <ROOT DISK SERIAL>
           ports:
             - address: <PXE NIC MAC>
+              pxe_enabled: true
 
-The ``driver`` field must be one of ``IronicEnabledDrivers`` or
-``IronicEnabledHardwareTypes``, which we set when `Configuring and deploying
-ironic`_.
+* The ``driver`` field must be one of ``IronicEnabledDrivers`` or
+  ``IronicEnabledHardwareTypes``, which we set when `Configuring and deploying
+  ironic`_.
 
-.. admonition:: Stable Branch
-   :class: stable
+  .. admonition:: Stable Branch
+     :class: stable
 
-   Hardware types are only available since the Pike release. In the example
-   above use ``pxe_ipmitool`` instead of ``ipmi`` for older releases.
+     Hardware types are only available since the Pike release. In the example
+     above use ``pxe_ipmitool`` instead of ``ipmi`` for older releases.
 
-The ``root_device`` property is optional, but it's highly recommended
-to set it if the bare metal node has more than one hard drive.
-There are several properties that can be used instead of the serial number
-to designate the root device, see the `root device hints documentation`_
-for details.
+* The ``resource_class`` field corresponds to a custom resource
+  class, as explained in `Resource classes`_.
+
+* The ``root_device`` property is optional, but it's highly recommended
+  to set it if the bare metal node has more than one hard drive.
+  There are several properties that can be used instead of the serial number
+  to designate the root device, see the `root device hints documentation`_
+  for details.
+
+* The ``local_gb`` field specifies the size (in GiB) of the root device. Its
+  value must match the size of the device specified by the ``root_device``
+  property. However, to allow for partitioning, it's highly recommended to
+  subtract 1 GiB from it.
+
+* Exactly one port with ``pxe_enabled`` set to ``true`` must be specified in
+  the ``ports`` list. It has to match the NIC used for provisioning.
+
+  .. note::
+    More ports with ``pxe_enabled=false`` can be specified safely here. They
+    won't be used for provisioning, but they are used with advanced networking
+    (not covered in this guide).
+
+* The ``memory_mb`` and ``local_gb`` properties will not be mandatory any more
+  in the Queens release.
 
 Enrolling nodes
 ~~~~~~~~~~~~~~~
@@ -605,30 +663,53 @@ credentials and make them available::
     DEPLOY_KERNEL=$(openstack image show deploy-kernel -f value -c id)
     DEPLOY_RAMDISK=$(openstack image show deploy-ramdisk -f value -c id)
 
-    for uuid in $(openstack baremetal node list -f value -c UUID);
+    for uuid in $(openstack baremetal node list --provision-state enroll -f value -c UUID);
     do
-        openstack baremetal node manage $uuid
         openstack baremetal node set $uuid \
             --driver-info deploy_kernel=$DEPLOY_KERNEL \
             --driver-info deploy_ramdisk=$DEPLOY_RAMDISK
-        openstack baremetal node provide $uuid
+        openstack baremetal node manage $uuid --wait &&
+            openstack baremetal node provide $uuid
     done
 
 The deploy kernel and ramdisk were created as part of `Adding deployment
 images`_.
 
+The ``baremetal node provide`` command makes a node go through cleaning
+procedure, so it might take some time depending on the configuration. Check
+your nodes status with::
+
+    openstack baremetal node list --fields uuid name provision_state last_error
+
+Wait for all nodes to reach the ``available`` state. Any failures during
+cleaning has to be corrected before proceeding with deployment.
+
+Populating host aggregates
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For hybrid bare metal and virtual case you need to specify which host
+belongs to which host aggregates (``virtual`` or ``baremetal`` as created in
+`Creating host aggregates`_).
+
+When the default host names are used, we can take advantage of the fact
+that every virtual host will have ``compute`` in its name. All bare metal
+hypervisors will be assigned to one (non-HA) or three (HA) controller hosts.
+So we can do the assignment with the following commands::
+
+    source overcloudrc
+    for vm_host in $(openstack hypervisor list -f value -c "Hypervisor Hostname" | grep compute);
+    do
+        openstack aggregate add host virtual-hosts $vm_host
+    done
+
+    openstack aggregate add host baremetal-hosts overcloud-controller-0.localdomain
+    # Ignore the following two for a non-HA environment
+    openstack aggregate add host baremetal-hosts overcloud-controller-1.localdomain
+    openstack aggregate add host baremetal-hosts overcloud-controller-2.localdomain
+
 .. note::
-    The ``baremetal node provide`` command makes a node go through cleaning
-    procedure, so it might take some time depending on the configuration.
-
-If a node gets stuck in the ``enroll`` state, and you see the following error::
-
-    The requested action "provide" can not be performed on node "<UUID>" while it is in state "enroll".
-
-then the power credentials validation failed for this node. Use the following
-command to get the last error::
-
-    openstack baremetal node show <UUID> -f value -c last_error
+    Every time you scale out compute nodes, you need to add newly added
+    hosts to the ``virtual-hosts`` aggregate.
 
 Checking available resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -657,54 +738,59 @@ should display the sum of bare metal and virtual resources::
     | 20 | a970c5db-67dd-4676-95ba-af1edc74b2ee |
     +----+--------------------------------------+
 
-    $ openstack hypervisor stats show
-    +----------------------+-------+
-    | Field                | Value |
-    +----------------------+-------+
-    | count                | 3     |
-    | current_workload     | 0     |
-    | disk_available_least | 146   |
-    | free_disk_gb         | 149   |
-    | free_ram_mb          | 16047 |
-    | local_gb             | 149   |
-    | local_gb_used        | 0     |
-    | memory_mb            | 18095 |
-    | memory_mb_used       | 2048  |
-    | running_vms          | 0     |
-    | vcpus                | 3     |
-    | vcpus_used           | 0     |
-    +----------------------+-------+
-
 .. note::
     Each bare metal node becomes a separate hypervisor in Nova. The hypervisor
     host name always matches the associated node UUID.
 
-Assigning host aggregates
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Next you can use the Placement API (available only via cURL for the time being)
+to check that bare metal resources are properly exposed. Start with checking
+that all nodes are recorded::
 
-For hybrid bare metal and virtual case you need to specify which host belongs
-to which host aggregates (``virtual`` or ``baremetal`` as created in
-`Creating host aggregates`_).
+    $ token=$(openstack token issue -f value -c id)
+    $ endpoint=$(openstack endpoint show placement -f value -c publicurl)
+    $ curl -sH "X-Auth-Token: $token" $endpoint/resource_providers | jq -r '.resource_providers | map({node: .name, uuid})'
+    [
+      {
+        "uuid": "9dff98a8-6fc9-4a05-8d78-c1d5888d9fde",
+        "node": "overcloud-novacompute-0.localdomain"
+      },
+      {
+        "uuid": "61d741b5-33d6-40a1-bcbe-b38ea34ca6c8",
+        "node": "bd99ec64-4bfc-491b-99e6-49bd384b526d"
+      },
+      {
+        "uuid": "e22bc261-53be-43b3-848f-e29c728142d3",
+        "node": "a970c5db-67dd-4676-95ba-af1edc74b2ee"
+      }
+    ]
 
-When the default host names are used, we can take advantage of the fact
-that every virtual host will have ``compute`` in its name. All bare metal
-hypervisors will be assigned to one (non-HA) or three (HA) controller hosts.
-So we can do the assignment with the following commands::
+Then for each of the bare metal resource providers (having node UUIDs as
+names) check their inventory::
 
-    source overcloudrc
-    for vm_host in $(openstack hypervisor list -f value -c "Hypervisor Hostname" | grep compute);
-    do
-        openstack aggregate add host virtual-hosts $vm_host
-    done
+    $ curl -sH "X-Auth-Token: $token" $endpoint/resource_providers/e22bc261-53be-43b3-848f-e29c728142d3/inventories | jq .inventories
+    {
+      "DISK_GB": {
+        "max_unit": 50,
+        "min_unit": 1,
+        "step_size": 1,
+        "reserved": 0,
+        "total": 50,
+        "allocation_ratio": 1
+      },
+      "CUSTOM_BAREMETAL": {
+        "max_unit": 1,
+        "min_unit": 1,
+        "step_size": 1,
+        "reserved": 0,
+        "total": 1,
+        "allocation_ratio": 1
+      }
+    }
 
-    openstack aggregate add host baremetal-hosts overcloud-controller-0.localdomain
-    # Ignore the following two for a non-HA environment
-    openstack aggregate add host baremetal-hosts overcloud-controller-1.localdomain
-    openstack aggregate add host baremetal-hosts overcloud-controller-2.localdomain
-
-.. note::
-    Every time you scale out compute nodes, you need to add newly added hosts
-    to the ``virtual-hosts`` aggregate.
+You see the custom ``baremetal`` resource class reported, as well as available
+disk space (only before the Queens release). If you see an empty inventory,
+nova probably consider the node unavailable. Check :ref:`no-valid-host` for
+tips on a potential cause.
 
 Booting a bare metal instance
 -----------------------------

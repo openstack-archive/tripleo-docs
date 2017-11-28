@@ -65,8 +65,8 @@ the following command on the undercloud::
 
    #. Open the tunnel from the virt host, to the undercloud::
 
-       ssh -Nf user@virthost -L 0.0.0.0:443:192.168.24.2:443 # If SSL
-       ssh -Nf user@virthost -L 0.0.0.0:3000:192.168.24.1:3000 # If no SSL
+       ssh -Nf user@undercloud -L 0.0.0.0:443:192.168.24.2:443 # If SSL
+       ssh -Nf user@undercloud -L 0.0.0.0:3000:192.168.24.1:3000 # If no SSL
 
       .. note:: Quickstart started creating the tunnel automatically
          during Pike. If using an older version you will have to create

@@ -172,7 +172,8 @@ descriptions.
 
 Each node description should contains required fields:
 
-* ``pm_type`` - driver for Ironic nodes, see `Ironic Drivers`_ for details
+* ``pm_type`` - driver for Ironic nodes, see `Ironic Hardware Types`_
+  for details
 
 * ``pm_addr`` - node BMC IP address (hypervisor address in case of virtual
   environment)
@@ -265,75 +266,131 @@ For example::
     You don't need to create this file, if you plan on using
     :doc:`../advanced_deployment/node_discovery`.
 
-Ironic Drivers
-^^^^^^^^^^^^^^
+Ironic Hardware Types
+^^^^^^^^^^^^^^^^^^^^^
 
-Ironic drivers provide various level of support for different hardware.
-The most up-to-date information about Ironic drivers is at
-http://docs.openstack.org/developer/ironic/deploy/drivers.html, but note that
-this page always targets Ironic git master, not the release we use.
+Ironic *hardware types* provide various level of support for different
+hardware. Hardware types, introduced in the Ocata cycle, are a new generation
+of Ironic *drivers*. Previously, the word *drivers* was used to refer to what
+is now called *classic drivers*. See `Ironic drivers documentation`_ for a full
+explanation of similarities and differences between the two types.
 
-This most generic driver is ``ipmi``. It uses `ipmitool`_ utility
-to manage a bare metal node, and supports a vast variety of hardware.
+Hardware types are enabled in the ``undercloud.conf`` using the
+``enabled_hardware_types`` configuration option. Classic drivers are enabled
+using the ``enabled_drivers`` option. It is deprecated in the Queens release
+cycle and should no longer be used. See the `hardware types migration guide`_
+for information on how to migrate existing nodes.
 
-.. admonition:: Stable Branch
-   :class: stable
+Both hardware types and classic drivers can be equially used in the
+``pm_addr`` field of the ``instackenv.json``.
 
-   This driver is supported starting with the Pike release. For older releases
-   use functionally equivalent ``pxe_ipmitool`` driver.
+See https://docs.openstack.org/ironic/latest/admin/drivers.html for the most
+up-to-date information about Ironic hardware types and hardware
+interfaces, but note that this page always targets Ironic git master, not the
+release we use.
 
-.. admonition:: Virtual
-   :class: virtual
+Generic Hardware Types
+~~~~~~~~~~~~~~~~~~~~~~~
 
-   When combined with :doc:`virtualbmc` this driver can be used for developing
-   and testing TripleO in a virtual environment as well.
+* This most generic hardware type is ipmi_. It uses the `ipmitool`_ utility
+  to manage a bare metal node, and supports a vast variety of hardware.
 
-   .. admonition:: Stable Branch
-      :class: stable
+  .. admonition:: Stable Branch
+     :class: stable
 
-      Prior to the Ocata release, a special ``pxe_ssh`` driver was used for
-      testing Ironic in the virtual environment. This driver connects to the
-      hypervisor to conduct management operations on virtual nodes. In case of
-      this driver, ``pm_addr`` is a hypervisor address, ``pm_user`` is a SSH
-      user name for accessing hypervisor, ``pm_password`` is a private SSH
-      key for accessing hypervisor. Note that private key must not be
-      encrypted.
+     This hardware type is supported starting with the Pike release. For older
+     releases use the functionally equivalent ``pxe_ipmitool`` driver.
 
-      .. warning::
-        The ``pxe_ssh`` driver is deprecated and ``pxe_ipmitool`` +
-        :doc:`virtualbmc` should be used instead.
+  .. admonition:: Virtual
+     :class: virtual
 
-Another generic driver is ``redfish``. It provides support for the quite new
-Redfish_ protocol, which aims to replace IPMI eventually as a generic
-protocol for managing hardware. In addition to the ``pm_*`` fields mentioned
-above, this driver also requires setting ``pm_system_id`` to the full
-identifier of the node in the controller (e.g. ``/redfish/v1/Systems/42``).
+     When combined with :doc:`virtualbmc`, this hardware type can be used for
+     developing and testing TripleO in a virtual environment as well.
 
-.. admonition:: Stable Branch
-   :class: stable
+     .. admonition:: Stable Branch
+        :class: stable
 
-   Redfish support was introduced in the Pike release.
+        Prior to the Ocata release, a special ``pxe_ssh`` driver was used for
+        testing Ironic in the virtual environment. This driver connects to the
+        hypervisor to conduct management operations on virtual nodes. In case
+        of this driver, ``pm_addr`` is a hypervisor address, ``pm_user`` is
+        a SSH user name for accessing hypervisor, ``pm_password`` is a private
+        SSH key for accessing hypervisor. Note that private key must not be
+        encrypted.
 
-Ironic also provides specific drivers for some types of hardware:
+        .. warning::
+          The ``pxe_ssh`` driver is deprecated and ``pxe_ipmitool`` +
+          :doc:`virtualbmc` should be used instead.
 
-* ``pxe_ilo`` targets HP Proliant Gen 8 and Gen 9 systems, and is recommended
-  for these systems instead of ``ipmi`` or ``pxe_ipmitool``. Please refer
-  to the `current iLO driver documentation`_ or `detailed iLO documentation
-  for Kilo version`_.
+* Another generic hardware type is redfish_. It provides support for the
+  quite new `Redfish standard`_, which aims to replace IPMI eventually as
+  a generic protocol for managing hardware. In addition to the ``pm_*`` fields
+  mentioned above, this hardware type also requires setting ``pm_system_id``
+  to the full identifier of the node in the controller (e.g.
+  ``/redfish/v1/Systems/42``).
 
-* ``pxe_drac`` targets DELL 11G and newer systems, and is recommended for these
-  systems instead of ``ipmi`` or ``pxe_ipmitool``.
+  .. admonition:: Stable Branch
+     :class: stable
 
-There are also 2 testing drivers:
+     Redfish support was introduced in the Pike release.
 
-* ``fake_pxe`` provides stubs instead of real power and management operations.
-  When using this driver, you have to conduct power on and off operations,
-  and set the current boot device, yourself.
+The following generic hardware types are not enabled by default:
 
-* ``fake`` provides stubs for every operation, so that Ironic does not touch
-  hardware at all.
+* The snmp_ hardware type supports controlling PDUs for power management.
+  It requires boot device to be manually configured on the nodes.
 
+* Finally, the ``manual-management`` hardware type (not enabled by default)
+  skips power and boot device management completely. It requires manual power
+  and boot operations to be done at the right moments, so it's not recommended
+  for a generic production.
+
+  .. admonition:: Stable Branch
+     :class: stable
+
+     The functional analog of this hardware type before the Queens release
+     was the ``fake_pxe`` driver.
+
+Vendor Hardware Types
+~~~~~~~~~~~~~~~~~~~~~
+
+TripleO also supports vendor-specific hardware types for some types
+of hardware:
+
+* ilo_ targets HPE Proliant Gen 8 and Gen 9 systems.
+
+  .. admonition:: Stable Branch
+     :class: stable
+
+     Use the ``pxe_ilo`` classic driver before the Queens release.
+
+* idrac_ targets DELL 12G and newer systems.
+
+  .. admonition:: Stable Branch
+     :class: stable
+
+     Use the ``pxe_drac`` classic driver before the Queens release.
+
+The following hardware types are supported but not enabled by default:
+
+* irmc_ targets FUJITSU PRIMERGY servers.
+
+* cisco-ucs-managed_ targets UCS Manager managed Cisco UCS B/C series servers.
+
+* cisco-ucs-standalone_ targets standalone Cisco UCS C series servers.
+
+.. note::
+    Contact a specific vendor team if you have problems with any of these
+    drivers, as the TripleO team often cannot assist with them.
+
+.. _Ironic drivers documentation: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html
+.. _hardware types migration guide: https://docs.openstack.org/ironic/latest/admin/upgrade-to-hardware-types.html
 .. _ipmitool: http://sourceforge.net/projects/ipmitool/
-.. _Redfish: https://www.dmtf.org/standards/redfish
-.. _current iLO driver documentation: http://docs.openstack.org/developer/ironic/drivers/ilo.html
-.. _detailed iLO documentation for Kilo version: https://wiki.openstack.org/wiki/Ironic/Drivers/iLODrivers/Kilo
+.. _Redfish standard: https://www.dmtf.org/standards/redfish
+.. _ipmi: https://docs.openstack.org/ironic/latest/admin/drivers/ipmitool.html
+.. _redfish: https://docs.openstack.org/ironic/latest/admin/drivers/redfish.html
+.. _snmp: https://docs.openstack.org/ironic/latest/admin/drivers/snmp.html
+.. _ilo: https://docs.openstack.org/ironic/latest/admin/drivers/ilo.html
+.. _idrac: https://docs.openstack.org/ironic/latest/admin/drivers/idrac.html
+.. _irmc: https://docs.openstack.org/ironic/latest/admin/drivers/irmc.html
+.. _cisco-ucs-managed: https://docs.openstack.org/ironic/latest/admin/drivers/ucs.html
+.. _cisco-ucs-standalone: https://docs.openstack.org/ironic/latest/admin/drivers/cimc.html

@@ -196,7 +196,7 @@ Using a more realistic example. Given a `puppet_config` section like this::
             - [ {get_param: DockerNamespace}, {get_param: DockerGlanceApiImage} ]
 
 
-Would generated a json file called `/var/lib/docker-puppet-tasks2.json` that looks like::
+Would generated a json file called `/var/lib/docker-puppet/docker-puppet-tasks2.json` that looks like::
 
     [
         {

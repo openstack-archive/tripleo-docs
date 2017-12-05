@@ -281,3 +281,24 @@ When new service containers are added, be sure to update the image names in
 `container-images` in the tripleo-common repo. These service
 images are pulled in and available in the local docker registry that the
 containers ci job uses.
+
+Packages versions in containers
+-------------------------------
+
+With the container CI jobs, it can be challenging to find which version of OpenStack runs in the containers.
+An easy way to find out is to use the `logs/undercloud/home/zuul/overcloud_containers.yaml.txt.gz` log file and
+see which tag was deployed.
+
+For example::
+
+  container_images:
+  - imagename: docker.io/tripleomaster/centos-binary-ceilometer-central:ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7
+    push_destination: 192.168.24.1:8787
+
+So we know the tag is `ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7`.
+The tag is actually a Delorean hash. You can find out the versions
+of packages by using this tag.
+For example, `ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7` tag,
+is in fact using this `Delorean repository`_.
+
+..  _Delorean repository: https://trunk.rdoproject.org/centos7-master/ac/82/ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7/

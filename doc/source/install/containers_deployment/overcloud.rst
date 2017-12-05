@@ -50,6 +50,11 @@ stable tag ``current-tripleo-rdo``::
       --image trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo \
       --tag-from-label rdo_version
 
+.. note:: The tag is actually a Delorean hash. You can find out the versions
+          of packages by using this tag.
+          For example, `ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7` tag,
+          is in fact using this `Delorean repository`_.
+
 The option ``--image
 trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo``
 will typically be replaced with a value specific to the environment. You may
@@ -150,3 +155,4 @@ The command below will deploy a containerized overcloud on top of a baremetal un
     bash quickstart.sh --config=~/.quickstart/config/general_config/containers_minimal.yml $VIRTHOST
 
 ..  _TripleO Quickstart: https://docs.openstack.org/developer/tripleo-quickstart/
+..  _Delorean repository: https://trunk.rdoproject.org/centos7-master/ac/82/ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7/

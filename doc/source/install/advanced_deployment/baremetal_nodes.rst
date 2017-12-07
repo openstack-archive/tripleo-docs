@@ -15,3 +15,4 @@ Documentation on how to do advanced configuration of baremetal nodes in
    introspection_data
    whole_disk_images
    uefi_boot
+   ansible_deploy_interface

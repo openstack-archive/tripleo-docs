@@ -139,7 +139,7 @@ To see how this container is started by TripleO:
 
   # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --container heat_api --action print-cmd
 
-  docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleoupstream/centos-binary-heat-api:latest
+  docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleomaster/centos-binary-heat-api:latest
 
 You can also dump the configuration of a container to a file so you can
 edit it and rerun it with different a different configuration:
@@ -197,7 +197,7 @@ Would generated a json file called `/var/lib/docker-puppet/docker-puppet-tasks2.
 
     [
         {
-            "config_image": "tripleoupstream/centos-binary-glance-api:latest",
+            "config_image": "tripleomaster/centos-binary-glance-api:latest",
             "config_volume": "glance_api",
             "puppet_tags": "glance_api_config,glance_api_paste_ini,glance_swift_config,glance_cache_config",
             "step_config": "include ::tripleo::profile::base::glance::api\n"
@@ -234,7 +234,7 @@ in a container on an existing deployment.
 For example let's update packages for the mariadb container::
 
     (undercloud) [stack@undercloud ~]$ docker images | grep mariadb
-    192.168.24.1:8787/tripleoupstream/centos-binary-mariadb    latest     035a8237c376    2 weeks ago    723.5 MB
+    192.168.24.1:8787/tripleomaster/centos-binary-mariadb    latest     035a8237c376    2 weeks ago    723.5 MB
 
 So docker image `035a8237c376` is the one we need to base our work on. Since
 docker images are supposed to be immutable we will base our work off of
@@ -242,7 +242,7 @@ docker images are supposed to be immutable we will base our work off of
 
     mkdir -p galera-workaround
     cat > galera-workaround/Dockerfile <<EOF
-    FROM 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:latest
+    FROM 192.168.24.1:8787/tripleomaster/centos-binary-mariadb:latest
     USER root
     RUN yum-config-manager --add-repo http://people.redhat.com/mbaldess/rpms/container-repo/pacemaker-bundle.repo && yum clean all && rm -rf /var/cache/yum
     RUN yum update -y pacemaker pacemaker-remote pcs libqb resource-agents && yum clean all && rm -rf /var/cache/yum
@@ -252,14 +252,14 @@ docker images are supposed to be immutable we will base our work off of
 To determine which user is the default one being used in a container you can run  `docker run -it 035a8237c376 whoami`.
 Then we build the new image and tag it with `:workaround1`::
 
-    docker build --rm -t 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1 ~/galera-workaround
+    docker build --rm -t 192.168.24.1:8787/tripleomaster/centos-binary-mariadb:workaround1 ~/galera-workaround
 
 Then we push it in our docker registry on the undercloud::
 
-    docker push 192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1
+    docker push 192.168.24.1:8787/tripleomaster/centos-binary-mariadb:workaround1
 
 At this stage we can either point THT to use
-`192.168.24.1:8787/tripleoupstream/centos-binary-mariadb:workaround1` as the
+`192.168.24.1:8787/tripleomaster/centos-binary-mariadb:workaround1` as the
 container image by tweaking the necessary environment files and we redeploy the overcloud.
 If we only want to test a tweaked image, the following steps can be used:
 First, determine if the containers are managed by pacemaker (those will typically have a `:pcmklatest` tag) or by paunch.

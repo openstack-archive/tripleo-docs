@@ -190,10 +190,7 @@ Using a more realistic example. Given a `puppet_config` section like this::
         config_volume: glance_api
         puppet_tags: glance_api_config,glance_api_paste_ini,glance_swift_config,glance_cache_config
         step_config: {get_attr: [GlanceApiPuppetBase, role_data, step_config]}
-        config_image:
-          list_join:
-            - '/'
-            - [ {get_param: DockerNamespace}, {get_param: DockerGlanceApiImage} ]
+        config_image: {get_param: DockerGlanceApiConfigImage}
 
 
 Would generated a json file called `/var/lib/docker-puppet/docker-puppet-tasks2.json` that looks like::

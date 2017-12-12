@@ -18,8 +18,11 @@ The node-specific hieradata is provisioned based on the node UUID, which is
 hardware dependent and immutable across reboots/reinstalls.
 
 First make sure the introspection data is available for the target node, if it
-isn't one can run introspection for a particular node as described in:
-:doc:`introspect_single_node`.
+isn't one may run introspection for a particular node as described in:
+:doc:`introspect_single_node`. If the `undercloud.conf` does not have
+`inspection_extras = true` prior to undercloud installation/upgrade
+and introspection, then the machine unique UUID will not be in the
+Ironic database.
 
 Then extract the machine unique UUID for the target node with a command like::
 

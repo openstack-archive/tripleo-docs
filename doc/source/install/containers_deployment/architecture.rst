@@ -56,9 +56,9 @@ section for more info on this.
 
 .. _paunch: https://github.com/openstack/paunch
 
-
 TripleO Heat Templates
 ----------------------
+.. _containers_arch_tht:
 
 The `TripleO Heat Templates`_ repo is where most of the logic resides in the form
 of heat templates. These templates define each service, the containers'

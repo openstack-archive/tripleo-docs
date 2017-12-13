@@ -113,7 +113,7 @@ The docker templates can be found under the `docker` sub directory in the
 `docker/service` directory.
 
 For more information on how to integrate containers into the TripleO Heat templates,
-see the ``install/containers_deployment/architecture.rst`` document. (FIXME: proper link)
+see the :ref:`Containerized TripleO architecture<containers_arch_tht>` document.
 
 If all you need to do is change out a container for a specific service, you can
 create a custom heat environment file that contains your override.  To swap out

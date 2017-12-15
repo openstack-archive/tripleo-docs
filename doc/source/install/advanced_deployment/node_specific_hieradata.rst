@@ -36,9 +36,18 @@ Ironic node UUID. For the next step, we'll assume the output was
 Creating the Heat environment file
 ----------------------------------
 
-Assuming we want to use `/dev/sdc` as data disk for `ceph-osd` on our target
-node, we'll create a yaml file looking like the following
-(eg. `my-node-settings.yaml`)::
+Assuming we want to use `/dev/sdc` as a data disk for `ceph-osd` on our target
+node, we'll create a yaml file, e.g. `my-node-settings.yaml`, with the
+following content depending on if either ceph-ansible (Pike and newer)
+or puppet-ceph (Ocata and older).
+
+For ceph-ansible use::
+
+  parameter_defaults:
+    NodeDataLookup: |
+      {"32E87B4C-C4A7-418E-865B-191684A6883B": {"devices": ["/dev/sdc"]}}
+
+For puppet-ceph use::
 
   resource_registry:
     OS::TripleO::CephStorageExtraConfigPre: /path/to/tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml

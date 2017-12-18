@@ -196,6 +196,17 @@ configured.
 
 .. note::
 
+    All role-specific parameters have to be tagged::
+
+      ExampleParameter:
+        description: This is an example.
+        type: json
+        default: {}
+        tags:
+          - role_specific
+
+.. note::
+
   It is required for all service templates to accept the EndpointMap parameter,
   all other parameters are optional and may be defined per-service. Care should
   be taken to avoid naming collisions between service parameters, e.g via using

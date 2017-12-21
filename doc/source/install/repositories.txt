@@ -23,42 +23,42 @@ For example::
 
      Enable the current Newton repositories::
 
-         sudo tripleo-repos -b newton current
+         sudo -E tripleo-repos -b newton current
 
      .. admonition:: Ceph
         :class: ceph
 
         Include the Ceph repo in the tripleo-repos call::
 
-            sudo tripleo-repos -b newton current ceph
+            sudo -E tripleo-repos -b newton current ceph
 
   .. admonition:: Ocata
      :class: ocata ntoo
 
      Enable the current Ocata repositories::
 
-         sudo tripleo-repos -b ocata current
+         sudo -E tripleo-repos -b ocata current
 
      .. admonition:: Ceph
         :class: ceph
 
         Include the Ceph repo in the tripleo-repos call::
 
-            sudo tripleo-repos -b ocata current ceph
+            sudo -E tripleo-repos -b ocata current ceph
 
   .. admonition:: Pike
      :class: pike otop
 
      Enable the current Pike repositories::
 
-         sudo tripleo-repos -b pike current
+         sudo -E tripleo-repos -b pike current
 
      .. admonition:: Ceph
         :class: ceph
 
         Include the Ceph repo in the tripleo-repos call::
 
-            sudo tripleo-repos -b pike current ceph
+            sudo -E tripleo-repos -b pike current ceph
 
 .. warning::
    The remaining repositories configuration steps below should not be done for stable
@@ -71,11 +71,11 @@ repository configurations available in tripleo-repos, see its --help output
 for details.
 ::
 
-    sudo tripleo-repos current-tripleo-dev
+    sudo -E tripleo-repos current-tripleo-dev
 
 .. admonition:: Ceph
   :class: ceph
 
   Include the Ceph repository in the tripleo-repos command::
 
-      sudo tripleo-repos current-tripleo-dev ceph
+      sudo -E tripleo-repos current-tripleo-dev ceph

@@ -148,13 +148,13 @@ created on the undercloud, one should use a non-root user.
    .. admonition:: RHEL
       :class: rhel
 
-      Download the RHEL 7.3 cloud image or copy it over from a different location,
+      Download the RHEL 7.4 cloud image or copy it over from a different location,
       for example:
-      ``https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.3/x86_64/product-downloads``,
-      and define the needed environment variables for RHEL 7.3 prior to running
+      ``https://access.redhat.com/downloads/content/69/ver=/rhel---7/7.4/x86_64/product-software``,
+      and define the needed environment variables for RHEL 7.4 prior to running
       ``tripleo-build-images``::
 
-          export DIB_LOCAL_IMAGE=rhel-guest-image-7.3-35.x86_64.qcow2
+          export DIB_LOCAL_IMAGE=rhel-server-7.4-x86_64-kvm.qcow2
 
    .. admonition:: RHEL Portal Registration
       :class: portal

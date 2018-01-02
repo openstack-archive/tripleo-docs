@@ -154,7 +154,7 @@ Once the repositories have been enabled on the deployed servers, the initial
 packages for the Heat agent need to be installed. Run the following command on
 each server intending to be used as part of the Overcloud::
 
-    sudo yum -y install python-heat-agent*
+    sudo yum install python-heat-agent*
 
 Certificate Authority Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

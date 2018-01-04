@@ -49,7 +49,7 @@ You can upgrade any packages that are installed on the undercloud machine.
          sudo systemctl stop neutron-*
          sudo systemctl stop openvswitch
          sudo systemctl stop httpd
-         sudo yum -y update instack-undercloud openstack-puppet-modules openstack-tripleo-common
+         sudo yum update instack-undercloud openstack-puppet-modules openstack-tripleo-common
 
    .. admonition:: Ocata to Pike
       :class: otop
@@ -64,8 +64,8 @@ You can upgrade any packages that are installed on the undercloud machine.
          repository must be enabled on the undercloud and the
          ceph-ansible package must then be installed::
 
-            sudo yum -y install --enablerepo=extras centos-release-ceph-jewel
-            sudo yum -y install ceph-ansible
+            sudo yum install --enablerepo=extras centos-release-ceph-jewel
+            sudo yum install ceph-ansible
 
          Ceph clusters deployed with Ocata via puppet-ceph will be migrated
          so that all of the existing Ceph services are run inside of containers.
@@ -76,7 +76,7 @@ You can upgrade any packages that are installed on the undercloud machine.
 
    Update TripleO CLI package::
 
-      sudo yum -y update python-tripleoclient
+      sudo yum update python-tripleoclient
 
 
 #. Run the undercloud upgrade command. This command will upgrade all packages

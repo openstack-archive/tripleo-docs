@@ -42,6 +42,53 @@ service users with the correct SubjectAltNames.
 
 The following are instructions assuming the default CA, which is FreeIPA.
 
+CA installation
+~~~~~~~~~~~~~~~
+
+As mentioned before, the default CA is FreeIPA. Due to port conflicts between
+FreeIPA and some OpenStack services, it's not trivial to install it in the
+undercloud. On the other hand, often folks already have a FreeIPA server
+installed on-premise.
+
+To have a minimal FreeIPA installation with the required functionalities for TLS
+everywhere in TripleO, you can run the following command::
+
+    ipa-server-install -U -r `hostname -d|tr "[a-z]" "[A-Z]"` \
+                   -p $DirectoryManagerPassword -a $AdminPassword \
+                   --hostname `hostname -f` \
+                   --ip-address=$FreeIPAIP \
+                   --setup-dns --auto-forwarders --auto-reverse
+
+There are several things to note from the aforementioned command:
+
+* This command assumes that your kerberos realm is the same as your host's
+  domain name. This is a fairly normal setup, but note that it's possible to
+  use different values.
+
+* The $DirectoryManagerPassword and $AdminPassword don't need to be the same.
+  However, please remember $AdminPassword since it's what you will use in a
+  subsequent command to set up the undercloud.
+
+* $FreeIPAIP needs to be an IP address that's accessible from both the
+  undercloud and the overcloud nodes.
+
+* We enable DNS because FreeIPA will serve as the nameserver for both the
+  undercloud and overcloud nodes. This simplifies the installation as the nodes
+  can autodiscover FreeIPA's capabilities (for enrollment and for the CA)
+  through DNS.
+
+* Assuming the FreeIPA node has working DNS, setting the ``--auto-forwarders``
+  flag adds the node's configured nameservers and forwards DNS queries to them
+  if needed. Note that you can also specify manually the forwarders for the DNS
+  setup through the ``--forwarder`` option.
+
+For more information on FreeIPA and its capabilities, please consult the
+`FreeIPA documentation`_
+
+.. note:: You could also try out the `IdM container`_ as an alternative to the
+          FreeIPA installation. Just make sure to enable DNS and follow the
+          considerations listed above.
+
 CA setup
 ~~~~~~~~
 
@@ -211,3 +258,5 @@ to the following::
 .. _certmonger: https://pagure.io/certmonger
 .. _Nova vendordata plugin: https://docs.openstack.org/developer/nova/vendordata.html
 .. _novajoin: https://github.com/openstack/novajoin
+.. _FreeIPA documentation: https://www.freeipa.org/page/Documentation
+.. _IdM container: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/using_containerized_identity_management_services/

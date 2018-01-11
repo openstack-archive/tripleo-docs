@@ -169,6 +169,14 @@ via certmonger and create the appropriate service principals for kerberos
 .. note:: As part of the enrollment, FreeIPA is set as a trusted CA, so we
    don't need to do any extra steps for this.
 
+.. note:: When using Ceph, you need to tell it to use FQDNs instead of
+          shortnames. One can do this by passing the following in a heat
+          environment file::
+
+              parameter_defaults:
+                CephAnsibleExtraConfig:
+                  mon_use_fqdn: true
+
 Classic public TLS and certmonger-based internal TLS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

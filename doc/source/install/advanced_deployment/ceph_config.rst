@@ -121,7 +121,7 @@ file "~/my-ceph-settings.yaml" and added to the deploy commandline::
 Customizing ceph.conf with ceph-ansible
 ---------------------------------------
 
-The playbooks provided by `ceph-ansible` are triggered by Mistral
+The playbooks provided by `ceph-ansible` are triggered by a Mistral
 workflow. A new `CephAnsibleExtraConfig` parameter has been added to
 the templates and can be used to provide arbitrary config variables
 consumed by `ceph-ansible`. The pre-existing template params consumed
@@ -135,17 +135,44 @@ For example, to encrypt the data stored on OSDs use the following::
     CephAnsibleExtraConfig:
       dmcrypt: true
 
-The above overrides the defaults found in the
+To change the backfill and recovery operations that Ceph uses to
+rebalance a cluster, use an example like the following::
+
+  parameter_defaults:
+    CephAnsibleExtraConfig:
+      osd_recovery_op_priority: 3
+      osd_recovery_max_active: 3
+      osd_max_backfills: 1
+
+The above example may be used to change any of the defaults found in
 `ceph-ansible/group_vars`_.
 
-Global settings in the `ceph.conf` may be set using
-`CephConfigOverrides` like the following::
+If a parameter to override is not an
+available group variable, then global settings in the `ceph.conf` may
+be set directly using `CephConfigOverrides` like the following::
 
   parameter_defaults:
     CephConfigOverrides:
       max_open_files: 131072
 
-To specify a set of dedicated block devices to use as Ceph OSDs use
+Configure container settings with ceph-ansible
+----------------------------------------------
+
+The group variables `ceph_osd_docker_memory_limit`, which corresponds
+to `docker run ... --memory`, and `ceph_osd_docker_cpu_limit`, which
+corresponds to `docker run ... --cpu-quota`, may be overridden
+depending on the hardware configuration and the system needs. Below is
+an example of setting custom values to these parameters::
+
+  parameter_defaults:
+    CephAnsibleExtraConfig:
+      ceph_osd_docker_memory_limit: 3g
+      ceph_osd_docker_cpu_limit: 1
+
+Configure OSD settings with ceph-ansible
+----------------------------------------
+
+To specify a set of dedicated block devices to use as Ceph OSDs, use
 a variation of the following::
 
   parameter_defaults:
@@ -174,8 +201,68 @@ above should be changed to the following::
         - /dev/sdd
       osd_scenario: collocated
 
-The `parameter_defaults` like the above may be saved in an environment
-file "~/my-ceph-settings.yaml" and added to the deploy commandline::
+The number of OSDs in a Ceph deployment should proportionally affect
+the number of Ceph PGs per Pool as determined by Ceph's
+`pgcalc`_. When the appropriate default pool size and PG number are
+determined, the defaults should be overridden using an example like
+the following::
+
+  parameter_defaults:
+    CephPoolDefaultSize: 3
+    CephPoolDefaultPgNum: 128
+
+Override Ansible run options
+----------------------------
+
+TripleO runs the ceph-ansible `site-docker.yml.sample` playbook by
+default. The values in this playbook should be overridden as described
+in this document and the playbooks themselves should not be modified.
+However, it is possible to specify which playbook is run using the
+following parameter::
+
+  parameter_defaults:
+    CephAnsiblePlaybook: /usr/share/ceph-ansible/site-docker.yml.sample
+
+For each TripleO Ceph deployment, the above playbook's output is logged
+to `/var/log/mistral/ceph-install-workflow.log`. The default verbosity
+of the playbook run is 0. The example below sets the verbosity to 3::
+
+  parameter_defaults:
+    CephAnsiblePlaybookVerbosity: 3
+
+During the playbook run temporary files, like the Ansible inventory
+and the ceph-ansible parameters that are passed as overrides as
+described in this document, are stored on the undercloud in a
+directory that matches the pattern `/tmp/ansible-mistral-action*`.
+This directory is deleted at the end of each Mistral workflow which
+triggers the playbook run. However, the temporary files are not
+deleted when the verbosity is greater than 0. This option is helpful
+when debugging.
+
+The Ansible environment variables may be overridden using an example
+like the following::
+
+  parameter_defaults:
+    CephAnsibleEnvironmentVariables:
+      ANSIBLE_SSH_RETRIES: '6'
+      DEFAULT_FORKS: '25'
+
+In the above example, the number of SSH retries is increased from the
+default to prevent timeouts. Ansible's fork number is automatically
+limited to the number of possible hosts at runtime. TripleO uses
+ceph-ansible to configure Ceph clients in addition to Ceph servers so
+when deploying a large number of compute nodes ceph-ansible may
+consume a lot of memory on the undercloud. Lowering the fork count
+will reduce the memory footprint while the Ansible playbook is running
+at the expense of the number of hosts configured in parallel.
+
+Applying ceph-ansible customizations to a overcloud deployment
+--------------------------------------------------------------
+
+The desired options from the ceph-ansible examples above to customize
+the ceph.conf, container, OSD or Ansible options may be combined under
+one `parameter_defaults` setting and saved in an environment file
+"~/my-ceph-settings.yaml" and added to the deploy commandline::
 
     openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e ~/my-ceph-settings.yaml
 
@@ -203,4 +290,5 @@ file "~/my-ceph-settings.yaml" and added to the deploy commandline::
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible
 .. _`ceph.yaml static hieradata`: https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/hieradata/ceph.yaml
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars
+.. _`pgcalc`: http://ceph.com/pgcalc
 .. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html

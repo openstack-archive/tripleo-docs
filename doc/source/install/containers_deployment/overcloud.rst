@@ -112,6 +112,15 @@ Then upload the images to the local registry using the generated file::
 
     openstack overcloud container image upload --config-file overcloud_containers.yaml
 
+.. note::
+   If this command fails with the following error::
+
+      Error while fetching server API version: ('Connection aborted.', error(13, 'Permission denied'))
+
+   You may need to run ``newgrp docker``. This is because the undercloud install
+   adds the current user to the docker group, but that change will not
+   automatically take effect in the current session.
+
 Or :ref:`build and push the images <build_container_images>` yourself.  This is
 useful if you wish to customize the containers or modify an existing one.
 

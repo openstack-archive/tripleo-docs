@@ -32,7 +32,7 @@ into the overcloud deploy command as follows::
     openstack overcloud deploy --templates \
       -e <full environment> -e  horizon_password.yaml
 
-Default Security Values in Horzion
+Default Security Values in Horizon
 ----------------------------------
 
 The following config directives are set to ``True`` as a secure default, however

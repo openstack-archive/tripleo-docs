@@ -235,8 +235,7 @@ machines with a great deal of RAM and CPU capacity are used to run Nova in the
 overcloud, and the smaller machines run less demanding services, such as
 Keystone.
 
-The version of TripleO included in |project| is capable of handling flavors in
-two different modes.
+|project| is capable of handling flavors in two different modes.
 
 The simpler PoC (Proof of Concept) mode is intended to enable new users to
 experiment, without worrying about matching hardware profiles. In this mode,

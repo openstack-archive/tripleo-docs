@@ -7,6 +7,7 @@ TripleO Contributor Guide
 
   new_developers
   contributions
+  reproduce-ci
   check_gates
   dlrn-promoter-overview
   stages-overview

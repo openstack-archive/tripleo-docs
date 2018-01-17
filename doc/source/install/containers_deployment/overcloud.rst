@@ -80,6 +80,11 @@ will typically be replaced with a value specific to the
 environment. Run with ``--help`` to see the other options available for
 controlling what is generated.
 
+It is possible to limit the output to only the images that are going to be used
+in the deployment by specifying the heat environment files with the
+``--environment-file`` option and the roles file with the ``--roles-file``
+option.
+
 Populate local docker registry
 ..............................
 
@@ -88,25 +93,21 @@ overcloud deployment faster and more reliable. For development purposes an
 insecure docker registry is already setup to listen on port 8787 as part of the
 undercloud install.
 
-To copy the images from one registry to another, the `prepare` command is run
-to generate the `overcloud_containers.yaml` file. This describes the source and
-destination image locations consumed by the `upload` command.
+To copy the images from one registry to another, the above `prepare` command is
+modified to also generate the `overcloud_containers.yaml` file. This describes
+the source and destination image locations consumed by the `upload` command.
 
 To copy the pre-built images coming from the `rdoproject` registry to
 the local repository, the following commands are run.  The first sets
 up the ``overcloud_containers.yaml`` configuration file containing the
-pull and push diestinations::
+pull and push destinations::
 
     openstack overcloud container image prepare \
       --namespace trunk.registry.rdoproject.org/master \
       --tag <tag> \
       --push-destination 192.168.24.1:8787 \
+      --output-env-file ~/docker_registry.yaml \
       --output-images-file overcloud_containers.yaml
-
-It is possible to limit the output to only the images that are going to be used
-in the deployment by specifying the heat environment files with the
-``--environment-file`` option and the roles file with the ``--roles-file``
-option.
 
 Then upload the images to the local registry using the generated file::
 
@@ -123,16 +124,6 @@ Then upload the images to the local registry using the generated file::
 
 Or :ref:`build and push the images <build_container_images>` yourself.  This is
 useful if you wish to customize the containers or modify an existing one.
-
-The command ``openstack overcloud container image prepare`` then needs to be
-called again to generate the `~/docker_registry.yaml` file that specifies the
-containers available in the local registry::
-
-    openstack overcloud container image prepare \
-      --namespace 192.168.24.1:8787/master \
-      --tag <tag> \
-      --output-env-file ~/docker_registry.yaml
-
 
 Deploying the containerized Overcloud
 -------------------------------------

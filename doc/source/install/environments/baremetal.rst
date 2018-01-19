@@ -228,6 +228,12 @@ user identifying machines inside ``instackenv.json`` file:
   description and so on). Note that this field will not be considered by
   Ironic during the import
 
+Also if you're working in a diverse environment with multiple architectures
+and/or platforms within an architecture you may find it necessary to include a
+platform field:
+
+* ``platform`` - String paired with images to fine tune image selection
+
 For example::
 
   {

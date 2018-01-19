@@ -272,6 +272,23 @@ Load the images into the containerized undercloud Glance::
 
 To upload a single image, see :doc:`../post_deployment/upload_single_image`.
 
+If working with multiple atchitectures and/or plaforms with an architecure these
+attributes can be specified at upload time as in::
+
+    openstack overcloud image upload
+    openstack overcloud image upload --arch x86_64 \
+        --httpboot /httpboot/x86_64
+    openstack overcloud image upload --arch x86_64 --platform SNB \
+        --httpboot /httpboot/x86_64-SNB
+
+.. note::
+
+    Adding --httpboot is optional but suggested if you need to ensure that the
+    ``agent`` images are unique within your environment.
+
+This will create 3 sets of images with in the undercloud image service for later
+use in deployment, see :doc:`../environments/baremetal`
+
 Register Nodes
 --------------
 

@@ -90,13 +90,13 @@ the default, which is ``False``.
 How do I repair broken nodes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Usually, the nodes should only be deleted when the hardware is decomissioned.
+Usually, the nodes should only be deleted when the hardware is decommissioned.
 Before that, you're expected to remove instances from them using scale-down.
 However, in some cases, it may be impossible to repair a node with e.g. broken
 power management, and it gets stuck in an abnormal state.
 
 .. warning::
-    Before proceeding with this section, always try to decomission a node
+    Before proceeding with this section, always try to decommission a node
     normally, by scaling down your cloud. Forcing node deletion may cause
     unpredicable results.
 

@@ -22,7 +22,7 @@ where the Undercloud installation has been performed.
 manner, and will often be used to refer to the method detailed in this
 documentation.
 
-At a high level, an additonal cli arg (``--config-download``) is passed to
+At a high level, an additional cli arg (``--config-download``) is passed to
 ``openstack overcloud deploy``, which enables the various pieces to use
 Ansible in the manner detailed here.
 
@@ -35,7 +35,7 @@ ports.
 The difference is that although Heat creates all the deployment data necessary
 via SoftwareDeployment resources to perform the Overcloud installation and
 configuration, it does not apply any of the deployments. The data is only made
-available via the Heat API, and an additonal config-download workflow is
+available via the Heat API, and an additional config-download workflow is
 triggered after the Heat stack is completed that downloads all of the
 deployment data from Heat.
 

@@ -37,7 +37,7 @@ Default Security Values in Horizon
 
 The following config directives are set to ``True`` as a secure default, however
 if a reason exists for an operator to disable one of the following values, they
-can do so using an enviroment file.
+can do so using an environment file.
 
 .. note:: The following directives should only be set to ``False`` once the
           potential security impacts are fully understood.
@@ -66,7 +66,7 @@ vulnerability, so this option allows extra security hardening where iframes are
 not used in deployment.
 
 If however a reason exists to allow Iframe embedding, then the following
-parameter can be set within an enviroment file::
+parameter can be set within an environment file::
 
     parameter_defaults:
       ControllerExtraConfig:
@@ -86,7 +86,7 @@ SSH Banner Text
 ---------------
 
 SSH ``/etc/issue`` Banner text can be set using the following parameters in an
-enviroment file::
+environment file::
 
     resource_registry:
       OS::TripleO::Services::Sshd: ../puppet/services/sshd.yaml
@@ -118,7 +118,7 @@ is capable of logging many events such as someone changing the system time,
 changes to Mandatory / Discretionary Access Control, creating / destroying users
 or groups.
 
-Rules can be declared using an enviroment file and injected into
+Rules can be declared using an environment file and injected into
 ``/etc/audit/audit.rules``::
 
     parameter_defaults:

@@ -11,6 +11,7 @@ Documentation on how to enable and configure various features available in
    network_isolation
    network_isolation_virt
    ssl
+   ipsec
    node_placement
    ops_tools
    high_availability

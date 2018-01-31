@@ -385,8 +385,8 @@ parameters::
     openstack subnet create --network provisioning \
         --subnet-range 192.168.24.0/24 --gateway 192.168.24.40 \
         --allocation-pool start=192.168.24.41,end=192.168.24.100 provisioning-subnet
-    openstack router create provisioning-router
-    openstack router add subnet provisioning-router provisioning-subnet
+    openstack router create default-router
+    openstack router add subnet default-router provisioning-subnet
 
 .. warning::
     Network types other than "flat" are not supported when using ``flat``
@@ -399,13 +399,11 @@ In a real situation you will only use it as provisioning, and create a separate
 physical network as external.
 
 Now you can create a regular tenant network to use for virtual instances
-and a router between provisioning and tenant networks::
+and use the ``default-router`` to link the provisioning and tenant networks::
 
     openstack network create tenant-net
     openstack subnet create --network tenant-net --subnet-range 192.0.3.0/24 \
         --allocation-pool start=192.0.3.10,end=192.0.3.20 tenant-subnet
-    openstack router create default-router
-    openstack router add subnet default-router provisioning-subnet
     openstack router add subnet default-router tenant-subnet
 
 Configuring cleaning

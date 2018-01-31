@@ -18,6 +18,7 @@ Documentation on how to enable and configure various features available in
    baremetal_overcloud
    ovs_dpdk_config
    deployed_server
+   keystone_security_compliance
    security_hardening
    api_policies
    disable_telemetry

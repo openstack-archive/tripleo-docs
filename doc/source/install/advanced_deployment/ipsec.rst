@@ -94,10 +94,17 @@ To change the default encryption algorithm, you can use an environment file
 that looks as follows::
 
     parameter_defaults:
-      IPSECPhase2Alg: 'aes_gcm256-null'
+      IpsecVars:
+        ipsec_algorithm: 'aes_gcm256-null'
+
+The ``IpsecVars`` option is able to change any parameter in the tripleo-ipsec
+ansible role.
 
 .. note:: For more information on the algorithms that Libreswan suppports,
           please check the `Libreswan documentation`_
+
+.. note:: For more information on the available parameters, check the README
+          file in the `tripleo-ipsec repository`_.
 
 
 Verification
@@ -162,3 +169,4 @@ deployment is done, you'll need to do several things:
 .. _Libreswan: https://libreswan.org/
 .. _Libreswan documentation: https://libreswan.org/man/ipsec.conf.5.html
 .. _Libreswan wiki entry on the subject: https://libreswan.org/wiki/How_to_read_status_output
+.. _tripleo-ipsec repository: https://github.com/openstack/tripleo-ipsec/blob/master/README.md

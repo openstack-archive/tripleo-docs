@@ -10,3 +10,4 @@ Documentation of developer-specific options in |project|.
    tht_walkthrough/tht_walkthrough
    upgrades/upgrades
    release
+   mistral_workflows/00-index

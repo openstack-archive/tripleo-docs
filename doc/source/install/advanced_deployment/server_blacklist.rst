@@ -34,6 +34,10 @@ The blacklist can be used during scale out operations or for isolating changes
 to certain servers only.
 
 .. warning::
+  Blacklisting servers disables **all** updates to the blacklisted nodes, even
+  for those deployments that could be considered critical.
+
+.. warning::
   Blacklisting servers should be done with caution, and only when the operator
   understands that the requested change can be applied with a blacklist in
   effect.

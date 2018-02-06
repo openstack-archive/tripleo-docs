@@ -160,9 +160,11 @@ given environment type and that networking is correctly set up.
 
 Next step is to install the undercloud. We install undercloud using `Instack
 <https://github.com/openstack/instack-undercloud>`_'s script and it calls
-puppet scripts in the background. Upstream TripleO developers also use the
-developer-based steps known as `devtest <http://docs.openstack.org/developer/
-tripleo-incubator/devtest.html>`_.
+puppet scripts in the background.
+
+For development or proof of concept (PoC) environments, `Quickstart
+<https://docs.openstack.org/tripleo-quickstart/latest/index.html>`_
+can also be used.
 
 
 Undercloud Data Preparation

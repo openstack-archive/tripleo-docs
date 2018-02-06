@@ -22,8 +22,7 @@ How to execute the reproducer-quickstart script
 
 Go to the "logs" directory of the job::
 
-    wget http://logs.openstack.org/07/472607/<snip>/f98d674/logs/
-    reproducer-quickstart.sh
+    wget http://logs.openstack.org/07/472607/<snip>/f98d674/logs/reproducer-quickstart.sh
 
 Source your OpenStack RC file::
 
@@ -35,8 +34,8 @@ Execute the reproducer-quickstart.sh::
 
 The following additional options are recommended::
 
-    bash -x reproducer-quickstart.sh --workspace /var/tmp/reproduce
-    --create-virtualenv true --remove-stacks-keypairs true
+    bash -x reproducer-quickstart.sh --workspace /var/tmp/reproduce \
+    --create-virtualenv true --remove-stacks-keypairs true \
     --nodestack-prefix repro
 
 Please check the script's help command however the available options are::

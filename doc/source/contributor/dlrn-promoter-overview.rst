@@ -125,7 +125,7 @@ The DLRN Promotor script calls the `container push playbook
 <https://github.com/rdo-infra/ci-config/blob/master/ci-scripts/container-push/container-push.yml>`_
 to push the RDO containers at each stage to `docker.io
 <https://hub.docker.com/r/tripleopike/centos-binary-heat-api/tags/>`_.
-Note that the the above ``docker.io`` link shows containers tagged with ``tripleo-ci-testing``,
+Note that the above ``docker.io`` link shows containers tagged with ``tripleo-ci-testing``,
 ``current-tripleo`` and ``current-tripleo-rdo``.
 
 

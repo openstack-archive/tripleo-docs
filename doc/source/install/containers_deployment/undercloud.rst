@@ -2,7 +2,11 @@ Containers based Undercloud Deployment
 ======================================
 
 This documentation explains how to deploy a fully containerized undercloud on
-Docker. This feature is supported starting with Pike.
+Docker.
+
+.. warning::
+    This feature isn't supported yet but we hope to support it by the end
+    of Rocky cycle.
 
 While this is not currently used to deploy the overcloud, it is a great
 development tool as it uses the same templates and infrastructure as the
@@ -45,9 +49,9 @@ configured.
 Make sure these packages are installed before proceeding with the undercloud
 installation:
 
-* python-tripleoclient >= Pike
-* python-openstackclient >= Pike
-* openstack-heat-agents >= Pike
+* python-tripleoclient
+* python-tripleoclient-heat-installer
+* python-openstackclient
 * docker >= 1.12.5
 * openvswitch (minimum version supported by neutron)
 
@@ -109,27 +113,12 @@ similar to the containerized overcloud case, see
 Deploying the undercloud
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following command will install an undercloud with ironic, mistral and zaqar
-(substitute $THT_ROOT with the right path, which is normally
-`/usr/share/openstack-tripleo-heat-templates`, and $YOUR_SERVER_IP with your
-server's private IP)::
+The following command will install an undercloud with ironic, mistral and zaqar::
 
-    $ sudo openstack undercloud deploy \
-      --templates=$THT_ROOT \
-      --local-ip=$YOUR_SERVER_IP \
-      --keep-running \
-      -e $THT_ROOT/environments/services-docker/ironic.yaml \
-      -e $THT_ROOT/environments/services-docker/mistral.yaml \
-      -e $THT_ROOT/environments/services-docker/zaqar.yaml \
-      -e $THT_ROOT/environments/docker.yaml \
-      -e $THT_ROOT/environments/mongodb-nojournal.yaml \
-      -e $HOME/custom.yaml \
-      -e $HOME/docker_registry.yaml
+    $ openstack undercloud install --use-heat
 
 
-The `keep-running` flag will keep the `openstack undercloud deploy` process
-running on failures, which allows for debugging the current execution. A minimal
-`stackrc` file will be required to query both, the keystone and the heat, APIs::
+A minimal `stackrc` file will be required to query both, the keystone and the heat, APIs::
 
     export OS_NO_CACHE=True
     export OS_CLOUDNAME=overcloud
@@ -166,7 +155,7 @@ also remove them by running::
 How does the undercloud deploy work?
 ------------------------------------
 
-The `undercloud deploy` command as written in the `Deploying the undercloud`_
+The `undercloud install` command as written in the `Deploying the undercloud`_
 section will run all the OpenStack services in a container runtime (docker)
 unless the default settings are overwritten.
 

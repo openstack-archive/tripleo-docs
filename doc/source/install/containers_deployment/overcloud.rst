@@ -47,7 +47,7 @@ following command will return the tag from the RDO docker registry using the
 stable tag ``current-tripleo-rdo``::
 
     openstack overcloud container image tag discover \
-      --image trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo \
+      --image docker.io/tripleomaster/centos-binary-base:current-tripleo-rdo \
       --tag-from-label rdo_version
 
 .. note:: The tag is actually a Delorean hash. You can find out the versions
@@ -56,7 +56,7 @@ stable tag ``current-tripleo-rdo``::
           is in fact using this `Delorean repository`_.
 
 The option ``--image
-trunk.registry.rdoproject.org/master/centos-binary-base:current-tripleo-rdo``
+docker.io/tripleomaster/centos-binary-base:current-tripleo-rdo``
 will typically be replaced with a value specific to the environment. You may
 wish to use stable tag ``tripleo-passed-ci`` for a more stable set of
 containers.
@@ -71,11 +71,11 @@ a heat environment file `~/docker_registry.yaml` to deploy an overcloud
 with container images from RDO docker registry::
 
     openstack overcloud container image prepare \
-      --namespace trunk.registry.rdoproject.org/master \
+      --namespace docker.io/tripleomaster \
       --tag <tag> \
       --output-env-file ~/docker_registry.yaml
 
-The option ``--namespace trunk.registry.rdoproject.org/master``
+The option ``--namespace docker.io/tripleomaster``
 will typically be replaced with a value specific to the
 environment. Run with ``--help`` to see the other options available for
 controlling what is generated.
@@ -103,7 +103,7 @@ up the ``overcloud_containers.yaml`` configuration file containing the
 pull and push destinations::
 
     openstack overcloud container image prepare \
-      --namespace trunk.registry.rdoproject.org/master \
+      --namespace docker.io/tripleomaster \
       --tag <tag> \
       --push-destination 192.168.24.1:8787 \
       --output-env-file ~/docker_registry.yaml \

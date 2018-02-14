@@ -15,6 +15,7 @@ Documentation on how to enable and configure various features available in
    node_placement
    ops_tools
    high_availability
+   instance_ha
    baremetal_overcloud
    ovs_dpdk_config
    deployed_server

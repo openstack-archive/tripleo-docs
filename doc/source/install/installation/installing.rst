@@ -72,7 +72,7 @@ Installing the Undercloud
    .. admonition:: Ceph
       :class: ceph
 
-      If you intend to deploy Ceph in the overcloud and are running Pike or newer, then install ceph-ansible on the undercloud::
+      If you intend to deploy Ceph in the overcloud, or configure the overcloud to use an external Ceph cluster, and are running Pike or newer, then install ceph-ansible on the undercloud::
 
           sudo yum install -y ceph-ansible
 

@@ -5,7 +5,11 @@ Use an external Ceph cluster with the Overcloud
 in the Overcloud.
 
 This happens by enabling a particular environment file when deploying the
-Overcloud, specifically `environments/puppet-ceph-external.yaml`.
+Overcloud. For Ocata and earlier use
+`environments/puppet-ceph-external.yaml`. For Pike and newer, use
+`environments/ceph-ansible/ceph-ansible-external.yaml` and install
+ceph-ansible on the Undercloud as described in
+:doc:`../installation/installing`.
 
 Some of the parameters in the above environment file can be overridden::
 
@@ -51,14 +55,36 @@ at least three required parameters related to the external Ceph cluster::
     # The list of Ceph monitors
     CephExternalMonHost: '172.16.1.7, 172.16.1.8, 172.16.1.9'
 
-Last but not least, from the Newton release TripleO will install Ceph Jewel. If
-the external Ceph cluster uses the Hammer release instead, you should also
-pass the following parameters to enable backward compatibility features::
+As of the Newton release TripleO will install Ceph Jewel. If the
+external Ceph cluster uses the Hammer release instead, pass the
+following parameters to enable backward compatibility features::
 
   parameter_defaults:
     ExtraConfig:
       ceph::profile::params::rbd_default_features: '1'
 
-Finally add the above environment files to the deploy commandline::
+When using ceph-ansible and :doc:`deployed_server`, it is necessary
+to run commands like the following from the undercloud before
+deployment::
+
+    export OVERCLOUD_HOSTS="192.168.1.8 192.168.1.42"
+    bash /usr/share/openstack-tripleo-heat-templates/deployed-server/scripts/enable-ssh-admin.sh
+    for h in $OVERCLOUD_HOSTS ; do
+        ssh $h -l stack "sudo groupadd ceph -g 64045 ; sudo useradd ceph -u 64045 -g ceph"
+    done
+
+In the example above, the OVERCLOUD_HOSTS variable should be set to
+the IPs of the overcloud hosts which will be Ceph clients (e.g. Nova,
+Cinder, Glance, Gnocchi, Manila, etc.). The `enable-ssh-admin.sh`
+script configures a user on the overcloud nodes that Ansible uses to
+configure Ceph. The `for` loop creates the Ceph user on the relevant
+overcloud hosts.
+
+Finally add the above environment files to the deploy commandline. For
+Ocata and earlier::
 
   openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-ceph-external.yaml -e ~/my-additional-ceph-settings.yaml
+
+For Pike and later::
+
+  openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible-external.yaml -e ~/my-additional-ceph-settings.yaml

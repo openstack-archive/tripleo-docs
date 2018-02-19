@@ -141,34 +141,45 @@ Deploying the Overcloud with an External Backend
 
 #. Copy the Manila driver-specific configuration file to your home directory:
 
-   - Generic driver::
+   - Dell-EMC Isilon driver::
 
-          sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-generic-config.yaml ~
+       sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-isilon-config.yaml ~
+
+   - Dell-EMC Unity driver::
+
+       sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-unity-config.yaml ~
+
+   - Dell-EMC Vmax driver::
+
+       sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-vmax-config.yaml ~
+
+   - Dell-EMC VNX driver::
+
+       sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-vnx-config.yaml ~
 
    - NetApp driver::
 
-         sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-netapp-config.yaml ~
+       sudo cp /usr/share/openstack-tripleo-heat-templates/environments/manila-netapp-config.yaml ~
 
 #. Edit the permissions (user is typically ``stack``)::
 
     sudo chown $USER ~/manila-*-config.yaml
     sudo chmod 755 ~/manila-*-config.yaml
 
-
 #. Edit the parameters in this file to fit your requirements.
-    - If you're using the generic driver, ensure that the service image
-      details correspond to the service image you intend to load.
-    - Ensure that the following line is changed::
 
-       OS::TripleO::ControllerExtraConfigPre: /usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/controller/manila-[generic or netapp].yaml
+   - Fill in or override the values of parameters for your back end.
 
+   - Since you have copied the file out of its original locaation,
+     replace relative paths in the resource_registry with absolute paths
+     based on ``/usr/share/openstack-tripleo-heat-templates``.
 
 #. Continue following the TripleO instructions for deploying an overcloud.
    Before entering the command to deploy the overcloud, add the environment
    file that you just configured as an argument. For example::
 
     openstack overcloud deploy --templates \
-      -e <full environment> -e ~/manila-[generic or netapp]-config.yaml
+      -e <full environment> -e ~/manila-[isilon or unity or vmax or vnx or netapp]-config.yaml
 
 #. Wait for the completion of the overcloud deployment process.
 
@@ -182,17 +193,6 @@ Creating the Share
     tenant user. Sourcing the ``overcloudrc`` file will authenticate you as
     the admin user. You can then create a tenant user and use environment
     files to switch between them.
-
-#. Upload a service image:
-
-   .. note::
-
-       This step is only required for the generic driver.
-
-   Download a Manila service image to be used for share servers and upload it
-   to Glance so that Manila can use it [tenant]::
-
-       glance image-create --name manila-service-image --disk-format qcow2 --container-format bare --file manila_service_image.qcow2
 
 #. Create a share network to host the shares:
 

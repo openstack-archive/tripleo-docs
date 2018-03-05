@@ -25,3 +25,4 @@ Documentation on how to enable and configure various features available in
    server_blacklist
    split_stack
    ansible_config_download
+   rhsm

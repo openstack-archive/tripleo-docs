@@ -42,10 +42,11 @@ Get Images
        delete the older images and restart the process from this step.
 
        Alternatively, images are available via RDO at
-       https://images.rdoproject.org/ which offers images from both the
+       https://images.rdoproject.org/master which offers images from both the
        CentOS Build System (cbs) and RDO Trunk (called rdo_trunk or delorean).
        However this mirror is slow so if you experience slow download speeds
-       you should skip to building the images instead.
+       you should skip to building the images instead. If you require older
+       versions specify the upstream openstack release for "master".
 
        The image files required are::
 

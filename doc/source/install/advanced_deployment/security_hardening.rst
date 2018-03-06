@@ -336,3 +336,48 @@ If `openstack overcloud deploy` is called as a subsequent run to an initial
 deployment *and* the AIDE configuration rules are changed, the TripleO AIDE
 service will rebuild the database to ensure the new config attributes are
 encapsulated in the integrity database.
+
+SecureTTY
+---------
+
+SecureTTY allows disabling root access via any console device (tty) by means of
+entries to the `/etc/securetty` file.
+
+An environment file can be used to set `/etc/securetty` entries as follows::
+
+  resource_registry:
+    OS::TripleO::Services::Securetty: ../puppet/services/securetty.yaml
+
+  parameter_defaults:
+    TtyValues:
+      - console
+      - tty1
+      - tty2
+      - tty3
+      - tty4
+      - tty5
+      - tty6
+
+Keystone CADF auditing
+----------------------
+
+Keystone CADF auditing can be enabled by setting `KeystoneNotificationFormat`::
+
+  parameter_defaults:
+    KeystoneNotificationFormat: cadf
+
+login.defs values
+-----------------
+
+Entries can be made to `/etc/login.defs` to enforce password characteristics
+for new users added to the system, for example::
+
+  resource_registry:
+    OS::TripleO::Services::LoginDefs: ../puppet/services/login-defs.yaml
+
+  parameter_defaults:
+    PasswordMaxDays: 60
+    PasswordMinDays: 1
+    PasswordMinLen: 5
+    PasswordWarnAge: 7
+    FailDelay: 4

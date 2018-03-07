@@ -121,3 +121,86 @@ the cinder container from our previous example we would add::
 
     parameter_defaults:
         DockerCinderVolumeImage: centos-binary-cinder-volume-vendorx:rev1
+
+
+3rd party kernel modules
+------------------------
+
+Some applications (like Neutron or Cinder plugins) require specific kernel modules to be installed
+and loaded on the system.
+
+We recommend two different methods to deploy and load these modules.
+
+kernel module is deployed on the host
+.....................................
+
+The kernel module is deployed on the base Operating System via RPM or DKMS.
+It is suggested to deploy the module via virt-customize.
+The libguestfs-tools package contains the virt-customize tool. Install the libguestfs-tools::
+
+    sudo yum install libguestfs-tools
+
+Then you need to create a repository file where the module will be downloaded from, and uplaod the repo into the image::
+
+    virt-customize --selinux-relabel -a overcloud-full.qcow2 --upload my-repo.repo:/etc/yum.repos.d/
+
+Once the repository is deployed, you can now install the rpm that contains the kernel module::
+
+    virt-customize --selinux-relabel -a overcloud-full.qcow2 --install my-rpm
+
+Now that the rpm is deployed with the kernel module, we need to configure TripleO to load it.
+To configure an extra kernel module named "dpdk_module" for a specific role, we would add::
+
+    parameter_defaults:
+      ControllerExtraKernelModules:
+        dpdk_module: {}
+
+Since our containers don't get their own kernels, we load modules on the host.
+Therefore, ExtraKernelModules parameter is used to configure which modules we want to configure.
+This parameter will be applied to the Puppet manifest (in the kernel.yaml service).
+The container needs the modules mounted from the host, so make sure the plugin template has the
+following configuration (at minimum)::
+
+    volumes:
+      - /lib/modules:/lib/modules:ro
+
+However, this method might be problematic if RPMs dependencies are too complex to deploy the kernel
+module on the host.
+
+
+kernel module is containerized
+..............................
+
+Kernel modules can be loaded from the container.
+The module can be deployed in the same container as the application that will use it, or in a separated
+container.
+
+Either way, if you need to run a privileged container, make sure to set this parameter::
+
+    privileged: true
+
+If privilege mode isn't required, it is suggested to set it to false for security reaons.
+
+Kernel modules will need to be loaded when the container will be started by Docker. To do so, it is
+suggested to configure the composable service which deploys the module in the container this way::
+
+          kolla_config:
+            /var/lib/kolla/config_files/neutron_ovs_agent.json:
+            command: /dpdk_module_launcher.sh
+          docker_config_scripts:
+            dpdk_module_launcher.sh:
+              mode: "0755"
+              content: |
+                #!/bin/bash
+                set -xe
+                modprobe dpdk_module
+          docker_config:
+            step_3:
+              neutron_ovs_bridge:
+                volumes:
+                  list_concat:
+                    - {get_attr: [ContainersCommon, volumes]}
+                    -
+                      - /var/lib/docker-config-scripts/dpdk_module_launcher.sh:/dpdk_module_launcher.sh:ro
+
+That way, the container will be configured to load the module at start, so the operator can restart containers without caring about loading the module manually.

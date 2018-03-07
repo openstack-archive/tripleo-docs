@@ -109,6 +109,36 @@ pull and push destinations::
       --output-env-file ~/docker_registry.yaml \
       --output-images-file overcloud_containers.yaml
 
+.. admonition:: Stable Branch
+  :class: stable
+
+  If you wish to deploy a stable version, you will need to pull down the
+  correct containers for the version being deployed.
+
+  .. admonition:: Pike
+     :class: pike
+
+     Use the Pike containers::
+
+         openstack overcloud container image prepare \
+          --namespace docker.io/tripleopike \
+          --tag <tag> \
+          --push-destination 192.168.24.1:8787 \
+          --output-env-file ~/docker_registry.yaml \
+          --output-images-file overcloud_containers.yaml
+
+  .. admonition:: Queens
+     :class: queens
+
+     Use the Queens containers::
+
+         openstack overcloud container image prepare \
+          --namespace docker.io/tripleoqueens \
+          --tag <tag> \
+          --push-destination 192.168.24.1:8787 \
+          --output-env-file ~/docker_registry.yaml \
+          --output-images-file overcloud_containers.yaml
+
 Then upload the images to the local registry using the generated file::
 
     openstack overcloud container image upload --config-file overcloud_containers.yaml

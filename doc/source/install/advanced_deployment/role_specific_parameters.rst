@@ -59,6 +59,6 @@ which will be done by the service implementation::
     As of now, not all parameters can be set per role, it is based on the
     service or template implementation. Each service should have the
     implementation to merge the global parameters and role-specific
-    parameters, as explained in the above example. And today, not all services
-    have this merging logic, check the parameter usage before using it as
-    role-specific.
+    parameters, as explained in the above example. A warning will be shown
+    during the deployment, if an invalid parameter (which does not support
+    role-specific implementation) is provided as role-specific input.

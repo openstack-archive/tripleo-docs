@@ -60,6 +60,21 @@ For example::
 
             sudo -E tripleo-repos -b pike current ceph
 
+  .. admonition:: Queens
+     :class: queens ptoq
+
+     Enable the current Queens repositories::
+
+         sudo -E tripleo-repos -b queens current
+
+     .. admonition:: Ceph
+        :class: ceph
+
+        Include the Ceph repo in the tripleo-repos call::
+
+            sudo -E tripleo-repos -b queens current ceph
+
+
 .. warning::
    The remaining repositories configuration steps below should not be done for stable
    releases!

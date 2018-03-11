@@ -16,3 +16,4 @@ Documentation on how to deploy custom configurations with |project|.
    deploy_swift
    role_specific_parameters
    plan_export
+   routed_spine_leaf_network

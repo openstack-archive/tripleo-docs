@@ -38,32 +38,8 @@ To prepare your environment, you must follow all the steps described in the
 :ref:`basic-deployment-cli` documentation. Stop right at the
 :ref:`deploy-the-overcloud` section.
 
-A tag needs to be specified which is unique to the images being deployed.  This
-makes it possible to later update the overcloud to newer image versions. It
-also makes it easier to determine what images you are running in the overcloud.
-This unique tag can be discovered by running the command ``openstack overcloud
-container image tag discover`` with a known stable tag such as ``latest``. The
-following command will return the tag from the RDO docker registry using the
-stable tag ``current-tripleo-rdo``::
-
-    openstack overcloud container image tag discover \
-      --image docker.io/tripleomaster/centos-binary-base:current-tripleo-rdo \
-      --tag-from-label rdo_version
-
-.. note:: The tag is actually a Delorean hash. You can find out the versions
-          of packages by using this tag.
-          For example, `ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7` tag,
-          is in fact using this `Delorean repository`_.
-
-The option ``--image
-docker.io/tripleomaster/centos-binary-base:current-tripleo-rdo``
-will typically be replaced with a value specific to the environment. You may
-wish to use stable tag ``tripleo-passed-ci`` for a more stable set of
-containers.
-
 It is necessary to generate a heat environment file which specifies the
-container image parameters. These parameters will deploy the overcloud with
-images from a specific repository with the discovered ``<tag>``.
+container image parameters.
 
 The ``openstack overcloud container image prepare`` command is an easy
 way to generate these parameters. The following command will generate
@@ -72,8 +48,22 @@ with container images from RDO docker registry::
 
     openstack overcloud container image prepare \
       --namespace docker.io/tripleomaster \
-      --tag <tag> \
+      --tag current-tripleo \
+      --tag-from-label rdo_version \
       --output-env-file ~/docker_registry.yaml
+
+A tag needs to be specified which is unique to the images being deployed.  This
+makes it possible to later update the overcloud to newer image versions. It
+also makes it easier to determine what images you are running in the overcloud.
+This unique tag is discovered with the above command with the argument
+``--tag-from-label rdo_version``. This will cause every image with the tag
+``current-tripleo`` to be inspected to find the unique tag by looking at
+the value of the ``rdo_version`` label.
+
+.. note:: The tag is actually a Delorean hash. You can find out the versions
+          of packages by using this tag.
+          For example, `ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7` tag,
+          is in fact using this `Delorean repository`_.
 
 The option ``--namespace docker.io/tripleomaster``
 will typically be replaced with a value specific to the
@@ -104,7 +94,8 @@ pull and push destinations::
 
     openstack overcloud container image prepare \
       --namespace docker.io/tripleomaster \
-      --tag <tag> \
+      --tag current-tripleo \
+      --tag-from-label rdo_version \
       --push-destination 192.168.24.1:8787 \
       --output-env-file ~/docker_registry.yaml \
       --output-images-file overcloud_containers.yaml

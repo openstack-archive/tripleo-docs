@@ -108,24 +108,27 @@ Installing the Undercloud
           environment and generates sane values for a number of the important
           options.
 
-#. (OPTIONAL) Set up a containers registry and prepare container images
-   configuration.
+#. (OPTIONAL) Generate configuration for preparing container images
 
-   See :ref:`prepare-environment-containers` for details on the containers
-   images preparations. The described workflow is applicable both for
-   overclouds and underclouds. Additional ``docker_insecure_registries`` and
-   ``docker_registry_mirror`` parameters allow to customize container registries
-   via the ``undercloud.conf`` file.
+   As part of the undercloud install, an image registry is configured on port
+   `8787`.  This is used to increase reliability of overcloud image pulls, and
+   minimise overall network transfers.  The undercloud registry will be
+   populated with images required by the undercloud by generating the following
+   `containers-prepare-parameter.yaml` file and including it in
+   ``undercloud.conf:
+   container_images_file=$HOME/containers-prepare-parameter.yaml``::
 
-   .. note:: Local undercloud containers registry is not suitable for real
-      deployments. For production use, it is highly recommended that you use an
-      external container registry.
-      See :ref:`populate-local-registry-containers` for details on managing
-      containers images data populated into registries.
+      openstack tripleo container image prepare default \
+        --local-push-destination \
+        --output-env-file ~/containers-prepare-parameter.yaml
 
-   Once you have a containers images configuration file prepared and
-   containers images populated into registries, the images config file should
-   be explicitly specified in ``undercloud.conf: container_images_file``.
+   See :ref:`prepare-environment-containers` for details on using
+   `containers-prepare-parameter.yaml` to control what can be done
+   during the container images prepare phase of an undercloud install.
+
+   Additionally, ``docker_insecure_registries`` and ``docker_registry_mirror``
+   parameters allow to customize container registries via the
+   ``undercloud.conf`` file.
 
 #. (OPTIONAL) Override heat parameters and environment files used for undercloud
    deployment.

@@ -1,3 +1,5 @@
+.. _config_download:
+
 Deploying with Ansible
 ======================
 
@@ -94,6 +96,25 @@ When successful, the end of the output will look like the following example::
 
 Review the ``PLAY RECAP`` which will show each host that is part of the
 Overcloud and the grouped count of each task status.
+
+config-download with deployed-server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When using ``config-download`` with :doc:`deployed-server <deployed_server>`
+(pre-provisioned nodes), a ``HostnameMap`` parameter must be provided. Create
+an environment file to define the parameter, and assign the node hostnames in
+the parameter value. The following example shows a sample value::
+
+  parameter_defaults:
+    HostnameMap:
+      overcloud-controller-0: controller-00-rack01
+      overcloud-controller-1: controller-01-rack02
+      overcloud-controller-2: controller-02-rack03
+      overcloud-novacompute-0: compute-00-rack01
+      overcloud-novacompute-1: compute-01-rack01
+      overcloud-novacompute-2: compute-02-rack01
+
+Write the contents to an environment file such as ``hostnamemap.yaml``, and
+pass it the environment as part of the deployment command.
 
 ansible-playbook execution
 --------------------------

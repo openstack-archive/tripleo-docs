@@ -1,3 +1,5 @@
+.. _deployed_server:
+
 Using Already Deployed Servers
 ==============================
 
@@ -252,6 +254,27 @@ the Swift container and object name Heat should use for storing the deployment
 data for that server resource. These values should match the container and
 object names as described in the
 :ref:`pre-configuring-metadata-agent-configuration` section.
+
+deployed-server with config-download
+____________________________________
+When using :doc:`config-download <ansible_config_download>` with
+``deployed-server`` (pre-provisioned nodes), a ``HostnameMap`` parameter must
+be provided. Create an environment file to define the parameter, and assign the
+node hostnames in the parameter value. The following example shows a sample
+value::
+
+  parameter_defaults:
+    HostnameMap:
+      overcloud-controller-0: controller-00-rack01
+      overcloud-controller-1: controller-01-rack02
+      overcloud-controller-2: controller-02-rack03
+      overcloud-novacompute-0: compute-00-rack01
+      overcloud-novacompute-1: compute-01-rack01
+      overcloud-novacompute-2: compute-02-rack01
+
+Write the contents to an environment file such as ``hostnamemap.yaml``, and
+pass it the environment as part of the deployment command.
+
 
 
 Network Configuration

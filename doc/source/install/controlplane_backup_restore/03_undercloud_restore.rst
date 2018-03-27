@@ -1,31 +1,17 @@
-Backing up and Restoring your Undercloud
-========================================
+Restoring the Undercloud
+========================
 
-Backing up your Undercloud
---------------------------
-
-In order to backup your undercloud you need to make sure the following items are backed up
-
-* All MariaDB databases on the undercloud node
-* MariaDB configuration file on undercloud (so we can restore databases accurately)
-* All glance image data in /var/lib/glance/images
-* All swift data in /srv/node
-* All data in stack users home directory
-
-The following commands can be used to perform a backup of all data from the undercloud node::
-
-  mysqldump --opt --all-databases > /root/undercloud-all-databases.sql
-  tar -czf undercloud-backup-`date +%F`.tar.gz undercloud-all-databases.sql /etc/my.cnf.d/server.cnf /var/lib/glance/images /srv/node /home/stack /etc/pki /opt/stack
-
-Restoring a backup of your Undercloud on a Fresh Machine
---------------------------------------------------------
 The following restore process assumes you are recovering from a failed undercloud node where you have to reinstall it from scratch.
 It assumes that the hardware layout is the same, and the hostname and undercloud settings of the machine will be the same as well.
 Once the machine is installed and is in a clean state, re-enable all the subscriptions/repositories needed to install and run TripleO.
 
 Note that unless specified, all commands are run as root.
 
-Then install mariadb server with::
+
+Restoring a backup of your Undercloud on a Fresh Machine
+--------------------------------------------------------
+
+Install the MariaDB server with::
 
   yum install -y mariadb-server
 
@@ -59,7 +45,7 @@ We have to now install the swift and glance base packages, and then restore thei
   chown -R swift: /srv/node
   chown -R glance: /var/lib/glance/images
 
-Finally we rerun the undercloud installation from the stack user, making sure to run it in the stack user home dir::
+Finally, we rerun the undercloud installation from the stack user, making sure to run it in the stack user home dir::
 
   su - stack
   sudo yum install -y python-tripleoclient

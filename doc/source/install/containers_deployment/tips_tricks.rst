@@ -29,6 +29,34 @@ are quite there yet, so we export traditional logs from containers
 into the `/var/log/containers` directory on the host, where you can
 look at them.
 
+.. _toggle_debug:
+
+Toggle debug
+------------
+
+For services that support `reloading their configuration at runtime`_::
+
+    $ sudo docker exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
+    $ sudo docker kill -s SIGHUP nova_scheduler
+
+.. _reloading their configuration at runtime: https://storyboard.openstack.org/#!/story/2001545
+
+Restart the container to turn back the configuration to normal::
+
+    $ sudo docker restart nova_scheduler
+
+Otherwise, if the service does not yet support reloading its configuration, it
+is necessary to change the configuration on the host filesystem and restart the
+container::
+
+    $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug true
+    $ sudo docker restart nova_scheduler
+
+Apply the inverse change to restore the default log verbosity::
+
+    $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug false
+    $ sudo docker restart nova_scheduler
+
 Debugging container failures
 ----------------------------
 

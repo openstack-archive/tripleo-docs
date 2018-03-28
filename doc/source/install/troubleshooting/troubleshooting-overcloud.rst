@@ -277,3 +277,5 @@ Each OpenStack service has now its own Debug parameter.
 
 Glance was an example, but all OpenStack services are supported. You can find their Debug
 in the TripleO Heat Templates composable services.
+
+It is also possible to :ref:`toggle debug<toggle_debug>` for services after deployment.

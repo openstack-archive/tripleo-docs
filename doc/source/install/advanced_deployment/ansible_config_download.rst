@@ -149,7 +149,7 @@ Change to the latest directory shown (example)::
 Within this directory, all the files are present to rerun
 ``ansible-playbook``:
 
-tripleo-ansible-inventory
+tripleo-ansible-inventory.yaml
   Ansible inventory file containing hosts and vars for all the Overcloud nodes.
 ansible.log
   Log file from the last run of ``ansible-playbook``.
@@ -200,7 +200,7 @@ To generate an inventory file to use with ``ansible-playbook`` use
 
     tripleo-ansible-inventory \
       --ansible_ssh_user centos \
-      --static-inventory inventory
+      --static-yaml-inventory inventory.yaml
 
 The above example shows setting the ansible ssh user as ``centos``. This can be
 changed depending on the environment.
@@ -208,7 +208,7 @@ changed depending on the environment.
 The following illustrates an example execution of ``ansible-playbook``::
 
     ansible-playbook \
-      -i inventory \
+      -i inventory.yaml \
       --private-key /path/private/ssh/key \
       config-download/tripleo-<random>-config/deploy_steps_playbook.yaml
 

@@ -76,7 +76,7 @@ Installing the Undercloud
 
           sudo yum install -y ceph-ansible
 
-#. Copy in the sample configuration file and edit it to reflect your environment::
+#. For a non-containerized undercloud, copy in the sample configuration file and edit it to reflect your environment::
 
     cp /usr/share/instack-undercloud/undercloud.conf.sample ~/undercloud.conf
 
@@ -86,6 +86,10 @@ Installing the Undercloud
              It takes some basic information about the intended overcloud
              environment and generates sane values for a number of the important
              options.
+
+#. For a containerized undercloud, use this file::
+
+    cp /usr/share/python-tripleoclient/undercloud.conf.sample ~/undercloud.conf
 
 #. Run the command to install the undercloud:
 
@@ -102,11 +106,28 @@ Installing the Undercloud
       ``enable_validations = false`` in ``undercloud.conf`` to prevent
       that.
 
+   .. admonition:: Stable Branch
+      :class: stable
+
+      The containerized undercloud deployment isn't supported before Rocky release.
 
    Install the undercloud::
 
        openstack undercloud install
 
+   To deploy a containerized undercloud, just add --use-heat option::
+
+       openstack undercloud install --use-heat
+
+.. note::
+    The `openstack undercloud install --use-heat` command
+    will run all the OpenStack services in a container runtime (docker)
+    unless the default settings are overwritten.
+    This command requires 2 services to be running at all times. The first one is a
+    basic keystone service, which is currently executed by `tripleoclient` itself, the
+    second one is `heat-all` which executes the templates and installs the services.
+    The latter can be run on baremetal or in a container (tripleoclient will run it
+    in a container by default).
 
 Once the install has completed, you should take note of the files ``stackrc`` and
 ``undercloud-passwords.conf``.  You can source ``stackrc`` to interact with the

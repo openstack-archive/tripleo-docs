@@ -76,7 +76,7 @@ You can upgrade any packages that are installed on the undercloud machine.
 
    Update TripleO CLI package::
 
-      sudo yum update python-tripleoclient
+      sudo yum update python-tripleoclient*
 
 
 #. Run the undercloud upgrade command. This command will upgrade all packages
@@ -84,6 +84,17 @@ You can upgrade any packages that are installed on the undercloud machine.
    services::
 
       openstack undercloud upgrade
+
+   To upgrade to a containerized undercloud, just add --use-heat option::
+
+       openstack undercloud upgrade --use-heat
+
+   .. admonition:: Queens to Rocky and later
+      :class: otop
+
+      The containerized undercloud deployment isn't supported before Rocky release.
+      Therefore, the upgrade is supported in Rocky, from a non containerized undercloud
+      in Queens to a containerized undercloud in Rocky.
 
    .. note::
 

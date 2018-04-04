@@ -7,7 +7,7 @@ control plane.
 The use case involved in the creation and restore of these procedures are related to the
 possible failures of a minor update or major upgrade for both Undercloud and Overcloud.
 
-The general approach to recovery from failures during the minor update or major upgrade workflow
+The general approach to recover from failures during the minor update or major upgrade workflow
 is to fix the environment and restart services before re-running the last executed step.
 
 There are specific cases in which rolling back to previous steps in the upgrades

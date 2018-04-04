@@ -17,13 +17,16 @@ Install the MariaDB server with::
 
 Now restore the MariaDB configuration file and database backup, then start the MariaDB server and load the backup in::
 
-  tar -xzC / -f undercloud-backup-$DATE.tar.gz etc/my.cnf.d/server.cnf /root/undercloud-all-databases.sql
+  tar -xzC / -f undercloud-backup-$DATE.tar.gz etc/my.cnf.d/mariadb-server.cnf /root/undercloud-all-databases.sql
   # Edit /etc/my.cnf.d/server.cnf and comment out 'bind-address'
   systemctl start mariadb
   cat /root/undercloud-all-databases.sql | mysql
   # Now we need to clean out some old permissions to be recreated
   for i in ceilometer glance heat ironic keystone neutron nova;do mysql -e "drop user $i";done
   mysql -e 'flush privileges'
+
+Note that depending on the MySQL version, the config file can
+be `/etc/my.cnf.d/mariadb-server.cnf` or `/etc/my.cnf.d/server.cnf`.
 
 Now create the stack user and restore the stack users home directory::
 

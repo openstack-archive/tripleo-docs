@@ -9,7 +9,7 @@ References:
 
 #. https://review.openstack.org/#/q/topic:composable_service
 
-#. http://docs.openstack.org/developer/tripleo-docs/advanced_deployment/template_deploy.html
+#. https://docs.openstack.org/tripleo-docs/latest/install/advanced_deployment/template_deploy.html
 
 #. http://hardysteven.blogspot.com.es/2015/05/tripleo-heat-templates-part-1-roles-and.html
 

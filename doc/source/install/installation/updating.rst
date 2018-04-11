@@ -89,6 +89,10 @@ You can upgrade any packages that are installed on the undercloud machine.
 
        openstack undercloud upgrade --use-heat
 
+   .. note::
+       When upgrading a containerized undercloud, it's possible to enable verbose
+       logging with --verbose option.
+
    .. admonition:: Queens to Rocky and later
       :class: otop
 

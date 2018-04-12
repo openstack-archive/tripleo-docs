@@ -182,7 +182,21 @@ Each node description should contains required fields:
 
 Some fields are optional if you're going to use introspection later:
 
-* ``mac`` - list of MAC addresses, optional for bare metal
+* ``ports`` - list of baremetal port objects, a map specifying the following
+  keys: address, physical_network (optional) and local_link_connection
+  (optional). Optional for bare metal. Example::
+
+    "ports": [
+        {
+            "address": "52:54:00:87:c8:2f",
+            "physical_network": "physical-network",
+            "local_link_connection": {
+                "switch_info": "switch",
+                "port_id": "gi1/0/11",
+                "switch_id": "a6:18:66:33:cb:48"
+            }
+        }
+    ]
 
 * ``cpu`` - number of CPU's in system
 
@@ -212,55 +226,65 @@ user identifying machines inside ``instackenv.json`` file:
 
 For example::
 
-    {
-        "nodes": [
-            {
-                "name":"node-a",
-                "pm_type":"ipmi",
-                "mac":[
-                    "fa:16:3e:2a:0e:36"
-                ],
-                "cpu":"2",
-                "memory":"4096",
-                "disk":"40",
-                "arch":"x86_64",
-                "pm_user":"admin",
-                "pm_password":"password",
-                "pm_addr":"10.0.0.8",
-                "_comment": "Room 1 - Rack A - Unit 22/24"
-            },
-            {
-                "name":"node-b",
-                "pm_type":"ipmi",
-                "mac":[
-                    "fa:16:3e:da:39:c9"
-                ],
-                "cpu":"2",
-                "memory":"4096",
-                "disk":"40",
-                "arch":"x86_64",
-                "pm_user":"admin",
-                "pm_password":"password",
-                "pm_addr":"10.0.0.15",
-                "_comment": "Room 1 - Rack A - Unit 26/28"
-            },
-            {
-                "name":"node-n",
-                "pm_type":"ipmi",
-                "mac":[
-                    "fa:16:3e:51:9b:68"
-                ],
-                "cpu":"2",
-                "memory":"4096",
-                "disk":"40",
-                "arch":"x86_64",
-                "pm_user":"admin",
-                "pm_password":"password",
-                "pm_addr":"10.0.0.16",
-                "_comment": "Room 1 - Rack B - Unit 10/12"
-            }
-        ]
-    }
+  {
+      "nodes": [
+          {
+              "name": "node-a",
+              "pm_type": "ipmi",
+              "ports": [
+                  {
+                      "address": "fa:16:3e:2a:0e:36",
+                      "physical_network": "ctlplane"
+                  }
+              ],
+              "cpu": "2",
+              "memory": "4096",
+              "disk": "40",
+              "arch": "x86_64",
+              "pm_user": "admin",
+              "pm_password": "password",
+              "pm_addr": "10.0.0.8",
+              "_comment": "Room 1 - Rack A - Unit 22/24"
+          },
+          {
+              "name": "node-b",
+              "pm_type": "ipmi",
+              "ports": [
+                  {
+                      "address": "fa:16:3e:da:39:c9",
+                      "physical_network": "ctlplane"
+                  }
+              ],
+              "cpu": "2",
+              "memory": "4096",
+              "disk": "40",
+              "arch": "x86_64",
+              "pm_user": "admin",
+              "pm_password": "password",
+              "pm_addr": "10.0.0.15",
+              "_comment": "Room 1 - Rack A - Unit 26/28"
+          },
+          {
+              "name": "node-n",
+              "pm_type": "ipmi",
+              "ports": [
+                  {
+                      "address": "fa:16:3e:51:9b:68",
+                      "physical_network": "leaf1"
+                  }
+              ],
+              "cpu": "2",
+              "memory": "4096",
+              "disk": "40",
+              "arch": "x86_64",
+              "pm_user": "admin",
+              "pm_password": "password",
+              "pm_addr": "10.0.0.16",
+              "_comment": "Room 1 - Rack B - Unit 10/12"
+          }
+      ]
+  }
+
 
 .. note::
     You don't need to create this file, if you plan on using

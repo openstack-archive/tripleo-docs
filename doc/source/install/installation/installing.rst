@@ -120,6 +120,10 @@ Installing the Undercloud
        openstack undercloud install --use-heat
 
 .. note::
+    When installing a containerized undercloud, it's possible to enable verbose
+    logging with --verbose option.
+
+.. note::
     The `openstack undercloud install --use-heat` command
     will run all the OpenStack services in a container runtime (docker)
     unless the default settings are overwritten.

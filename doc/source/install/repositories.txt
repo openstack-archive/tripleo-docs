@@ -2,15 +2,18 @@
 
 Download and install the python2-tripleo-repos RPM from
 `the current RDO repository <https://trunk.rdoproject.org/centos7/current/>`_.
-For example::
+For example
 
-    sudo yum install -y https://trunk.rdoproject.org/centos7/current/python2-tripleo-repos-<version>.el7.centos.noarch.rpm
+.. code-block:: bash
 
-.. note:: tripleo-repos removes any repositories that it manages before each
-          run.  This means all repositories must be specified in a single
-          tripleo-repos call.  As an example, the correct way to install the
-          current and ceph repos is to run ``tripleo-repos current ceph``,
-          not two separate calls.
+   sudo yum install -y https://trunk.rdoproject.org/centos7/current/python2-tripleo-repos-<version>.el7.centos.noarch.rpm
+
+.. note::
+
+   tripleo-repos removes any repositories that it manages before each run.
+   This means all repositories must be specified in a single tripleo-repos
+   call. As an example, the correct way to install the current and ceph repos
+   is to run ``tripleo-repos current ceph``, not two separate calls.
 
 .. admonition:: Stable Branch
   :class: stable
@@ -21,76 +24,96 @@ For example::
   .. admonition:: Newton
      :class: newton mton
 
-     Enable the current Newton repositories::
+     Enable the current Newton repositories
+
+     .. code-block:: bash
 
          sudo -E tripleo-repos -b newton current
 
      .. admonition:: Ceph
         :class: ceph
 
-        Include the Ceph repo in the tripleo-repos call::
+        Include the Ceph repo in the tripleo-repos call
 
-            sudo -E tripleo-repos -b newton current ceph
+        .. code-block:: bash
+
+           sudo -E tripleo-repos -b newton current ceph
 
   .. admonition:: Ocata
      :class: ocata ntoo
 
-     Enable the current Ocata repositories::
+     Enable the current Ocata repositories
 
-         sudo -E tripleo-repos -b ocata current
+     .. code-block:: bash
+
+        sudo -E tripleo-repos -b ocata current
 
      .. admonition:: Ceph
         :class: ceph
 
-        Include the Ceph repo in the tripleo-repos call::
+        Include the Ceph repo in the tripleo-repos call
+
+        .. code-block:: bash
 
             sudo -E tripleo-repos -b ocata current ceph
 
   .. admonition:: Pike
      :class: pike otop
 
-     Enable the current Pike repositories::
+     Enable the current Pike repositories
 
-         sudo -E tripleo-repos -b pike current
+     .. code-block:: bash
+
+        sudo -E tripleo-repos -b pike current
 
      .. admonition:: Ceph
         :class: ceph
 
-        Include the Ceph repo in the tripleo-repos call::
+        Include the Ceph repo in the tripleo-repos call
 
-            sudo -E tripleo-repos -b pike current ceph
+        .. code-block:: bash
+
+           sudo -E tripleo-repos -b pike current ceph
 
   .. admonition:: Queens
      :class: queens ptoq
 
-     Enable the current Queens repositories::
+     Enable the current Queens repositories
 
-         sudo -E tripleo-repos -b queens current
+     .. code-block:: bash
+
+        sudo -E tripleo-repos -b queens current
 
      .. admonition:: Ceph
         :class: ceph
 
-        Include the Ceph repo in the tripleo-repos call::
+        Include the Ceph repo in the tripleo-repos call
 
-            sudo -E tripleo-repos -b queens current ceph
+        .. code-block:: bash
+
+           sudo -E tripleo-repos -b queens current ceph
 
 
 .. warning::
-   The remaining repositories configuration steps below should not be done for stable
-   releases!
+
+   The remaining repositories configuration steps below should not be done for
+   stable releases!
 
 Run tripleo-repos to install the appropriate repositories.  The option below
 will enable the latest master TripleO packages and the latest promoted
 packages for all other OpenStack services and dependencies.  There are other
 repository configurations available in tripleo-repos, see its --help output
 for details.
-::
 
-    sudo -E tripleo-repos current-tripleo-dev
+.. code-block:: bash
+
+   sudo -E tripleo-repos current-tripleo-dev
 
 .. admonition:: Ceph
   :class: ceph
 
-  Include the Ceph repository in the tripleo-repos command::
+  Include the Ceph repository in the tripleo-repos command
 
-      sudo -E tripleo-repos current-tripleo-dev ceph
+  .. code-block:: bash
+
+     sudo -E tripleo-repos current-tripleo-dev ceph

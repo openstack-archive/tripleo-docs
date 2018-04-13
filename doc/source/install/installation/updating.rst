@@ -7,14 +7,16 @@ You can upgrade any packages that are installed on the undercloud machine.
 
    .. note::
 
-     You may wish to backup your current repos before disabling them::
+      You may wish to backup your current repos before disabling them
 
-         mkdir /home/stack/REPOBACKUP
+      .. code-block:: bash
+
+         mkdir -p /home/stack/REPOBACKUP
          sudo mv /etc/yum.repos.d/delorean* /home/stack/REPOBACKUP
 
-   ::
+   .. code-block:: bash
 
-     sudo rm /etc/yum.repos.d/delorean*
+      sudo rm /etc/yum.repos.d/delorean*
 
 
 #. Enable new Delorean repositories:
@@ -24,9 +26,12 @@ You can upgrade any packages that are installed on the undercloud machine.
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
 
-3. Clean the yum cache to ensure only the new repos are used::
+3. Clean the yum cache to ensure only the new repos are used
 
-    sudo yum clean all
+   .. code-block:: bash
+
+      sudo yum clean all
+      sudo rm -rf /var/cache/yum
 
 #. Update required package:
 
@@ -36,9 +41,11 @@ You can upgrade any packages that are installed on the undercloud machine.
       It is strongly recommended that you validate the state of your undercloud
       before starting any upgrade operations. The tripleo-validations_ repo has
       some 'pre-upgrade' validations that you can execute by following the
-      instructions at validations_ to execute the "pre-upgrade" group::
+      instructions at validations_ to execute the "pre-upgrade" group
 
-          mistral execution-get-output $(openstack workflow execution create -f value -c ID tripleo.validations.v1.run_groups '{"group_names": ["pre-upgrade"]}')
+      .. code-block:: bash
+
+         mistral execution-get-output $(openstack workflow execution create -f value -c ID tripleo.validations.v1.run_groups '{"group_names": ["pre-upgrade"]}')
 
    .. admonition:: Newton to Ocata
       :class: ntoo
@@ -74,22 +81,28 @@ You can upgrade any packages that are installed on the undercloud machine.
          the Ocata to Pike upgrade.
 
 
-   Update TripleO CLI package::
+   Update TripleO CLI package
+
+   .. code-block:: bash
 
       sudo yum update python-tripleoclient
 
 
 #. Run the undercloud upgrade command. This command will upgrade all packages
    and use puppet to apply new configuration and restart all OpenStack
-   services::
+   services
+
+   .. code-block:: bash
 
       openstack undercloud upgrade
 
    .. note::
 
-      You may wish to use time and capture the output to a file for any debug::
+      You may wish to use time and capture the output to a file for any debug
 
-        time openstack undercloud upgrade 2>&1 | tee undercloud_upgrade.log
+      .. code-block:: bash
+
+         time openstack undercloud upgrade 2>&1 | tee undercloud_upgrade.log
 
    .. note::
 

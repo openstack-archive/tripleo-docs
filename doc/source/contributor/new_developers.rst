@@ -124,14 +124,11 @@ interface functions along side the command line interface.
 Using the Containerized Undercloud for Development.
 ---------------------------------------------------
 
-While not yet part of the TripleO distribution, we have a functioning
-containerized undercloud that we have been using for development purposes.
-This reuses much of the existing TripleO heat templates, allowing you to do
-development using this framework instead of a complete overcloud.  The
-iteration time for starting the undercloud via containers is MUCH shorter -
-typically 15 minutes or less and you could also reduce the services to make it
-even faster.  This is very useful if you are developing heat templates or
-containerized services.
+The containerized undercloud can be used for development purposes.
+This reuses the existing TripleO Heat Templates, allowing you to do the
+development using this framework instead of a complete overcloud.
+This is very useful if you are developing Heat templates or containerized
+services.
 
 Please see the following guide on how to set up a containerized undercloud:
 https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/undercloud.html

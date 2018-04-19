@@ -211,6 +211,26 @@ the following::
     CephPoolDefaultSize: 3
     CephPoolDefaultPgNum: 128
 
+Customize OpenStack Ceph Pools
+------------------------------
+
+In addition to setting the default PG number for each pool created,
+each Ceph pool created for OpenStack can have its own PG number.
+TripleO supports customization of these values by using a syntax like
+the following::
+
+  parameter_defaults:
+    CephPools:
+      - {"name": backups, "pg_num": 512, "pgp_num": 512}
+      - {"name": volumes, "pg_num": 1024, "pgp_num": 1024, "rule_name": 'replicated_rule', "erasure_profile": '', "expected_num_objects": 6000}
+      - {"name": vms, "pg_num": 512, "pgp_num": 512}
+      - {"name": images, "pg_num": 128, "pgp_num": 128}
+
+In the above example, PG numbers for each pool differ based on the
+OpenStack use case from `pgcalc`_. The example above also passes
+additional options as described in the `ceph osd pool create`_
+documentation to the volumes pool used by Cinder.
+
 Override Ansible run options
 ----------------------------
 
@@ -311,4 +331,5 @@ loop creates the Ceph user on the relevant overcloud hosts.
 .. _`ceph.yaml static hieradata`: https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/hieradata/ceph.yaml
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars
 .. _`pgcalc`: http://ceph.com/pgcalc
+.. _`ceph osd pool create`: http://docs.ceph.com/docs/jewel/rados/operations/pools/#create-a-pool
 .. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html

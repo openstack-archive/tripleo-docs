@@ -90,7 +90,7 @@ created on the undercloud, one should use a non-root user.
 
       ::
 
-          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images/rhel7.yaml"
+          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-rhel7.yaml"
 
 
 #. Install the ``current-tripleo`` delorean repository and deps repository:

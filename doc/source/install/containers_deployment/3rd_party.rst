@@ -71,7 +71,8 @@ Configure Kolla to build images for TripleO, in `/etc/kolla/kolla-build.conf`::
 Use the following command to build all of the container images used in TripleO::
 
   openstack overcloud container image build \
-        --config-file /usr/share/tripleo-common/container-images/overcloud_images.yaml
+        --config-file /usr/share/tripleo-common/container-images/overcloud_containers.yaml \
+        --kolla-config-file /etc/kolla/kolla-build.conf
 
 Or use `kolla-build` to build the images yourself, which provides more
 flexibility and allows you to rebuild selectively just the images matching

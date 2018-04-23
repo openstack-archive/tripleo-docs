@@ -528,6 +528,19 @@ To return to working with the undercloud, source the ``stackrc`` file again::
     source ~/stackrc
 
 
+Add entries to /etc/hosts
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In cases where the overcloud hostnames are not already resolvable with DNS,
+entries can be added to /etc/hosts to make them resolvable. This is
+particularly convenient on the undercloud. The Heat stack provides an output
+value that can be appended to /etc/hosts easily. Run the following command to
+get the output value and add it to /etc/hosts wherever the hostnames should
+be resolvable::
+
+    openstack stack output show overcloud HostsEntry -f value -c output_value
+
+
 Setup the Overcloud network
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

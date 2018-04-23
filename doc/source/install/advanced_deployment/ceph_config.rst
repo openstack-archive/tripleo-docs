@@ -135,25 +135,25 @@ For example, to encrypt the data stored on OSDs use the following::
     CephAnsibleExtraConfig:
       dmcrypt: true
 
-To change the backfill and recovery operations that Ceph uses to
-rebalance a cluster, use an example like the following::
-
-  parameter_defaults:
-    CephAnsibleExtraConfig:
-      osd_recovery_op_priority: 3
-      osd_recovery_max_active: 3
-      osd_max_backfills: 1
-
 The above example may be used to change any of the defaults found in
 `ceph-ansible/group_vars`_.
 
-If a parameter to override is not an
-available group variable, then global settings in the `ceph.conf` may
-be set directly using `CephConfigOverrides` like the following::
+If a parameter to override is not an available group variable, then
+global settings in the `ceph.conf` may be set directly using
+`CephConfigOverrides` like the following::
 
   parameter_defaults:
     CephConfigOverrides:
       max_open_files: 131072
+
+To change the backfill and recovery operations that Ceph uses to
+rebalance a cluster, use an example like the following::
+
+  parameter_defaults:
+    CephConfigOverrides:
+      osd_recovery_op_priority: 3
+      osd_recovery_max_active: 3
+      osd_max_backfills: 1
 
 Configure container settings with ceph-ansible
 ----------------------------------------------

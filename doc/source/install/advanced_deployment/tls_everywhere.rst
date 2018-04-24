@@ -21,7 +21,7 @@ it, and it has the added value that, besides being able to automatically
 provide the certificates we need, we can also keep track of the nodes and have
 an identity for them.
 
-.. note:: The default CA can be overriden via the **CertmongerCA** parameter.
+.. note:: The default CA can be overridden via the **CertmongerCA** parameter.
           However, the CA has to be something that certmonger understands, so
           there are adjustments to be done. For more information on how to
           change it you can consult the `certmonger`_ documentation

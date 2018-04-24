@@ -230,7 +230,7 @@ Additional configuration
   that ``netboot`` was used by default.
 
   .. note::
-    This value can be overriden per node by setting the ``boot_option``
+    This value can be overridden per node by setting the ``boot_option``
     capability on both the node and a flavor.
 
 * ``IronicDefaultNetworkInterface`` specifies the network management

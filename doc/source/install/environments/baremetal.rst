@@ -25,8 +25,8 @@ you need an additional baremetal machine.
 
 The baremetal machines must meet the following minimum specifications:
 
-* multi-core CPU
-* 8 GB memory
+* 8 core CPU
+* 12 GB memory
 * 60 GB free disk space
 
 Larger systems are recommended for production deployments, however.
@@ -39,7 +39,7 @@ in its glance, one time in /var/lib subdirectories for PXE/TFTP).
 
 TripleO is supporting only the following operating systems:
 
-* RHEL 7.1 x86_64 or
+* RHEL 7 x86_64
 * CentOS 7 x86_64
 
 

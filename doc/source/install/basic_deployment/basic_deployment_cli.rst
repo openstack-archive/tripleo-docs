@@ -593,22 +593,20 @@ Create a directory for Tempest (eg. naming it ``tempest``)::
 Tempest expects the tests it discovers to be in the current working directory.
 Set it up accordingly::
 
-    /usr/share/openstack-tempest-*/tools/configure-tempest-directory
+    tempest init .
 
 The ``~/tempest-deployer-input.conf`` file was created during deployment and
 contains deployment specific settings. Use that file to configure
 Tempest::
 
-    tools/config_tempest.py --deployer-input ~/tempest-deployer-input.conf \
-                            --debug --create \
-                            identity.uri $OS_AUTH_URL \
-                            identity.admin_password $OS_PASSWORD
+    discover-tempest-config --deployer-input ~/tempest-deployer-input.conf \
+                            --debug --create
 
 Run Tempest::
 
-    tools/run-tests.sh
+    tempest run -r '(tempest.api|tempest.scenario)'
 
-.. note:: The full Tempest test suite might take hours to run on a single CPU.
+.. note:: The full API/Scenario Tempest test suite might take hours to run on a single CPU.
 
 
 Redeploy the Overcloud

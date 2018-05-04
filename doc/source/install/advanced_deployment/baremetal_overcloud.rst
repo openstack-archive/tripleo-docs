@@ -189,28 +189,6 @@ in an environment file:
                 - ComputeCapabilitiesFilter
                 - ImagePropertiesFilter
 
-     For a deployment with **only** bare metal hosts you might want
-     to replace the filters with their ``Exact`` counterparts. In such case
-     the scheduler will require a strict match between bare metal nodes
-     and flavors. Otherwise, any bare metal node with higher or equal specs
-     would match.
-
-     ::
-
-           parameter_defaults:
-               NovaSchedulerDefaultFilters:
-                   - RetryFilter
-                   - AvailabilityZoneFilter
-                   - ExactRamFilter
-                   - ExactDiskFilter
-                   - ExactCoreFilter
-                   - ComputeFilter
-                   - ComputeCapabilitiesFilter
-                   - ImagePropertiesFilter
-
-     The ``Exact`` filters are deprecated as of the Pike release and will be
-     removed in Queens.
-
 Additional configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

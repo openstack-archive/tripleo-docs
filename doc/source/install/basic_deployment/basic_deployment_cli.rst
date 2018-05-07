@@ -3,8 +3,22 @@
 Basic Deployment (CLI)
 ======================
 
-With these few steps you will be able to simply deploy via |project| to your
-environment using our defaults in a few steps.
+These steps document a basic deployment with |project| in an environment using
+the project defaults.
+
+.. note::
+
+      Beginning in the Rocky release, Ansible is used to deploy the software
+      configuration of the overcloud nodes using a feature called
+      **config-download**. While there are no necessary changes to the default
+      deployment commands, there are several differences to the deployer
+      experience.
+
+      It's recommended to review these differences as documented at
+      :doc:`../advanced_deployment/ansible_config_download_differences`
+
+      **config-download** is fully documented at
+      :doc:`../advanced_deployment/ansible_config_download`
 
 
 Prepare Your Environment
@@ -15,7 +29,8 @@ Prepare Your Environment
    * :doc:`../environments/environments`
    * :doc:`../installation/installing`
 
-#. Log into your undercloud (instack) virtual machine as non-root user::
+#. Log into your undercloud virtual machine and become the non-root user (stack
+   by default)::
 
     ssh root@<undercloud-machine>
 
@@ -34,7 +49,7 @@ Get Images
 .. note::
 
        If you already have images built, perhaps from a previous installation of
-       |project|, you can simply copy those image files into your regular user's
+       |project|, you can simply copy those image files into your non-root user's
        home directory and skip this section.
 
        If you do this, be aware that sometimes newer versions of |project| do not
@@ -45,8 +60,7 @@ Get Images
        https://images.rdoproject.org/master which offers images from both the
        CentOS Build System (cbs) and RDO Trunk (called rdo_trunk or delorean).
        However this mirror is slow so if you experience slow download speeds
-       you should skip to building the images instead. If you require older
-       versions specify the upstream openstack release for "master".
+       you should skip to building the images instead.
 
        The image files required are::
 
@@ -506,7 +520,7 @@ Post-Deployment
 .. admonition:: Validations
    :class: validations
 
-   After the deployment finished, you can run the ``post-deployment``
+   After the deployment finishes, you can run the ``post-deployment``
    validations::
 
      openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["post-deployment"]}'
@@ -556,7 +570,7 @@ environment appropriately. This assumes a dedicated interface or native VLAN::
     172.16.23.128/25 public
 
 The example shows naming the network "public" because that will allow tempest
-tests to pass, based on the default floating pool name set in ``nova.conf``. 
+tests to pass, based on the default floating pool name set in ``nova.conf``.
 You can confirm that the network was created with::
 
     openstack network list
@@ -616,12 +630,12 @@ The overcloud can be redeployed when desired.
 
 #. First, delete any existing Overcloud::
 
-    heat stack-delete overcloud
+    openstack overcloud delete overcloud
 
 #. Confirm the Overcloud has deleted. It may take a few minutes to delete::
 
     # This command should show no stack once the Delete has completed
-    heat stack-list
+    openstack stack list
 
 #. It is recommended that you delete existing partitions from all nodes before
    redeploying. Starting with TripleO Ocata, you can use existing workflows -

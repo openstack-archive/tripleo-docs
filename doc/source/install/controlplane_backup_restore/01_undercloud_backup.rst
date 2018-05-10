@@ -59,8 +59,8 @@ Filesystem backups
 
 The following command can be used to perform a backup of all data from the undercloud node::
 
-  tar --ignore-failed-read -czf \
-      undercloud-backup-`date +%F`.tar.gz \
+  tar --ignore-failed-read -cf \
+      UC-backup-`date +%F`.tar \
       /root/undercloud-all-databases.sql \
       /etc/my.cnf.d \
       /var/lib/glance/images \

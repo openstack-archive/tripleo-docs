@@ -7,6 +7,26 @@ Once the machine is installed and is in a clean state, re-enable all the subscri
 
 Note that unless specified, all commands are run as root.
 
+Downloading automated Undercloud backups
+----------------------------------------
+
+If the user has executed the Undercloud backup from the
+TripleO CLI, it will need to download it to a local folder
+and from there execute the restore steps.
+
+::
+
+  # From the Undercloud
+  source stackrc
+  mkdir restore_uc_backup
+  cd restore_uc_backup
+  openstack container save undercloud-backups
+
+Now, in the `restore_uc_backup` folder there must be a file with the
+following naming convention `UC-backup-<timestamp>.tar`.
+
+After getting the backup file and unzipping it in any
+selected folder, the user can proceed with the Undercloud restore.
 
 Restoring a backup of your Undercloud on a Fresh Machine
 --------------------------------------------------------
@@ -17,7 +37,7 @@ Install the MariaDB server with::
 
 Now restore the MariaDB configuration file and database backup, then start the MariaDB server and load the backup in::
 
-  tar -xzC / -f undercloud-backup-$DATE.tar.gz etc/my.cnf.d/mariadb-server.cnf /root/undercloud-all-databases.sql
+  tar -xC / -f UC-backup-<timestamp>.tar etc/my.cnf.d/mariadb-server.cnf /root/undercloud-all-databases.sql
   # Edit /etc/my.cnf.d/server.cnf and comment out 'bind-address'
   systemctl start mariadb
   cat /root/undercloud-all-databases.sql | mysql
@@ -38,12 +58,12 @@ Now create the stack user and restore the stack users home directory::
 
 Next restore the stack users home directory::
 
-  tar -xzC / -f undercloud-backup-$DATE.tar.gz home/stack
+  tar -xC / -f UC-backup-<timestamp>.tar home/stack
 
 We have to now install the swift and glance base packages, and then restore their data::
 
   yum install -y openstack-glance openstack-swift
-  tar -xzC / -f undercloud-backup-$DATE.tar.gz srv/node var/lib/glance/images
+  tar -xC / -f UC-backup-<timestamp>.tar srv/node var/lib/glance/images
   # Confirm data is owned by correct user
   chown -R swift: /srv/node
   chown -R glance: /var/lib/glance/images

@@ -86,7 +86,7 @@ Finally, we rerun the Undercloud installation from the stack user, making sure t
   su - stack
   sudo yum install -y python-tripleoclient
   # Double check hostname is correctly set in /etc/hosts
-  openstack install undercloud
+  openstack undercloud install
 
 If you are using Pike and Ceph will be used in the overcloud, install
 ceph-ansible on the Undercloud::

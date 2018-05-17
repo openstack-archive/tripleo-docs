@@ -1,7 +1,9 @@
 Updating Undercloud Components
 ------------------------------
 
-You can upgrade any packages that are installed on the undercloud machine.
+#. Before upgrading the undercloud, it is highly suggested to perform
+   a :doc:`backup <../controlplane_backup_restore/01_undercloud_backup>`
+   of the undercloud and validate that a restore works fine.
 
 #. Remove all Delorean repositories:
 
@@ -86,7 +88,6 @@ You can upgrade any packages that are installed on the undercloud machine.
    .. code-block:: bash
 
       sudo yum update python-tripleoclient*
-
 
 #. Run the undercloud upgrade command. This command will upgrade all packages
    and use puppet to apply new configuration and restart all OpenStack

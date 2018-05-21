@@ -295,16 +295,12 @@ deployment::
 
     export OVERCLOUD_HOSTS="192.168.1.8 192.168.1.42"
     bash /usr/share/openstack-tripleo-heat-templates/deployed-server/scripts/enable-ssh-admin.sh
-    for h in $OVERCLOUD_HOSTS ; do
-        ssh $h -l stack "sudo groupadd ceph -g 64045 ; sudo useradd ceph -u 64045 -g ceph"
-    done
 
 In the example above, the OVERCLOUD_HOSTS variable should be set to
 the IPs of the overcloud hosts which will be Ceph servers or which
 will host Ceph clients (e.g. Nova, Cinder, Glance, Gnocchi, Manila,
 etc.). The `enable-ssh-admin.sh` script configures a user on the
-overcloud nodes that Ansible uses to configure Ceph. The `for`
-loop creates the Ceph user on the relevant overcloud hosts.
+overcloud nodes that Ansible uses to configure Ceph.
 
 .. note::
 

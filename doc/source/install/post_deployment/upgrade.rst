@@ -1,15 +1,11 @@
 Upgrading to a Next Major Release
 =================================
 
-Upgrading a TripleO deployment to a next major release is done by
-first upgrading the undercloud, and then upgrading the overcloud.
+Upgrading a TripleO deployment to the next major release is done by first
+upgrading the undercloud and using it to upgrade the overcloud.
 
-Note that there are version specific caveats and notes which are pointed out as below:
-
-.. admonition:: Mitaka to Newton
-   :class: mton
-
-   mitaka to newton specific note
+Note that there are version specific caveats and notes which are pointed out
+as below:
 
 .. note::
 
@@ -26,8 +22,239 @@ Note that there are version specific caveats and notes which are pointed out as 
 .. Undercloud upgrade section
 .. include:: ../../install/installation/updating.rst
 
-Upgrading the Overcloud to Ocata or Pike
+Upgrading the Overcloud from Pike to Queens
 -------------------------------------------
+
+The Queens upgrade workflow for TripleO is significantly different to previous
+cycles. At a high level, the workflow no longer relies on Heat to deliver the
+upgrade configuration, but instead uses ansible playbooks. Those
+playbooks *are* still generated using a Heat stack update of the overcloud
+stack, as the first step in the workflow. However there is no configuration
+applied during that stack update and so comparatively it takes *much* less
+time to complete than a 'normal' stack update. More information and pointers
+can be found in the relevant queens-upgrade-spec_ and the
+queens-upgrade-dev-docs_.
+
+The tripleo cli has been updated accordingly to accommodate this new
+workflow. In Queens a new `openstack overcloud upgrade` command is introduced
+and it expects one of three subcommands: **prepare**, **run** and
+**converge**. Each subcommand has its own set of options which you can explore
+with  --help:
+
+   .. code-block:: bash
+
+          source /home/stack/stackrc
+          openstack overcloud upgrade run --help
+
+The Queens upgrade workflow essentially consists of the following steps:
+
+#. **Prepare you environment, backup, get container images**.
+   Generate any environment files you need for the upgrade such as the
+   references to the latest container images or commands used to switch repos.
+
+#. **openstack overcloud upgrade prepare $OPTS**.
+   Run a heat stack update to generate the upgrade playbooks.
+
+#. **openstack overcloud upgrade run $OPTS**.
+   Run the upgrade on specific nodes or groups of nodes. Repeat until all nodes
+   are successfully upgraded.
+
+#. **openstack overcloud upgrade converge $OPTS**.
+   Finally run a heat stack update, unsetting any upgrade specific variables
+   and leaving the heat stack in a healthy state for future updates.
+
+.. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.openstack.org/#/c/569443/
+
+Prepare your environment - get latest container images
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As a part of the upgrade the container images for the target release should be
+downloaded to the Undercloud. Please see the `openstack overcloud container image prepare`
+:doc:`../containers_deployment/overcloud` for more information.
+
+The output of this step will be a Heat environment file that contains
+references to the latest container images. You will need to pass this file
+into the **upgrade prepare** command using the --container-registry-file
+option.
+
+You will also need to create an environment file to override the
+UpgradeInitCommand_ tripleo-heat-templates parameter, that can be used to
+switch the yum repos in use by the nodes during the upgrade. This will likely
+be the same commands that were used to switch repositories on the undercloud.
+
+   .. code-block:: bash
+
+      cat <<EOF > init-repo.yaml
+        parameter_defaults:
+        UpgradeInitCommand: |
+          set -e
+          #  -- REPLACE LINES WITH YOUR REPO SWITCH COMMANDS --
+          curl -L -o /etc/yum.repos.d/delorean.repo https://trunk.rdoproject.org/centos7-queens/current/delorean.repo
+          curl -L -o /etc/yum.repos.d/delorean-deps.repo https://trunk.rdoproject.org/centos7-queens/delorean-deps.repo
+          yum clean all
+        EOF
+
+The resulting init-repo.yaml will then be passed into the upgrade prepare using
+the -e option.
+
+.. _Upgradeinitcommand: https://github.com/openstack/tripleo-heat-templates/blob/1d9629ec0b3320bcbc5a4150c8be19c6eb4096eb/puppet/role.role.j2.yaml#L468-L493
+
+openstack overcloud upgrade prepare
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+prepare
+queens-upgrade-dev-docs.
+
+   .. note::
+
+      Before running the overcloud upgrade prepare ensure you have a valid backup
+      of the current state, including the **undercloud** since there will be a
+      Heat stack update performed here.
+
+
+   .. note::
+
+      After running the upgrade prepare and until successful completion
+      of the upgrade converge operation, stack updates to the deployment Heat
+      stack are expected to fail. That is, operations such as scaling to add
+      a new node or to apply any new TripleO configuration via Heat stack
+      update **must not** be performed on a Heat stack that has been prepared
+      for upgrade with the 'prepare' command and only consider doing so after
+      running the converge step. See the queens-upgrade-dev-docs_ for more.
+
+Run **overcloud upgrade prepare**. NOTE: this command expects the full set
+of environment files that were passed into the deploy command, as well as the
+roles_data.yaml file used to deploy the overcloud you are about to upgrade. The
+--container-registry-file should point to the file that was output by the image
+prepare command you ran to get the latest container image references.
+
+   .. note::
+
+      It is especially important to remember that you **must** include all
+      environment files that were used to deploy the overcloud that you are about
+      to upgrade.
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade prepare --templates \
+        --container-registry-file /home/stack/containers-default-parameters.yaml \
+        -e <ALL Templates from overcloud-deploy.sh> \
+        -e init-repo.yaml
+        -r /path/to/roles_data.yaml
+
+This will begin an update on the overcloud Heat stack but without
+applying any of the TripleO configuration, as explained above. Once this
+`upgrade prepare` operation has successfully completed the heat stack will be
+in the UPDATE_COMPLETE state. At that point you can use `config download` to
+download and inspect the configuration ansible playbooks that will be used
+to deliver the upgrade in the next step:
+
+   .. code-block:: bash
+
+      openstack overcloud config download --config-dir SOMEDIR
+      # playbooks will be downloaded to SOMEDIR directory
+
+
+openstack overcloud upgrade run
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This will run the ansible playbooks to deliver the upgrade configuration.
+By default, 3 playbooks are executed: the upgrade_steps_playbook, then the
+deploy_steps_playbook and finally the post_upgrade_steps_playbook. These
+playbooks are invoked on those overcloud nodes specified by the --roles or
+--nodes parameters, which are mutually exclusive. You are expected to use
+--roles for controlplane nodes, since these need to be upgraded in the same
+step. For non controlplane nodes, such as Compute or Storage, you can use
+--nodes to specify a single node or list of nodes to upgrade.
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade run --roles Controller
+
+   Optionally specify `--playbook` to manually step through the upgrade
+   playbooks: You need to run all three in this order and as specified below
+   (no path) for the full upgrade run
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade run --roles Controller --playbook upgrade_steps_playbook.yaml
+      openstack overcloud upgrade run --roles Controller --playbook deploy_steps_playbook.yaml
+      openstack overcloud upgrade run --roles Controller --playbook post_upgrade_steps_playbook.yaml
+
+After all three playbooks have been executed without error on all nodes of
+the controller role, all controllers will have been fully upgraded to Queens.
+At a minimum an operator mayb check the health of the pacemaker cluster and see
+if there are any errors
+
+   .. code-block:: bash
+
+      [root@overcloud-controller-0 ~]# pcs status | grep -C 10 -i "error\|fail"
+
+The operator may also want to confirm that openstack and
+related service containers are all in a good state and using the image
+references passed during upgrade prepare with the --container-registry-file
+parameter.
+
+   .. code-block:: bash
+
+      [root@overcloud-controller-0 ~]# docker ps -a
+
+For non controlplane, you use `--nodes overcloud-compute-0` to upgrade particular
+nodes, or even "compute0,compute1,compute3" for multiple nodes. Note these
+are again upgraded in parallel
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade run --nodes overcloud-compute-0
+
+This allows the operator to upgrade some subset, perhaps just one, compute
+or other non controlplane node and verify that the upgrade has successfully
+completed. You might even try to migrate workloads onto the newly upgraded
+compute and confirm there are no problems, before deciding to proceed with
+upgrading the remaining nodes in the role.
+
+Again you can optionally step through the upgrade playbooks if you prefer. Be
+sure to run upgrade_steps_playbook.yaml then deploy_steps_playbook.yaml and
+finally post_upgrade_steps_playbook.yaml in that order.
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade run --nodes overcloud-compute-1 \
+         --playbook upgrade_steps_playbook.yaml
+      # etc for the other 2 as above example for controller
+
+For re-run, you can specify --skip-tags validation to skip those step 0
+ansible tasks that check if services are running, in case you can't or
+don't want to start them all.
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade run --roles Controller --skip-tags validation
+
+openstack overcloud upgrade converge
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, run the converge heat stack update. This will re-apply all Queens
+configuration across all nodes and unset all variables that were used during
+the upgrade. Until you have successfully completed this step, heat stack
+updates against the overcloud stack are expected to fail.
+
+   .. note::
+
+      It is especially important to remember that you **must** include all
+      environment files that were used to deploy the overcloud that you are about
+      to upgrade converge, including the list of Queens container image references
+      and the roles_data.yaml roles and services definition. You should omit
+      any repo switch commands, or override of the UpgradeInitCommand.
+
+   .. code-block:: bash
+
+      openstack overcloud upgrade converge --templates
+        -e /home/stack/containers-default-parameters.yaml \
+        -e <ALL Templates from overcloud-deploy.sh> \
+        -r /path/to/roles_data.yaml
+
+Upgrading the Overcloud to Ocata or Pike
+----------------------------------------
 
 As of the Ocata release, the upgrades workflow in tripleo has changed
 significantly to accommodate the operators' new ability to deploy custom roles
@@ -68,14 +295,14 @@ For those roles with the ``disable_upgrade_deployment`` flag set True, the
 operator will upgrade the corresponding nodes with the
 upgrade-non-controller.sh_. The operator uses that script to invoke the
 tripleo_upgrade_node.sh_ which is delivered during the
-major-upgrade-composable-steps that comes first, as described above.
+major-upgrade-composable-steps that come first, as described above.
 
-1. Run the major upgrade composable ansible steps
+#. Run the major upgrade composable ansible steps
 
    This step will upgrade the nodes of all roles that do not explicitly set the
    ``disable_upgrade_deployment`` flag to ``True`` in the roles_data.yaml_
-   (this is an operator decision, and the current default is for the 'Compute'
-   and' ObjectStorage' roles to have this set).
+   (this is an operator decision, and the current default is for the **Compute**
+   and **ObjectStorage** roles to have this set).
 
    The ansible upgrades tasks are collected from all service manifests_ and
    executed in a series of steps as described in the introduction above.
@@ -85,11 +312,11 @@ major-upgrade-composable-steps that comes first, as described above.
    completed.
 
    From Ocata to Pike, the Overcloud will be upgraded to a containerized
-   environment. All the services will run under Docker.
+   environment. All OpenStack related services will run in containers.
 
-   If you deploy TripleO with custom roles, you want to synchronize
-   them with roles_data.yaml visible in default roles and make sure
-   parameters and new services are present in your roles.
+   If you deploy TripleO with custom roles, you want to synchronize them with
+   `roles_data.yaml` visible in default roles and make sure parameters and new
+   services are present in your roles.
 
    .. admonition:: Newton
       :class: newton
@@ -109,128 +336,144 @@ major-upgrade-composable-steps that comes first, as described above.
       Pike roles_data.yaml is available here:
       https://github.com/openstack/tripleo-heat-templates/blob/stable/pike/roles_data.yaml
 
+   .. admonition:: Queens
+      :class: queens
+
+      Queens roles_data.yaml is available here:
+      https://github.com/openstack/tripleo-heat-templates/blob/stable/queens/roles_data.yaml
+
+
    Create an environment file with commands to switch OpenStack repositories to
    a new release. This will likely be the same commands that were used to switch
-   repositories on the undercloud::
+   repositories on the undercloud
 
-      cat > overcloud-repos.yaml <<EOF
-      parameter_defaults:
-        UpgradeInitCommand: |
-          set -e
-          # REPOSITORY SWITCH COMMANDS GO HERE
-      EOF
+    .. code-block:: bash
+
+       cat > overcloud-repos.yaml <<EOF
+       parameter_defaults:
+         UpgradeInitCommand: |
+           set -e
+           # REPOSITORY SWITCH COMMANDS GO HERE
+       EOF
 
    .. admonition:: Newton to Ocata
       :class: ntoo
 
-       Run `overcloud deploy`, passing in full set of environment
-       files plus `major-upgrade-composable-steps.yaml` and
-       `overcloud-repos.yaml`::
+      Run ``overcloud deploy``, passing in full set of environment files plus
+      `major-upgrade-composable-steps.yaml` and ``overcloud-repos.yaml``
+
+      .. code-block:: bash
 
          openstack overcloud deploy --templates \
-             -e <full environment> \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps.yaml \
-             -e overcloud-repos.yaml
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps.yaml \
+           -e overcloud-repos.yaml
 
    .. admonition:: Ceph
       :class: ceph
 
-        If Ceph has been deployed in the Overcloud, then use the ceph-ansible.yaml
-        environment file ''instead of'' storage-environment.yaml and make sure
-        to move any customization into ceph-ansible.yaml (or a copy of
-        ceph-ansible.yaml)::
+       If Ceph has been deployed in the Overcloud, then use the
+       `ceph-ansible.yaml` environment file **instead of**
+       `storage-environment.yaml`. Make sure to move any customization into
+       `ceph-ansible.yaml` (or a copy of ceph-ansible.yaml)
+
+       .. code-block:: bash
 
           openstack overcloud deploy --templates \
-             -e <full environment> \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
-             -e overcloud-repos.yaml
+            -e <full environment> \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
+            -e overcloud-repos.yaml
 
-        Customizations for the Ceph deployment previously passed as hieradata
-        via \*ExtraConfig should be removed as they are ignored, specifically
-        the deployment will stop if ``ceph::profile::params::osds`` is found
-        to ensure the devices list has been migrated to the format expected
-        by ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig``
-        and ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables
-        to ceph-ansible, like ``devices`` and ``dedicated_devices``.
-        See the `ceph-ansible scenarios`_ or
-        the :doc:`TripleO Ceph config guide <../advanced_deployment/ceph_config>`
+       Customizations for the Ceph deployment previously passed as hieradata
+       via \*ExtraConfig should be removed as they are ignored, specifically
+       the deployment will stop if ``ceph::profile::params::osds`` is found to
+       ensure the devices list has been migrated to the format expected by
+       ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig`` and
+       ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
+       ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
+       `ceph-ansible scenarios`_ or the :doc:`TripleO Ceph config guide
+       <../advanced_deployment/ceph_config>`
 
-        The other parameters (for example ``CinderRbdPoolName``,
-        ``CephClientUserName``, ...) will behave as they used to with puppet-ceph
-        with the only exception of ``CephPools``. This can be used to create
-        additional pools in the Ceph cluster but the two tools expect the list
-        to be in a different format. Specifically while puppet-ceph expected it
-        in this format::
+       The other parameters (for example ``CinderRbdPoolName``,
+       ``CephClientUserName``, ...) will behave as they used to with puppet-ceph
+       with the only exception of ``CephPools``. This can be used to create
+       additional pools in the Ceph cluster but the two tools expect the list
+       to be in a different format. Specifically while puppet-ceph expected it
+       in this format::
 
-          {
-           "mypool": {
-            "size": 1,
-            "pg_num": 32,
-            "pgp_num": 32
-           }
-          }
+        {
+         "mypool": {
+          "size": 1,
+          "pg_num": 32,
+          "pgp_num": 32
+         }
+        }
 
-        with ceph-ansible that would become::
+       with ceph-ansible that would become::
 
-          [{"name": "mypool", "pg_num": 32, "rule_name": ""}]
+        [{"name": "mypool", "pg_num": 32, "rule_name": ""}]
 
    .. note::
 
-        Before upgrading your deployment to containers, you must perform the
-        actions mentioned here to prepare your environment. In particular
-        *image prepare* to generate the docker registry which you must include
-        as one of the environment files specified below:
-        * :doc:`../containers_deployment/overcloud`
+      Before upgrading your deployment to containers, you must perform the
+      actions mentioned here to prepare your environment. In particular
+      *image prepare* to generate the docker registry which you must include
+      as one of the environment files specified below:
+      * :doc:`../containers_deployment/overcloud`
 
    .. __:
 
    Run `overcloud deploy`, passing in full set of environment
    files plus `major-upgrade-composable-steps-docker.yaml` and
-   `overcloud-repos.yaml` (and docker registry if upgrading to containers)::
+   `overcloud-repos.yaml` (and docker registry if upgrading to containers)
 
-        openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
-          -e overcloud-repos.yaml
+   .. code-block:: bash
 
-   .. note::
-
-        It is especially important to remember that you **must** include all
-        environment files that were used to deploy the overcloud that you are about
-        to upgrade.
+      openstack overcloud deploy --templates \
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
+        -e overcloud-repos.yaml
 
    .. note::
 
-        If the Overcloud has been deployed with Pacemaker, then add the docker-ha.yaml
-        environment file to the upgrade command::
-
-          openstack overcloud deploy --templates \
-             -e <full environment> \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
-             -e overcloud-repos.yaml
+      It is especially important to remember that you **must** include all
+      environment files that were used to deploy the overcloud that you are about
+      to upgrade.
 
    .. note::
 
-        The first step of the ansible tasks is to validate that the deployment is
-        in a good state before performing any other upgrade operations. Each
-        service manifest in the tripleo-heat-templates includes a check that it is
-        running and if any of those checks fail the upgrade will exit early at
-        ansible step 0.
+      If the Overcloud has been deployed with Pacemaker, then add the
+      `docker-ha.yaml` environment file to the upgrade command
 
-        If you are re-running the upgrade after an initial failed attempt, you may
-        need to disable these checks in order to allow the upgrade to proceed with
-        services down. This is done with the SkipUpgradeConfigTags parameter to
-        specify that tasks with the 'validation' tag should be skipped. You can
-        include this in any of the environment files you are using::
+      .. code-block:: bash
 
-           SkipUpgradeConfigTags: [validation]
+         openstack overcloud deploy --templates \
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
+           -e overcloud-repos.yaml
 
-2. Upgrade remaining nodes for roles with ``disable_upgrade_deployment: True``
+   .. note::
+
+      The first step of the ansible tasks is to validate that the deployment is
+      in a good state before performing any other upgrade operations. Each
+      service manifest in the tripleo-heat-templates includes a check that it is
+      running and if any of those checks fail the upgrade will exit early at
+      ansible step 0.
+
+      If you are re-running the upgrade after an initial failed attempt, you may
+      need to disable these checks in order to allow the upgrade to proceed with
+      services down. This is done with the SkipUpgradeConfigTags parameter to
+      specify that tasks with the 'validation' tag should be skipped. You can
+      include this in any of the environment files you are using::
+
+         SkipUpgradeConfigTags: [validation]
+
+#. Upgrade remaining nodes for roles with ``disable_upgrade_deployment: True``
 
    It is expected that the operator will want to upgrade the roles that have the
    ``openstack-nova-compute`` and ``openstack-swift-object`` services deployed
@@ -250,13 +493,15 @@ major-upgrade-composable-steps that comes first, as described above.
    the nodes with ``disable_upgrade_deployment`` set ``True`` during the initial
    major upgrade composable steps in step 1 above.
 
-   For Ocata to Pike, the tripleo_upgrade_node.sh is still delivered to the
+   For Ocata to Pike, the tripleo_upgrade_node.sh_ is still delivered to the
    ``disable_upgrade_deployment`` nodes but is now empty. Instead, the
-   upgrade_non_controller.sh downloads ansible playbooks and those are executed
-   to deliver the upgrade. See the Queens-upgrade-spec_ for more information
-   on this mechanism.
+   `upgrade_non_controller.sh` downloads ansible playbooks and those are
+   executed to deliver the upgrade. See the Queens-upgrade-spec_ for more
+   information on this mechanism.
 
-   To upgrade remaining roles (at your convenience)::
+   To upgrade remaining roles (at your convenience)
+
+   .. code-block:: bash
 
       upgrade-non-controller.sh --upgrade overcloud-compute-0
 
@@ -264,54 +509,59 @@ major-upgrade-composable-steps that comes first, as described above.
         upgrade-non-controller.sh --upgrade overcloud-objectstorage-$i &
       done
 
-3. Converge to unpin Nova RPC
+#. Converge to unpin Nova RPC
 
    The final step is required to unpin Nova RPC version. Unlike in previous
-   releases, for Ocata the puppet configuration has already been applied to nodes
-   as part of each upgrades step, i.e. after the ansible tasks or when invoking
-   the tripleo_upgrade_node.sh_ script to upgrade compute nodes. Thus the
-   significance of this step is somewhat diminished compared to previously.
+   releases, for Ocata the puppet configuration has already been applied to
+   nodes as part of each upgrades step, i.e. after the ansible tasks or when
+   invoking the tripleo_upgrade_node.sh_ script to upgrade compute nodes. Thus
+   the significance of this step is somewhat diminished compared to previously.
    However a re-application of puppet configuration across all nodes here will
    also serve as a sanity check and hopefully show any issues that an operator
    may have missed during any of the previous upgrade steps.
 
-   To converge, run the deploy command with
-   `major-upgrade-converge-docker.yaml`::
+   To converge, run the deploy command with `major-upgrade-converge-docker.yaml`
+
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
-       -e <full environment> \
-       -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-       -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge-docker.yaml
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge-docker.yaml
 
    .. admonition:: Newton to Ocata
       :class: ntoo
 
-       For Newton to Ocata, run the deploy command with
-       `major-upgrade-pacemaker-converge.yaml`::
+      For Newton to Ocata, run the deploy command with
+      `major-upgrade-pacemaker-converge.yaml`
 
-          openstack overcloud deploy --templates \
+      .. code-block:: bash
+
+         openstack overcloud deploy --templates \
            -e <full environment> \
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
 
    .. note::
 
-        If the Overcloud has been deployed with Pacemaker, then add the docker-ha.yaml
-        environment file to the upgrade command::
+      If the Overcloud has been deployed with Pacemaker, then add the
+      `docker-ha.yaml` environment file to the upgrade command
 
-          openstack overcloud deploy --templates \
-            -e <full environment> \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge-docker.yaml
+      .. code-block:: bash
 
-          openstack overcloud deploy --templates \
-            -e <full environment> \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge.yaml
+         openstack overcloud deploy --templates \
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge-docker.yaml
+
+         openstack overcloud deploy --templates \
+           -e <full environment> \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-converge.yaml
 
    .. note::
 
-        It is especially important to remember that you **must** include all
-        environment files that were used to deploy the overcloud.
+      It is especially important to remember that you **must** include all
+      environment files that were used to deploy the overcloud.
 
 .. _spec: https://specs.openstack.org/openstack/tripleo-specs/specs/ocata/tripleo-composable-upgrades.html
 .. _major-upgrade-composable-steps.yaml: https://github.com/openstack/tripleo-heat-templates/blob/master/environments/major-upgrade-composable-steps.yaml
@@ -330,34 +580,37 @@ Upgrading the Overcloud to Newton and earlier
 
    The `openstack overcloud deploy` calls in upgrade steps below are
    non-blocking. Make sure that the overcloud is `UPDATE_COMPLETE` in
-   `openstack stack list` and `sudo pcs status` on a controller
-   reports everything running fine before proceeding to the next step.
+   `openstack stack list` and `sudo pcs status` on a controller reports
+   everything running fine before proceeding to the next step.
 
 .. admonition:: Mitaka to Newton
    :class: mton
-
 
    **Deliver the migration for ceilometer to run under httpd.**
 
    This is to deliver the migration for ceilometer to be run under httpd (apache)
    rather than eventlet as was the case before. To execute this step run
    `overcloud deploy`, passing in the full set of environment files plus
-   `major-upgrade-ceilometer-wsgi-mitaka-newton.yaml`::
+   `major-upgrade-ceilometer-wsgi-mitaka-newton.yaml`
+
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-ceilometer-wsgi-mitaka-newton.yaml
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-ceilometer-wsgi-mitaka-newton.yaml
 
 #. Upgrade initialization
 
-   The initialization step switches to new repositories on overcloud
-   nodes, and it delivers upgrade scripts to nodes which are going to
-   be upgraded one-by-one (this means non-controller nodes, except any
-   stand-alone block storage nodes).
+   The initialization step switches to new repositories on overcloud nodes, and
+   it delivers upgrade scripts to nodes which are going to be upgraded
+   one-by-one (this means non-controller nodes, except any stand-alone block
+   storage nodes).
 
-   Create an environment file with commands to switch OpenStack
-   repositories to a new release. This will likely be the same
-   commands that were used to switch repositories on the undercloud::
+   Create an environment file with commands to switch OpenStack repositories to
+   a new release. This will likely be the same commands that were used to
+   switch repositories on the undercloud
+
+   .. code-block:: bash
 
       cat > overcloud-repos.yaml <<EOF
       parameter_defaults:
@@ -366,104 +619,112 @@ Upgrading the Overcloud to Newton and earlier
           # REPOSITORY SWITCH COMMANDS GO HERE
       EOF
 
-   And run `overcloud deploy`, passing in full set of environment
-   files plus `major-upgrade-pacemaker-init.yaml` and
-   `overcloud-repos.yaml`::
+
+   And run `overcloud deploy`, passing in full set of environment files plus
+   `major-upgrade-pacemaker-init.yaml` and `overcloud-repos.yaml`
+
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-init.yaml \
-          -e overcloud-repos.yaml
-
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-init.yaml \
+        -e overcloud-repos.yaml
 
 #. Object storage nodes upgrade
 
-   If the deployment has any standalone object storage nodes, upgrade
-   them one-by-one using the `upgrade-non-controller.sh` script on the
-   undercloud node::
+   If the deployment has any standalone object storage nodes, upgrade them
+   one-by-one using the `upgrade-non-controller.sh` script on the undercloud
+   node
+
+   .. code-block:: bash
 
       upgrade-non-controller.sh --upgrade <nova-id of object storage node>
 
-   This is ran before controller node upgrade because swift storage
-   services should be upgraded before swift proxy services.
+   This is ran before controller node upgrade because swift storage services
+   should be upgraded before swift proxy services.
 
 #. Upgrade controller and block storage nodes
-
 
    .. admonition:: Mitaka to Newton
       :class: mton
 
       **Explicitly disable sahara services if so desired:**
-      As discussed at bug1630247_  sahara services are disabled by default
-      in the Newton overcloud deployment. This special case is handled for
-      the duration of the upgrade by defaulting to 'keep sahara-\*'.
+      As discussed at bug1630247_  sahara services are disabled by default in
+      the Newton overcloud deployment. This special case is handled for the
+      duration of the upgrade by defaulting to 'keep sahara-\*'.
 
       That is by default sahara services are restarted after the mitaka to
-      newton upgrade of controller nodes and sahara config is re-applied
-      during the final upgrade converge step.
+      newton upgrade of controller nodes and sahara config is re-applied during
+      the final upgrade converge step.
 
-      If an operator wishes to **disable** sahara services as part of the mitaka
-      to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
-      environment file during the controller upgrade step as well as during
-      the converge step later::
+      If an operator wishes to **disable** sahara services as part of the
+      mitaka to newton upgrade they need to include the
+      major-upgrade-remove-sahara.yaml_ environment file during the controller
+      upgrade step as well as during the converge step later
 
-          openstack overcloud deploy --templates \
+      .. code-block:: bash
+
+         openstack overcloud deploy --templates \
            -e <full environment> \
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker.yaml
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-remove-sahara.yaml
 
-   All controllers will be upgraded in sync in order to make services
-   only talk to DB schema versions they expect. Services will be
-   unavailable during this operation. Standalone block storage nodes
-   are automatically upgraded in this step too, in sync with
-   controllers, because block storage services don't have a version
-   pinning mechanism.
+   All controllers will be upgraded in sync in order to make services only talk
+   to DB schema versions they expect. Services will be unavailable during this
+   operation. Standalone block storage nodes are automatically upgraded in this
+   step too, in sync with controllers, because block storage services don't
+   have a version pinning mechanism.
 
-   Run the deploy command with `major-upgrade-pacemaker.yaml`::
+   Run the deploy command with `major-upgrade-pacemaker.yaml`
+
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker.yaml
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker.yaml
 
-   Services of the compute component on the controller nodes are now
-   pinned to communicate like the older release, ensuring that they
-   can talk to the compute nodes which haven't been upgraded yet.
-
-   .. note::
-
-      If this step fails, it may leave the pacemaker cluster stopped
-      (together with all OpenStack services on the controller
-      nodes). The root cause and restoration procedure may vary, but
-      in simple cases the pacemaker cluster can be started by logging
-      into one of the controllers and running `sudo pcs cluster start
-      --all`.
+   Services of the compute component on the controller nodes are now pinned to
+   communicate like the older release, ensuring that they can talk to the
+   compute nodes which haven't been upgraded yet.
 
    .. note::
 
-      After this step, or if this step failed with the error: `ERROR:
-      upgrade cannot start with some cluster nodes being
-      offlineAfter`, it's possible that some pacemaker resources needs
-      to be clean.  Check the failed actions and clean them by running
-      on *only one* controller node as root::
+      If this step fails, it may leave the pacemaker cluster stopped (together
+      with all OpenStack services on the controller nodes). The root cause and
+      restoration procedure may vary, but in simple cases the pacemaker cluster
+      can be started by logging into one of the controllers and running `sudo
+      pcs cluster start --all`.
 
-          pcs status
-          pcs resource cleanup
+   .. note::
 
-      It can take few minutes for the cluster to go back to a “normal”
-      state as displayed by `crm_mon`.  This is expected.
+      After this step, or if this step failed with the error: `ERROR: upgrade
+      cannot start with some cluster nodes being offlineAfter`, it's possible
+      that some pacemaker resources needs to be clean. Check the failed
+      actions and clean them by running on `only one` controller node as root
+
+      .. code-block:: bash
+
+         pcs status
+         pcs resource cleanup
+
+      It can take few minutes for the cluster to go back to a “normal” state as
+      displayed by `crm_mon`.  This is expected.
 
 #. Upgrade ceph storage nodes
 
-   If the deployment has any ceph storage nodes, upgrade them
-   one-by-one using the `upgrade-non-controller.sh` script on the
-   undercloud node::
+   If the deployment has any ceph storage nodes, upgrade them one-by-one using
+   the `upgrade-non-controller.sh` script on the undercloud node
+
+   .. code-block:: bash
 
       upgrade-non-controller.sh --upgrade <nova-id of ceph storage node>
 
 #. Upgrade compute nodes
 
-   Upgrade compute nodes one-by-one using the
-   `upgrade-non-controller.sh` script on the undercloud node::
+   Upgrade compute nodes one-by-one using the `upgrade-non-controller.sh`
+   script on the undercloud node
+
+   .. code-block:: bash
 
       upgrade-non-controller.sh --upgrade <nova-id of compute node>
 
@@ -473,20 +734,22 @@ Upgrading the Overcloud to Newton and earlier
       :class: mton
 
       **Explicitly disable sahara services if so desired:**
-      As discussed at bug1630247_  sahara services are disabled by default
-      in the Newton overcloud deployment. This special case is handled for
-      the duration of the upgrade by defaulting to 'keep sahara-\*'.
+      As discussed at bug1630247_  sahara services are disabled by default in
+      the Newton overcloud deployment. This special case is handled for the
+      duration of the upgrade by defaulting to 'keep sahara-\*'.
 
       That is by default sahara services are restarted after the mitaka to
-      newton upgrade of controller nodes and sahara config is re-applied
-      during the final upgrade converge step.
+      newton upgrade of controller nodes and sahara config is re-applied during
+      the final upgrade converge step.
 
-      If an operator wishes to **disable** sahara services as part of the mitaka
-      to newton upgrade they need to include the major-upgrade-remove-sahara.yaml_
-      environment file during the controller upgrade earlier and converge
-      step here::
+      If an operator wishes to **disable** sahara services as part of the
+      mitaka to newton upgrade they need to include the
+      major-upgrade-remove-sahara.yaml_ environment file during the controller
+      upgrade earlier and converge step here
 
-          openstack overcloud deploy --templates \
+      .. code-block:: bash
+
+         openstack overcloud deploy --templates \
            -e <full environment> \
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-remove-sahara.yaml
@@ -495,47 +758,33 @@ Upgrading the Overcloud to Newton and earlier
    .. _major-upgrade-remove-sahara.yaml: https://github.com/openstack/tripleo-heat-templates/blob/2e6cc07c1a74c2dd7be70568f49834bace499937/environments/major-upgrade-remove-sahara.yaml
 
 
-
    This step unpins compute services communication (upgrade level) on
-   controller and compute nodes, and it triggers configuration
-   management tooling to converge the overcloud configuration
-   according to the new release of `tripleo-heat-templates`.
+   controller and compute nodes, and it triggers configuration management
+   tooling to converge the overcloud configuration according to the new release
+   of `tripleo-heat-templates`.
 
-   Make sure that all overcloud nodes have been upgraded to the new
-   release, and then run the deploy command with
-   `major-upgrade-pacemaker-converge.yaml`::
+   Make sure that all overcloud nodes have been upgraded to the new release,
+   and then run the deploy command with `major-upgrade-pacemaker-converge.yaml`
 
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
+        -e <full environment> \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-pacemaker-converge.yaml
 
 
    .. note::
 
-    After the converge step, it's possible that some pacemaker
-    resources needs to be cleaned.  Check the failed actions and clean
-    them by running on *only one* controller as root::
+      After the converge step, it's possible that some pacemaker resources
+      needs to be cleaned.  Check the failed actions and clean them by running
+      on **only one** controller as root
 
-      pcs status
-      pcs resource cleanup
+      .. code-block:: bash
 
-    It can take few minutes for the cluster to go back to a “normal”
-    state as displayed by `crm_mon`.  This is expected.
+         pcs status
+         pcs resource cleanup
 
-
-.. admonition:: Mitaka to Newton
-   :class: mton
+      It can take few minutes for the cluster to go back to a “normal” state as
+      displayed by ``crm_mon``. This is expected.
 
 
-   **Deliver the data migration for aodh.**
-
-   This is to deliver the data migration for aodh. In Newton, aodh uses its
-   own mysql backend. This step migrates all the existing alarm data from
-   mongodb to the new mysql backend. To execute this step run
-   `overcloud deploy`, passing in the full set of environment files plus
-   `major-upgrade-aodh-migration.yaml`::
-
-      openstack overcloud deploy --templates \
-          -e <full environment> \
-          -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-aodh-migration.yaml

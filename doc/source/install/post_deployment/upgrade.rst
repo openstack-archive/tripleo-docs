@@ -59,6 +59,10 @@ The Queens upgrade workflow essentially consists of the following steps:
    Run the upgrade on specific nodes or groups of nodes. Repeat until all nodes
    are successfully upgraded.
 
+#. `openstack overcloud ceph-upgrade run`_ $OPTS. (optional)
+   Not necessary unless a TripleO managed Ceph cluster is deployed in the overcloud;
+   this step performs the upgrade of the Ceph cluster.
+
 #. `openstack overcloud upgrade converge`_ $OPTS.
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
@@ -228,6 +232,30 @@ don't want to start them all.
 
       openstack overcloud upgrade run --roles Controller --skip-tags validation
 
+openstack overcloud ceph-upgrade run
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This step is only necessary if Ceph was deployed in the Overcloud and it
+triggers an upgrade of the Ceph cluster which will be performed without
+taking down the cluster.
+
+   .. note::
+
+      It is especially important to remember that you **must** include all
+      environment files that were used to deploy the overcloud that you are about
+      to upgrade.
+
+   .. code-block:: bash
+
+      openstack overcloud ceph-upgrade run --templates \
+        --container-registry-file /home/stack/containers-default-parameters.yaml \
+        -e <ALL Templates from overcloud-deploy.sh> \
+        -r /path/to/roles_data.yaml
+
+At the end of the process, Ceph will be upgraded from Jewel to Luminous so
+there will be new containers for the `ceph-mgr` service running on the
+controlplane node.
+
 openstack overcloud upgrade converge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -381,52 +409,6 @@ major-upgrade-composable-steps that come first, as described above.
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps.yaml \
            -e overcloud-repos.yaml
 
-   .. admonition:: Ceph
-      :class: ceph
-
-       If Ceph has been deployed in the Overcloud, then use the
-       `ceph-ansible.yaml` environment file **instead of**
-       `storage-environment.yaml`. Make sure to move any customization into
-       `ceph-ansible.yaml` (or a copy of ceph-ansible.yaml)
-
-       .. code-block:: bash
-
-          openstack overcloud deploy --templates \
-            -e <full environment> \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
-            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
-            -e overcloud-repos.yaml
-
-       Customizations for the Ceph deployment previously passed as hieradata
-       via \*ExtraConfig should be removed as they are ignored, specifically
-       the deployment will stop if ``ceph::profile::params::osds`` is found to
-       ensure the devices list has been migrated to the format expected by
-       ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig`` and
-       ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
-       ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
-       `ceph-ansible scenarios`_ or the :doc:`TripleO Ceph config guide
-       <../advanced_deployment/ceph_config>`
-
-       The other parameters (for example ``CinderRbdPoolName``,
-       ``CephClientUserName``, ...) will behave as they used to with puppet-ceph
-       with the only exception of ``CephPools``. This can be used to create
-       additional pools in the Ceph cluster but the two tools expect the list
-       to be in a different format. Specifically while puppet-ceph expected it
-       in this format::
-
-        {
-         "mypool": {
-          "size": 1,
-          "pg_num": 32,
-          "pgp_num": 32
-         }
-        }
-
-       with ceph-ansible that would become::
-
-        [{"name": "mypool", "pg_num": 32, "rule_name": ""}]
-
    .. note::
 
       Before upgrading your deployment to containers, you must perform the
@@ -468,6 +450,52 @@ major-upgrade-composable-steps that come first, as described above.
            -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml \
            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
            -e overcloud-repos.yaml
+
+   .. admonition:: Ceph
+      :class: ceph
+
+      When upgrading to Pike, if Ceph has been deployed in the Overcloud, then
+      use the `ceph-ansible.yaml` environment file **instead of**
+      `storage-environment.yaml`. Make sure to move any customization into
+      `ceph-ansible.yaml` (or a copy of ceph-ansible.yaml)
+
+      .. code-block:: bash
+
+          openstack overcloud deploy --templates \
+            -e <full environment> \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/docker.yaml \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+            -e /usr/share/openstack-tripleo-heat-templates/environments/major-upgrade-composable-steps-docker.yaml \
+            -e overcloud-repos.yaml
+
+      Customizations for the Ceph deployment previously passed as hieradata
+      via \*ExtraConfig should be removed as they are ignored, specifically
+      the deployment will stop if ``ceph::profile::params::osds`` is found to
+      ensure the devices list has been migrated to the format expected by
+      ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig`` and
+      ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
+      ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
+      `ceph-ansible scenarios`_ or the :doc:`TripleO Ceph config guide
+      <../advanced_deployment/ceph_config>`
+
+      The other parameters (for example ``CinderRbdPoolName``,
+      ``CephClientUserName``, ...) will behave as they used to with puppet-ceph
+      with the only exception of ``CephPools``. This can be used to create
+      additional pools in the Ceph cluster but the two tools expect the list
+      to be in a different format. Specifically while puppet-ceph expected it
+      in this format::
+
+        {
+         "mypool": {
+          "size": 1,
+          "pg_num": 32,
+          "pgp_num": 32
+         }
+        }
+
+      with ceph-ansible that would become::
+
+        [{"name": "mypool", "pg_num": 32, "rule_name": ""}]
 
    .. note::
 

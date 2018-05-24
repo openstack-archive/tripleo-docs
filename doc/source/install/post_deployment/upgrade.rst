@@ -48,18 +48,18 @@ with  --help:
 
 The Queens upgrade workflow essentially consists of the following steps:
 
-#. **Prepare you environment, backup, get container images**.
+#. `Prepare your environment - get latest container images`_, backup.
    Generate any environment files you need for the upgrade such as the
    references to the latest container images or commands used to switch repos.
 
-#. **openstack overcloud upgrade prepare $OPTS**.
+#. `openstack overcloud upgrade prepare`_ $OPTS.
    Run a heat stack update to generate the upgrade playbooks.
 
-#. **openstack overcloud upgrade run $OPTS**.
+#. `openstack overcloud upgrade run`_ $OPTS.
    Run the upgrade on specific nodes or groups of nodes. Repeat until all nodes
    are successfully upgraded.
 
-#. **openstack overcloud upgrade converge $OPTS**.
+#. `openstack overcloud upgrade converge`_ $OPTS.
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
 
@@ -101,8 +101,6 @@ the -e option.
 
 openstack overcloud upgrade prepare
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-prepare
-queens-upgrade-dev-docs.
 
    .. note::
 
@@ -121,7 +119,7 @@ queens-upgrade-dev-docs.
       for upgrade with the 'prepare' command and only consider doing so after
       running the converge step. See the queens-upgrade-dev-docs_ for more.
 
-Run **overcloud upgrade prepare**. NOTE: this command expects the full set
+Run **overcloud upgrade prepare**. This command expects the full set
 of environment files that were passed into the deploy command, as well as the
 roles_data.yaml file used to deploy the overcloud you are about to upgrade. The
 --container-registry-file should point to the file that was output by the image
@@ -170,9 +168,9 @@ step. For non controlplane nodes, such as Compute or Storage, you can use
 
       openstack overcloud upgrade run --roles Controller
 
-   Optionally specify `--playbook` to manually step through the upgrade
-   playbooks: You need to run all three in this order and as specified below
-   (no path) for the full upgrade run
+**Optionally** specify `--playbook` to manually step through the upgrade
+playbooks: You need to run all three in this order and as specified below
+(no path) for a full upgrade to Queens.
 
    .. code-block:: bash
 
@@ -181,36 +179,36 @@ step. For non controlplane nodes, such as Compute or Storage, you can use
       openstack overcloud upgrade run --roles Controller --playbook post_upgrade_steps_playbook.yaml
 
 After all three playbooks have been executed without error on all nodes of
-the controller role, all controllers will have been fully upgraded to Queens.
-At a minimum an operator mayb check the health of the pacemaker cluster and see
-if there are any errors
+the controller role the controlplane will have been fully upgraded to Queens.
+At a minimum an operator should check the health of the pacemaker cluster
 
    .. code-block:: bash
 
       [root@overcloud-controller-0 ~]# pcs status | grep -C 10 -i "error\|fail"
 
-The operator may also want to confirm that openstack and
-related service containers are all in a good state and using the image
-references passed during upgrade prepare with the --container-registry-file
-parameter.
+The operator may also want to confirm that openstack and related service
+containers are all in a good state and using the image references passed
+during upgrade prepare with the --container-registry-file parameter.
 
    .. code-block:: bash
 
       [root@overcloud-controller-0 ~]# docker ps -a
 
-For non controlplane, you use `--nodes overcloud-compute-0` to upgrade particular
-nodes, or even "compute0,compute1,compute3" for multiple nodes. Note these
-are again upgraded in parallel
+For non controlplane nodes, such as Compute or ObjectStorage, you can use
+`--nodes overcloud-compute-0` to upgrade particular nodes, or even
+"compute0,compute1,compute3" for multiple nodes. Note these are again
+upgraded in parallel. Also note that you can still use the `--roles` parameter
+with non controlplane roles if that is preferred.
 
    .. code-block:: bash
 
       openstack overcloud upgrade run --nodes overcloud-compute-0
 
-This allows the operator to upgrade some subset, perhaps just one, compute
-or other non controlplane node and verify that the upgrade has successfully
-completed. You might even try to migrate workloads onto the newly upgraded
-compute and confirm there are no problems, before deciding to proceed with
-upgrading the remaining nodes in the role.
+Use of `--nodes` allows the operator to upgrade some subset, perhaps just one,
+compute or other non controlplane node and verify that the upgrade is
+successful. One may even migrate workloads onto the newly upgraded node and
+confirm there are no problems, before deciding to proceed with upgrading the
+remaining nodes that are still on Pike.
 
 Again you can optionally step through the upgrade playbooks if you prefer. Be
 sure to run upgrade_steps_playbook.yaml then deploy_steps_playbook.yaml and
@@ -236,7 +234,8 @@ openstack overcloud upgrade converge
 Finally, run the converge heat stack update. This will re-apply all Queens
 configuration across all nodes and unset all variables that were used during
 the upgrade. Until you have successfully completed this step, heat stack
-updates against the overcloud stack are expected to fail.
+updates against the overcloud stack are expected to fail. You can read more
+about why this is the case in the queens-upgrade-dev-docs_.
 
    .. note::
 
@@ -244,7 +243,16 @@ updates against the overcloud stack are expected to fail.
       environment files that were used to deploy the overcloud that you are about
       to upgrade converge, including the list of Queens container image references
       and the roles_data.yaml roles and services definition. You should omit
-      any repo switch commands, or override of the UpgradeInitCommand.
+      any repo switch commands and ensure that none of the environment files
+      you are about to use is specifying a value for UpgradeInitCommand.
+
+   .. note::
+
+      The Queens container image references that were passed into the
+      `openstack overcloud upgrade prepare`_ with the `--container-registry-file`
+      parameter **must** be included as an environment file, with the -e option
+      to the openstack overcloud upgrade run command, together with all other
+      environment files for your deployment.
 
    .. code-block:: bash
 
@@ -252,6 +260,10 @@ updates against the overcloud stack are expected to fail.
         -e /home/stack/containers-default-parameters.yaml \
         -e <ALL Templates from overcloud-deploy.sh> \
         -r /path/to/roles_data.yaml
+
+The Heat stack will be in the **UPDATE_IN_PROGRESS** state for the duration of
+the openstack overcloud upgrade converge. Once converge has completed
+successfully the Heat stack should also be in the **UPDATE_COMPLETE** state.
 
 Upgrading the Overcloud to Ocata or Pike
 ----------------------------------------

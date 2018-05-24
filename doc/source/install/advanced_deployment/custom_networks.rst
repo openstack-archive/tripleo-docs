@@ -69,6 +69,8 @@ The steps to define your custom networks are:
     IP range list, e.g. ``[{'start':'10.0.0.4', 'end':'10.0.0.250'}]``
    gateway_ip
     gateway for the network
+   vlan  (supported in Queens and later)
+    Vlan ID for this network.
 
    Other options are supported, see the documentation in the default
    network_data.yaml_ for details.
@@ -81,7 +83,7 @@ The steps to define your custom networks are:
 
 3. Copy network configuration templates, add new networks.
 
-   At present, the nic config templates are not dynamically generated, so it is
+   Prior to Queens the nic config templates are not dynamically generated, so it is
    necessary to copy those that are in use, and add parameters for any
    additional networks, for example::
 
@@ -90,6 +92,12 @@ The steps to define your custom networks are:
    Each file in ``single-nic-vlans`` will require update to add parameters for
    each custom network. Copy those that exist for the default networks, and
    rename to match the *name* field in ``custom_network_data.yaml``.
+
+  .. note::
+     In Queens and later the NIC config templates are dynamically generated so
+     this step is only necessary when creating custom NIC config templates,
+     not when just adding a custom network.
+
 
 4. Adjust your network-environment to reference the modified nic templates.
 

@@ -1,6 +1,12 @@
 Updating Undercloud Components
 ------------------------------
 
+.. note::
+   Instack-undercloud is deprecated in Rocky cycle. Instack undercloud can
+   only be upgraded to containerized undercloud. See
+   :doc:`../containers_deployment/undercloud`
+   for backward compatibility related information.
+
 #. Before upgrading the undercloud, it is highly suggested to perform
    a :doc:`backup <../controlplane_backup_restore/01_undercloud_backup>`
    of the undercloud and validate that a restore works fine.
@@ -28,7 +34,7 @@ Updating Undercloud Components
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
 
-3. Clean the yum cache to ensure only the new repos are used
+#. Clean the yum cache to ensure only the new repos are used
 
    .. code-block:: bash
 

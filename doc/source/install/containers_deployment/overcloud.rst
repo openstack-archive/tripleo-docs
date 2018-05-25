@@ -75,6 +75,8 @@ in the deployment by specifying the heat environment files with the
 ``--environment-file`` option and the roles file with the ``--roles-file``
 option.
 
+.. _populate-local-registry-containers:
+
 Populate local docker registry
 ..............................
 

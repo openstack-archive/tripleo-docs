@@ -5,7 +5,7 @@ The following restore process assumes you are recovering from a failed Underclou
 It assumes that the hardware layout is the same, and the hostname and Undercloud settings of the machine will be the same as well.
 Once the machine is installed and is in a clean state, re-enable all the subscriptions/repositories needed to install and run TripleO.
 
-Note that unless specified, all commands are run as root.
+Note that unless specified, all commands should run as the stack user.
 
 Downloading automated Undercloud backups
 ----------------------------------------
@@ -18,8 +18,8 @@ and from there execute the restore steps.
 
   # From the Undercloud
   source stackrc
-  mkdir restore_uc_backup
-  cd restore_uc_backup
+  mkdir /var/tmp/test_bk_down
+  cd /var/tmp/test_bk_down
   openstack container save undercloud-backups
 
 Now, in the `restore_uc_backup` folder there must be a file with the
@@ -28,75 +28,121 @@ following naming convention `UC-backup-<timestamp>.tar`.
 After getting the backup file and unzipping it in any
 selected folder, the user can proceed with the Undercloud restore.
 
-The following is an example of how to download and extract the Undercloud
+The following is an example of how to extract the Undercloud
 backup content:
 
 ::
 
-  tar -xvf UC-backup-<timestamp>.tar
+  sudo tar -xvf /var/tmp/test_bk_down/UC-backup-*.tar -C /var/tmp/test_bk_down || true
 
 There, the user will have a tar file with the content of the file system backup
 and another gz file with the content of the database backup.
 
-The user can proceed to unzip the database backup by executing::
+The user can proceed to unzip the database
+and filesystem backup by executing:
 
-  gunzip all-databases-<timestamp>.sql.gz
+::
+
+  sudo gunzip /var/tmp/test_bk_down/*.gz -c > /var/tmp/test_bk_down/all-databases.sql
+  sudo tar -xvf /var/tmp/test_bk_down/filesystem-*.tar -C /var/tmp/test_bk_down
 
 Restoring a backup of your Undercloud on a Fresh Machine
 --------------------------------------------------------
 
-The first step is to unzip the Undercloud backup to a temporary folder,
-then install the MariaDB server with::
+Assuming that the user has a fresh installed Undercloud
+node, the user is able to log in as the stack user, and
+have the Backup restored in the folder
+`/var/tmp/test_bk_down`, follow the next steps.
 
-  yum install -y mariadb-server
+Syncronize the stack home directory, haproxy configuration,
+certificates and hieradata with the backup content:
 
-Restore the MariaDB configuration file,
-noticing that depending on the MySQL version, the config file can
-be `/etc/my.cnf.d/mariadb-server.cnf` or `/etc/my.cnf.d/server.cnf`.
-Also, edit /etc/my.cnf.d/server.cnf and comment out 'bind-address'.
+::
 
-Start the MariaDB server and load the backup following this example::
+  sudo rsync -a /var/tmp/test_bk_down/home/stack/ /home/stack
+  sudo rsync -a /var/tmp/test_bk_down/etc/haproxy/ /etc/haproxy/
+  sudo rsync -a /var/tmp/test_bk_down/etc/pki/instack-certs/ /etc/pki/instack-certs/
+  sudo mkdir -p /etc/puppet/hieradata/
+  sudo rsync -a /var/tmp/test_bk_down/etc/puppet/hieradata/ /etc/puppet/hieradata/
 
-  systemctl start mariadb
-  cat /root/undercloud-all-databases.sql | mysql
-  # Now we need to clean out some old permissions to be recreated
-  for i in ceilometer glance heat ironic keystone neutron nova;do mysql -e "drop user $i";done
-  mysql -e 'flush privileges'
 
-Now create the stack user and restore the stack users home directory::
+If the user is using SSL, you need to refresh the CA certificate:
 
-  sudo useradd stack
-  sudo passwd stack  # specify a password
+::
 
-  echo "stack ALL=(root) NOPASSWD:ALL" | sudo tee -a /etc/sudoers.d/stack
-  sudo chmod 0440 /etc/sudoers.d/stack
+  sudo mkdir -p /etc/pki/instack-certs || true
+  sudo cp /home/stack/undercloud.pem /etc/pki/instack-certs
+  sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
+  sudo restorecon -R /etc/pki/instack-certs
+  sudo cp /home/stack/cacert.pem /etc/pki/ca-trust/source/anchors/
+  sudo update-ca-trust extract
 
-Next restore the stack users home directory from the Undercloud backup.
+Install the required packages with:
 
-We have to now install the swift and glance base packages, and then restore their data::
+::
 
-  yum install -y openstack-glance openstack-swift
+  sudo yum install -y mariadb mariadb-server python-tripleoclient
+
+If you are using Pike and Ceph will be used in the Overcloud, install
+ceph-ansible on the Undercloud:
+
+::
+
+  sudo yum install -y ceph-ansible
+
+Restart MySQL:
+
+::
+
+  sudo systemctl restart mariadb
+
+Allow restore big dump DB files:
+
+::
+
+  mysql -uroot -e"set global max_allowed_packet = 1073741824;"
+
+
+Restore the DB backup:
+
+::
+
+  cat /var/tmp/test_bk_down/all-databases-*.sql | sudo mysql
+
+Restart Mariadb to refresh the permissions from the backup file:
+
+::
+
+  sudo systemctl restart mariadb
+
+Register the root password from the configuration file and clean
+the DB password to be able to reinstall the Undercloud:
+
+::
+
+  oldpassword=$(sudo cat /var/tmp/test_bk_down/root/.my.cnf | grep -m1 password | cut -d'=' -f2 | tr -d "'")
+  mysqladmin -u root -p$oldpassword password ''
+
+We have to now install the swift and glance base packages, and then restore their data:
+
+::
+
+  sudo yum install -y openstack-glance openstack-swift
   # Restore data from the Backup to: srv/node and var/lib/glance/images
   # Confirm data is owned by correct user
   chown -R swift: /srv/node
   chown -R glance: /var/lib/glance/images
 
-Finally, we rerun the Undercloud installation from the stack user, making sure to run it in the stack user home dir::
+Finally, we rerun the Undercloud installation from the stack user, making sure to run it in the stack user home dir:
 
-  su - stack
-  sudo yum install -y python-tripleoclient
+::
+
   # Double check hostname is correctly set in /etc/hosts
   openstack undercloud install
 
-If you are using Pike and Ceph will be used in the overcloud, install
-ceph-ansible on the Undercloud::
-
-  sudo yum install -y ceph-ansible
-
-
-Reconnect the restored Undercloud to the overcloud
+Reconnect the restored Undercloud to the Overcloud
 --------------------------------------------------
 Having completed the steps above, the Undercloud can be expected to automatically
-restore its connection to the overcloud. The nodes will continue to poll
+restore its connection to the Overcloud. The nodes will continue to poll
 Orchestration (heat) for pending tasks, using a simple HTTP request issued every
 few seconds.

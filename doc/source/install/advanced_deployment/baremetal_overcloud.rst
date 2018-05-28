@@ -848,6 +848,7 @@ and passing `rd.iscsi.firmware=1` to the kernel in the grub config::
 
     $ mkdir /tmp/mountpoint
     $ guestmount -i -a /tmp/CentOS-7-x86_64-GenericCloud.qcow2 /tmp/mountpoint
+    $ mount -o bind /dev /tmp/mountpoint/dev
     $ chroot /tmp/mountpoint /bin/bash
     chroot> mv /etc/resolv.conf /etc/resolv.conf_
     chroot> echo "nameserver 8.8.8.8" > /etc/resolv.conf
@@ -858,6 +859,7 @@ and passing `rd.iscsi.firmware=1` to the kernel in the grub config::
     # Edit the file /etc/default/grub and add rd.iscsi.firmware=1 to GRUB_CMDLINE_LINUX=...
     chroot> vi /etc/default/grub
     chroot> exit
+    $ umount /tmp/mountpoint/dev
     $ guestunmount /tmp/mountpoint
     $ guestfish -a /tmp/CentOS-7-x86_64-GenericCloud.qcow2 -m /dev/sda1 sh "/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg"
 

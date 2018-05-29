@@ -87,11 +87,12 @@ for messages on the Zaqar_queue_ that is used by the mistral workflow.
 
 It is worth noting here that before invoking the Heat stack update,
 prepare_command_prepends_ the prepare_env_file_ to the list of environment
-files passed to Heat. Also worth highlighting is that the
-`--container-registry-file_parameter`_ is unique to the upgrade prepare
-command, and is expected to point to the tripleo-heat-templates
-environment file containing the references for the target version container
-images. That file looks something like
+files passed to Heat. Also worth highlighting is that the operator must
+include all environment files used in deploying the overcloud that is being
+upgraded. It is especially important that the operator includes the environment
+file containing the references for the target version container images. See
+the operator_docs_ for pointers to how that file is generated and for
+reference it will look something like
 
     .. code-block:: bash
 
@@ -129,7 +130,6 @@ before executing them.
 .. _base_wait_for_messages: https://github.com/openstack/python-tripleoclient/blob/3d9183fc03aa96bce093e774ab4bf51655579a9c/tripleoclient/workflows/package_update.py#L38
 .. _zaqar_queue: https://github.com/openstack/tripleo-common/blob/1d3aefbe2f0aac2828eba69ee9efc57a7b7bf385/workbooks/package_update.yaml#L17
 .. _prepare_command_prepends: https://github.com/openstack/python-tripleoclient/blob/3d9183fc03aa96bce093e774ab4bf51655579a9c/tripleoclient/v1/overcloud_upgrade.py#L76-L79
-.. _`--container-registry-file_parameter`: https://github.com/openstack/python-tripleoclient/blob/3d9183fc03aa96bce093e774ab4bf51655579a9c/tripleoclient/v1/overcloud_upgrade.py#L41
 
 openstack overcloud upgrade run $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -221,10 +221,7 @@ openstack overcloud upgrade converge $ARGS
 The UpgradeConverge_ class like the UpgradePrepare class also inherits from
 the DeployOvercloud_ class thus getting all of its parameters and template
 processing. The operator needs to pass in all Heat environment files
-used as part of the deployment and upgrade prepare, with the caveat that the
-container images file that was passed as the
-`--container-registry-file_parameter`_  in the prepare operation is also passed
-as an extra environment file with -e.
+used as part of the upgrade prepare including the container images file.
 
 The main objective of the upgrade converge operation is to unset the
 upgrade specific parameters that have been set on the overcloud Heat stack

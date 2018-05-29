@@ -75,6 +75,7 @@ If the user is using SSL, you need to refresh the CA certificate:
   sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
   sudo restorecon -R /etc/pki/instack-certs
   sudo cp /home/stack/cacert.pem /etc/pki/ca-trust/source/anchors/
+  sudo cp /home/stack/overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/
   sudo update-ca-trust extract
 
 Install the required packages with:

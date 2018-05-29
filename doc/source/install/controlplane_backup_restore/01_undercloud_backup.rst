@@ -18,15 +18,27 @@ By default, all databases are included in the backup, also, the folder `/home/st
 
 The command usage is::
 
-  openstack undercloud backup [--add-path ADD_FILES_TO_BACKUP]
+  openstack undercloud backup [--add-path ADD_FILES_TO_BACKUP] [--exclude-path EXCLUDE_FILES_TO_BACKUP]
 
 For example, we can run a full MySQL backup with additional paths as::
 
-  openstack undercloud backup --add-path /etc/hosts \
+  openstack undercloud backup --add-path /etc/ \
                               --add-path /var/log/ \
-                              --add-path /var/lib/glance/images/ \
+                              --add-path /root/ \
+                              --add-path /var/lib/glance/ \
+                              --add-path /var/lib/docker/ \
+                              --add-path /var/lib/certmonger/ \
+                              --add-path /var/lib/registry/ \
                               --add-path /srv/node/ \
-                              --add-path /etc/
+                              --exclude-path /home/stack/
+
+Note that we are excluding the folder `/home/stack/`
+from the backup, but this folder is not included using the `--add-path`,
+CLI option, this is due to the fact that the `/home/stack/` folder is
+added by default in any backup as it contains necessary files
+to restore correctly the Undercloud.
+You can exclude that folder and add specific files if you are required to
+do so.
 
 When executing the Undercloud backup via the OpenStack
 CLI, the backup is stored in a temporary folder called
@@ -59,13 +71,15 @@ Filesystem backups
 
 The following command can be used to perform a backup of all data from the undercloud node::
 
-  tar --ignore-failed-read -cf \
+  sudo tar --ignore-failed-read -cf \
       UC-backup-`date +%F`.tar \
       /root/undercloud-all-databases.sql \
-      /etc/my.cnf.d \
-      /var/lib/glance/images \
+      /etc \
+      /var/log \
+      /root \
+      /var/lib/glance \
+      /var/lib/docker \
+      /var/lib/certmonger \
+      /var/lib/registry \
       /srv/node \
-      /home/stack \
-      /etc/pki \
-      /opt/stack
-
+      /home/stack

@@ -20,3 +20,8 @@ base network layer.
 
 .. note:: Check the :ref:`debug-containers` section for more tips and tricks for
           debugging containers.
+
+.. note:: Check our "Deep Dive" video_ which explain the architecture backgrounds and changes
+          as well as some demos and Q/A.
+
+.. _video: https://www.youtube.com/watch?v=lv233gPynwk

@@ -7,6 +7,40 @@ Once the machine is installed and is in a clean state, re-enable all the subscri
 
 Note that unless specified, all commands should run as the stack user.
 
+NTP service
+-----------
+
+OpenStack services are time sensitive, users need to
+be sure their environment have the time synchronized
+correctly before proceeding with any backup task.
+
+By default, both Undercloud and Overcloud should have
+configured correctly the NTP service as there are
+parameters specifically defined to manage this service.
+
+The user is responsible to ensure that the Undercloud
+restore is consistent in time. For example, a user
+installs the Undercloud at the time 'm', then they deploy
+the Undercloud and the Overcloud at the time 'n', and
+they create an Undercloud backup at the time 'o'. When the user
+restore the Undercloud it needs to be sure is restored
+at a time later than 'o'. So, before and after restoring the Undercloud
+node is important to have all the deployment with the time
+updated and synchronized correctly.
+
+In case this is done manually, execute:
+
+::
+
+  sudo yum install -y ntp
+  sudo chkconfig ntpd on
+  sudo service ntpd stop
+  sudo ntpdate pool.ntp.org
+  sudo service ntpd restart
+
+After ensuring the environment have the time synchronized correctly
+you can continue with the restore tasks.
+
 Downloading automated Undercloud backups
 ----------------------------------------
 
@@ -64,7 +98,8 @@ certificates and hieradata with the backup content:
   sudo rsync -a /var/tmp/test_bk_down/etc/pki/instack-certs/ /etc/pki/instack-certs/
   sudo mkdir -p /etc/puppet/hieradata/
   sudo rsync -a /var/tmp/test_bk_down/etc/puppet/hieradata/ /etc/puppet/hieradata/
-
+  sudo rsync -a /var/tmp/test_bk_down/srv/node/ /srv/node/
+  sudo rsync -a /var/tmp/test_bk_down/var/lib/glance/ /var/lib/glance/
 
 If the user is using SSL, you need to refresh the CA certificate:
 
@@ -72,10 +107,10 @@ If the user is using SSL, you need to refresh the CA certificate:
 
   sudo mkdir -p /etc/pki/instack-certs || true
   sudo cp /home/stack/undercloud.pem /etc/pki/instack-certs
-  sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
-  sudo restorecon -R /etc/pki/instack-certs
   sudo cp /home/stack/cacert.pem /etc/pki/ca-trust/source/anchors/
   sudo cp /home/stack/overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/
+  sudo semanage fcontext -a -t etc_t "/etc/pki/instack-certs(/.*)?"
+  sudo restorecon -R /etc/pki/instack-certs
   sudo update-ca-trust extract
 
 Install the required packages with:
@@ -108,7 +143,7 @@ Restore the DB backup:
 
 ::
 
-  cat /var/tmp/test_bk_down/all-databases-*.sql | sudo mysql
+  mysql -u root < /var/tmp/test_bk_down/all-databases.sql
 
 Restart Mariadb to refresh the permissions from the backup file:
 
@@ -124,6 +159,14 @@ the DB password to be able to reinstall the Undercloud:
   oldpassword=$(sudo cat /var/tmp/test_bk_down/root/.my.cnf | grep -m1 password | cut -d'=' -f2 | tr -d "'")
   mysqladmin -u root -p$oldpassword password ''
 
+Remove old user permisology if it exists, replace <node> with the host related to each user.
+
+::
+
+  mysql -e 'select host, user, password from mysql.user;'
+  for i in ceilometer glance heat ironic keystone neutron nova mistral zaqar;do mysql -e "drop user $i@<node>" || true ;done
+  mysql -e 'flush privileges'
+
 We have to now install the swift and glance base packages, and then restore their data:
 
 ::
@@ -131,8 +174,8 @@ We have to now install the swift and glance base packages, and then restore thei
   sudo yum install -y openstack-glance openstack-swift
   # Restore data from the Backup to: srv/node and var/lib/glance/images
   # Confirm data is owned by correct user
-  chown -R swift: /srv/node
-  chown -R glance: /var/lib/glance/images
+  sudo chown -R swift: /srv/node
+  sudo chown -R glance: /var/lib/glance/images
 
 Finally, we rerun the Undercloud installation from the stack user, making sure to run it in the stack user home dir:
 

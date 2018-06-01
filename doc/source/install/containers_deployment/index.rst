@@ -9,6 +9,7 @@ the undercloud or the overcloud.
 
    undercloud
    overcloud
+   standalone
    architecture
    3rd_party
    tips_tricks

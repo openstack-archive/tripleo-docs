@@ -273,3 +273,10 @@ external
   all external deployments
 external_deploy_steps
   external deployments that run on the undercloud
+
+config-download with Heat SoftwareDeployment outputs
+----------------------------------------------------
+``config-download`` does not support outputs on Heat
+SoftwareDeployment/SoftwareConfig resources. Often, ``deploy_steps_tasks`` can
+be used to reproduce the same behavior that would be handled by an output, by
+using Ansible tasks and the ``register`` keyword.

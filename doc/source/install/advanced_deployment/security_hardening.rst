@@ -251,10 +251,10 @@ structure::
   'not var/spool':
     content: '!/var/spool.*'
     order  : 7
-  'not /var/adm/utmp'
-    content: '!/var/adm/utmp$ '
+  'not /var/adm/utmp':
+    content: '!/var/adm/utmp$'
     order: 8
-  'not nova instances'
+  'not nova instances':
     content: '!/var/lib/nova/instances.*'
     order: 9
 

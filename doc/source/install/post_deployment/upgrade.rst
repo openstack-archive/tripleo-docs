@@ -112,6 +112,12 @@ openstack overcloud upgrade prepare
       of the current state, including the **undercloud** since there will be a
       Heat stack update performed here.
 
+   .. note::
+
+      If you have enabled neutron_DVR_ in your deployment you must ensure that
+      compute nodes are connected to the External network via the
+      roles_data.yaml that you will pass using the -r parameter to upgrade prepare.
+      This is necessary to allow floating IP connectivity via the external api network.
 
    .. note::
 
@@ -154,6 +160,8 @@ to deliver the upgrade in the next step:
 
       openstack overcloud config download --config-dir SOMEDIR
       # playbooks will be downloaded to SOMEDIR directory
+
+.. _neutron_DVR: https://specs.openstack.org/openstack/neutron-specs/specs/juno/neutron-ovs-dvr.html
 
 
 openstack overcloud upgrade run

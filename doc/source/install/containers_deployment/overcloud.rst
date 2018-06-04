@@ -100,6 +100,15 @@ pull and push destinations::
       --output-env-file ~/docker_registry.yaml \
       --output-images-file overcloud_containers.yaml
 
+.. note:: Use the IP address of your undercloud, which you previously set with
+    the `local_ip` parameter in your `undercloud.conf` file. For these example
+    commands, the address is assumed to be `192.168.24.1:8787`.
+
+This creates an `~/docker_registry.yaml` environment file, which contains image
+locations on the undercloud. You include this file with your deployment.
+This also creates a file called `overcloud_containers.yaml` with your
+container image information you should use to push images into the local registry.
+
 .. admonition:: Stable Branch
   :class: stable
 

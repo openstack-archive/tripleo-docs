@@ -9,6 +9,40 @@ the updates or upgrades workflows.
 The following sections will describe how to
 execute an Undercloud backup.
 
+NTP service
+-----------
+
+OpenStack services are time sensitive, users need to
+be sure their environment have the time synchronized
+correctly before proceeding with any backup task.
+
+By default, both Undercloud and Overcloud should have
+configured correctly the NTP service as there are
+parameters specifically defined to manage this service.
+
+The user is responsible to ensure that the Undercloud
+restore is consistent in time. For example, a user
+installs the Undercloud at the time 'm', then they deploy
+the Undercloud and the Overcloud at the time 'n', and
+they create an Undercloud backup at the time 'o'. When the user
+restore the Undercloud it needs to be sure is restored
+at a time later than 'o'. So, before and after restoring the Undercloud
+node is important to have all the deployment with the time
+updated and synchronized correctly.
+
+In case this is done manually, execute:
+
+::
+
+  sudo yum install -y ntp
+  sudo chkconfig ntpd on
+  sudo service ntpd stop
+  sudo ntpdate pool.ntp.org
+  sudo service ntpd restart
+
+After ensuring the environment have the time synchronized correctly
+you can continue with the backup tasks.
+
 CLI driven backups
 ------------------
 

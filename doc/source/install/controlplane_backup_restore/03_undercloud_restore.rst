@@ -101,6 +101,18 @@ certificates and hieradata with the backup content:
   sudo rsync -a /var/tmp/test_bk_down/srv/node/ /srv/node/
   sudo rsync -a /var/tmp/test_bk_down/var/lib/glance/ /var/lib/glance/
 
+The Keystone configuration files need to be synchronized
+before reinstalling the Undercloud node. This is needed
+because we need to have the same keys in the folders
+`credential-keys` and `fernet-keys` so they don't get regenerated
+when running the puppet Undercloud configuration.
+Take into account that the package `openstack-keystone` needs to be installed
+before synchronizing its configuration data:
+
+::
+
+  sudo rsync -a /var/tmp/test_bk_down/etc/keystone/ /etc/keystone/
+
 If the user is using SSL, you need to refresh the CA certificate:
 
 ::

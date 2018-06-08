@@ -1,16 +1,144 @@
 .. _package_update:
 
-Updating Packages on Overcloud Nodes
-====================================
+Updating Content on Overcloud Nodes
+===================================
 
-The update of overcloud packages to the latest version of the current release
-is referred to as the 'minor update' in TripleO (distinguishing it from the
-'major upgrade' to the next release). In the Pike cycle the minor update
-workflow has changed significantly compared to previous cycles. There are
-thus version specific sections below.
+The update of overcloud packages and containers to the latest version
+of the current release is referred to as the 'minor update' in TripleO
+(distinguishing it from the 'major upgrade' to the next release). In
+the Queens cycle the minor update workflow has changed compared to
+previous cycles. There are thus version specific sections below.
 
-Updating your Overcloud - Pike and beyond
+Updating your Overcloud - Queens and beyond
 -------------------------------------------
+
+The Queens release brings common CLI and workflow conventions to the
+main deployment lifecycle operations (minor updates, major upgrades,
+and fast forward upgrades). This means that the minor update workflow
+has changed compared to previous releases, and it should now be easier
+to learn and reason about the lifecycle operations in general.
+
+To update your overcloud to the latest packages / container images of
+the OpenStack release that you currently operate, perform these steps:
+
+#. **Software sources setup**
+
+   In case you use pinned repositories (e.g. to some DLRN hash), make
+   sure to update your repository files on overcloud to get the latest
+   RPMs. If you use stable RDO repositories, you don't need to change
+   anything.
+
+   Fetch latest container images to your undercloud registry and
+   generate a Heat environment file pointing to new container
+   images. This is done via workflow described in
+   :doc:`containerized deployment documentation<../containers_deployment/overcloud>`.
+
+#. **Update preparation**
+
+   To prepare the overcloud for the update, run:
+
+   .. code-block:: bash
+
+      openstack overcloud update prepare \
+          <OPTIONS> \
+          -e container-params.yaml
+
+   In place of the `<OPTIONS>` token should go all parameters that you
+   used with previous `openstack overcloud deploy` command. The last
+   argument `container-params.yaml` is a Heat environment file
+   pointing to new container images, obtained in previous step.
+
+   .. note::
+
+      The `update prepare` command performs a Heat stack update, and
+      as such it should be passed all parameters currently used by the
+      Heat stack (most notably environment files, role counts, roles
+      data, and network data). This is crucial in order to keep
+      correct state of the stack.
+
+   .. note::
+
+      The `container-params.yaml` file is intended to replace any
+      previous container parameters file. You should drop the previous
+      container parameters file and pass the new one for any
+      subsequent stack update operations.
+
+   The `update prepare` command temporarily disables config management
+   operations that would be normally performed on a Heat stack update,
+   and it updates the stack outputs with Ansible snippets used in the
+   next step of the update.
+
+#. **Update run**
+
+   Run the update procedure on a subset of nodes selected via the
+   `--nodes` parameter:
+
+   .. code-block:: bash
+
+      openstack overcloud update run --nodes overcloud-controller-0
+
+   You can specify a role name, e.g. 'Compute', to execute the minor
+   update on all nodes of that role in a rolling fashion (`serial: 1`
+   is used on the playbooks).
+
+   There is no required node ordering for performing the minor update
+   on the overcloud, but it's a good practice to keep some consistency
+   in the process. E.g. all controllers first, then all computes, etc.
+
+   Do this for all the overcloud nodes before proceeding to next step.
+
+#. **Ceph update (optional)**
+
+   If your environment includes Ceph managed by TripleO (i.e. *not*
+   what TripleO calls "external Ceph"), update Ceph by running:
+
+   .. code-block:: bash
+
+      openstack overcloud ceph-upgrade run <OPTIONS>
+
+   In place of the `<OPTIONS>` token should go all parameters that you
+   used with previous `openstack overcloud update prepare` command
+   (including the new `-e container-params.yaml`).
+
+   .. note::
+
+      The `ceph-upgrade run` command performs a Heat stack update, and
+      as such it should be passed all parameters currently used by the
+      Heat stack (most notably environment files, role counts, roles
+      data, and network data). This is crucial in order to keep
+      correct state of the stack.
+
+   The `ceph-upgrade run` command re-enables config management
+   operations previously disabled by `update prepare`, and triggers
+   the rolling update playbook of the Ceph installer (`ceph-ansible`).
+
+#. **Update convergence**
+
+   To finish the update procedure, run:
+
+   .. code-block:: bash
+
+      openstack overcloud update converge <OPTIONS>
+
+   In place of the `<OPTIONS>` token should go all parameters that you
+   used with previous `openstack overcloud update prepare` command
+   (including the new `-e container-params.yaml`).
+
+   .. note::
+
+      The `update converge` command performs a Heat stack update, and
+      as such it should be passed all parameters currently used by the
+      Heat stack (most notably environment files, role counts, roles
+      data, and network data). This is crucial in order to keep
+      correct state of the stack.
+
+   The `update converge` command re-enables config management
+   operations previously disabled by `update prepare`, and it runs the
+   config management operations to assert that the overcloud state
+   matches the used overcloud templates.
+
+Updating your Overcloud - Pike
+------------------------------
 
 .. note::
    The minor update workflow described below is generally not well tested for

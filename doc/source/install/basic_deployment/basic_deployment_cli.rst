@@ -294,6 +294,10 @@ as a root device. Please see :ref:`root_device` for details.
    across rebuilds. Make sure to wipe the previous installation before
    rebuilding in this case.
 
+If there is information from previous deployments on the nodes' disks, it is
+recommended to at least remove the partitions and partition table(s). See
+:doc:`../advanced_deployment/cleaning` for information on how to do it.
+
 Finally, if you want your nodes to boot in the UEFI mode, additional steps may
 have to be taken - see :doc:`../advanced_deployment/uefi_boot` for details.
 
@@ -638,8 +642,7 @@ The overcloud can be redeployed when desired.
     openstack stack list
 
 #. It is recommended that you delete existing partitions from all nodes before
-   redeploying. Starting with TripleO Ocata, you can use existing workflows -
-   see :ref:`cleaning` for details.
+   redeploying, see :doc:`../advanced_deployment/cleaning` for details.
 
 #. Deploy the Overcloud again::
 

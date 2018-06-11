@@ -214,10 +214,12 @@ comparison point to verify the integrity of the files and directories.
 The TripleO AIDE service allows an operator to populate entries into an AIDE
 configuration, which is then used by the AIDE service to create an integrity
 database. This can be achieved using an environment file with the following
-example structure::
+example structure
+
+.. code-block:: yaml
 
   resource_registry:
-    OS::TripleO::Services::Aide: ../puppet/services/aide.yaml
+    OS::TripleO::Services::Aide: /usr/share/openstack-tripleo-heat-templates/deployment/aide/aide-baremetal-ansible.yaml
 
   parameter_defaults:
     AideRules:
@@ -257,7 +259,7 @@ example structure::
 If above environment file were saved as `aide.yaml` it could then be passed to
 the `overcloud deploy` command as follows::
 
-  openstack overcloud deploy --templates -e /path/to/aide.yaml
+  openstack overcloud deploy --templates -e aide.yaml
 
 Let's walk through the different values used here.
 

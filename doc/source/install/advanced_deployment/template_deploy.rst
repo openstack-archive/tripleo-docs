@@ -20,6 +20,8 @@ the packaged Heat templates::
     `/usr/share/openstack-tripleo-heat-templates`.
 
 
+.. _override-heat-templates:
+
 Overriding specific templates with local versions
 -------------------------------------------------
 

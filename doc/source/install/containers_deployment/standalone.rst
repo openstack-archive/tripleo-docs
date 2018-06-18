@@ -36,6 +36,7 @@ Deploying a Standalone Keystone node
     # not be needed anymore. Will need to clean this up.
 
     export NETWORK=192.168.24
+    export NETMASK=24
     export IP=$NETWORK.2
     export INTERFACE=eth1
 
@@ -61,15 +62,15 @@ Deploying a Standalone Keystone node
       DockerInsecureRegistryAddress:
       - $IP:8787
       MasqueradeNetworks:
-        $NETWORK.0/24:
-        - $NETWORK.0/24
+        $NETWORK.0/$NETMASK:
+        - $NETWORK.0/$NETMASK
       NeutronPublicInterface: $INTERFACE
       StandaloneCtlplaneLocalSubnet: ctlplane-subnet
       StandaloneCtlplaneSubnets:
         ctlplane-subnet:
           DhcpRangeEnd: $NETWORK.40
           DhcpRangeStart: $NETWORK.20
-          NetworkCidr: $NETWORK.0/24
+          NetworkCidr: $NETWORK.0/$NETMASK
           NetworkGateway: $IP
       StandaloneEnableRoutedNetworks: false
       StandaloneHomeDir: $HOME
@@ -80,7 +81,7 @@ Deploying a Standalone Keystone node
 
     sudo openstack tripleo deploy \
       --templates \
-      --local-ip=$IP \
+      --local-ip=$IP/$NETMASK \
       -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
       -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
       -e $HOME/standalone_parameters.yaml \
@@ -92,7 +93,7 @@ Deploying a Standalone Keystone node
    You can validate the Keystone is running by fetching a token::
 
     # validate keystone
-    ADMIN_PASS=$(egrep "^[[:space:]]+AdminPassword:" $HOME/tripleo-undercloud-passwords.yaml | awk '{print $2}')
+    export ADMIN_PASS=$(egrep "^[[:space:]]+AdminPassword:" $HOME/tripleo-undercloud-passwords.yaml | awk '{print $2}')
 
     KEYSTONE_PAYLOAD=$(cat <<EOF
     { "auth": {
@@ -114,4 +115,24 @@ Deploying a Standalone Keystone node
       -H "Content-Type: application/json" \
       -d "$KEYSTONE_PAYLOAD" \
       "http://$IP:5000/v3/auth/tokens" ; echo
+
+#. Create clouds.yaml for use with openstackclient
+
+   You can create a clouds.yaml which allows you to use the openstackclient::
+
+    mkdir -p ~/.config/openstack
+    cat <<EOF >~/.config/openstack/clouds.yaml
+    clouds:
+      standalone:
+        auth:
+          auth_url: http://$IP:5000/
+          project_name: admin
+          username: admin
+          password: $ADMIN_PASS
+        region_name: regionOne
+        identity_api_version: 3
+    EOF
+    export OS_CLOUD=standalone
+
+    openstack endpoint list
 

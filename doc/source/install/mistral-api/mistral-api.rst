@@ -260,7 +260,7 @@ nodes to be in the "manageable" state.
     $ openstack workflow execution create tripleo.baremetal.v1.introspect \
         '{"nodes_uuids": ["UUID1", "UUID2"]}'
 
-.. _cleaning:
+.. _cleaning_workflow:
 
 Cleaning Nodes
 ^^^^^^^^^^^^^^

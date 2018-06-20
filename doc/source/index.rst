@@ -25,6 +25,16 @@ Install Guide
 
   install/index
 
+Fast Forward Upgrade Guide
+--------------------------
+
+.. toctree::
+  :maxdepth: 3
+  :includehidden:
+
+  fast_forward_upgrade/index
+
+
 Documentation Conventions
 =========================
 

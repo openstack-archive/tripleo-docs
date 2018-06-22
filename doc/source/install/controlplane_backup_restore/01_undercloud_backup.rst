@@ -105,7 +105,7 @@ Filesystem backups
 
 The following command can be used to perform a backup of all data from the undercloud node::
 
-  sudo tar --ignore-failed-read -cf \
+  sudo tar --xattrs --ignore-failed-read -cf \
       UC-backup-`date +%F`.tar \
       /root/undercloud-all-databases.sql \
       /etc \

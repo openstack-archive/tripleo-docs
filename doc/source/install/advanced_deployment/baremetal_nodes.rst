@@ -8,6 +8,7 @@ Documentation on how to do advanced configuration of baremetal nodes in
 
    node_states
    cleaning
+   bios_settings
    node_discovery
    root_device
    introspect_single_node

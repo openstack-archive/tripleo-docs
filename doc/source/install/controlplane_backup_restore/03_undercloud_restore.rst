@@ -78,7 +78,7 @@ and filesystem backup by executing:
 ::
 
   sudo gunzip /var/tmp/test_bk_down/*.gz -c > /var/tmp/test_bk_down/all-databases.sql
-  sudo tar -xvf /var/tmp/test_bk_down/filesystem-*.tar -C /var/tmp/test_bk_down
+  sudo tar -xvf /var/tmp/test_bk_down/filesystem-*.tar -C /var/tmp/test_bk_down --xattrs
 
 Restoring a backup of your Undercloud on a Fresh Machine
 --------------------------------------------------------
@@ -93,13 +93,13 @@ certificates and hieradata with the backup content:
 
 ::
 
-  sudo rsync -a /var/tmp/test_bk_down/home/stack/ /home/stack
-  sudo rsync -a /var/tmp/test_bk_down/etc/haproxy/ /etc/haproxy/
-  sudo rsync -a /var/tmp/test_bk_down/etc/pki/instack-certs/ /etc/pki/instack-certs/
+  sudo rsync -aX /var/tmp/test_bk_down/home/stack/ /home/stack
+  sudo rsync -aX /var/tmp/test_bk_down/etc/haproxy/ /etc/haproxy/
+  sudo rsync -aX /var/tmp/test_bk_down/etc/pki/instack-certs/ /etc/pki/instack-certs/
   sudo mkdir -p /etc/puppet/hieradata/
-  sudo rsync -a /var/tmp/test_bk_down/etc/puppet/hieradata/ /etc/puppet/hieradata/
-  sudo rsync -a /var/tmp/test_bk_down/srv/node/ /srv/node/
-  sudo rsync -a /var/tmp/test_bk_down/var/lib/glance/ /var/lib/glance/
+  sudo rsync -aX /var/tmp/test_bk_down/etc/puppet/hieradata/ /etc/puppet/hieradata/
+  sudo rsync -aX /var/tmp/test_bk_down/srv/node/ /srv/node/
+  sudo rsync -aX /var/tmp/test_bk_down/var/lib/glance/ /var/lib/glance/
 
 The Keystone configuration files need to be synchronized
 before reinstalling the Undercloud node. This is needed

@@ -240,6 +240,63 @@ Additional configuration
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
   it's on by default. Also iPXE is required for UEFI boot support.
 
+Using a Custom Network for Overcloud Provisioning
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Pike release provided the the ability to define a custom network,
+this has been further enhanced in Queens to allow for the definition
+of a VLAN in the network definition.  Using a custom network to provision
+Overcloud nodes for Ironic has the advantage of moving all Ironic services
+off of the Undercloud Provisioning network (control plane) so that routing or
+bridging to the control plane is not necessary. This can increase security,
+and isolates tenant bare metal node provisioning from the overcloud node
+provisioning done by the undercloud.
+
+Follow the instructions in :doc:`custom_networks` to add an additional network,
+in this example called OcProvisioning, to ``network_data.yaml``::
+
+    # custom network for Overcloud provisioning
+    - name: OcProvisioning
+      name_lower: oc_provisioning
+      vip: true
+      vlan: 205
+      ip_subnet: '172.23.3.0/24'
+      allocation_pools: [{'start': '172.23.3.10', 'end': '172.23.3.200'}]
+
+The ServiceNetMap can be updated in ``network-environment.yaml`` to move the
+Ironic services used for Overcloud provisioning to the new network::
+
+    ServiceNetMap:
+         IronicApiNetwork: oc_provisioning # changed from ctlplane
+         IronicNetwork: oc_provisioning # changed from ctlplane
+
+Add the new network to the roles file ``roles_data.yaml`` for
+controller::
+
+    networks:
+      - External
+      - InternalApi
+      - Storage
+      - StorageMgmt
+      - Tenant
+      - OcProvisioning
+
+Add the new network to the NIC config controller.yaml file. Starting in Queens,
+the example NIC config files will automatically populated with this new network
+when it is in ``network_data.yaml`` and ``roles_data.yaml`` so this step is
+not necessary::
+
+       - type: vlan
+         vlan_id:
+           get_param: OcProvisioningNetworkVlanID
+         addresses:
+         - ip_netmask:
+             get_param: OcProvisioningIpSubnet
+
+.. note::
+    The baremetal nodes will send and received untagged VLAN traffic
+    in order to properly run DHCP and PXE boot.
+
 Deployment
 ~~~~~~~~~~
 
@@ -257,6 +314,19 @@ instead.
     We don't require any virtual compute nodes for the bare metal only case,
     so feel free to set ``ComputeCount: 0`` in your environment file, if you
     don't need them.
+
+If using a custom network in Pike or later, include the ``network_data.yaml``
+and ``roles_data.yaml`` files in the deployment::
+
+     -n /home/stack/network_data.yaml \
+     -r /home/stack/roles_data.yaml \
+
+In addition, if ``network-environment.yaml`` was updated to include the
+ServiceNetMap changes, include the updated and generated
+``network-environment.yaml`` files::
+
+     -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
+     -e /home/stack/templates/environments/network-environment.yaml \
 
 Validation
 ~~~~~~~~~~
@@ -346,8 +416,7 @@ Preparing networking
 
 Next, we need to create at least one network for nodes to use. By default
 Ironic uses the tenant network for the provisioning process, and the same
-network is often configured for cleaning. Using separate networks is beyond
-the scope of this guide.
+network is often configured for cleaning.
 
 As already mentioned, this guide assumes only one physical network shared
 between undercloud and overcloud. In this case the subnet address must match
@@ -366,11 +435,6 @@ parameters::
     openstack router create default-router
     openstack router add subnet default-router provisioning-subnet
 
-.. warning::
-    Network types other than "flat" are not supported when using ``flat``
-    bare metal networking implementation (see `Additional configuration`_
-    above for more details).
-
 We will use this network for bare metal instances (both for provisioning and
 as a tenant network), as well as an external network for virtual instances.
 In a real situation you will only use it as provisioning, and create a separate
@@ -383,6 +447,26 @@ and use the ``default-router`` to link the provisioning and tenant networks::
     openstack subnet create --network tenant-net --subnet-range 192.0.3.0/24 \
         --allocation-pool start=192.0.3.10,end=192.0.3.20 tenant-subnet
     openstack router add subnet default-router tenant-subnet
+
+Networking using a custom network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If using a custom network for overcloud provisioning, create a network of
+type ``vlan`` with VlanID matching the ``OcProvisioning`` network created
+during deployment::
+
+    openstack network create --share --provider-network-type vlan \
+      --provider-physical-network datacentre --provider-segment 205 provisioning
+
+Use a subnet range outside of the ``allocation_pool`` defined in
+``network_data.yaml``, for example::
+
+    openstack subnet create --network provisioning --subnet-range \
+      172.21.2.0/24 --gateway 172.21.2.1  --allocation-pool \
+      start=172.21.2.201,end=172.21.2.250 provisioning-subnet
+
+As defined in ``Preparing networking``, you can create a tenant nework along
+with a ``default-router`` to link the provisioning and tenant networks.
 
 Configuring cleaning
 ~~~~~~~~~~~~~~~~~~~~

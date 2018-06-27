@@ -15,4 +15,4 @@ Create the following environment file::
 And add the following arguments to your `openstack overcloud deploy`
 command to deploy with HA::
 
-  -e environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-pacemaker.yaml --ntp-server pool.ntp.org
+  -e environment.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/docker-ha.yaml --ntp-server pool.ntp.org

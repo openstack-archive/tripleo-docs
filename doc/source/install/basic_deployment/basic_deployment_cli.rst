@@ -599,33 +599,10 @@ and VLAN id based on the environment::
 
 Validate the Overcloud
 ^^^^^^^^^^^^^^^^^^^^^^
-Source the ``overcloudrc`` file::
 
-    source ~/overcloudrc
+Check the `Tempest`_ documentation on how to run tempest.
 
-Create a directory for Tempest (eg. naming it ``tempest``)::
-
-    mkdir ~/tempest
-    cd ~/tempest
-
-Tempest expects the tests it discovers to be in the current working directory.
-Set it up accordingly::
-
-    tempest init .
-
-The ``~/tempest-deployer-input.conf`` file was created during deployment and
-contains deployment specific settings. Use that file to configure
-Tempest::
-
-    discover-tempest-config --deployer-input ~/tempest-deployer-input.conf \
-                            --debug --create
-
-Run Tempest::
-
-    tempest run -r '(tempest.api|tempest.scenario)'
-
-.. note:: The full API/Scenario Tempest test suite might take hours to run on a single CPU.
-
+.. _tempest: ../basic_deployment/tempest.html
 
 Redeploy the Overcloud
 ^^^^^^^^^^^^^^^^^^^^^^

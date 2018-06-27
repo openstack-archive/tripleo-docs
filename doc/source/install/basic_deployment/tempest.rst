@@ -37,28 +37,28 @@ What Tempest provides?
   InterOp certifications as validating the OpenStack deployment for the above
   services.
 
-* The tests which are not fit with in Tempest testsuite will go under
+* The test which do not fit within the Tempest testsuite will go under
   respective service specific tempest plugins.
 
 Tempest Plugins
 ---------------
 
-Tempest plugins contains the API and scenario tests for specific OpenStack
+Tempest plugins contain the API and scenario tests for specific OpenStack
 services.
-Here is the detail list of `tempest plugins consumed`_ in TripleO deployment.
+Here is the detailed list of `tempest plugins consumed`_ in a TripleO deployment.
 
 .. _tempest plugins consumed: ../basic_deployment/tempest_plugins.html
 
 Packages provided by RDO
 ------------------------
 
-* Tempest related rpms
+* Tempest related RPMs
 
   * python-tempest: this package contains the tempest python library and is
     consumed as a dependency for out of tree tempest plugins i.e. for Horizon
     and Designate tempest plugins.
-  * python-tempestconf: It provides `discover-tempest-config` utility through
-    which we can generate tempest config.
+  * python-tempestconf: It provides the `discover-tempest-config` utility
+    through which we can generate tempest config.
   * openstack-tempest: this package contains a set of integration tests to be
     run against a live OpenStack cluster and required executables for running
     tempest. Packages `python-tempest` and `python-tempestconf` mentioned above
@@ -69,7 +69,7 @@ Packages provided by RDO
 * Test Runners:
 
   * python-stestr: It is a parallel python test runner built around subunit.
-    It is used by Tempest run under the hood to run tempest tests.
+    It is used by Tempest to run tempest tests under the hood.
   * python-os-testr: It is another test runner wrapped around stestr. It is
     also used to run tempest tests.
 
@@ -87,15 +87,15 @@ Some housekeeping rules
 
 * **Always** install tempest and its dependencies from **RPM**.
 * Make sure the right package with **correct version** is installed
-  (openstack-tempest rpm and its plugins are well tested in CI).
-* **Never ever** mix pip and rpm in an openstack deployment.
+  (openstack-tempest RPM and its plugins are well tested in CI).
+* **Never ever** mix pip and RPM in an openstack deployment.
 * Please **read** the documentation fully before running tempest.
 * openstack-tempest rpm **does not** install tempest plugins, they need to be
   installed separately.
 * Additional configuration for tempest plugins **may need** to be set.
 * **python-tempestconf** is installed by **openstack-tempest** rpm itself. It's
   not needed to install it separately.
-* openstack-tempest is installed **on undercloud**.
+* openstack-tempest is installed **on the undercloud**.
 * Source **openstackrc file** for undercloud or overcloud when running Tempest
   from undercloud.
 * openstack-tempest is currently used **to validate** undercloud as well as
@@ -109,6 +109,11 @@ Using TripleO-QuickStart to run Tempest
 
 TripleO project provides validate-tempest ansible role through which Tempest is
 used to validate undercloud and overcloud.
+Set your workspace and path to a config file that contains the node
+configuration, the following is the default::
+
+    CONFIG=config/general_config/minimal.yml
+    WORKSPACE=/home/centos/.quickstart
 
 * Running tempest against overcloud::
 
@@ -117,7 +122,7 @@ used to validate undercloud and overcloud.
     $ bash quickstart.sh \
       --bootstrap \
       --tags all \
-      --config $WORKSPACE/config/general_config/$CONFIG.yml \
+      --config $CONFIG \
       --working-dir $WORKSPACE/ \
       --no-clone \
       --release master-tripleo-ci \
@@ -132,7 +137,7 @@ used to validate undercloud and overcloud.
     $ bash quickstart.sh \
       --bootstrap \
       --tags all \
-      --config $WORKSPACE/config/general_config/$CONFIG.yml \
+      --config $CONFIG \
       --working-dir $WORKSPACE/ \
       --no-clone \
       --release master-tripleo-ci \
@@ -151,7 +156,7 @@ used to validate undercloud and overcloud.
     $ bash quickstart.sh \
       --bootstrap \
       --tags all \
-      --config $WORKSPACE/config/general_config/$CONFIG.yml \
+      --config $CONFIG \
       --working-dir $WORKSPACE/ \
       --no-clone \
       --release master-tripleo-ci \
@@ -167,7 +172,7 @@ used to validate undercloud and overcloud.
   undercloud using containerized tempest.
 
 Note: Here is the list of
-`validate-tempest role variable <http://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/roles/validate-tempest/README.md>`_
+`validate-tempest role variables <http://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/roles/validate-tempest/README.md>`_
 which can be modified using extra-vars.
 
 
@@ -218,7 +223,7 @@ manually.
         $ public_net_id=$(openstack network show {{ public_net_name }} -f value -c id)
 
 
-Installing Tempest rpm and its plugins
+Installing Tempest RPM and its plugins
 ++++++++++++++++++++++++++++++++++++++
 
 Install openstack-tempest::
@@ -270,8 +275,8 @@ The tempest configuration file can be generated automatically by
 package installed by openstack-tempest rpm.
 **discover-tempest-config** queries the cloud and discovers cloud configuration.
 **Note:** Not all of the configuration may be discovered by
-discover-tempest-config, therefor the tempest.conf needs to be rechecked for
-correctness or tuned so that it suits better to users' needs.
+discover-tempest-config, therefore the tempest.conf needs to be rechecked for
+correctness or tuned so that it better suits the user's needs.
 
 All the below operations will be performed from undercloud.
 
@@ -349,7 +354,7 @@ Things to keep in mind while using discover-tempest-config
 
 * --remove option can be used to remove values from tempest.conf.
   For example: **--remove network-feature-enabled.api_extensions=dvr**
-  The feature is usefull when some values in tempest.conf are automatically
+  The feature is useful when some values in tempest.conf are automatically
   set by the discovery, but they are not wanted to be printed to tempest.conf.
 
 
@@ -362,8 +367,8 @@ tests::
     $ tempest cleanup --init-saved-state
 
 It will create **saved_state.json** file in tempest workspace containing all
-the tenants and resources information present on system under test. More about
-the feature can be found in
+the tenants and resources information present on the system under test. More
+about the feature can be found in
 `Tempest documentation <https://docs.openstack.org/tempest/latest/cleanup.html>`
 
 List tempest plugins installed on undercloud
@@ -406,9 +411,7 @@ defined in tempest.conf to run tests against the targeted host.
 
 * Running multiple tests::
 
-    $ tempest run --regex '((test_regex1 | test_regex2 | test_regex 3)'
-
-* We use *|* (separator) to specific tests.
+    $ tempest run --regex '(test_regex1 | test_regex2 | test_regex 3)'
 
 * Use **--black-regex** argument to skip specific tests::
 

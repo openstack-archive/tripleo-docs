@@ -160,6 +160,20 @@ Deploying a Standalone Keystone node
      export OS_CLOUD=standalone
      openstack endpoint list
 
+Manual deployments with ansible
+-------------------------------
+
+With the ``--output-only`` option enabled, the installation stops before Ansible
+playbooks would be normally executed. Instead, it only creates a Heat stack,
+then downloads the ansible deployment data and playbooks to ``--output-dir`` for
+the manual execution.
+
+.. note::
+   When updating the existing standalone installation, keep in mind the
+   special cases described in :ref:`notes-for-stack-updates`. There is an
+   additional case for the ``--force-stack-update`` flag that might need to be
+   used, when in the ``--output-only`` mode.  That is when you cannot know the
+   results of the actual deployment before ansible has started.
 
 Example: 1 NIC, Using Compute with Tenant and Provider Networks
 ---------------------------------------------------------------

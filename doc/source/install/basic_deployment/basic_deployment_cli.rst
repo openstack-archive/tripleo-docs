@@ -257,9 +257,18 @@ created on the undercloud, one should use a non-root user.
 Upload Images
 -------------
 
-Load the images into the undercloud Glance::
+Load the images into the containerized undercloud Glance::
 
-    openstack overcloud image upload
+    openstack overcloud image upload --http-boot /var/lib/ironic/httpboot
+
+
+.. admonition:: Prior to Rocky release
+  :class: stable
+
+  Before Rocky, the undercloud isn't containerized by default. Hence
+  you must run the following command::
+
+    openstack overcloud image upload --http-boot /httpboot
 
 To upload a single image, see :doc:`../post_deployment/upload_single_image`.
 

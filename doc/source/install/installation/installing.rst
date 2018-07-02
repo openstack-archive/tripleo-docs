@@ -24,16 +24,9 @@ Installing the Undercloud
           su - stack
 
    .. note::
-      The containerized undercloud is intended to work correctly with SELinux
-      permissive, and cannot be installed to a system with SELinux enforcing.
-
-      .. admonition:: Stable Branch
-         :class: stable
-
-         The instack undercloud is intended to work correctly with SELinux
-         enforcing, and cannot be installed to a system with SELinux disabled.
-         If SELinux enforcement must be turned off for some reason, like upgrading
-         an undercloud into containers, it should instead be set to permissive.
+      The undercloud is intended to work correctly with SELinux enforcing.
+      Installatoins with the permissive/disabled SELinux are not recommended.
+      The ``undercloud_enable_selinux`` config option controls that setting.
 
    .. note::
       vlan tagged interfaces must follow the if_name.vlan_id convention, like for

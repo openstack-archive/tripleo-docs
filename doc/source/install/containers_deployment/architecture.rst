@@ -10,6 +10,55 @@ Like other areas of TripleO, the containers based deployment requires a couple
 of different projects to play together. The next section will cover each of the
 parts that allow for deploying OpenStack in containers using TripleO.
 
+
+Containers runtime deployment and configuration notes
+-----------------------------------------------------
+
+TripleO deploys the containers runtime and image components from the docker
+packages. The installed components include the docker daemon system service and
+`OCI`_ compliant `Moby`_ and `Containerd`_ - the building blocks for the
+container system.
+
+Containers control plane includes `Paunch`_ and `Dockerd`_ for the
+stateless services, and Pacemaker `Bundle`_ for the containerized stateful
+services, like the messaging system or database.
+
+.. _OCI: https://www.opencontainers.org/
+.. _Moby: https://mobyproject.org/
+.. _Containerd: https://github.com/containerd/containerd
+.. _dockerd: https://docs.docker.com/engine/reference/commandline/dockerd/
+.. _Bundle: https://wiki.clusterlabs.org/wiki/Bundle_Walk-Through
+
+There are ``Docker*`` configuration parameters in TripleO Heat Templates
+available for operators. Those options may be used to override defaults for the
+main docker daemon system service, or help to debug containerized TripleO
+deployments. Parameter override example::
+
+  parameter_defaults:
+    DockerDebug: true
+    DockerOptions: '--log-driver=syslog --live-restore'
+    DockerNetworkOptions: '--bip=10.10.0.1/16'
+    DockerInsecureRegistryAddress: ['myregistry.local:8787']
+    DockerRegistryMirror: 'mirror.regionone.local:8081/myregistry-1.local/'
+
+* ``DockerDebug`` adds more framework-specific details to the deployment logs.
+
+* ``DockerOptions``, ``DockerNetworkOptions``, ``DockerAdditionalSockets`` define
+  the docker service startup options, like the default IP address for the
+  `docker0` bridge interface (``--bip``) or SELinux mode (``--selinux-enabled``).
+
+  .. note:: Make sure the default CIDR assigned for the `docker0` bridge interface
+      does not conflict to other network ranges defined for your deployment.
+
+* ``DockerInsecureRegistryAddress``, ``DockerRegistryMirror`` allow you to
+  specify a custom registry mirror which can optionally be accessed insecurely
+  by using the ``DockerInsecureRegistryAddress`` parameter.
+
+See the official dockerd `documentation`_ for the reference.
+
+.. _documentation: https://docs.docker.com/engine/reference/commandline/dockerd/
+
+
 Building Containers
 -------------------
 

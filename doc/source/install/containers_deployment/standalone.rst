@@ -70,10 +70,14 @@ Deploying a Standalone Keystone node
         ControlPlaneStaticRoutes: []
         Debug: true
         DeploymentUser: $USER
-        DnsServers: ''
+        DnsServers:
+          - 1.1.1.1
+          - 8.8.8.8
         DockerInsecureRegistryAddress:
         - $IP:8787
         NeutronPublicInterface: $INTERFACE
+        # domain name used by the host
+        NeutronDnsDomain: localdomain
         # re-use ctlplane bridge for public net
         NeutronBridgeMappings: datacentre:br-ctlplane
         NeutronPhysicalBridge: br-ctlplane
@@ -128,12 +132,16 @@ Deploying a Standalone Keystone node
             default: true
         Debug: true
         DeploymentUser: $USER
-        DnsServers: ''
+        DnsServers:
+          - 1.1.1.1
+          - 8.8.8.8
         # needed for vip & pacemaker
         KernelIpNonLocalBind: 1
         DockerInsecureRegistryAddress:
         - $IP:8787
         NeutronPublicInterface: $INTERFACE
+        # domain name used by the host
+        NeutronDnsDomain: localdomain
         # re-use ctlplane bridge for public net
         NeutronBridgeMappings: datacentre:br-ctlplane
         NeutronPhysicalBridge: br-ctlplane

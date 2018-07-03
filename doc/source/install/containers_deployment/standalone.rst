@@ -1,6 +1,9 @@
 Standalone Containers based Deployment
 ======================================
 
+.. warning::
+   This currently is only supported in Rocky or newer versions.
+
 This documentation explains how the underlying framework used by the
 Containterized Undercloud deployment mechanism can be reused to deploy a single
 node capable of running OpenStack services for development.

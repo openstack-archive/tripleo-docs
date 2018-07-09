@@ -42,6 +42,10 @@ TripleO is supporting only the following operating systems:
 * RHEL 7 x86_64
 * CentOS 7 x86_64
 
+Please also ensure your node clock is set to UTC in order to prevent any issue
+when the OS hwclock syncs to the BIOS clock before applying timezone offset,
+causing files to have a future-dated timestamp.
+
 
 Preparing the Baremetal Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -6,6 +6,13 @@ Installing the Undercloud
    should be installed instead. See :doc:`../containers_deployment/undercloud`
    for backward compatibility related information.
 
+.. note::
+   Please ensure all your nodes (undercloud, compute, controllers, etc) have
+   their internal clock set to UTC in order to prevent any issue with possible
+   file future-dated timestamp if hwclock is synced before any timezone offset
+   is applied.
+
+
 #. Log in to your machine (baremetal or VM) where you want to install the
    undercloud as a non-root user (such as the stack user)::
 

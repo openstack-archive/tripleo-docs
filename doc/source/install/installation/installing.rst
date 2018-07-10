@@ -101,7 +101,7 @@ Installing the Undercloud
           environment and generates sane values for a number of the important
           options.
 
-#. Set up a containers registry (optional) and prepare container images
+#. (OPTIONAL) Set up a containers registry and prepare container images
    configuration.
 
    See :ref:`prepare-environment-containers` for details on the containers
@@ -120,7 +120,7 @@ Installing the Undercloud
    containers images populated into registries, the images config file should
    be explicitly specified in ``undercloud.conf: container_images_file``.
 
-#. Override heat parameters and environment files used for undercloud
+#. (OPTIONAL) Override heat parameters and environment files used for undercloud
    deployment.
 
    Similarly to overcloud deployments, see :ref:`override-heat-templates` and

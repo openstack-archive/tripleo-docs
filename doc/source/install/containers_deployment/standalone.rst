@@ -167,50 +167,13 @@ Deploying a Standalone Keystone node
       --output-dir $HOME \
       --standalone
 
-#. Validate Keystone services
+#. Check the deployed OpenStack Services
 
-   You can validate the Keystone is running by fetching a token::
+   At the end of the deployment, a clouds.yaml configuration file is placed in
+   the /root/.config/openstack folder. This can be used with the openstack
+   client to query the OpenStack services.
 
-    # validate keystone
-    export ADMIN_PASS=$(egrep "^[[:space:]]+AdminPassword:" $HOME/tripleo-undercloud-passwords.yaml | awk '{print $2}')
+   .. code-block:: bash
 
-    KEYSTONE_PAYLOAD=$(cat <<EOF
-    { "auth": {
-        "identity": {
-          "methods": ["password"],
-          "password": {
-            "user": {
-              "name": "admin",
-              "domain": { "id": "default" },
-              "password": "$ADMIN_PASS"
-            }
-          }
-        }
-      }
-    }
-    EOF
-    )
-    curl -i \
-      -H "Content-Type: application/json" \
-      -d "$KEYSTONE_PAYLOAD" \
-      "http://$IP:5000/v3/auth/tokens" ; echo
-
-#. Create clouds.yaml for use with openstackclient
-
-   You can create a clouds.yaml which allows you to use the openstackclient::
-
-    mkdir -p ~/.config/openstack
-    cat <<EOF >~/.config/openstack/clouds.yaml
-    clouds:
-      standalone:
-        auth:
-          auth_url: http://$IP:5000/
-          project_name: admin
-          username: admin
-          password: $ADMIN_PASS
-        region_name: regionOne
-        identity_api_version: 3
-    EOF
-    export OS_CLOUD=standalone
-
-    openstack endpoint list
+     export OS_CLOUD=standalone
+     openstack endpoint list

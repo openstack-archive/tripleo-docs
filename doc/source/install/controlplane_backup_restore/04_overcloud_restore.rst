@@ -131,7 +131,7 @@ directory and uncompress all the data::
   mkdir /var/tmp/filesystem_backup/data/
   cd /var/tmp/filesystem_backup/data/
   mv <path_to_the_backup_file> .
-  tar -xvzf <backup_faile>.tar.gz
+  tar --xattrs -xvzf <backup_file>.tar.gz
 
 NOTE: Untarring directly on the / directory will
 override your current files. Its recommended to

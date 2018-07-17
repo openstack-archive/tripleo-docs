@@ -109,7 +109,7 @@ paths to backup is as much general as possible.
 The following folders should be backed up::
 
   mkdir -p /var/tmp/filesystem_backup/
-  tar --ignore-failed-read \
+  tar --xattrs --ignore-failed-read \
       -zcvf /var/tmp/filesystem_backup/fs_backup-`date '+%Y-%m-%d-%H-%M-%S'`.tar.gz \
       /etc/nova \
       /var/log/nova \

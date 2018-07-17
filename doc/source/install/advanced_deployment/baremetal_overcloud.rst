@@ -194,13 +194,16 @@ Additional configuration
 
 * ``IronicCleaningNetwork`` sets the name or UUID of the **overcloud** network
   to use for node cleaning. Initially is set to ``provisioning`` and should be
-  set to an actual UUID later when `Configuring cleaning`_.
+  set to an actual UUID later when `Configuring networks`_.
 
   .. admonition:: Newton
       :class: newton
 
       In the Newton release this parameter was not available, and no default
       value was set for the cleaning network.
+
+  Similarly, there are ``IronicProvisioningNetwork`` and
+  ``IronicRescuingNetwork``. See `Configuring networks`_ for details.
 
 * ``IronicDefaultBootOption`` specifies whether the instances will boot from
   local disk (``local``) or from PXE or iPXE (``netboot``). This parameter was
@@ -468,24 +471,49 @@ Use a subnet range outside of the ``allocation_pool`` defined in
 As defined in ``Preparing networking``, you can create a tenant nework along
 with a ``default-router`` to link the provisioning and tenant networks.
 
-Configuring cleaning
+Configuring networks
 ~~~~~~~~~~~~~~~~~~~~
 
+Ironic has to be configured to use three networks for its internal purposes:
+
+* *Cleaning* network is used during cleaning and is mandatory to configure.
+
+  This network can be configured to a name or UUID during deployment via
+  the ``IronicCleaningNetwork`` parameter.
+
+* *Provisioning* network is used during deployment if the *network interface*
+  is set to ``neutron`` (either explicitly or via setting
+  ``IronicDefaultNetworkInterface`` during installation).
+
+  This network is supported by TripleO starting with the Pike release and
+  can be configured to a name or UUID during deployment via
+  the ``IronicProvisioningNetwork`` parameter.
+
+* *Rescuing* network is used when starting the *rescue* process - repairing
+  broken instances through a special ramdisk.
+
+  This network is supported by TripleO starting with the Rocky release and
+  can be configured to a name or UUID during deployment via
+  the ``IronicRescuingNetwork`` parameter.
+
 Starting with the Ocata release, Ironic is configured to use network called
-``provisioning`` for node cleaning. However, network names are not unique.
-A user creating another network with the same name will break bare metal
-provisioning. Thus, it's highly recommended to update the deployment,
+``provisioning`` for all three networks by default. However, network names are
+not unique.  A user creating another network with the same name will break bare
+metal provisioning. Thus, it's highly recommended to update the deployment,
 providing the provider network UUID.
 
 Use the following command to get the UUID::
 
     openstack network show provisioning -f value -c id
 
-Update the environment file you've created, setting ``IronicCleaningNetwork``
-to the this UUID, for example::
+Configuring networks on deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    parameter_defaults:
-        IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+To update the whole deployment update the environment file you've created,
+setting ``IronicCleaningNetwork`` to the this UUID, for example::
+
+ parameter_defaults:
+     IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
 
 .. admonition:: Newton
    :class: newton
@@ -500,9 +528,42 @@ to the this UUID, for example::
    This variable does not support node names and does not have a default value
    in this release.
 
+In the Pike release or newer, also set the provisioning network. You can use
+the same network or create a new one::
+
+ parameter_defaults:
+     IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+     IronicProvisioningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+
+In the Rocky release or newer, also set the rescuing network. You can use
+the same network or create a new one::
+
+ parameter_defaults:
+     IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+     IronicProvisioningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+     IronicRescuingNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
+
 Finally, run the deploy command with exactly the same arguments as before
 (don't forget to include the environment file if it was not included
 previously).
+
+Configuring networks per node
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Alternatively, you can set the networks per node starting with the Queens
+release.
+
+When enrolling nodes, add ``cleaning_network``, ``provisioning_network``
+and/or ``rescuing_network`` to the ``driver_info`` dictionary when
+`Preparing inventory`_.
+
+After enrolling nodes, you can update each of them with the following
+command (adjusting it for your release)::
+
+ openstack baremetal node set <node> \
+     --driver-info cleaning_network=<network uuid> \
+     --driver-info provisioning_network=<network uuid> \
+     --driver-info rescuing_network=<network uuid>
 
 Adding deployment images
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -727,7 +788,9 @@ credentials and make them available::
     do
         openstack baremetal node set $uuid \
             --driver-info deploy_kernel=$DEPLOY_KERNEL \
-            --driver-info deploy_ramdisk=$DEPLOY_RAMDISK
+            --driver-info deploy_ramdisk=$DEPLOY_RAMDISK \
+            --driver-info rescue_kernel=$DEPLOY_KERNEL \
+            --driver-info rescue_ramdisk=$DEPLOY_RAMDISK
         openstack baremetal node manage $uuid --wait &&
             openstack baremetal node provide $uuid
     done

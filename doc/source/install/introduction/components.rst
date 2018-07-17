@@ -229,7 +229,6 @@ for details.
 * Upstream Project: https://github.com/openstack/ironic-inspector
 * PyPI: https://pypi.org/project/ironic-inspector
 * Bugs: https://bugs.launchpad.net/ironic-inspector
-* Blueprints: https://blueprints.launchpad.net/ironic-inspector
 
 VirtualBMC
 ^^^^^^^^^^

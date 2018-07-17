@@ -69,8 +69,8 @@ be RoleNameExtraConfig where RoleName is the name specified in roles_data.yaml.
        parameter_defaults:
          ComputeExtraConfig:
            'nova::scheduler::filter::max_io_ops_per_host': '4.0'
-           compute_classes:
+           Compute_classes:
            - '::nova::scheduler::filter'
 
-    The compute_classes data is included via the hiera_include in the
-    overcloud_compute.pp puppet manifest.
+    The Compute_classes data is included via the hiera_include in the
+    overcloud_common.pp puppet manifest.

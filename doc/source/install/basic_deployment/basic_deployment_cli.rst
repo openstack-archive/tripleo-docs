@@ -259,16 +259,8 @@ Upload Images
 
 Load the images into the containerized undercloud Glance::
 
-    openstack overcloud image upload --http-boot /var/lib/ironic/httpboot
+    openstack overcloud image upload
 
-
-.. admonition:: Prior to Rocky release
-  :class: stable
-
-  Before Rocky, the undercloud isn't containerized by default. Hence
-  you must run the following command::
-
-    openstack overcloud image upload --http-boot /httpboot
 
 To upload a single image, see :doc:`../post_deployment/upload_single_image`.
 
@@ -277,14 +269,20 @@ attributes can be specified at upload time as in::
 
     openstack overcloud image upload
     openstack overcloud image upload --arch x86_64 \
-        --httpboot /httpboot/x86_64
+        --httpboot /var/lib/ironic/httpboot/x86_64
     openstack overcloud image upload --arch x86_64 --platform SNB \
-        --httpboot /httpboot/x86_64-SNB
+        --httpboot /var/lib/ironic/httpboot/x86_64-SNB
 
 .. note::
 
     Adding --httpboot is optional but suggested if you need to ensure that the
     ``agent`` images are unique within your environment.
+
+.. admonition:: Prior to Rocky release
+  :class: stable
+
+  Before Rocky, the undercloud isn't containerized by default. Hence
+  you should use the ``/httpboot/*`` paths instead.
 
 This will create 3 sets of images with in the undercloud image service for later
 use in deployment, see :doc:`../environments/baremetal`

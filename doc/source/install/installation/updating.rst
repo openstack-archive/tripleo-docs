@@ -103,28 +103,22 @@ Updating Undercloud Components
 
       openstack undercloud upgrade
 
-   To upgrade to a containerized undercloud, just add --use-heat option::
-
-       openstack undercloud upgrade --use-heat
+   .. note::
+       The undercloud is containerized by default as of Rocky. Therefore,
+       an undercloud deployed on Queens (non-containerized) will be upgraded
+       to a containerized undercloud on Rocky, by default.
+       To upgrade with instack undercloud, you'll need to upgrade
+       with --use-heat=False option. Note this isn't tested and not supported.
 
    .. note::
-       When upgrading a containerized undercloud, it's possible to enable verbose
-       logging with --verbose option.
-
-   .. admonition:: Queens to Rocky and later
-      :class: otop
-
-      The containerized undercloud deployment isn't supported before Rocky release.
-      Therefore, the upgrade is supported in Rocky, from a non containerized undercloud
-      in Queens to a containerized undercloud in Rocky.
+       It's possible to enable verbose logging with --verbose option.
+       To cleanup an undercloud after its upgrade, you'll need to set
+       upgrade_cleanup to True in undercloud.conf. It'll remove the rpms
+       that were deployed by instack-undercloud, after the upgrade to a
+       containerized undercloud.
 
    .. note::
-
-      You may wish to use time and capture the output to a file for any debug
-
-      .. code-block:: bash
-
-         time openstack undercloud upgrade 2>&1 | tee undercloud_upgrade.log
+       It's possible to enable verbose logging with --verbose option.
 
    .. note::
 

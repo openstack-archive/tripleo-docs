@@ -166,30 +166,28 @@ Installing the Undercloud
       ``enable_validations = false`` in ``undercloud.conf`` to prevent
       that.
 
-   To deploy a containerized undercloud::
+   To deploy an undercloud::
 
-       openstack undercloud install --use-heat
-
-   .. admonition:: Stable Branch
-      :class: stable
-
-      To install a deprecated instack undercloud::
-
-          openstack undercloud install
+       openstack undercloud install
 
 .. note::
-    When installing a containerized undercloud, it's possible to enable verbose
-    logging with --verbose option.
+    The undercloud is containerized by default as of Rocky.
 
 .. note::
-    The ``openstack undercloud install --use-heat`` command
-    will run all the OpenStack services in a moby container runtime
-    unless the default settings are overwritten.
-    This command requires 2 services to be running at all times. The first one is a
-    basic keystone service, which is currently executed by `tripleoclient` itself, the
-    second one is `heat-all` which executes the templates and installs the services.
-    The latter can be run on baremetal or in a container (tripleoclient will run it
-    in a container by default).
+    It's possible to enable verbose logging with --verbose option.
+
+.. note::
+    To install a deprecated instack undercloud, you'll need to deploy
+    with --use-heat=False option.
+
+
+In Rocky, we will run all the OpenStack services in a moby container runtime
+unless the default settings are overwritten.
+This command requires 2 services to be running at all times. The first one is a
+basic keystone service, which is currently executed by `tripleoclient` itself, the
+second one is `heat-all` which executes the templates and installs the services.
+The latter can be run on baremetal or in a container (tripleoclient will run it
+in a container by default).
 
 Once the install has completed, you should take note of the files ``stackrc`` and
 ``undercloud-passwords.conf``.  You can source ``stackrc`` to interact with the

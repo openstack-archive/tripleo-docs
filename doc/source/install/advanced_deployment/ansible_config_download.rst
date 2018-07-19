@@ -124,36 +124,25 @@ Mistral workflow
 The Mistral workflow that runs config-download and ``ansible-playbook`` is
 ``tripleo.deployment.v1.config_download_deploy``.
 
-The workflow will create a working directory under ``/var/lib/mistral`` where
-all of the ansible related files are stored.
+The workflow will create a working directory with the plan name under
+``/var/lib/mistral`` where all of the ansible related files are stored.
 
 Ansible working directory
 _________________________
-The workflow uses a working directory under ``/var/lib/mistral`` to store the generated
-files needed to run ``ansible-playbook``.
+The workflow uses a working directory with the plan name under
+``/var/lib/mistral`` to store the generated files needed to run
+``ansible-playbook``.
 
-The directory for a given execution of the workflow is
-``/var/lib/mistral/<execution-id>``.
-
-All of the files under ``/var/lib/mistral`` are owned by the mistral user and
-readable by the mistral group. The interactive user account on the undercloud
-can be granted read-only access to these files by adding the user to the
-``mistral`` group::
+All of the files under ``/var/lib/mistral/<plan name>`` are owned by the
+mistral user and readable by the mistral group. The interactive user account on
+the undercloud can be granted read-only access to these files by adding the
+user to the ``mistral`` group::
 
     sudo usermod -a -G mistral $USER
 
-Once a member of the ``mistral`` group, the contents of ``/var/lib/mistral``
-can be browsed, examined, and ``ansible-playbook`` rerun if needed for
-debugging purposes.
-
-For example, to see the latest execution of
-``tripleo.deployment.v1.config_download_deploy``, run::
-
-    ls -ltr /var/lib/mistral
-
-Change to the latest directory shown (example)::
-
-    cd /var/lib/mistral/de35fb93-aa73-4535-9b71-c50011952969
+Once a member of the ``mistral`` group, the contents of
+``/var/lib/mistral/<plan name>`` can be browsed, examined, and
+``ansible-playbook`` rerun if needed for debugging purposes.
 
 Within this directory, all the files are present to rerun
 ``ansible-playbook``:

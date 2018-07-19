@@ -100,6 +100,33 @@ the software configuration to the overcloud nodes.
 
 .. include:: deployment_log.rst
 
+Ansible configuration
+^^^^^^^^^^^^^^^^^^^^^
+When ``ansible-playbook`` runs, it will use a configuration file with the
+following default values::
+
+    [defaults]
+    retry_files_enabled = False
+    log_path = <working directory>/ansible.log
+    forks = 25
+
+    [ssh_connection]
+    ssh_args = -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ControlMaster=auto -o ControlPersist=60s
+    control_path_dir = <working directory>/ansible-ssh
+
+Any of the above configuration options can be overridden, or any additional
+ansible configuration used by passing the path to an ansible configuration file
+with ``--override-ansible-cfg`` on the deployment command.
+
+For example the following command will use the configuration options from
+``/home/stack/ansible.cfg``. Any options specified in the override file will
+take precendence over the defaults::
+
+    openstack overcloud deploy \
+      ...
+      --override-config-file /home/stack/ansible.cfg
+
+
 config-download with deployed-server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 When using ``config-download`` with :doc:`deployed-server <deployed_server>`

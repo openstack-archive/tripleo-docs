@@ -94,7 +94,7 @@ An output on the ``overcloud-baremetal`` stack produces the contents of an
 environment file that needs to be passed to the ``overcloud-services`` command.
 Use the following command to save the output value::
 
-  openstack stack output show overcloud-baremetal DeployedServerEnvironment -f value -c output_value > deployed-server-environment-output.json
+  openstack stack output show overcloud-baremetal DeployedServerEnvironment -f json -c output_value | jq .output_value > deployed-server-environment-output.json
 
 Services Deployment Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

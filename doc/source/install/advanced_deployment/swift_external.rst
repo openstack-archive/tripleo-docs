@@ -49,7 +49,7 @@ how to configure the Swift proxy to use Keystone from the overcloud::
   paste.filter_factory = keystonemiddleware.auth_token:filter_factory
   signing_dir = /tmp/keystone-signing-swift
   www_authenticate_uri = http://<public Keystone endpoint>:5000/
-  auth_url = http://<admin Keystone endpoint>:35357/
+  auth_url = http://<admin Keystone endpoint>:5000/
   password = <Password as defined in the environment parameters>
   auth_plugin = password
   project_domain_id = default

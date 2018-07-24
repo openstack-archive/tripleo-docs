@@ -812,162 +812,9 @@ Following there is a list of all the changes needed:
 
 Annex: NFV template changes needed from Newton to Queens
 --------------------------------------------------------
-Following there is a list of all the changes needed into NFV context:
+Following there is a list of general changes needed into NFV context:
 
-1. Add this content to any existing post-install.yaml file:
-
-   ::
-
-      heat_template_version: 2014-10-16
-
-      description: >
-        Example extra config for post-deployment
-
-       parameters:
-         servers:
-           type: json
-         HostCpusList:
-           description: >
-             List of logical cores to be used by ovs-dpdk processess (dpdk-lcore-mask)
-           type: string
-         NeutronDpdkCoreList:
-           description: >
-             List of logical cores for PMD threads. (pmd-cpu-mask)
-           type: string
-       resources:
-         ExtraDeployments:
-           type: OS::Heat::StructuredDeployments
-           properties:
-             servers:  {get_param: servers}
-             config: {get_resource: ExtraConfig}
-             actions: ['CREATE','UPDATE']
-
-         ExtraConfig:
-           type: OS::Heat::SoftwareConfig
-           properties:
-             group: script
-           config:
-             str_replace:
-               template: |
-                 #!/bin/bash
-                 set -x
-                 function tuned_service_dependency() {
-                   tuned_service=/usr/lib/systemd/system/tuned.service
-                   grep -q "network.target" $tuned_service
-                     if [ "$?" -eq 0 ]; then
-                       sed -i '/After=.*/s/network.target//g' $tuned_service
-                     fi
-                     grep -q "Before=.*network.target" $tuned_service
-                     if [ ! "$?" -eq 0 ]; then
-                       grep -q "Before=.*" $tuned_service
-                       if [ "$?" -eq 0 ]; then
-                         sed -i 's/^\(Before=.*\)/\1 network.target openvswitch.service/g' $tuned_service
-                       else
-                         sed -i '/After/i Before=network.target openvswitch.service' $tuned_service
-                       fi
-                     fi
-                   }
-
-                   function ovs_permission_fix() {
-                     ovs_service_path="/usr/lib/systemd/system/ovs-vswitchd.service"
-                     grep -q "RuntimeDirectoryMode=.*" $ovs_service_path
-                     if [ "$?" -eq 0 ]; then
-                       sed -i 's/RuntimeDirectoryMode=.*/RuntimeDirectoryMode=0775/' $ovs_service_path
-                     else
-                       echo "RuntimeDirectoryMode=0775" >> $ovs_service_path
-                     fi
-                     grep -Fxq "Group=qemu" $ovs_service_path
-                     if [ ! "$?" -eq 0 ]; then
-                       echo "Group=qemu" >> $ovs_service_path
-                     fi
-                     grep -Fxq "UMask=0002" $ovs_service_path
-                     if [ ! "$?" -eq 0 ]; then
-                       echo "UMask=0002" >> $ovs_service_path
-                     fi
-                     ovs_ctl_path='/usr/share/openvswitch/scripts/ovs-ctl'
-                     grep -q "umask 0002 \&\& start_daemon \"\$OVS_VSWITCHD_PRIORITY\"" $ovs_ctl_path
-                     if [ ! "$?" -eq 0 ]; then
-                       sed -i 's/start_daemon \"\$OVS_VSWITCHD_PRIORITY.*/umask 0002 \&\& start_daemon \"$OVS_VSWITCHD_PRIORITY\" \"$OVS_VSWITCHD_WRAPPER\" \"$@\"/' $ovs_ctl_path
-                     fi
-                   }
-
-                   function set_ovs_socket_dir {
-                     # TODO: Hardcoding it here as this directory is fixed, because it requires SELinux permissions
-                     NEUTRON_VHOSTUSER_SOCKET_DIR="/var/lib/vhost_sockets"
-                     mkdir -p $NEUTRON_VHOSTUSER_SOCKET_DIR
-                     chown -R qemu:qemu $NEUTRON_VHOSTUSER_SOCKET_DIR
-                     restorecon $NEUTRON_VHOSTUSER_SOCKET_DIR
-                   }
-
-                   get_mask()
-                   {
-                     local list=$1
-                     local mask=0
-                     declare -a bm
-                     max_idx=0
-                     for core in $(echo $list | sed 's/,/ /g')
-                     do
-                       index=$(($core/32))
-                       bm[$index]=0
-                       if [ $max_idx -lt $index ]; then
-                           max_idx=$(($index))
-                       fi
-                     done
-                     for ((i=$max_idx;i>=0;i--));
-                     do
-                       bm[$i]=0
-                     done
-                     for core in $(echo $list | sed 's/,/ /g')
-                     do
-                       index=$(($core/32))
-                       temp=$((1<<$(($core % 32))))
-                       bm[$index]=$((${bm[$index]} | $temp))
-                     done
-                     printf -v mask "%x" "${bm[$max_idx]}"
-                     for ((i=$max_idx-1;i>=0;i--));
-                     do
-                       printf -v hex "%08x" "${bm[$i]}"
-                       mask+=$hex
-                     done
-                     printf "%s" "$mask"
-                  }
-
-                  if hiera -c /etc/puppet/hiera.yaml service_names | grep -q neutron_ovs_dpdk_agent; then
-                    pmd_cpu_mask=$( get_mask $PMD_CORES )
-                    host_cpu_mask=$( get_mask $LCORE_LIST )
-                    ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask=$pmd_cpu_mask
-                    ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-lcore-mask=$host_cpu_mask
-                    tuned_service_dependency
-                    ovs_permission_fix
-                    set_ovs_socket_dir
-                  fi
-             params:
-               $LCORE_LIST: {get_param: HostCpusList}
-               $PMD_CORES: {get_param: NeutronDpdkCoreList}
-
-2. Modify HostCpuList and NeutronDpdkCoreList to match your configuration.
-   Ensure that you use only double quotation marks in the yaml file for these
-   parameters:
-
-   ::
-
-      HostCpusList: "0,16,8,24"
-      NeutronDpdkCoreList: "1,17,9,25"
-
-3. Modify NeutronDpdkSocketMemory to match your configuration. Ensure that you
-   use only double quotation marks in the yaml file for this parameter:
-
-   ::
-
-      NeutronDpdkSocketMemory: "2048,2048"
-
-4. Modify NeutronVhostuserSocketDir as follows:
-
-   ::
-
-      NeutronVhostuserSocketDir: "/var/lib/vhost_sockets"
-
-5. Fixed VIP addresses for overcloud networks use new parameters as syntax:
+1. Fixed VIP addresses for overcloud networks use new parameters as syntax:
 
    ::
 
@@ -981,7 +828,40 @@ Following there is a list of all the changes needed into NFV context:
         StorageMgmtVirtualFixedIPs: [{'ip_address':'172.19.0.9'}]
         RedisVirtualFixedIPs: [{'ip_address':'172.16.0.8'}]
 
-6. In the parameter_defaults section, add a network deployment parameter to run
+
+For DPDK environments:
+
+1. Modify HostCpuList and NeutronDpdkCoreList to match your configuration.
+   Ensure that you use only double quotation marks in the yaml file for these
+   parameters:
+
+   ::
+
+      HostCpusList: "0,16,8,24"
+      NeutronDpdkCoreList: "1,17,9,25"
+
+2. Modify NeutronDpdkSocketMemory to match your configuration. Ensure that you
+   use only double quotation marks in the yaml file for this parameter:
+
+   ::
+
+      NeutronDpdkSocketMemory: "2048,2048"
+
+3. Modify NeutronVhostuserSocketDir as follows:
+
+   ::
+
+      NeutronVhostuserSocketDir: "/var/lib/vhost_sockets"
+
+4. Modify VhostuserSocketGroup as follows, mapping to the right compute role:
+
+   ::
+
+     parameter_defaults:
+       <name_of_your_compute_role>Parameters:
+         VhostuserSocketGroup: "hugetlbfs"
+
+5. In the parameter_defaults section, add a network deployment parameter to run
    os-net-config during the upgrade process to associate OVS PCI address with
    DPDK ports:
 
@@ -994,10 +874,38 @@ Following there is a list of all the changes needed into NFV context:
    In this example, the role name is Compute so the parameter name is
    ComputeNetworkDeploymentActions.
 
-7. In the resource_registry section, override the ComputeNeutronOvsAgent service
-   to the neutron-ovs-dpdk-agent puppet service:
+6. In the resource_registry section, override the
+   ComputeNeutronOvsDpdk service to the neutron-ovs-dpdk-agent docker service:
 
    ::
 
-      resource_registry:
-        OS::TripleO::Services::ComputeNeutronOvsAgent: /usr/share/openstack-tripleo-heat-templates/puppet/services/neutron-ovs-dpdk-agent.yaml
+     resource_registry:
+       OS::TripleO::Services::ComputeNeutronOvsDpdk: ../docker/services/neutron-ovs-dpdk-agent.yaml
+
+   And remove the previous entry:
+
+   ::
+
+     resource_registry:
+       OS::TripleO::Services::ComputeNeutronOvsAgent: ../puppet/services/neutron-ovs-dpdk-agent.yaml
+
+   Please notice the naming change between `ComputeNeutronOvsAgent` and
+   `ComputeNeutronOvsDpdk`.
+
+
+For SR-IOV environments:
+
+1. In the resource registry section, override the NeutronSriovAgent service
+   to the neutron-sriov-agent docker service:
+
+   ::
+
+     resource_registry:
+       OS::TripleO::Services::NeutronSriovAgent: ../docker/services/neutron-sriov-agent.yaml
+
+   And remove the previous entry:
+
+   ::
+
+     resource_registry:
+       OS::TripleO::Services::NeutronSriovAgent: ../puppet/services/neutron-sriov-agent.yaml

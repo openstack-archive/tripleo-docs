@@ -29,3 +29,4 @@ Documentation on how to enable and configure various features available in
    split_stack
    ansible_config_download_differences
    rhsm
+   designate

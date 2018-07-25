@@ -30,6 +30,18 @@ can execute the following to create a `roles_data.yaml` containing only the
 
     openstack overcloud roles generate -o ~/roles_data.yaml Controller Compute
 
+These provided roles can be generated with a different `name` in the
+`roles_data.yaml` by using a format like, `Compute:ComputeHardwareA`, which
+will add the role `Compute` to `roles_data.yaml` by modifying the `name` of
+the role to `ComputeHardwareA`. This helps in associating nodes with a specific
+hardware group to a role and target parameters specific to this hardware
+group. The example command below generates a `role_data.yaml` with two Compute
+roles which can be addressed to specific hardware groups.::
+
+    openstack overcloud roles generate -o ~/roles_data.yaml Controller \
+        Compute:ComputeHardwareA Compute:ComputeHardwareB
+
+
 Deploying with custom roles
 ---------------------------
 

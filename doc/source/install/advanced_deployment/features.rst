@@ -18,6 +18,7 @@ Documentation on how to enable and configure various features available in
    instance_ha
    oslo_messaging_config
    baremetal_overcloud
+   container_image_prepare
    ovs_dpdk_config
    deployed_server
    keystone_security_compliance

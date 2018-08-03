@@ -89,7 +89,7 @@ following::
 
   parameter_defaults:
     ContainerImagePrepare:
-    - push_destination: 192.168.24.1:8787
+    - push_destination: true
       set:
         ceph_image: daemon
         ceph_namespace: docker.io/ceph
@@ -101,13 +101,14 @@ following::
         tag: current-tripleo
       tag_from_label: rdo_version
 
-This is identical to the default registry, except for the `push_destination`
-entry which inserts the discovered address for the local undercloud registry.
+This is identical to the default registry, except for the `push_destination:
+true` entry which indicates that the address of the local undercloud registry
+will be discovered at upload time.
 
-By specifying a `push_destination`, during deployment all images will be pulled
-from the remote registry then pushed to the local undercloud registry. The
-resulting image parameters will also be modified to refer to the images in
-`push_destination` instead of `namespace`.
+By specifying a `push_destination` value such as `192.168.24.1:8787`, during
+deployment all images will be pulled from the remote registry then pushed to
+the specified registry. The resulting image parameters will also be modified to
+refer to the images in `push_destination` instead of `namespace`.
 
 Running container image prepare
 ...............................
@@ -191,7 +192,7 @@ following::
 
   ContainerImagePrepare:
   - tag_from_label: rdo_version
-    push_destination: 192.168.24.1:8787
+    push_destination: true
     excludes:
     - nova-api
     set:
@@ -199,7 +200,7 @@ following::
       name_prefix: centos-binary-
       name_suffix: ''
       tag: current-tripleo
-  - push_destination: 192.168.24.1:8787
+  - push_destination: true
     includes:
     - nova-api
     set:

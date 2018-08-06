@@ -57,8 +57,8 @@ Packages provided by RDO
   * python-tempest: this package contains the tempest python library and is
     consumed as a dependency for out of tree tempest plugins i.e. for Horizon
     and Designate tempest plugins.
-  * python-tempestconf: It provides the `discover-tempest-config` utility
-    through which we can generate tempest config.
+  * python-tempestconf: It provides the :command:`discover-tempest-config`
+    utility through which we can generate tempest config.
   * openstack-tempest: this package contains a set of integration tests to be
     run against a live OpenStack cluster and required executables for running
     tempest. Packages `python-tempest` and `python-tempestconf` mentioned above
@@ -171,9 +171,10 @@ configuration, the following is the default::
   The above command will run Identity, Compute, Network and Image api tests on
   undercloud using containerized tempest.
 
-Note: Here is the list of
-`validate-tempest role variables <http://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/roles/validate-tempest/README.md>`_
-which can be modified using extra-vars.
+.. note::
+  Here is the list of
+  `validate-tempest role variables <http://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/roles/validate-tempest/README.md>`_
+  which can be modified using extra-vars.
 
 
 Running Tempest manually
@@ -266,17 +267,24 @@ The tempest workspace information is found in ~/.tempest folder.
 Generating tempest.conf using discover-tempest-config
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-For running Tempest a tempest configuration file called tempest.conf needs to
-be created. Thanks to that file Tempest knows the configuration of the
+For running Tempest a tempest configuration file called ``tempest.conf`` needs
+to be created. Thanks to that file Tempest knows the configuration of the
 environment it will be run against and can execute the proper set of tests.
 
 The tempest configuration file can be generated automatically by
-**discover-tempest-config** binary, which is provided by python-tempestconf
-package installed by openstack-tempest rpm.
-**discover-tempest-config** queries the cloud and discovers cloud configuration.
-**Note:** Not all of the configuration may be discovered by
-discover-tempest-config, therefore the tempest.conf needs to be rechecked for
-correctness or tuned so that it better suits the user's needs.
+:command:`discover-tempest-config` binary, which is provided by
+``python-tempestconf`` package installed by ``openstack-tempest`` rpm.
+:command:`discover-tempest-config` queries the cloud and discovers cloud
+configuration.
+
+.. note::
+  To know more about ``python-tempestconf`` visit
+  `python-tempestconf's documentation. <https://docs.openstack.org/python-tempestconf/latest/>`_
+
+.. note::
+  Not all of the configuration may be discovered by
+  :command:`discover-tempest-config`, therefore the tempest.conf needs to be
+  rechecked for correctness or tuned so that it better suits the user's needs.
 
 All the below operations will be performed from undercloud.
 
@@ -287,7 +295,8 @@ Source the stackrc file::
 
     $ source stackrc
 
-Use discover-tempest-config to generate tempest.conf automatically::
+Use :command:`discover-tempest-config` to generate ``tempest.conf``
+automatically::
 
     $ cd <path to tempest workspace>
 
@@ -311,7 +320,7 @@ Source the overcloudrc file::
 
     $ source overcloudrc
 
-Use discover-tempest-config to generate tempest.conf automatically::
+Use :command:`discover-tempest-config` to generate tempest.conf automatically::
 
     $ discover-tempest-config --out etc/tempest.conf \
       --deployer-input ~/tempest-deployer-input.conf \
@@ -344,18 +353,22 @@ Things to keep in mind while using discover-tempest-config
 * tempest.conf values may be overridden by passing [section].[key] [value]
   arguments.
   For example: when **compute.allow_tenant_isolation true** is passed to
-  discover-tempest-config that value will be set in tempest.conf and will
+  :command:`discover-tempest-config` that value will be set in tempest.conf and will
   override the value set by discovery.
+  `More about override options. <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#override-values>`_
 
 * If OpenStack was deployed using TripleO/Director, pass the deployment input
-  file tempest-deployer-input.conf to the discover-tempest-config command with
+  file tempest-deployer-input.conf to the :command:`discover-tempest-config` command with
   --deployer-input option. The file contains some version specific values set
-  by the instaler.
+  by the installer. More about the argument can be found in
+  `python-tempestconf's CLI documentation. <https://docs.openstack.org/python-tempestconf/latest/cli/cli_options.html>`_
 
 * --remove option can be used to remove values from tempest.conf.
   For example: **--remove network-feature-enabled.api_extensions=dvr**
   The feature is useful when some values in tempest.conf are automatically
   set by the discovery, but they are not wanted to be printed to tempest.conf.
+  More about the feature can be found
+  `here. <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#prevent-some-key-value-pairs-to-be-set-in-tempest-conf>`_.
 
 
 Always save the state of resources before running tempest tests
@@ -437,7 +450,8 @@ and use the same with tempest run to run those specific whitelist tests.
       # networking bgpvpn tempest tests
       networking_bgpvpn_tempest.tests*
 
-  Note: use **#** to add comments in the whitelist/blacklist file.
+  .. note::
+    Use **#** to add comments in the whitelist/blacklist file.
 
 * Running tempest tests present in whitelist file::
 
@@ -636,7 +650,7 @@ Generate tempest.conf and run tempest tests within the container
     # export TEMPESTCONF environment variable for easier later usage
     export TEMPESTCONF="/usr/bin/discover-tempest-config"
     # Execute the discover-tempest-config in order to generate tempest.conf
-    # Set --out to /home/stack/tempest_workspace/tempset.conf so that the
+    # Set --out to /home/stack/tempest_workspace/tempest.conf so that the
     # tempest.conf file is later accessible from host machine as well.
     # Set --deployer-input to point to the tempest-deployer-input.conf
     # located in the shared directory.
@@ -652,20 +666,20 @@ Generate tempest.conf and run tempest tests within the container
 
     EOF
 
-  **Note:**
+  .. note::
 
-  * Apart from arguments passed to python-tempestconf showed above, any other
-    wanted arguments can be specified there. See
-    `Generating tempest.conf using discover-tempest-config`_.
-  * Instead of running smoke tests, other types of tests can be ran,
-    see `Running Tempest tests`_ section.
-  * `Always save the state of resources before running tempest tests`_.
-  * If you **already have** a `tempest.conf` file and you want to just run
-    tempest tests, **omit** TEMPESTCONF from the script above and replace it
-    with a command which copies your `tempest.conf` from `container_tempest`
-    directory to `tempest_workspace/etc` directory::
+    * Apart from arguments passed to python-tempestconf showed above, any other
+      wanted arguments can be specified there. See
+      `Generating tempest.conf using discover-tempest-config`_.
+    * Instead of running smoke tests, other types of tests can be ran,
+      see `Running Tempest tests`_ section.
+    * `Always save the state of resources before running tempest tests`_.
+    * If you **already have** a `tempest.conf` file and you want to just run
+      tempest tests, **omit** TEMPESTCONF from the script above and replace it
+      with a command which copies your `tempest.conf` from `container_tempest`
+      directory to `tempest_workspace/etc` directory::
 
-      $ cp /home/stack/container_tempest/tempets.conf /home/stack/tempest_workspace/etc/tempest.conf
+        $ cp /home/stack/container_tempest/tempets.conf /home/stack/tempest_workspace/etc/tempest.conf
 
 * Set executable privileges to the `tempest_script.sh` script::
 
@@ -685,5 +699,6 @@ Generate tempest.conf and run tempest tests within the container
     $ sudo rm -rf /home/stack/container_tempest
     $ mkdir /home/stack/container_tempest
 
-  **Note:** It's done with sudo because tempest in containers creates the files
-  as root.
+  .. note::
+    It's done with sudo because tempest in containers creates the files
+    as root.

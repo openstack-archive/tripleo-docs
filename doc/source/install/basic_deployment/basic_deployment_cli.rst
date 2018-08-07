@@ -515,6 +515,38 @@ Run the deploy command, including any additional parameters as necessary::
 
   openstack overcloud deploy --templates [additional parameters]
 
+.. note::
+
+      When deploying a new stack or updating a preexisting deployment, it is
+      important to avoid using component cli along side the unified cli. This
+      will lead to unexpected results.
+
+      Example:
+
+      The following will present a behavior where the my_roles_data will persist,
+      due to the location of the custom roles data, which is stored in swift.
+
+      * openstack overcloud deploy --templates -r my_roles_data.yaml
+      * heat stack-delete overcloud
+
+      Allow the stack to be deleted then continue.
+
+      * openstack overcloud deploy --templates
+
+      The execution of the above will still reference my_roles_data as the
+      unified command line client will perform a look up against the swift
+      storage. The reason for the unexpected behavior is due to the heatclient
+      lack of awareness of the swift storage.
+
+      The correct course of action should be as followed:
+
+      * openstack overcloud deploy --templates -r my_roles_data.yaml
+      * openstack overcloud delete <stack name>
+
+      Allow the stack to be deleted then continue.
+
+      * openstack overcloud deploy --templates
+
 To deploy an overcloud with multiple controllers and achieve HA,
 follow :doc:`../advanced_deployment/high_availability`.
 

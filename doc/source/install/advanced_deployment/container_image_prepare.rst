@@ -220,4 +220,119 @@ services in the plan. `includes` matches take precedence over `excludes`
 matches, followed by role/service filtering. The image name must contain the
 value within it to be considered a match.
 
+Modifying images during prepare
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to modify images during prepare to make any required changes,
+then immediately deploy with those changes. The use-cases for modifying images
+include:
+
+- As part of a Continuous Integration pipeline where images are modified with
+  the changes being tested before deployment
+- As part of a development workflow where local changes need to be deployed for
+  testing and development
+- When changes need to be deployed but are not available through an image
+  build pipeline (proprietry addons, emergency fixes)
+
+The modification is done by invoking an ansible role on each image which needs
+to be modified. The role takes a source image, makes the requested changes,
+then tags the result. The prepare can then push the image and set the heat
+parameters to refer to the modified image.
+
+The ansible role `tripleo-modify-image`_ conforms with the required role
+interface, and provides the required behaviour for the modify use-cases. Modification is controlled via modify-specific keys in the
+`ContainerImagePrepare` parameter:
+
+- `modify_role` specifies what ansible role to invoke for each image to modify.
+- `modify_append_tag` is used to append to the end of the
+  source image tag. This makes it obvious that the resulting image has been
+  modified. It is also used to skip modification if the `push_destination`
+  registry already has that image, so it is recommended to change
+  `modify_append_tag` whenever the image must be modified.
+- `modify_vars` is a dictionary of ansible variables to pass to the role.
+
+The different use-cases handled by role `tripleo-modify-image`_ are selected by
+setting the `tasks_from` variable to the required file in that role. For all of
+the following examples, see the documentation for the role
+`tripleo-modify-image`_ for the other variables supported by that `tasks_from`.
+
+While developing and testing the `ContainerImagePrepare` entries which modify
+images, it is recommended to run prepare on its own to confirm it is being
+modified as expected::
+
+  sudo openstack tripleo container image prepare \
+    -e ~/containers-prepare-parameter.yaml
+
+Updating existing packages
+..........................
+
+The following entries will result in all packages being updated in the images,
+but using the undercloud host's yum repository configuration::
+
+  ContainerImagePrepare:
+  - push_destination: true
+    ...
+    modify_role: tripleo-modify-image
+    modify_append_tag: "-updated"
+    modify_vars:
+      tasks_from: yum_update.yml
+      compare_host_packages: true
+      yum_repos_dir_path: /etc/yum.repos.d
+    ...
+
+Install RPM files
+.................
+
+It is possible to install a directory of RPM files, which is useful for
+installing hotfixes, local package builds, or any package which is not
+available through a package repository. For example the following would install
+some hotfix packages only in the `centos-binary-nova-compute` image::
+
+  ContainerImagePrepare:
+  - push_destination: true
+    ...
+    includes:
+    - nova-compute
+    modify_role: tripleo-modify-image
+    modify_append_tag: "-hotfix"
+    modify_vars:
+      tasks_from: rpm_install.yml
+      rpms_path: /home/stack/nova-hotfix-pkgs
+    ...
+
+Modify with custom Dockerfile
+.............................
+
+For maximum flexibility, it is possible to specify a directory containing a
+`Dockerfile` to make the required changes. When the role is invoked, a
+`Dockerfile.modified` is generated which changes the `FROM` directive and adds
+extra `LABEL` directives. The following example runs the custom
+`Dockerfile` on the `centos-binary-nova-compute` image::
+
+  ContainerImagePrepare:
+  - push_destination: true
+    ...
+    includes:
+    - nova-compute
+    modify_role: tripleo-modify-image
+    modify_append_tag: "-hotfix"
+    modify_vars:
+      tasks_from: modify_image.yml
+      modify_dir_path: /home/stack/nova-custom
+    ...
+
+An example `/home/stack/nova-custom/Dockerfile` follows. Note that after any
+`USER root` directives have been run, it is necessary to switch back to the
+original image default user::
+
+    FROM docker.io/tripleomaster/centos-binary-nova-compute:latest
+
+    USER root
+
+    COPY customize.sh /tmp/
+    RUN /tmp/customize.sh
+
+    USER "nova"
+
 ..  _Delorean repository: https://trunk.rdoproject.org/centos7-master/ac/82/ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7/
+..  _tripleo-modify-image: https://github.com/openstack/ansible-role-tripleo-modify-image

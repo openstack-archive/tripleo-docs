@@ -30,6 +30,7 @@ files, e.g::
         - OS::TripleO::Services::RabbitMQ
         - OS::TripleO::Services::HAproxy
         - OS::TripleO::Services::MySQL
+        - OS::TripleO::Services::Keepalived
       ComputeCount: 0
     EOF
 

@@ -158,6 +158,9 @@ and enable novajoin::
 
     openstack undercloud install
 
+.. important:: Please make sure that the aforementioned configuration options
+               are set in the ``[DEFAULT]`` section of **undercloud.conf**
+
 Overcloud deployment
 ~~~~~~~~~~~~~~~~~~~~
 

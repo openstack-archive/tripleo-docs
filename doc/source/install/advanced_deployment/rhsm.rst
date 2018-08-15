@@ -61,6 +61,23 @@ In some advanced use cases, you might want to configure RHSM for a specific role
 
 In that case, all nodes deployed with ComputeHCI will be configured with these RHSM parameters.
 
+Scale-down the Overcloud
+------------------------
+The automatic unsubscription isn't currently supported and before scaling down the Overcloud,
+the operator will have to run this playbook against the host(s) that will be removed.
+Example when we want to remove 2 compute nodes::
+
+    - hosts:
+         - overcloud-compute47
+         - overcloud-compute72
+      vars:
+        rhsm_username: bob.smith@acme.com
+        rhsm_password: my_secret
+        rhsm_state: absent
+      roles:
+         - openstack.redhat-subscription
+
+The playbook needs to be executed prior to the actual scale-down.
 
 Transition from previous method
 -------------------------------

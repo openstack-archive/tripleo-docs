@@ -50,9 +50,8 @@ Deploying a Standalone Keystone node
    .. code-block:: bash
 
       # EXAMPLE: 2 interfaces
-      # TODO(aschultz): This still assumes a bunch of undercloud stuff that may
-      # not be needed anymore. Will need to clean this up.
-
+      # NIC1 - management NIC (any address, left untouched)
+      # NIC2 - OpenStack & Provider network NIC ($INTERFACE configured with $IP, $NETMASK)
       export IP=192.168.24.2
       export NETMASK=24
       export INTERFACE=eth1
@@ -96,8 +95,7 @@ Deploying a Standalone Keystone node
    .. code-block:: bash
 
       # EXAMPLE: 1 interface
-      # TODO(aschultz): This still assumes a bunch of undercloud stuff that may
-      # not be needed anymore. Will need to clean this up.
+      # NIC1 - management, OpenStack, & Provider network ($INTERFACE reconfigured using $IP, $NETMASK, $GATEWAY)
       export IP=192.168.24.2
       export NETMASK=24
       # We need the gateway as we'll be reconfiguring the eth0 interface
@@ -161,3 +159,274 @@ Deploying a Standalone Keystone node
 
      export OS_CLOUD=standalone
      openstack endpoint list
+
+
+Example: 1 NIC, Using Compute with Tenant and Provider Networks
+---------------------------------------------------------------
+
+The following example is based on the single NIC configuration and assumes that
+the environment had at least 3 total IP addresses available to it. The IPs are
+used for the following:
+
+- 1 IP address for the OpenStack services (this is the --local-ip from the
+  deploy command)
+- 1 IP used as a Virtual Router to provide connectivity to the Tenant network
+  is used for the OpenStack services (is automatically assigned in this example)
+- The remaining IP addresses (at least 1) are used for Floating IPs on the
+  provider network.
+
+The following is an example post deployment launching of a VM using the
+private tenant network and the provider network.
+
+#. Create helper variables for the configuration::
+
+    # standalone with tenant networking and provider networking
+    export OS_CLOUD=standalone
+    export GATEWAY=192.168.24.1
+    export STANDALONE_HOST=192.168.24.2
+    export PUBLIC_NETWORK_CIDR=192.168.24.0/24
+    export PRIVATE_NETWORK_CIDR=192.168.100.0/24
+    export PUBLIC_NET_START=192.168.24.4
+    export PUBLIC_NET_END=192.168.24.5
+    export DNS_SERVER=1.1.1.1
+
+#. Initial Nova and Glance setup::
+
+    # nova flavor
+    openstack flavor create --ram 512 --disk 1 --vcpu 1 --public tiny
+    # basic cirros image
+    wget https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+    openstack image create cirros --container-format bare --disk-format qcow2 --public --file cirros-0.4.0-x86_64-disk.img
+    # nova keypair for ssh
+    ssh-keygen
+    openstack keypair create --public-key ~/.ssh/id_rsa.pub default
+
+#. Setup a simple network security group::
+
+    # create basic security group to allow ssh/ping/dns
+    openstack security group create basic
+    # allow ssh
+    openstack security group rule create basic --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0
+    # allow ping
+    openstack security group rule create --protocol icmp basic
+    # allow DNS
+    openstack security group rule create --protocol udp --dst-port 53:53 basic
+
+#. Create Neutron Networks::
+
+    openstack network create --external --provider-physical-network datacentre --provider-network-type flat public
+    openstack network create --internal private
+    openstack subnet create public-net \
+        --subnet-range $PUBLIC_NETWORK_CIDR \
+        --no-dhcp \
+        --gateway $GATEWAY \
+        --allocation-pool start=$PUBLIC_NET_START,end=$PUBLIC_NET_END \
+        --network public
+    openstack subnet create private-net \
+        --subnet-range $PRIVATE_NETWORK_CIDR \
+        --network private
+
+#. Create Virtual Router::
+
+    # create router
+    # NOTE(aschultz): In this case an IP will be automatically assigned
+    # out of the allocation pool for the subnet.
+    openstack router create vrouter
+    openstack router set vrouter --external-gateway public
+    openstack router add subnet vrouter private-net
+
+#. Create floating IP::
+
+    # create floating ip
+    openstack floating ip create public
+
+#. Launch Instance::
+
+    # launch instance
+    openstack server create --flavor tiny --image cirros --key-name default --network private --security-group basic myserver
+
+#. Assign Floating IP::
+
+    openstack server add floating ip myserver <FLOATING_IP>
+
+#. Test SSH::
+
+    # login to vm
+    ssh cirros@<FLOATING_IP>
+
+
+Example: 1 NIC, Using Compute with Provider Network
+---------------------------------------------------
+
+The following example is based on the single NIC configuration and assumes that
+the environment had at least 4 total IP addresses available to it. The IPs are
+used for the following:
+
+- 1 IP address for the OpenStack services (this is the --local-ip from the
+  deploy command)
+- 1 IP used as a Virtual Router to provide connectivity to the Tenant network
+  is used for the OpenStack services
+- 1 IP used for DHCP on the provider network
+- The remaining IP addresses (at least 1) are used for Floating IPs on the
+  provider network.
+
+The following is an example post deployment launching of a VM using the
+private tenant network and the provider network.
+
+#. Create helper variables for the configuration::
+
+    # standalone with provider networking
+    export OS_CLOUD=standalone
+    export GATEWAY=192.168.24.1
+    export STANDALONE_HOST=192.168.24.2
+    export VROUTER_IP=192.168.24.3
+    export PUBLIC_NETWORK_CIDR=192.168.24.0/24
+    export PUBLIC_NET_START=192.168.24.4
+    export PUBLIC_NET_END=192.168.24.5
+    export DNS_SERVER=1.1.1.1
+
+#. Initial Nova and Glance setup::
+
+    # nova flavor
+    openstack flavor create --ram 512 --disk 1 --vcpu 1 --public tiny
+    # basic cirros image
+    wget https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+    openstack image create cirros --container-format bare --disk-format qcow2 --public --file cirros-0.4.0-x86_64-disk.img
+    # nova keypair for ssh
+    ssh-keygen
+    openstack keypair create --public-key ~/.ssh/id_rsa.pub default
+
+#. Setup a simple network security group::
+
+    # create basic security group to allow ssh/ping/dns
+    openstack security group create basic
+    # allow ssh
+    openstack security group rule create basic --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0
+    # allow ping
+    openstack security group rule create --protocol icmp basic
+    # allow DNS
+    openstack security group rule create --protocol udp --dst-port 53:53 basic
+
+#. Create Neutron Networks::
+
+    openstack network create --external --provider-physical-network datacentre --provider-network-type flat public
+    openstack subnet create public-net \
+        --subnet-range $PUBLIC_NETWORK_CIDR \
+        --gateway $GATEWAY \
+        --allocation-pool start=$PUBLIC_NET_START,end=$PUBLIC_NET_END \
+        --network public \
+        --host-route destination=169.254.169.254/32,gateway=$VROUTER_IP \
+        --host-route destination=0.0.0.0/0,gateway=$GATEWAY \
+        --dns-nameserver $DNS_SERVER
+
+#. Create Virtual Router::
+
+    # vrouter needed for metadata route
+    # NOTE(aschultz): In this case we're creating a fixed IP because we need
+    # to create a manual route in the subnet for the metadata service
+    openstack router create vrouter
+    openstack port create --network public --fixed-ip subnet=public-net,ip-address=$VROUTER_IP vrouter-port
+    openstack router add port vrouter vrouter-port
+
+#. Launch Instance::
+
+    # launch instance
+    openstack server create --flavor tiny --image cirros --key-name default --network public --security-group basic myserver
+
+#. Test SSH::
+
+    # login to vm
+    ssh cirros@<VM_IP>
+
+Example: 2 NIC, Using Compute with Tenant and Provider Networks
+---------------------------------------------------------------
+
+The following example is based on the dual NIC configuration and assumes that
+the environment has an entire IP range available to it on the provider network.
+We are assuming the following would be reserved on the provider network:
+
+- 1 IP address for a gateway on the provider network
+- 1 IP address for OpenStack Endpoints
+- 1 IP used as a Virtual Router to provide connectivity to the Tenant network
+  is used for the OpenStack services (is automatically assigned in this example)
+- The remaining IP addresses (at least 1) are used for Floating IPs on the
+  provider network.
+
+The following is an example post deployment launching of a VM using the
+private tenant network and the provider network.
+
+#. Create helper variables for the configuration::
+
+    # standalone with tenant networking and provider networking
+    export OS_CLOUD=standalone
+    export GATEWAY=192.168.24.1
+    export STANDALONE_HOST=192.168.0.2
+    export PUBLIC_NETWORK_CIDR=192.168.24.0/24
+    export PRIVATE_NETWORK_CIDR=192.168.100.0/24
+    export PUBLIC_NET_START=192.168.0.3
+    export PUBLIC_NET_END=192.168.24.254
+    export DNS_SERVER=1.1.1.1
+
+#. Initial Nova and Glance setup::
+
+    # nova flavor
+    openstack flavor create --ram 512 --disk 1 --vcpu 1 --public tiny
+    # basic cirros image
+    wget https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+    openstack image create cirros --container-format bare --disk-format qcow2 --public --file cirros-0.4.0-x86_64-disk.img
+    # nova keypair for ssh
+    ssh-keygen
+    openstack keypair create --public-key ~/.ssh/id_rsa.pub default
+
+#. Setup a simple network security group::
+
+    # create basic security group to allow ssh/ping/dns
+    openstack security group create basic
+    # allow ssh
+    openstack security group rule create basic --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0
+    # allow ping
+    openstack security group rule create --protocol icmp basic
+    # allow DNS
+    openstack security group rule create --protocol udp --dst-port 53:53 basic
+
+#. Create Neutron Networks::
+
+    openstack network create --external --provider-physical-network datacentre --provider-network-type flat public
+    openstack network create --internal private
+    openstack subnet create public-net \
+        --subnet-range $PUBLIC_NETWORK_CIDR \
+        --no-dhcp \
+        --gateway $GATEWAY \
+        --allocation-pool start=$PUBLIC_NET_START,end=$PUBLIC_NET_END \
+        --network public
+    openstack subnet create private-net \
+        --subnet-range $PRIVATE_NETWORK_CIDR \
+        --network private
+
+#. Create Virtual Router::
+
+    # create router
+    # NOTE(aschultz): In this case an IP will be automatically assigned
+    # out of the allocation pool for the subnet.
+    openstack router create vrouter
+    openstack router set vrouter --external-gateway public
+    openstack router add subnet vrouter private-net
+
+#. Create floating IP::
+
+    # create floating ip
+    openstack floating ip create public
+
+#. Launch Instance::
+
+    # launch instance
+    openstack server create --flavor tiny --image cirros --key-name default --network private --security-group basic myserver
+
+#. Assign Floating IP::
+
+    openstack server add floating ip myserver <FLOATING_IP>
+
+#. Test SSH::
+
+    # login to vm
+    ssh cirros@<FLOATING_IP>

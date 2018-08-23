@@ -33,8 +33,13 @@ Deploying a Standalone Keystone node
 
     sudo yum install -y python-tripleoclient
 
-#. Configure standalone parameters which include container discovery, network
-   configuration, and some deployment options.
+#. Generate a file with the default ContainerImagePrepare value::
+
+    openstack tripleo container image prepare default \
+      --output-env-file $HOME/containers-prepare-parameters.yaml
+
+#. Configure basic standalone parameters which include network configuration
+   and some deployment options.
 
    The following configuration can be used for a system with 2 network
    interfaces. This configuration assumes the first interface is used for
@@ -54,19 +59,7 @@ Deploying a Standalone Keystone node
 
       cat <<EOF > $HOME/standalone_parameters.yaml
       parameter_defaults:
-        CertmongerCA: local
         CloudName: $IP
-        ContainerImagePrepare:
-        - set:
-            ceph_image: daemon
-            ceph_namespace: docker.io/ceph
-            ceph_tag: v3.0.3-stable-3.0-luminous-centos-7-x86_64
-            name_prefix: centos-binary-
-            name_suffix: ''
-            namespace: docker.io/tripleomaster
-            neutron_driver: null
-            tag: current-tripleo
-          tag_from_label: rdo_version
         ControlPlaneStaticRoutes: []
         Debug: true
         DeploymentUser: $USER
@@ -74,11 +67,12 @@ Deploying a Standalone Keystone node
           - 1.1.1.1
           - 8.8.8.8
         DockerInsecureRegistryAddress:
-        - $IP:8787
+          - $IP:8787
         NeutronPublicInterface: $INTERFACE
         # domain name used by the host
         NeutronDnsDomain: localdomain
-        # re-use ctlplane bridge for public net
+        # re-use ctlplane bridge for public net, defined in the standalone
+        # net config (do not change unless you know what you're doing)
         NeutronBridgeMappings: datacentre:br-ctlplane
         NeutronPhysicalBridge: br-ctlplane
         # enable to force metadata for public net
@@ -86,7 +80,7 @@ Deploying a Standalone Keystone node
         StandaloneEnableRoutedNetworks: false
         StandaloneHomeDir: $HOME
         StandaloneLocalMtu: 1500
-        # Needed if running in a VM
+        # Needed if running in a VM, not needed if on baremetal
         StandaloneExtraConfig:
           nova::compute::libvirt::services::libvirt_virt_type: qemu
           nova::compute::libvirt::libvirt_virt_type: qemu
@@ -112,19 +106,7 @@ Deploying a Standalone Keystone node
 
       cat <<EOF > $HOME/standalone_parameters.yaml
       parameter_defaults:
-        CertmongerCA: local
         CloudName: $IP
-        ContainerImagePrepare:
-        - set:
-            ceph_image: daemon
-            ceph_namespace: docker.io/ceph
-            ceph_tag: v3.0.3-stable-3.0-luminous-centos-7-x86_64
-            name_prefix: centos-binary-
-            name_suffix: ''
-            namespace: docker.io/tripleomaster
-            neutron_driver: null
-            tag: current-tripleo
-          tag_from_label: rdo_version
         # default gateway
         ControlPlaneStaticRoutes:
           - ip_netmask: 0.0.0.0/0
@@ -138,11 +120,12 @@ Deploying a Standalone Keystone node
         # needed for vip & pacemaker
         KernelIpNonLocalBind: 1
         DockerInsecureRegistryAddress:
-        - $IP:8787
+          - $IP:8787
         NeutronPublicInterface: $INTERFACE
         # domain name used by the host
         NeutronDnsDomain: localdomain
-        # re-use ctlplane bridge for public net
+        # re-use ctlplane bridge for public net, defined in the standalone
+        # net config (do not change unless you know what you're doing)
         NeutronBridgeMappings: datacentre:br-ctlplane
         NeutronPhysicalBridge: br-ctlplane
         # enable to force metadata for public net
@@ -150,7 +133,7 @@ Deploying a Standalone Keystone node
         StandaloneEnableRoutedNetworks: false
         StandaloneHomeDir: $HOME
         StandaloneLocalMtu: 1500
-        # Needed if running in a VM
+        # Needed if running in a VM, not needed if on baremetal
         StandaloneExtraConfig:
           nova::compute::libvirt::services::libvirt_virt_type: qemu
           nova::compute::libvirt::libvirt_virt_type: qemu
@@ -163,6 +146,7 @@ Deploying a Standalone Keystone node
       --local-ip=$IP/$NETMASK \
       -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
       -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
+      -e $HOME/containers-prepare-parameters.yaml \
       -e $HOME/standalone_parameters.yaml \
       --output-dir $HOME \
       --standalone

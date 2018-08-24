@@ -1,9 +1,9 @@
 - project:
     templates:
-      - publish-openstack-sphinx-docs
+      - publish-openstack-docs-pti
     check:
       jobs:
-        - build-openstack-sphinx-docs
+        - openstack-tox-docs
     gate:
       jobs:
-        - build-openstack-sphinx-docs
+        - openstack-tox-docs

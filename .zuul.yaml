@@ -1,0 +1,9 @@
+- project:
+    templates:
+      - publish-openstack-sphinx-docs
+    check:
+      jobs:
+        - build-openstack-sphinx-docs
+    gate:
+      jobs:
+        - build-openstack-sphinx-docs

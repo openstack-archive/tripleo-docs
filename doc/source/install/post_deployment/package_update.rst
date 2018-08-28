@@ -90,27 +90,46 @@ the OpenStack release that you currently operate, perform these steps:
 #. **Ceph update (optional)**
 
    If your environment includes Ceph managed by TripleO (i.e. *not*
-   what TripleO calls "external Ceph"), update Ceph by running:
+   what TripleO calls "external Ceph"), you'll want to update Ceph at
+   this point too. The procedure differs between Queens and Rocky
+   releases:
 
-   .. code-block:: bash
+   .. admonition:: Queens
+      :class: ptoq
 
-      openstack overcloud ceph-upgrade run <OPTIONS>
+      Run:
 
-   In place of the `<OPTIONS>` token should go all parameters that you
-   used with previous `openstack overcloud update prepare` command
-   (including the new `-e container-params.yaml`).
+      .. code-block:: bash
 
-   .. note::
+         openstack overcloud ceph-upgrade run <OPTIONS>
 
-      The `ceph-upgrade run` command performs a Heat stack update, and
-      as such it should be passed all parameters currently used by the
-      Heat stack (most notably environment files, role counts, roles
-      data, and network data). This is crucial in order to keep
-      correct state of the stack.
+      In place of the `<OPTIONS>` token should go all parameters that you
+      used with previous `openstack overcloud update prepare` command
+      (including the new `-e container-params.yaml`).
 
-   The `ceph-upgrade run` command re-enables config management
-   operations previously disabled by `update prepare`, and triggers
-   the rolling update playbook of the Ceph installer (`ceph-ansible`).
+      .. note::
+
+         The `ceph-upgrade run` command performs a Heat stack update, and
+         as such it should be passed all parameters currently used by the
+         Heat stack (most notably environment files, role counts, roles
+         data, and network data). This is crucial in order to keep
+         correct state of the stack.
+
+      The `ceph-upgrade run` command re-enables config management
+      operations previously disabled by `update prepare`, and triggers
+      the rolling update playbook of the Ceph installer (`ceph-ansible`).
+
+   .. admonition:: Rocky
+      :class: qtor
+
+      Run:
+
+      .. code-block:: bash
+
+         openstack overcloud external-update run --tags ceph
+
+      This will update Ceph by running ceph-ansible installer with
+      update playbook.
 
 #. **Update convergence**
 

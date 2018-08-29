@@ -11,3 +11,5 @@ TripleO Contributor Guide
   check_gates
   dlrn-promoter-overview
   stages-overview
+
+.. include:: ./squads.rst

@@ -23,14 +23,14 @@ What Tempest provides?
 * Tempest provides a set of stable apis/interfaces which are used in tempest
   tests and tempest plugins to keep backward compatibility.
 
- * Below is the list of stable interfaces:
+  * Below is the list of stable interfaces:
 
-   * tempest.lib.*
-   * tempest.config
-   * tempest.test_discover.plugins
-   * tempest.common.credentials_factory
-   * tempest.clients
-   * tempest.test
+    * tempest.lib.*
+    * tempest.config
+    * tempest.test_discover.plugins
+    * tempest.common.credentials_factory
+    * tempest.clients
+    * tempest.test
 
 * Tempest contains API tests for Nova, Glance, Cinder, Swift, Keystone as well
   as scenario tests for covering these components and these tests are used for
@@ -204,13 +204,13 @@ manually.
 * Create a public network having external connectivity, will be used by tempest
   tests when running tempest tests against overcloud
 
-    * Create a public network::
+  * Create a public network::
 
         $ openstack network create public --router:external=True \
                                   --provider:network_type flat \
                         --provider:physical_network datacenter
 
-    * Create/Attach subnet to it::
+  * Create/Attach subnet to it::
 
         $ openstack subnet create ext-subnet \
                         --allocation-pool \
@@ -219,7 +219,7 @@ manually.
                           --gateway 192.168.24.1 \
                           public 192.168.24.0/24
 
-    * Export public network id::
+  * Export public network id::
 
         $ public_net_id=$(openstack network show {{ public_net_name }} -f value -c id)
 

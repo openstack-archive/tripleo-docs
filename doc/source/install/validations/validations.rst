@@ -5,7 +5,7 @@ Since the Newton release, TripleO ships with extensible checks for
 verifying the undercloud configuration, hardware setup, and the
 deployment to find common issues early.
 
-The TripleO GUI runs the validations automatically. While work is
+The TripleO UI runs the validations automatically. While work is
 underway for having them in the command line workflow, too, they need
 to be run by calling a Mistral workflow currently.
 
@@ -48,11 +48,13 @@ it like so::
    $ source stackrc
    $ openstack workflow execution create tripleo.validations.v1.run_validation '{"validation_name": "undercloud-ram"}'
 
-This will run the "undercloud-ram.yaml" validation. All validations
-are stored in the
-``/usr/share/openstack-tripleo-validations/validations/`` directory,
-so to get the name of the validation (``undercloud-ram`` here) find
-the right one there and use its filename without an extension.
+This will run the "undercloud-ram.yaml" validation.
+
+The undercloud comes with a set of default validations, which are stored in a
+Swift container called ``tripleo-validations``. To get the list of available
+validations, run ``openstack container list tripleo-validations``. To get the
+name of the validation (``undercloud-ram`` here) find the right one there and
+use its filename without an extension.
 
 The command will return an execution ID, which you can query for the
 results. To find out whether the validation finished, run::
@@ -72,6 +74,32 @@ that it succeeded. To find that out, we need to read its output::
 This will return the hosts the validation ran against, any warnings
 and error messages it encountered along the way as well as an overall
 summary.
+
+
+Custom validations
+------------------
+Support for `custom validations`_ has been added in the Rocky development cycle.
+It allows operators to add their own bespoke validations, in cases when it's
+not appropriate to include these in the set of default TripleO validations.
+
+Custom validations are associated with deployment plans and stored in the
+plan's Swift container, together with the rest of the plan files.
+
+To add custom validations for a deployment plan, create a ``custom-validations``
+subdirectory within the deployment plan Swift container and place the
+validations yaml files there.
+
+To run a custom validation, follow the same procedure as for running one of the
+default validations - determine the name of the validation by listing the contents
+of the ``custom-validations`` subdirectory, and supply that name (without the
+.yaml extension) to the ``run_validation`` workflow.
+
+If a validation with the same name is found both in the set of default
+validations, and in custom validations, the custom validation is always picked.
+This means that, if you wish to override a default validation with your custom
+implementation of it, all you need to do is create a validation with the same
+name and place it in the ``custom-validations`` subdirectory of the Swift
+container holding the deployment plan.
 
 
 .. _running_validation_group:
@@ -153,3 +181,4 @@ reasons that the validation fails. For example::
 
 .. _blueprint: https://blueprints.launchpad.net/tripleo/+spec/pre-upgrade-validations
 .. _tripleo-validations documentation page: http://docs.openstack.org/developer/tripleo-validations/readme.html#existing-validations
+.. _custom validations: https://review.openstack.org/#/c/393775/

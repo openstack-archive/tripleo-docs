@@ -15,6 +15,7 @@ TripleO Install Guide
   containers_deployment/index
   post_deployment/post_deployment
   advanced_deployment/features
+  advanced_deployment/ansible_config_download.rst
   advanced_deployment/baremetal_nodes
   advanced_deployment/backends
   advanced_deployment/custom

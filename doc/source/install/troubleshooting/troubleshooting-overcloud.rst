@@ -85,6 +85,16 @@ in the resulting table.
   ``virt-manager`` tool for virtual machines and vendor-specific virtual
   console (e.g. iDRAC for DELL) for bare metal machines.
 
+Showing deployment failures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Deployment failures can be shown with the following command::
+
+    [stack@undercloud ]$ openstack overcloud failures --plan my-deployment
+
+The command will show any errors encountered when running ``ansible-playbook``
+to configure the overcloud during the ``config-download`` process. See
+:ref:`config_download` for more information.
+
 Debugging Using Heat
 ^^^^^^^^^^^^^^^^^^^^
 

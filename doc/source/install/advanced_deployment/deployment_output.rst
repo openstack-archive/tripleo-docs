@@ -1,4 +1,9 @@
-The output from ``ansible-playbook`` will then begin to appear in the console
+Deployment Output
+^^^^^^^^^^^^^^^^^
+After the tripleo-admin user is created, ``ansible-playbook`` will be used to
+configure the overcloud nodes.
+
+The output from ``ansible-playbook`` will begin to appear in the console
 and will be updated periodically as more tasks are applied.
 
 When ansible is finished a play recap will be shown, and the usual overcloudrc

@@ -1,5 +1,5 @@
 Deployment Status
------------------
+^^^^^^^^^^^^^^^^^
 Since Heat is no longer the source of authority on the status of the overcloud
 deployment, a new tripleoclient command is available to show the overcloud
 deployment status::
@@ -8,7 +8,7 @@ deployment status::
 
 The output will report the status of the deployment, taking into consideration
 the result of all the steps to do the full deployment. The following is an
-example of the sample output::
+example of the output::
 
     [stack@undercloud ]$ openstack overcloud status
 

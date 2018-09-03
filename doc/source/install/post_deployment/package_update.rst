@@ -166,9 +166,10 @@ then execute these. See bug 1715557_ for more information about this mechanism
 and its implementation.
 
 
-1. You must first re-run the `openstack overcloud container image prepare`
-command to generate a docker registry file with the latest images see
-:doc:`../containers_deployment/overcloud` for more information.
+1. Confirm that your `$HOME/containers-prepare-parameter.yaml`
+`ContainerImagePrepare` parameter includes a `tag_from_label` value, so that
+the latest images are discovered on update, otherwise edit the `tag` value
+to specify what image versions to update to.
 
 
 2. Perform a heat stack update to generate the ansible playbooks, specifying

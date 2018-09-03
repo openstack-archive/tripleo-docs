@@ -1,6 +1,6 @@
 .. _prepare-environment-containers:
 
-Container Image Preperation
+Container Image Preparation
 ===========================
 
 This documentation explains how to instruct container image preparation to do
@@ -11,7 +11,7 @@ Choosing an image registry strategy
 
 Container images need to be pulled from an image registry which is reliably
 available to overcloud nodes. The three common options to serve images are to
-use the default registry, the registry availably on the undercloud, or an
+use the default registry, the registry available on the undercloud, or an
 independently managed registry. During deployment the environment parameter
 `ContainerImagePrepare` is used to specify any desired behaviour, including:
 
@@ -112,13 +112,16 @@ refer to the images in `push_destination` instead of `namespace`.
 
 Running container image prepare
 ...............................
-The prepare operations are actually run at the following times:
+The prepare operations are run at the following times:
 
 #. During ``undercloud install`` when `undercloud.conf` has
    `container_images_file=$HOME/containers-prepare-parameter.yaml` (see
    :ref:`install_undercloud`)
-#. Before overcloud deploy when ``openstack tripleo container image prepare``
-   is run (see :ref:`overcloud-prepare-container-images`)
+#. During ``overcloud deploy`` when a `ContainerImagePrepare` parameter is
+   provided by including the argument `-e
+   $HOME/containers-prepare-parameter.yaml`
+   (see :ref:`overcloud-prepare-container-images`)
+#. Any other time when ``openstack tripleo container image prepare`` is run
 
 
 Options available in heat parameter ContainerImagePrepare

@@ -49,23 +49,9 @@ with images required by the overcloud deploy by generating the following
 
 See :ref:`prepare-environment-containers` for details on using
 `containers-prepare-parameter.yaml` to control what can be done
-during container image preparation.
+with image preparation during overcloud deployment.
 
 .. _overcloud-prepare-container-images:
-
-Running container image prepare
-...............................
-
-The ``openstack tripleo container image prepare`` command performs all of the
-required prepare tasks as specified by `~/containers-prepare-parameter.yaml`.
-This generates the environment file `~/containers-default-parameters.yaml`
-which contains all of the container image parameters needed for the overcloud
-deploy. The prepare is run with the command::
-
-  openstack tripleo container image prepare \
-    -e ~/containers-prepare-parameter.yaml
-    --roles-file /usr/share/openstack-tripleo-heat-templates/roles_data.yaml \
-    --output-env-file ~/containers-default-parameters.yaml
 
 Deploying the containerized Overcloud
 -------------------------------------
@@ -75,7 +61,7 @@ baremetal :ref:`deploy-the-overcloud` documentation with the exception that it
 requires an extra environment file to be added to the ``openstack overcloud
 deploy`` command::
 
-  -e ~/containers-default-parameters.yaml
+  -e ~/containers-prepare-parameter.yaml
 
 If deploying with highly available controller nodes, include the
 following extra environment file in addition to the above and in place

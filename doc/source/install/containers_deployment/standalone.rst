@@ -33,10 +33,35 @@ Deploying a Standalone Keystone node
 
     sudo yum install -y python-tripleoclient
 
+   .. admonition:: Ceph
+      :class: ceph
+
+      Install the ceph-ansible package and util-linux.
+
+      .. code-block:: bash
+
+         sudo yum install -y ceph-ansible util-linux
+
 #. Generate a file with the default ContainerImagePrepare value::
 
     openstack tripleo container image prepare default \
       --output-env-file $HOME/containers-prepare-parameters.yaml
+
+   .. admonition:: Ceph
+      :class: ceph
+
+      Create a block device to be used as an OSD.
+
+      .. code-block:: bash
+
+         sudo dd if=/dev/zero of=/var/lib/ceph-osd.img bs=1 count=0 seek=7G
+         sudo losetup /dev/loop3 /var/lib/ceph-osd.img
+
+      Create a directory to back up the ceph-ansible fetch directory.
+
+      .. code-block:: bash
+
+         mkdir /root/ceph_ansible_fetch
 
 #. Configure basic standalone parameters which include network configuration
    and some deployment options.
@@ -137,7 +162,37 @@ Deploying a Standalone Keystone node
           nova::compute::libvirt::libvirt_virt_type: qemu
       EOF
 
-#. Run deploy command::
+   .. admonition:: Ceph
+      :class: ceph
+
+      Create an additional environment file which directs ceph-ansible
+      to use the block device and fecth directory backup created
+      earlier. In the same file pass additional Ceph parameters
+      for the OSD scenario and Ceph networks. Set the placement group
+      and replica count to values which fit the number of OSDs being
+      used, e.g. 32 and 1 are used for testing with only one OSD.
+
+      .. code-block:: bash
+
+         cat <<EOF > $HOME/ceph_parameters.yaml
+         parameter_defaults:
+           CephAnsibleDisksConfig:
+             devices:
+               - /dev/loop3
+             journal_size: 1024
+           LocalCephAnsibleFetchDirectoryBackup: /root/ceph_ansible_fetch
+           CephAnsibleExtraConfig:
+             osd_scenario: collocated
+             osd_objectstore: filestore
+             cluster_network: 192.168.24.0/24
+             public_network: 192.168.24.0/24
+           CephPoolDefaultPgNum: 32
+           CephPoolDefaultSize: 1
+         EOF
+
+#. Run deploy command:
+
+   .. code-block:: bash
 
     sudo openstack tripleo deploy \
       --templates \
@@ -148,6 +203,25 @@ Deploying a Standalone Keystone node
       -e $HOME/standalone_parameters.yaml \
       --output-dir $HOME \
       --standalone
+
+   .. admonition:: Ceph
+      :class: ceph
+
+      Include the Ceph environment files in the deploy command:
+
+      .. code-block:: bash
+
+         sudo openstack tripleo deploy \
+           --templates \
+           --local-ip=$IP/$NETMASK \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+           -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
+           -e $HOME/containers-prepare-parameters.yaml \
+           -e $HOME/standalone_parameters.yaml \
+           -e $HOME/ceph_parameters.yaml \
+           --output-dir $HOME \
+           --standalone
 
 #. Check the deployed OpenStack Services
 

@@ -77,9 +77,9 @@ downloaded to the Undercloud. Please see the `openstack overcloud container imag
 :doc:`../containers_deployment/overcloud` for more information.
 
 The output of this step will be a Heat environment file that contains
-references to the latest container images. You will need to pass this file
-into the **upgrade prepare** command using the --container-registry-file
-option.
+references to the latest container images. You will need to pass the path to
+this file into the **upgrade prepare** command using the -e option as you would
+any other environment file.
 
 You will also need to create an environment file to override the
 UpgradeInitCommand_ tripleo-heat-templates parameter, that can be used to
@@ -131,20 +131,20 @@ openstack overcloud upgrade prepare
 
 Run **overcloud upgrade prepare**. This command expects the full set
 of environment files that were passed into the deploy command, as well as the
-roles_data.yaml file used to deploy the overcloud you are about to upgrade. The
---container-registry-file should point to the file that was output by the image
-prepare command you ran to get the latest container image references.
+roles_data.yaml file used to deploy the overcloud you are about to upgrade. Be
+sure to include the container image references file that was output by the
+*container image prepare* command
 
    .. note::
 
       It is especially important to remember that you **must** include all
-      environment files that were used to deploy the overcloud that you are about
-      to upgrade.
+      environment files that were used to deploy the overcloud including the
+      container image references file for the target version container images
 
    .. code-block:: bash
 
       openstack overcloud upgrade prepare --templates \
-        --container-registry-file /home/stack/containers-default-parameters.yaml \
+        -e /home/stack/containers-default-parameters.yaml \
         -e <ALL Templates from overcloud-deploy.sh> \
         -e init-repo.yaml
         -r /path/to/roles_data.yaml
@@ -199,8 +199,8 @@ At a minimum an operator should check the health of the pacemaker cluster
       [root@overcloud-controller-0 ~]# pcs status | grep -C 10 -i "error\|fail"
 
 The operator may also want to confirm that openstack and related service
-containers are all in a good state and using the image references passed
-during upgrade prepare with the --container-registry-file parameter.
+containers are all in a good state and using the target version (new) images
+passed during upgrade prepare.
 
    .. code-block:: bash
 
@@ -281,14 +281,6 @@ about why this is the case in the queens-upgrade-dev-docs_.
       and the roles_data.yaml roles and services definition. You should omit
       any repo switch commands and ensure that none of the environment files
       you are about to use is specifying a value for UpgradeInitCommand.
-
-   .. note::
-
-      The Queens container image references that were passed into the
-      `openstack overcloud upgrade prepare`_ with the `--container-registry-file`
-      parameter **must** be included as an environment file, with the -e option
-      to the openstack overcloud upgrade run command, together with all other
-      environment files for your deployment.
 
    .. code-block:: bash
 

@@ -1,9 +1,3 @@
 - project:
     templates:
       - publish-openstack-docs-pti
-    check:
-      jobs:
-        - openstack-tox-docs
-    gate:
-      jobs:
-        - openstack-tox-docs

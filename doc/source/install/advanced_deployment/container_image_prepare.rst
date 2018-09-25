@@ -121,7 +121,7 @@ The prepare operations are run at the following times:
    provided by including the argument `-e
    $HOME/containers-prepare-parameter.yaml`
    (see :ref:`overcloud-prepare-container-images`)
-#. Any other time when ``openstack tripleo container image prepare`` is run
+#. Any other time when ``sudo openstack tripleo container image prepare`` is run
 
 
 Options available in heat parameter ContainerImagePrepare

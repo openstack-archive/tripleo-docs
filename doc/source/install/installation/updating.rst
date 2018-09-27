@@ -7,6 +7,10 @@ Updating Undercloud Components
    :doc:`../containers_deployment/undercloud`
    for backward compatibility related information.
 
+.. note::
+   When updating the existing containerized undercloud installation,
+   keep in mind the special cases described in :ref:`notes-for-stack-updates`.
+
 #. Before upgrading the undercloud, it is highly suggested to perform
    a :doc:`backup <../controlplane_backup_restore/01_undercloud_backup>`
    of the undercloud and validate that a restore works fine.

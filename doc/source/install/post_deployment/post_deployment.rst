@@ -14,6 +14,7 @@ In this chapter you will find advanced management of various |project| areas.
    vm_snapshot
    package_update
    upgrade
+   updating-stacks-notes
    build_single_image
    upload_single_image
    update_undercloud_ssh_keys

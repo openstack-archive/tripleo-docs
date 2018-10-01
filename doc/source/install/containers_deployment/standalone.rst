@@ -105,9 +105,7 @@ Deploying a Standalone Keystone node
         StandaloneHomeDir: $HOME
         StandaloneLocalMtu: 1500
         # Needed if running in a VM, not needed if on baremetal
-        StandaloneExtraConfig:
-          nova::compute::libvirt::services::libvirt_virt_type: qemu
-          nova::compute::libvirt::libvirt_virt_type: qemu
+        NovaComputeLibvirtType: qemu
       EOF
 
    The following configuration can be used for a system with a single network
@@ -157,9 +155,7 @@ Deploying a Standalone Keystone node
         StandaloneHomeDir: $HOME
         StandaloneLocalMtu: 1500
         # Needed if running in a VM, not needed if on baremetal
-        StandaloneExtraConfig:
-          nova::compute::libvirt::services::libvirt_virt_type: qemu
-          nova::compute::libvirt::libvirt_virt_type: qemu
+        NovaComputeLibvirtType: qemu
       EOF
 
    .. admonition:: Ceph

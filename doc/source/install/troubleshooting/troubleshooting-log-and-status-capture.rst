@@ -39,7 +39,7 @@ Example: Leave logs in a swift container
 
 If you want to perform a sosreport but do not currently wish to download the
 logs, you can leave them in a swift container for later retrieval. The
-`--collect-only` and `-c` options can be leveraged to store the
+``--collect-only`` and ``-c`` options can be leveraged to store the
 logs in a swift container. For example::
 
     openstack overcloud support report collect -c logs_20170601 --collect-only controller
@@ -51,18 +51,18 @@ the `openstack overcloud support report collect` command by running::
 
     openstack overcloud support report collect -c logs_20170601 --download-only -o /tmp/mylogs controller
 
-.. note:: There is a `--skip-container-delete` option that can be used if you
+.. note:: There is a ``--skip-container-delete`` option that can be used if you
           want to leave the logs in swift but still download them. This option
-          is ignored if `--collect-only` or `--download-only` options are
+          is ignored if ``--collect-only`` or ``--download-only`` options are
           provided.
 
 
 Additional Options
 ^^^^^^^^^^^^^^^^^^
 
-The `openstack overcloud support report collect` command has additional
+The ``openstack overcloud support report collect`` command has additional
 that can be passed to work with the log bundles. Run the command with
-`--help` to see additional options::
+``--help`` to see additional options::
 
     openstack overcloud support report collect --help
 

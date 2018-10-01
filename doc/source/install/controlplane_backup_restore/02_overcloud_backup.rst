@@ -17,7 +17,7 @@ MySQL backup
 ~~~~~~~~~~~~
 
 If using HA the operator can run the database backup in any controller node
-using the --single-transaction option when executing the mysqldump.
+using the ``--single-transaction`` option when executing the mysqldump.
 
 If the deployment is using containers the hieradata file containing the mysql
 root password is located in the folder `/var/lib/config-data/mysql/etc/puppet/hieradata/`.
@@ -101,7 +101,7 @@ We need to backup all files that can be used to recover
 from a possible failure in the Overcloud controllers when
 executing a minor update or a major upgrade.
 
-The option `--ignore-failed-read` is added to the `tar`
+The option ``--ignore-failed-read`` is added to the `tar`
 command because the list of files to backup might be
 different on each environment and we make the list of
 paths to backup is as much general as possible.

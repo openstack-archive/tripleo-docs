@@ -275,8 +275,8 @@ attributes can be specified at upload time as in::
 
 .. note::
 
-    Adding --httpboot is optional but suggested if you need to ensure that the
-    ``agent`` images are unique within your environment.
+    Adding ``--httpboot`` is optional but suggested if you need to ensure that
+    the ``agent`` images are unique within your environment.
 
 .. admonition:: Prior to Rocky release
   :class: stable
@@ -524,28 +524,28 @@ Run the deploy command, including any additional parameters as necessary::
       Example:
 
       The following will present a behavior where the my_roles_data will persist,
-      due to the location of the custom roles data, which is stored in swift.
+      due to the location of the custom roles data, which is stored in swift::
 
-      * openstack overcloud deploy --templates -r my_roles_data.yaml
-      * heat stack-delete overcloud
+          openstack overcloud deploy --templates -r my_roles_data.yaml
+          heat stack-delete overcloud
 
-      Allow the stack to be deleted then continue.
+      Allow the stack to be deleted then continue::
 
-      * openstack overcloud deploy --templates
+          openstack overcloud deploy --templates
 
       The execution of the above will still reference my_roles_data as the
       unified command line client will perform a look up against the swift
       storage. The reason for the unexpected behavior is due to the heatclient
       lack of awareness of the swift storage.
 
-      The correct course of action should be as followed:
+      The correct course of action should be as followed::
 
-      * openstack overcloud deploy --templates -r my_roles_data.yaml
-      * openstack overcloud delete <stack name>
+          openstack overcloud deploy --templates -r my_roles_data.yaml
+          openstack overcloud delete <stack name>
 
-      Allow the stack to be deleted then continue.
+      Allow the stack to be deleted then continue::
 
-      * openstack overcloud deploy --templates
+          openstack overcloud deploy --templates
 
 To deploy an overcloud with multiple controllers and achieve HA,
 follow :doc:`../advanced_deployment/high_availability`.

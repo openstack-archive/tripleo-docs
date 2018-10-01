@@ -67,7 +67,7 @@ For example, we can run a full MySQL backup with additional paths as::
                               --exclude-path /home/stack/
 
 Note that we are excluding the folder `/home/stack/`
-from the backup, but this folder is not included using the `--add-path`,
+from the backup, but this folder is not included using the ``--add-path``,
 CLI option, this is due to the fact that the `/home/stack/` folder is
 added by default in any backup as it contains necessary files
 to restore correctly the Undercloud.

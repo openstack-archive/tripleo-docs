@@ -159,8 +159,8 @@ Configure container settings with ceph-ansible
 ----------------------------------------------
 
 The group variables `ceph_osd_docker_memory_limit`, which corresponds
-to `docker run ... --memory`, and `ceph_osd_docker_cpu_limit`, which
-corresponds to `docker run ... --cpu-quota`, may be overridden
+to ``docker run ... --memory``, and `ceph_osd_docker_cpu_limit`, which
+corresponds to ``docker run ... --cpu-quota``, may be overridden
 depending on the hardware configuration and the system needs. Below is
 an example of setting custom values to these parameters::
 

@@ -359,16 +359,16 @@ Things to keep in mind while using discover-tempest-config
 
 * If OpenStack was deployed using TripleO/Director, pass the deployment input
   file tempest-deployer-input.conf to the :command:`discover-tempest-config` command with
-  --deployer-input option. The file contains some version specific values set
+  ``--deployer-input`` option. The file contains some version specific values set
   by the installer. More about the argument can be found in
   `python-tempestconf's CLI documentation. <https://docs.openstack.org/python-tempestconf/latest/cli/cli_options.html>`_
 
-* --remove option can be used to remove values from tempest.conf.
-  For example: **--remove network-feature-enabled.api_extensions=dvr**
+* ``--remove`` option can be used to remove values from tempest.conf,
+  for example: ``--remove network-feature-enabled.api_extensions=dvr``.
   The feature is useful when some values in tempest.conf are automatically
   set by the discovery, but they are not wanted to be printed to tempest.conf.
   More about the feature can be found
-  `here. <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#prevent-some-key-value-pairs-to-be-set-in-tempest-conf>`_.
+  `here <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#prevent-some-key-value-pairs-to-be-set-in-tempest-conf>`_.
 
 
 Always save the state of resources before running tempest tests
@@ -426,7 +426,7 @@ defined in tempest.conf to run tests against the targeted host.
 
     $ tempest run --regex '(test_regex1 | test_regex2 | test_regex 3)'
 
-* Use **--black-regex** argument to skip specific tests::
+* Use ``--black-regex`` argument to skip specific tests::
 
     $ tempest run -r '(api|scenario)' --black-regex='(keystone_tempest_plugin)'
 
@@ -502,7 +502,7 @@ Running Tempest tests serially as well as in parallel
 Generating HTML report of tempest tests
 +++++++++++++++++++++++++++++++++++++++
 
-* In order to generate tempest subunit files in v2 format, use **--subunit**
+* In order to generate tempest subunit files in v2 format, use ``--subunit``
   flag with tempest run::
 
     $ tempest run -r '(test_regex)' --subunit

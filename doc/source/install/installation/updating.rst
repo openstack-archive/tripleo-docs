@@ -93,11 +93,11 @@ Updating Undercloud Components
          the Ocata to Pike upgrade.
 
 
-   Update TripleO CLI package
+   Update TripleO CLI and dependencies
 
    .. code-block:: bash
 
-      sudo yum update python-tripleoclient*
+      sudo yum update python-tripleoclient* openstack-tripleo-common openstack-tripleo-heat-templates
 
 #. Run the undercloud upgrade command. This command will upgrade all packages
    and use puppet to apply new configuration and restart all OpenStack

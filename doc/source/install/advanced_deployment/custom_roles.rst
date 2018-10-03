@@ -128,7 +128,7 @@ cluster::
 
 .. note::
   It is also possible to copy the entire tripleo-heat-templates tree, and modify
-  the roles_data.yaml file in place, then deploy via `--templates <copy of tht>`
+  the roles_data.yaml file in place, then deploy via ``--templates <copy of tht>``
 
 .. warning::
   Note that in your custom roles you may not use any already predefined name

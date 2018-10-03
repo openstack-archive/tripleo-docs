@@ -71,7 +71,7 @@ the OpenStack release that you currently operate, perform these steps:
 #. **Update run**
 
    Run the update procedure on a subset of nodes selected via the
-   `--nodes` parameter:
+   ``--nodes`` parameter:
 
    .. code-block:: bash
 
@@ -196,7 +196,7 @@ the registry file generated from the first step above::
 
     openstack overcloud update --init-minor-update --container-registry-file latest-images.yaml
 
-3. Invoke the minor update on the nodes specified with the --nodes
+3. Invoke the minor update on the nodes specified with the ``--nodes``
 parameter::
 
     openstack overcloud update --nodes controller-0
@@ -250,7 +250,7 @@ breakpoint on next one.
    in the process by re-running same command.
 
 .. note::
-   The --templates and --environment-file (-e) are now deprecated. They can still
-   be passed to the command, but they will be silently ignored. This is due to
-   the plan now used for deployment should only be modified via plan modification
-   commands.
+   The ``--templates`` and ``--environment-file`` (``-e``) are now deprecated.
+   They can still be passed to the command, but they will be silently ignored.
+   This is due to the plan now used for deployment should only be modified via
+   plan modification commands.

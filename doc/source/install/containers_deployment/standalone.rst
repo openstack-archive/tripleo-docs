@@ -252,7 +252,7 @@ The following example is based on the single NIC configuration and assumes that
 the environment had at least 3 total IP addresses available to it. The IPs are
 used for the following:
 
-- 1 IP address for the OpenStack services (this is the --local-ip from the
+- 1 IP address for the OpenStack services (this is the ``--local-ip`` from the
   deploy command)
 - 1 IP used as a Virtual Router to provide connectivity to the Tenant network
   is used for the OpenStack services (is automatically assigned in this example)
@@ -385,7 +385,7 @@ The following example is based on the single NIC configuration and assumes that
 the environment had at least 4 total IP addresses available to it. The IPs are
 used for the following:
 
-- 1 IP address for the OpenStack services (this is the --local-ip from the
+- 1 IP address for the OpenStack services (this is the ``--local-ip`` from the
   deploy command)
 - 1 IP used as a Virtual Router to provide connectivity to the Tenant network
   is used for the OpenStack services

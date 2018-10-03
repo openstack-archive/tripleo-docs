@@ -949,7 +949,7 @@ bridge, then this command would add a provider network on VLAN 201::
     --shared provider_network
 
 This command would create a shared network, but it is also possible to
-specify a tenant instead of specifying --shared, and then that network will
+specify a tenant instead of specifying ``--shared``, and then that network will
 only be available to that tenant. If a provider network is marked as external,
 then only the operator may create ports on that network. A subnet can be added
 to a provider network if Neutron is to provide DHCP services to tenant VMs::

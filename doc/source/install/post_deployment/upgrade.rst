@@ -39,7 +39,7 @@ The tripleo cli has been updated accordingly to accommodate this new
 workflow. In Queens a new `openstack overcloud upgrade` command is introduced
 and it expects one of three subcommands: **prepare**, **run** and
 **converge**. Each subcommand has its own set of options which you can explore
-with  --help:
+with ``--help``:
 
    .. code-block:: bash
 
@@ -170,17 +170,17 @@ openstack overcloud upgrade run
 This will run the ansible playbooks to deliver the upgrade configuration.
 By default, 3 playbooks are executed: the upgrade_steps_playbook, then the
 deploy_steps_playbook and finally the post_upgrade_steps_playbook. These
-playbooks are invoked on those overcloud nodes specified by the --roles or
---nodes parameters, which are mutually exclusive. You are expected to use
---roles for controlplane nodes, since these need to be upgraded in the same
+playbooks are invoked on those overcloud nodes specified by the ``--roles`` or
+``--nodes`` parameters, which are mutually exclusive. You are expected to use
+``--roles`` for controlplane nodes, since these need to be upgraded in the same
 step. For non controlplane nodes, such as Compute or Storage, you can use
---nodes to specify a single node or list of nodes to upgrade.
+``--nodes`` to specify a single node or list of nodes to upgrade.
 
    .. code-block:: bash
 
       openstack overcloud upgrade run --roles Controller
 
-**Optionally** specify `--playbook` to manually step through the upgrade
+**Optionally** specify ``--playbook`` to manually step through the upgrade
 playbooks: You need to run all three in this order and as specified below
 (no path) for a full upgrade to Queens.
 
@@ -207,16 +207,16 @@ passed during upgrade prepare.
       [root@overcloud-controller-0 ~]# docker ps -a
 
 For non controlplane nodes, such as Compute or ObjectStorage, you can use
-`--nodes overcloud-compute-0` to upgrade particular nodes, or even
+``--nodes overcloud-compute-0`` to upgrade particular nodes, or even
 "compute0,compute1,compute3" for multiple nodes. Note these are again
-upgraded in parallel. Also note that you can still use the `--roles` parameter
+upgraded in parallel. Also note that you can still use the ``--roles`` parameter
 with non controlplane roles if that is preferred.
 
    .. code-block:: bash
 
       openstack overcloud upgrade run --nodes overcloud-compute-0
 
-Use of `--nodes` allows the operator to upgrade some subset, perhaps just one,
+Use of ``--nodes`` allows the operator to upgrade some subset, perhaps just one,
 compute or other non controlplane node and verify that the upgrade is
 successful. One may even migrate workloads onto the newly upgraded node and
 confirm there are no problems, before deciding to proceed with upgrading the
@@ -232,7 +232,7 @@ finally post_upgrade_steps_playbook.yaml in that order.
          --playbook upgrade_steps_playbook.yaml
       # etc for the other 2 as above example for controller
 
-For re-run, you can specify --skip-tags validation to skip those step 0
+For re-run, you can specify ``--skip-tags`` validation to skip those step 0
 ansible tasks that check if services are running, in case you can't or
 don't want to start them all.
 
@@ -732,8 +732,8 @@ Upgrading the Overcloud to Newton and earlier
       If this step fails, it may leave the pacemaker cluster stopped (together
       with all OpenStack services on the controller nodes). The root cause and
       restoration procedure may vary, but in simple cases the pacemaker cluster
-      can be started by logging into one of the controllers and running `sudo
-      pcs cluster start --all`.
+      can be started by logging into one of the controllers and running ``sudo
+      pcs cluster start --all``.
 
    .. note::
 

@@ -102,7 +102,7 @@ For example
 Run tripleo-repos to install the appropriate repositories.  The option below
 will enable the latest master TripleO packages and the latest promoted
 packages for all other OpenStack services and dependencies.  There are other
-repository configurations available in tripleo-repos, see its --help output
+repository configurations available in tripleo-repos, see its ``--help`` output
 for details.
 
 .. code-block:: bash

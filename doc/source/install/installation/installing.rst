@@ -177,11 +177,11 @@ Installing the Undercloud
     The undercloud is containerized by default as of Rocky.
 
 .. note::
-    It's possible to enable verbose logging with --verbose option.
+    It's possible to enable verbose logging with ``--verbose`` option.
 
 .. note::
     To install a deprecated instack undercloud, you'll need to deploy
-    with --use-heat=False option.
+    with ``--use-heat=False`` option.
 
 
 In Rocky, we will run all the OpenStack services in a moby container runtime

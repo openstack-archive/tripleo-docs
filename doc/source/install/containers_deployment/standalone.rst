@@ -9,8 +9,8 @@ Containterized Undercloud deployment mechanism can be reused to deploy a single
 node capable of running OpenStack services for development.
 
 
-Deploying a Standalone Keystone node
-------------------------------------
+Deploying a Standalone OpenStack node
+-------------------------------------
 
 #. Log into your machine (baremetal or VM) where you want to install the
    standalone services on as a non-root user.::
@@ -193,7 +193,7 @@ Deploying a Standalone Keystone node
     sudo openstack tripleo deploy \
       --templates \
       --local-ip=$IP/$NETMASK \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
+      -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
       -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
       -e $HOME/containers-prepare-parameters.yaml \
       -e $HOME/standalone_parameters.yaml \

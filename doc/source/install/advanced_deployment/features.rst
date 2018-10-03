@@ -30,3 +30,4 @@ Documentation on how to enable and configure various features available in
    ansible_config_download_differences
    rhsm
    designate
+   multiple_overclouds

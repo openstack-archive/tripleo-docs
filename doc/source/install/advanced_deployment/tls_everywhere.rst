@@ -205,12 +205,12 @@ To tell the overcloud deployment to deploy the keystone endpoints (and
 references) using DNS names instead of IPs, we need to add the following
 environment to our overcloud deployment::
 
-    ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml
+    ~/ssl-heat-templates/environments/ssl/tls-everywhere-endpoints-dns.yaml
 
 Finally, to enable TLS in the internal network, we need to use the following
 environment::
 
-    ~/ssl-heat-templates/environments/enable-internal-tls.yaml
+    ~/ssl-heat-templates/environments/ssl/enable-internal-tls.yaml
 
 This will set the appropriate resources that enable the certificate requests
 via certmonger and create the appropriate service principals for kerberos
@@ -232,9 +232,9 @@ look like the following::
 
     openstack overcloud deploy \
         ...
-        -e ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml \
-        -e ~/ssl-heat-templates/environments/enable-tls.yaml \
-        -e ~/ssl-heat-templates/environments/enable-internal-tls.yaml \
+        -e ~/ssl-heat-templates/environments/ssl/tls-everywhere-endpoints-dns.yaml \
+        -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml \
+        -e ~/ssl-heat-templates/environments/ssl/enable-internal-tls.yaml \
         -e ~/cloud-names.yaml
 
 Certmonger-based public and Internal TLS
@@ -251,9 +251,9 @@ to the following::
 
     openstack overcloud deploy \
         ...
-        -e ~/ssl-heat-templates/environments/tls-everywhere-endpoints-dns.yaml \
+        -e ~/ssl-heat-templates/environments/ssl/tls-everywhere-endpoints-dns.yaml \
         -e ~/ssl-heat-templates/environments/services/haproxy-public-tls-certmonger.yaml \
-        -e ~/ssl-heat-templates/environments/enable-internal-tls.yaml \
+        -e ~/ssl-heat-templates/environments/ssl/enable-internal-tls.yaml \
         -e ~/cloud-names.yaml
 
 .. References

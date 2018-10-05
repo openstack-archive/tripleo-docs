@@ -100,20 +100,11 @@ For example
    stable releases!
 
 Run tripleo-repos to install the appropriate repositories.  The option below
-will enable the latest master TripleO packages and the latest promoted
-packages for all other OpenStack services and dependencies.  There are other
-repository configurations available in tripleo-repos, see its ``--help`` output
-for details.
+will enable the latest master TripleO packages, the latest promoted
+packages for all other OpenStack services and dependencies and the latest
+stable Ceph packages. There are other repository configurations available in
+tripleo-repos, see its ``--help`` output for details.
 
 .. code-block:: bash
 
-   sudo -E tripleo-repos current-tripleo-dev
-
-.. admonition:: Ceph
-  :class: ceph
-
-  Include the Ceph repository in the tripleo-repos command
-
-  .. code-block:: bash
-
-     sudo -E tripleo-repos current-tripleo-dev ceph
+   sudo -E tripleo-repos current-tripleo-dev ceph

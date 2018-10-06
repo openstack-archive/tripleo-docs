@@ -130,4 +130,45 @@ their email address in `this config file
 Instructions can be found `here
 <https://github.com/openstack/tripleo-quickstart-extras/blob/master/roles/validate-tempest/files/tempestmail/README.md>`_.
 
+featureset override
+-------------------
+
+The set of tempest tests that run for a given TripleO CI job is defined in the
+`featureset config files
+<https://github.com/openstack/tripleo-quickstart/tree/master/config/general_config>`_.
+You may want to run a popular TripleO CI job with a custom set of Tempest
+tests and override the default Tempest run. This can be accomplished through
+`featureset_override` group of vars in Zuul job config. This setting allows
+projects to override featureset post deployment configuration. The overridable
+settings are:
+
+ - `run_tempest`: To run tempest or not (true|false).
+ - `tempest_whitelist`: List of tests you want to be executed.
+ - `test_black_regex`: Set of tempest tests to skip.
+
+For a given job `tripleo-ci-centos-7-scenario001-multinode-oooq-container`, you
+can create a new abstract layer job and overrides the tempest tests::
+
+    - job:
+        name: scn001-multinode-oooq-container-custom-tempest
+        parent: tripleo-ci-centos-7-scenario001-multinode-oooq-container
+        abstract: true
+        ...
+        vars:
+          featureset_override:
+            run_tempest: true
+            tempest_whitelist:
+              - 'tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern'
+
+In a similar way, for skipping Tempest run for the scenario001 job, you can do
+something like::
+
+    - job:
+        name: scn001-multinode-oooq-container-skip-tempest
+        parent: tripleo-ci-centos-7-scenario001-multinode-oooq-container
+        abstract: true
+        ...
+        vars:
+          featureset_override:
+            run_tempest: false
 

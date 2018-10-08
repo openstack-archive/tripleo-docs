@@ -17,7 +17,7 @@ The following subsections describe the individual update commands:
 
 * `openstack overcloud update prepare`_
 * `openstack overcloud update run`_
-* `openstack overcloud ceph-upgrade run`_
+* `openstack overcloud external-update run`_
 * `openstack overcloud update converge`_
 
 `openstack overcloud update prepare`
@@ -67,25 +67,34 @@ services which need to perform something *after* deployment workflow
 during the minor update. The update of the node is complete and the
 Ansible play continues to update another node.
 
-`openstack overcloud ceph-upgrade run`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`openstack overcloud external-update run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `ceph-upgrade run` command performs a Heat stack update. It
-reverts the previous ``OS::Heat::None`` resource mappings back to the
-values used for regular deployments and configuration updates, and it
-sets ``CephAnsiblePlaybook`` parameter to perform a rolling update of
-Ceph.
+The `external-update run` command is used to update the services whose
+deployment (and update) procedure is not tied to execution on
+particular overcloud nodes. The deployment/update procedures are thus
+executed from the undercloud, even though a full overcloud inventory
+is available for use.
 
-See the `ceph upgrade environment file`_.
+The `external update playbook` first executes `external_update_tasks`
+and then `external_deploy_tasks`. The execution happens within the
+same Ansible play, so facts from `external_update_tasks` are carried
+over to `external_deploy_tasks`. This is a mechanism which will allow
+you to amend what your deploy tasks do based on whether an update is
+being run or not.
 
-.. _`ceph upgrade environment file`: https://github.com/openstack/tripleo-heat-templates/blob/4286727ae70b1fa4ca6656c3f035afeac6eb2a95/environments/lifecycle/ceph-upgrade-prepare.yaml
+Often it's not desirable to run the tasks for all services at the same
+time, so `external-update run` supports ``--tags`` argument to limit
+which tasks are run.
 
-Currently there's no difference between update and upgrade workflow of
-Ceph in TripleO, so the `ceph-upgrade run` command serves both
-purposes.
+The mechanisms of `external-upgrade` and `external-update` commands
+and Ansible tasks are the same, but two commands and task hooks are
+provided because generally in OpenStack we distinguish minor update
+vs. major upgrade workflows. If your service only has one type of
+upgrade, you can make the `external_update_tasks` the same as
+`external_upgrade_tasks` by using YAML anchors and references.
 
-It is likely that with the switch to config-download, we won't be
-doing a stack update when updating Ceph.
+.. _external update playbook: https://github.com/openstack/tripleo-heat-templates/blob/8fd90c2d45e2680b018eae8387d86d420f738f5a/common/deploy-steps.j2#L644-L699
 
 `openstack overcloud update converge`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

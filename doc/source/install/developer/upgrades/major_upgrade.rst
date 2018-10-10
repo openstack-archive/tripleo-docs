@@ -13,7 +13,6 @@ and 'converge' command at the end of the upgrade). The
 Queens_upgrade_spec_ may be of interest in describing the design of
 the workflow.
 
-
 CLI code is in python-tripleoclient_, mistral workflows and actions in
 tripleo-common_, and upgrade tasks in tripleo-heat-templates_. The
 following sections dive into the details top-down per individual CLI
@@ -23,6 +22,14 @@ commands which are used to deliver the major upgrade:
 * `openstack overcloud upgrade run $ARGS`_
 * `openstack overcloud external-upgrade run $ARGS`_
 * `openstack overcloud upgrade converge $ARGS`_
+
+You might also find it helpful to consult this high-level diagram as
+you read the following sections:
+
+.. image:: major_upgrade.png
+   :scale: 20 %
+   :alt: Major upgrade workflow diagram
+   :target: ../../../_images/major_upgrade.png
 
 .. _queens_upgrade_spec: https://github.com/openstack/tripleo-specs/blob/master/specs/queens/tripleo_ansible_upgrades_workflow.rst
 .. _operator_docs: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/upgrade.html

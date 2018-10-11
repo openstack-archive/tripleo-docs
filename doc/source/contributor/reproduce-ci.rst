@@ -17,6 +17,17 @@ is ready, the script prompts the user with some additional instructions that
 executes the same scripts and tools used upstream to bootstrap and execute the
 CI.
 
+Install system dependencies
+---------------------------
+Before execute the reproduce-quickstart it's necessary to install few
+dependencies on the system::
+
+* pip
+* virtualenv
+* ansible
+* python-openstackclient
+* python-heatclient
+
 How to execute the reproducer-quickstart script
 -----------------------------------------------
 

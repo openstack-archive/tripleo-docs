@@ -408,7 +408,7 @@ Example ``roles_data``::
       - OS::TripleO::Services::NovaPlacement
       - OS::TripleO::Services::NovaScheduler
       - OS::TripleO::Services::NovaVncProxy
-      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Timesync
       - OS::TripleO::Services::ContainersLogrotateCrond
       - OS::TripleO::Services::OctaviaApi
       - OS::TripleO::Services::OctaviaHealthManager
@@ -481,7 +481,7 @@ Example ``roles_data``::
       - OS::TripleO::Services::NovaCompute
       - OS::TripleO::Services::NovaLibvirt
       - OS::TripleO::Services::NovaMigrationTarget
-      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Timesync
       - OS::TripleO::Services::ContainersLogrotateCrond
       - OS::TripleO::Services::OpenDaylightOvs
       - OS::TripleO::Services::Rhsm
@@ -536,7 +536,7 @@ Example ``roles_data``::
       - OS::TripleO::Services::NovaCompute
       - OS::TripleO::Services::NovaLibvirt
       - OS::TripleO::Services::NovaMigrationTarget
-      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Timesync
       - OS::TripleO::Services::ContainersLogrotateCrond
       - OS::TripleO::Services::OpenDaylightOvs
       - OS::TripleO::Services::Rhsm

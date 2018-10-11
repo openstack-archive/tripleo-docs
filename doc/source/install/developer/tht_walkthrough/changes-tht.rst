@@ -81,7 +81,7 @@ The updated .pp files for the NTP example were:
 Step 2 - overcloud-resource-registry-puppet.j2.yaml resource registry changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The resource ``OS::TripleO::Services::Ntp`` must be defined in the resource
+The resource ``OS::TripleO::Services::Timesync`` must be defined in the resource
 registry (``overcloud-resource-registry-puppet.j2.yaml``)
 
 Create a new resource type alias which references the per-service
@@ -89,7 +89,7 @@ heat template file, as described above.
 
 By updating the resource registry we are forcing to use a nested template to
 configure our resources. In the example case the created resource
-(OS::TripleO::Services::Ntp), will point to the corresponding service yaml file
+(OS::TripleO::Services::Timesync), will point to the corresponding service yaml file
 (puppet/services/time/ntp.yaml).
 
 
@@ -114,7 +114,7 @@ From ``roles_data.yaml`` find::
         - OS::TripleO::Services::GlanceApi
         - OS::TripleO::Services::GlanceRegistry
         ...
-        - OS::TripleO::Services::Ntp              ---> New service deployed in the controller overcloud
+        - OS::TripleO::Services::Timesync              ---> New service deployed in the controller overcloud
 
 
 Update this section with your new service to be deployed to the controllers in

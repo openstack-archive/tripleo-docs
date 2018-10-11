@@ -20,6 +20,14 @@ The following subsections describe the individual update commands:
 * `openstack overcloud external-update run`_
 * `openstack overcloud update converge`_
 
+You might also find it helpful to consult this high-level diagram as
+you read:
+
+.. image:: minor_update.png
+   :scale: 20 %
+   :alt: Minor update workflow diagram
+   :target: ../../../_images/minor_update.png
+
 `openstack overcloud update prepare`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,4 +1,4 @@
-Major Upgrade/Minor update developer documentation
+Major Upgrade/Minor Update Developer Documentation
 ==================================================
 
 This section is intended to give a better understanding of the upgrade/update

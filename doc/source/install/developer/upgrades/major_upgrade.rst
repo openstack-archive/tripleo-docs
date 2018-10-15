@@ -1,74 +1,55 @@
-Pike to Queens major upgrade workflow and cli
----------------------------------------------
+Overcloud Major Upgrade Workflow and CLI
+----------------------------------------
 
-The purpose of this documentation is to deep-dive into the code which delivers
-the Pike to Queens major upgrade workflow in TripleO. For information about
-the steps an operator needs to perform when running this upgrade please see the
-operator_docs_.
+The purpose of this documentation is to deep-dive into the code which
+delivers the major upgrade workflow in TripleO. For information about
+the steps an operator needs to perform when running this upgrade
+please see the operator_docs_.
 
-The Pike to Queens (P..Q) major upgrade workflow is significantly different
-to its predecesor (Ocata to Pike) or any previously used upgrade workflow.
-There are similarities to the Pike_minor_update_ in the general approach of
-using an initial Heat stack update to generate but not apply configuration,
-followed by *ansible-playbook $ARGS* to actually deliver it via ansible in
-a targetted way with respect to the overcloud nodes. The Queens_upgrade_spec_
-may also be of interest in describing the design of the P..Q workflow.
+The major upgrade workflow is delivered almost exclusively via Ansible
+playbook invocations on the overcloud nodes. Heat is used to generate
+the Ansible playbooks (during the 'prepare' command at the beginning,
+and 'converge' command at the end of the upgrade). The
+Queens_upgrade_spec_ may be of interest in describing the design of
+the workflow.
 
-The P..Q major upgrade workflow is delivered almost exclusively via ansible
-playbook invocations on the overcloud nodes. Heat is still used however and
-a Heat stack update is performed against the overcloud stack in the first
-and last step of the workflow (the 'prepare_' and 'converge_' respectively).
 
-The 'prepare' Heat stack update does not apply any TripleO configuration and is
-exclusively used to generate the ansible playbooks that are subsequently
-invoked to deliver the upgrade. The 'converge' stack update *does* apply all
-TripleO configuration against all overcloud nodes and thus serves as a sanity
-check that the overcloud was successfully upgraded, since the same
-configuration will already have been applied.
-
-The 'converge' will also leave the Heat stack in a good state for subsequent
-updates, for instance scaling to add nodes. The 'converge' stack update
-unsets all upgrade specific tripleo-heat-template Heat stack parameters that
-were set during the upgrade 'prepare'. These parameters are set by the TripleO
-client (more below) using the prepare_env_file_ and similarly unset using the
-converge_env_file_.
-
-The Queens upgrade workflow brings a new cli via python-tripleoclient_, that
-allows the operator to invoke the upgrade prepare, run and converge steps,
-using mistral workflows in tripleo-common_ to invoke either a Heat stack update
-involving the tripleo-heat-templates_ , or ansible-playbook_ (via tripleo-common)
-depending on the operation. The following sections will examine each of the
-upgrade steps, stepping through and pointing to some of the implementation
-details across the various code repos involved:
+CLI code is in python-tripleoclient_, mistral workflows and actions in
+tripleo-common_, and upgrade tasks in tripleo-heat-templates_. The
+following sections dive into the details top-down per individual CLI
+commands which are used to deliver the major upgrade:
 
 * `openstack overcloud upgrade prepare $ARGS`_
 * `openstack overcloud upgrade run $ARGS`_
 * `openstack overcloud upgrade converge $ARGS`_
 
-
 .. _queens_upgrade_spec: https://github.com/openstack/tripleo-specs/blob/master/specs/queens/tripleo_ansible_upgrades_workflow.rst
 .. _operator_docs: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/upgrade.html
-.. _Pike_minor_update: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/package_update.html
-.. _prepare: https://review.openstack.org/#/c/535859/26/doc/source/install/post_deployment/upgrade.rst #TODO UPDATE ME
-.. _converge: https://review.openstack.org/#/c/535859/26/doc/source/install/post_deployment/upgrade.rst # TODO UPDATE ME
-.. _prepare_env_file: https://github.com/openstack/tripleo-heat-templates/blob/3ab23982a2fd3ffcad09e76f226bd4aab4040d4e/environments/lifecycle/upgrade-prepare.yaml#L4-L12
-.. _converge_env_file: https://github.com/openstack/tripleo-heat-templates/blob/3ab23982a2fd3ffcad09e76f226bd4aab4040d4e/environments/lifecycle/upgrade-converge.yaml#L4-L7
 .. _python-tripleoclient: https://github.com/openstack/python-tripleoclient/blob/master/tripleoclient/v1/overcloud_upgrade.py
 .. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/workbooks/package_update.yaml
 .. _tripleo-heat-templates: https://github.com/openstack/tripleo-heat-templates/blob/8277d675bc9496eb164f429fa265f79252166f2d/common/deploy-steps.j2#L604
-.. _ansible-playbook: https://github.com/openstack/tripleo-common/blob/0b682f07502f99e003abafce097ce62fa2d20512/tripleo_common/actions/ansible.py#L243
 
 openstack overcloud upgrade prepare $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The entry point for the the Q upgrade cli commands, *prepare*, *run* and
-*execute*, is given in the python-tripleoclient setup.cfg_. All three are also
-defined in the same file, overcloud-upgrade.py_.
+The entry point for the the upgrade CLI commands, *prepare*, *run* and
+*execute*, is given in the python-tripleoclient setup.cfg_. All three
+are also defined in the same file, overcloud-upgrade.py_.
+
+The 'prepare' Heat stack update does not apply any TripleO
+configuration and is exclusively used to generate the Ansible
+playbooks that are subsequently invoked to deliver the upgrade.
 
 As you can see the UpgradePrepare_ class inherits from DeployOvercloud_. The
 reason for this is to prevent duplication of the logic concerned with validating
 the configuration passed into the prepare command (all the -e env.yaml files),
 as well as updating_the_swift_stored_plan_ with the overcloud configuration.
+
+The prepare_env_file_ is automatically prepended to the list of
+environment files passed to Heat (as specified by
+prepare_command_prepends_). It contains resource_registry and
+parameter_defaults which are intended to be in effect during the
+upgrade.
 
 As a result the UpgradePrepare class inherits all the Deploy_parser_arguments_,
 including ``--stack`` and ``-e`` for the additional environment files. We explicitly
@@ -85,14 +66,12 @@ the heat stack update using the update_stack_action_.
 Back on the tripleoclient side, we use base_wait_for_messages_  to listen
 for messages on the Zaqar_queue_ that is used by the mistral workflow.
 
-It is worth noting here that before invoking the Heat stack update,
-prepare_command_prepends_ the prepare_env_file_ to the list of environment
-files passed to Heat. Also worth highlighting is that the operator must
-include all environment files used in deploying the overcloud that is being
-upgraded. It is especially important that the operator includes the environment
-file containing the references for the target version container images. See
-the operator_docs_ for pointers to how that file is generated and for
-reference it will look something like
+The operator must include all environment files used in deploying the
+overcloud that is being upgraded. It is especially important that the
+operator includes the environment file containing the references for
+the target version container images. See the operator_docs_ for
+pointers to how that file is generated and for reference it will look
+something like
 
     .. code-block:: bash
 
@@ -130,6 +109,7 @@ before executing them.
 .. _base_wait_for_messages: https://github.com/openstack/python-tripleoclient/blob/3d9183fc03aa96bce093e774ab4bf51655579a9c/tripleoclient/workflows/package_update.py#L38
 .. _zaqar_queue: https://github.com/openstack/tripleo-common/blob/1d3aefbe2f0aac2828eba69ee9efc57a7b7bf385/workbooks/package_update.yaml#L17
 .. _prepare_command_prepends: https://github.com/openstack/python-tripleoclient/blob/3d9183fc03aa96bce093e774ab4bf51655579a9c/tripleoclient/v1/overcloud_upgrade.py#L76-L79
+.. _prepare_env_file: https://github.com/openstack/tripleo-heat-templates/blob/3ab23982a2fd3ffcad09e76f226bd4aab4040d4e/environments/lifecycle/upgrade-prepare.yaml#L4-L12
 
 openstack overcloud upgrade run $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,33 +123,30 @@ above. The upgrade run operation thus will simply execute those ansible playbook
 generated by the upgrade prepare command, against the nodes specified in the
 parameters.
 
-The ``--nodes`` and ``--roles`` parameters are used to limit the ansible playbook
-execution to specific nodes. These are defined in a mutually
-exclusive nodes_or_roles_ group and it is declared as required so that the
-operator must pass either one of those and never both. Both ``--roles`` and
-``--nodes`` are used by ansible with the tripleo-ansible-inventory_. This creates
-the ansible inventory based on the Heat stack outputs, so that for example
-`Controller` and `overcloud-controller-0` are both valid values for the
-ansible-playbook |--limit|_ parameter.
+Either ``--nodes`` or ``--roles`` parameters are used to limit the ansible
+playbook execution to specific nodes. Both ``--roles`` and ``--nodes`` are
+used by ansible with the tripleo-ansible-inventory_. This creates the
+ansible inventory based on the Heat stack outputs, so that for example
+``Controller`` and ``overcloud-controller-0`` are both valid values for
+the ansible-playbook |--limit| parameter.
 
-As documented in the run_user_docs_ and the nodes_or_roles_helptext_, the operator
-*must* use ``--roles`` for the controllers. Upgrading the controlplane, one node
-at a time is not supported, mainly due to limitations in the pacemaker cluster
-upgrade which needs to occur across all nodes in the same operation. The
-operator may use ``--roles`` for non controlplane nodes or may prefer to specify
-one or more specific nodes by name with ``--nodes``. In either case the value
+As documented in the run_user_docs_ and the nodes_or_roles_helptext_,
+the operator *must* use ``--roles`` for the controllers. Upgrading the
+controlplane, one node at a time is currently not supported, mainly
+due to limitations in the pacemaker cluster upgrade which needs to
+occur across all nodes in the same operation. The operator may use
+``--roles`` for non controlplane nodes or may prefer to specify one or
+more specific nodes by name with ``--nodes``. In either case the value
 specified by the operator is simply passed through to ansible as the
 limit_hosts_ parameter.
 
 The ``--ssh-user`` and all other parameters are similarly
 collected and passed to the ansible invocation which starts on the client side
-in the run_update_ansible_action_ method call. Before diving into more detail
-about the ansible playbook run it is also worth highlighting the |--skip-tags|_
-parameter that is used to skip certain ansible tasks with the ansible-skip-tags_
-ansible-playbook parameter. For the Queens upgrade workflow we only support
-skipping the step0 validation tasks that check services are running and this is
-enforced by checking the value passed by the operator against the
-MAJOR_UPGRADE_SKIP_TAGS_. Finally, the |--playbook|_ parameter as the name
+in the run_update_ansible_action_ method call. The |--skip-tags|
+parameter can be used to skip certain ansible tasks with the ansible-skip-tags_
+ansible-playbook parameter. The allowed ``--skip-tags`` values are restricted
+to a predefined set, validated against
+MAJOR_UPGRADE_SKIP_TAGS_. Finally, the |--playbook| parameter as the name
 suggests is used to specify the ansible playbook(s) to run. By default and
 as you can see in the definition, this defaults to a special value 'all'
 which causes all-upgrade-playbooks-to-run_. The value of all_playbooks
@@ -193,7 +170,6 @@ before declaring the upgrade-run-success_!
 
 
 .. _UpgradeRun: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L94
-.. _nodes_or_roles: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L110
 .. _tripleo-ansible-inventory: https://github.com/openstack/tripleo-common/blob/cef9c406514fd0b01b7984b89334d8e8abd7a244/tripleo_common/inventory.py#L1
 .. |--limit| replace:: ``--limit``
 .. _--limit: https://docs.ansible.com/ansible/2.4/ansible-playbook.html#cmdoption-ansible-playbook-l
@@ -227,12 +203,16 @@ processing. The operator needs to pass in all Heat environment files
 used as part of the upgrade prepare including the container images file.
 
 The main objective of the upgrade converge operation is to unset the
-upgrade specific parameters that have been set on the overcloud Heat stack
-as part of prepare. These can be found in the prepare_env_file_
-environment file that is used by the upgrade prepare operation. These are
-thus unset by the converge operation using the converge_env_file_ which is
-included in the list of client_converge_env_files_ passed to the Heat stack
-update.
+upgrade specific parameters that have been set on the overcloud Heat
+stack as part of prepare. These are unset using the converge_env_file_
+which is included in the list of client_converge_env_files_ passed to
+the Heat stack update.
+
+The 'converge' applies all TripleO configuration against all overcloud
+nodes and thus serves as a sanity check that the overcloud was
+successfully upgraded, since the same configuration will already have
+been applied. The 'converge' will also leave the Heat stack in a good
+state for subsequent updates, for instance scaling to add nodes.
 
 As these values are set in parameter_defaults a Heat stack update is required
 against the overcloud Heat stack to explicitly unset them. In particular and
@@ -252,13 +232,14 @@ converge_heat_stack_update_ and so the implementation is also simpler.
 .. _client_converge_env_files: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L253
 .. _operator_converge_docs: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/upgrade.html#openstack-overcloud-upgrade-converge
 .. _converge_heat_stack_update: https://github.com/openstack/python-tripleoclient/blob/3931606423a17c40a4458eb4df3c47cc6a829dbb/tripleoclient/v1/overcloud_deploy.py#L223
+.. _converge_env_file: https://github.com/openstack/tripleo-heat-templates/blob/3ab23982a2fd3ffcad09e76f226bd4aab4040d4e/environments/lifecycle/upgrade-converge.yaml#L4-L7
 
-Queens upgrade cli developer workflow
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Upgrade CLI developer workflow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section will give some examples of a potential developer workflow for
 testing fixes or in-progress gerrit reviews against python-tripleoclient,
-tripleo-common or tripleo-heat-templates for the Queens upgrade workflow. This
+tripleo-common or tripleo-heat-templates for the upgrade workflow. This
 may be useful if you are working on an upgrades related bug for example.
 
 Making changes to the ansible playbooks
@@ -329,6 +310,11 @@ Patching python-tripleoclient:
        popd
 
 Patching tripleo-common:
+
+    .. note::
+
+       After switching to containerized undercloud, local tripleo-common
+       changes to be applied in all Mistral containers.
 
     .. code-block:: bash
 

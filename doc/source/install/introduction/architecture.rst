@@ -138,7 +138,7 @@ Deployment Workflow Overview
      metadata from Heat Template configuration files
    * Hiera files are distributed across all nodes and Heat applies puppet
      manifests to configure the services on the nodes
-   * Puppet runs in multiple steps, so that after each step there can be test
+   * Puppet runs in multiple steps, so that after each step there can be tests
      triggered to check progress of the deployment and allow easier debugging.
 
 

@@ -28,10 +28,22 @@ the OpenStack release that you currently operate, perform these steps:
    RPMs. If you use stable RDO repositories, you don't need to change
    anything.
 
-   Fetch latest container images to your undercloud registry and
-   generate a Heat environment file pointing to new container
-   images. This is done via workflow described in
-   :doc:`containerized deployment documentation<../containers_deployment/overcloud>`.
+   Update container image parameter files:
+
+   .. admonition:: Queens
+      :class: queens
+
+      Fetch latest container images to your undercloud registry and
+      generate a Heat environment file pointing to new container
+      images. This is done via workflow described in
+      :doc:`containerized deployment documentation<../containers_deployment/overcloud>`.
+
+   .. admonition:: Rocky
+      :class: rocky
+
+      Prepare an environment file with new ``ContainerImagePrepare``
+      parameter. This is done via a command described in
+      :doc:`container image preparation documentation<../advanced_deployment/container_image_prepare>`.
 
 #. **Update preparation**
 
@@ -41,12 +53,18 @@ the OpenStack release that you currently operate, perform these steps:
 
       openstack overcloud update prepare \
           <OPTIONS> \
-          -e container-params.yaml
+          -e containers-prepare-parameter.yaml
 
    In place of the `<OPTIONS>` token should go all parameters that you
-   used with previous `openstack overcloud deploy` command. The last
-   argument `container-params.yaml` is a Heat environment file
-   pointing to new container images, obtained in previous step.
+   used with previous `openstack overcloud deploy` command.
+
+   The last argument `containers-prepare-parameter.yaml` differs in
+   content depending on release. In Queens and before, it has a list
+   of individual container image parameters, pointing to images you've
+   already uploaded to local registry in previous step. In Rocky and
+   beyond, this file contains the ``ContainerImagePrepare`` parameter.
+   The upload of images to local registry is yet to happen, in a
+   separate step after `update prepare`.
 
    .. note::
 
@@ -58,15 +76,25 @@ the OpenStack release that you currently operate, perform these steps:
 
    .. note::
 
-      The `container-params.yaml` file is intended to replace any
-      previous container parameters file. You should drop the previous
-      container parameters file and pass the new one for any
-      subsequent stack update operations.
+      The `containers-prepare-parameter.yaml` file is intended to
+      replace any previous container parameters file. You should drop
+      the previous container parameter file and pass the new one for
+      any subsequent stack update operations.
 
-   The `update prepare` command temporarily disables config management
-   operations that would be normally performed on a Heat stack update,
-   and it updates the stack outputs with Ansible snippets used in the
-   next step of the update.
+   The `update prepare` command updates the Heat stack outputs with
+   Ansible snippets used in the next steps of the update.
+
+#. **Container image upload**
+
+   .. admonition:: Rocky
+      :class: rocky
+
+      In Rocky and beyond, we'll need to upload the container images
+      to the local registry at this point. Run:
+
+      .. code-block:: bash
+
+         openstack overcloud external-update run --tags container_image_prepare
 
 #. **Update run**
 
@@ -95,7 +123,7 @@ the OpenStack release that you currently operate, perform these steps:
    releases:
 
    .. admonition:: Queens
-      :class: ptoq
+      :class: queens
 
       Run:
 
@@ -120,7 +148,7 @@ the OpenStack release that you currently operate, perform these steps:
       the rolling update playbook of the Ceph installer (`ceph-ansible`).
 
    .. admonition:: Rocky
-      :class: qtor
+      :class: rocky
 
       Run:
 
@@ -151,10 +179,10 @@ the OpenStack release that you currently operate, perform these steps:
       data, and network data). This is crucial in order to keep
       correct state of the stack.
 
-   The `update converge` command re-enables config management
-   operations previously disabled by `update prepare`, and it runs the
-   config management operations to assert that the overcloud state
-   matches the used overcloud templates.
+   The `update converge` command updates Heat stack outputs with
+   Ansible snippets the same way as `overcloud deploy` would, and it
+   runs the config management operations to assert that the overcloud
+   state matches the used overcloud templates.
 
 Updating your Overcloud - Pike
 ------------------------------

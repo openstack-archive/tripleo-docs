@@ -35,6 +35,10 @@ Go to the "logs" directory of the job::
 
     wget http://logs.openstack.org/07/472607/<snip>/f98d674/logs/reproducer-quickstart.sh
 
+Be sure you have download the OpenStack RC file. To have more information you
+can check the documentation `here <https://docs.openstack.org/newton/user-guide
+/common/cli-set-environment-variables-using-openstack-rc.html>`_.
+
 Source your OpenStack RC file::
 
     source openstack_rc.sh

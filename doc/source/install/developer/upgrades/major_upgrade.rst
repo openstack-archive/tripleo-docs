@@ -21,6 +21,7 @@ commands which are used to deliver the major upgrade:
 
 * `openstack overcloud upgrade prepare $ARGS`_
 * `openstack overcloud upgrade run $ARGS`_
+* `openstack overcloud external-upgrade run $ARGS`_
 * `openstack overcloud upgrade converge $ARGS`_
 
 .. _queens_upgrade_spec: https://github.com/openstack/tripleo-specs/blob/master/specs/queens/tripleo_ansible_upgrades_workflow.rst
@@ -193,6 +194,35 @@ before declaring the upgrade-run-success_!
 .. _run_zaqar_queue: https://github.com/openstack/python-tripleoclient/blob/3931606423a17c40a4458eb4df3c47cc6a829dbb/tripleoclient/workflows/package_update.py#L89
 .. _upgrade-run-success: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L219-L222
 
+openstack overcloud external-upgrade run $ARGS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The `external-upgrade run` command is used to upgrade the services
+whose deployment (and upgrade) procedure is not tied to execution on
+particular overcloud nodes. The deployment/upgrade procedures are thus
+executed from the undercloud, even though a full overcloud inventory
+is available for use.
+
+The `external upgrade playbook` first executes
+`external_upgrade_tasks` and then `external_deploy_tasks`. The
+execution happens within the same Ansible play, so facts from
+`external_upgrade_tasks` are carried over to
+`external_deploy_tasks`. This is a mechanism which will allow you to
+amend what your deploy tasks do based on whether an upgrade is being
+run or not.
+
+Often it's not desirable to run the tasks for all services at the same
+time, so `external-upgrade run` supports ``--tags`` argument to limit
+which tasks are run.
+
+The mechanisms of `external-upgrade` and `external-update` commands
+and Ansible tasks are the same, but two commands and task hooks are
+provided because generally in OpenStack we distinguish minor update
+vs. major upgrade workflows. If your service only has one type of
+upgrade, you can make the `external_update_tasks` the same as
+`external_upgrade_tasks` by using YAML anchors and references.
+
+.. _external upgrade playbook: https://github.com/openstack/tripleo-heat-templates/blob/8fd90c2d45e2680b018eae8387d86d420f738f5a/common/deploy-steps.j2#L767-L822
 
 openstack overcloud upgrade converge $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

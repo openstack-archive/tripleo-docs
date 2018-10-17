@@ -41,7 +41,7 @@ openstack overcloud upgrade prepare $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The entry point for the the upgrade CLI commands, *prepare*, *run* and
-*execute*, is given in the python-tripleoclient setup.cfg_. All three
+*converge*, is given in the python-tripleoclient setup.cfg_. All three
 are also defined in the same file, overcloud-upgrade.py_.
 
 The 'prepare' Heat stack update does not apply any TripleO
@@ -74,8 +74,8 @@ the heat stack update using the update_stack_action_.
 Back on the tripleoclient side, we use base_wait_for_messages_  to listen
 for messages on the Zaqar_queue_ that is used by the mistral workflow.
 
-The operator must include all environment files used in deploying the
-overcloud that is being upgraded. It is especially important that the
+The operator must include all environment files previously used with
+the `overcloud deploy` command. It is especially important that the
 operator includes the environment file containing the references for
 the target version container images. See the operator_docs_ for
 pointers to how that file is generated and for reference it will look

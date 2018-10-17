@@ -22,64 +22,79 @@ as below:
 .. Undercloud upgrade section
 .. include:: ../../install/installation/updating.rst
 
-Upgrading the Overcloud from Pike to Queens
+Upgrading the Overcloud to Queens and later
 -------------------------------------------
 
-The Queens upgrade workflow for TripleO is significantly different to previous
-cycles. At a high level, the workflow no longer relies on Heat to deliver the
-upgrade configuration, but instead uses ansible playbooks. Those
-playbooks *are* still generated using a Heat stack update of the overcloud
-stack, as the first step in the workflow. However there is no configuration
-applied during that stack update and so comparatively it takes *much* less
-time to complete than a 'normal' stack update. More information and pointers
-can be found in the relevant queens-upgrade-spec_ and the
-queens-upgrade-dev-docs_.
-
-The tripleo cli has been updated accordingly to accommodate this new
-workflow. In Queens a new `openstack overcloud upgrade` command is introduced
-and it expects one of three subcommands: **prepare**, **run** and
-**converge**. Each subcommand has its own set of options which you can explore
-with ``--help``:
+The overcloud upgrade workflow is mainly delivered through the
+`openstack overcloud upgrade` command, in particular one of its
+subcommands: **prepare**, **run** and **converge**. Each subcommand
+has its own set of options which you can explore with ``--help``:
 
    .. code-block:: bash
 
           source /home/stack/stackrc
           openstack overcloud upgrade run --help
 
-The Queens upgrade workflow essentially consists of the following steps:
+The upgrade workflow essentially consists of the following steps:
 
-#. `Prepare your environment - get latest container images`_, backup.
+#. `Prepare your environment files`_.
+   Generate any environment files you need for the upgrade such as the
+   references to the latest container images or commands used to
+   switch repos.
+
+#. `openstack overcloud upgrade prepare`_.
+   Run a heat stack update to generate the upgrade playbooks.
+
+#. `openstack overcloud external-upgrade run (for container images)`_.
    Generate any environment files you need for the upgrade such as the
    references to the latest container images or commands used to switch repos.
 
-#. `openstack overcloud upgrade prepare`_ $OPTS.
-   Run a heat stack update to generate the upgrade playbooks.
-
-#. `openstack overcloud upgrade run`_ $OPTS.
+#. `openstack overcloud upgrade run`_.
    Run the upgrade on specific nodes or groups of nodes. Repeat until all nodes
    are successfully upgraded.
 
-#. `openstack overcloud ceph-upgrade run`_ $OPTS. (optional)
-   Not necessary unless a TripleO managed Ceph cluster is deployed in the overcloud;
-   this step performs the upgrade of the Ceph cluster.
+#. `openstack overcloud external-upgrade run (for services)`_. (optional)
+   This step is only necessary if your deployment contains services
+   which are managed using external installers, e.g. Ceph.
 
-#. `openstack overcloud upgrade converge`_ $OPTS.
+#. `openstack overcloud upgrade converge`_.
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
 
+Detailed infromation and pointers can be found in the relevant the
+queens-upgrade-dev-docs_.
+
 .. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.openstack.org/#/c/569443/
 
-Prepare your environment - get latest container images
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Prepare your environment files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As a part of the upgrade the container images for the target release should be
-downloaded to the Undercloud. Please see the `openstack overcloud container image prepare`
-:doc:`../containers_deployment/overcloud` for more information.
+First we prepare an environment file for new container images:
 
-The output of this step will be a Heat environment file that contains
-references to the latest container images. You will need to pass the path to
-this file into the **upgrade prepare** command using the -e option as you would
-any other environment file.
+.. admonition:: Pike to Queens
+   :class: ptoq
+
+   As part of the upgrade to Queens, the container images for the
+   target release should be downloaded to the Undercloud. Please see
+   the `openstack overcloud container image prepare`.
+   :doc:`../containers_deployment/overcloud` for more information.
+
+   The output of this step will be a Heat environment file that contains
+   references to the latest container images. You will need to pass the path to
+   this file into the **upgrade prepare** command using the -e option as you would
+   any other environment file.
+
+.. admonition:: Queens to Rocky
+   :class: qtor
+
+   In Rocky we only generate a new environment file with
+   ``ContainerImagePrepare`` parameter at this point in the workflow. See
+   :doc:`container image preparation documentation<../advanced_deployment/container_image_prepare>`.
+   for details how to generate this environment file.
+
+   The file is then passed to the `upgrade prepare` command, and
+   images will be uploaded to the local registry in a separate
+   `external-upgrade run` step afterwards.
 
 You will also need to create an environment file to override the
 UpgradeInitCommand_ tripleo-heat-templates parameter, that can be used to
@@ -130,10 +145,10 @@ openstack overcloud upgrade prepare
       running the converge step. See the queens-upgrade-dev-docs_ for more.
 
 Run **overcloud upgrade prepare**. This command expects the full set
-of environment files that were passed into the deploy command, as well as the
-roles_data.yaml file used to deploy the overcloud you are about to upgrade. Be
-sure to include the container image references file that was output by the
-*container image prepare* command
+of environment files that were passed into the deploy command, as well
+as the roles_data.yaml and network_data.yaml, if you've customized
+those. Be sure to include environment files with the new container
+image parameter and Yum repository switch parameter.
 
    .. note::
 
@@ -144,17 +159,18 @@ sure to include the container image references file that was output by the
    .. code-block:: bash
 
       openstack overcloud upgrade prepare --templates \
-        -e /home/stack/containers-default-parameters.yaml \
+        -r /path/to/roles_data.yaml \
+        -n /path/to/network_data.yaml \
         -e <ALL Templates from overcloud-deploy.sh> \
-        -e init-repo.yaml
-        -r /path/to/roles_data.yaml
+        -e init-repo.yaml \
+        -e containers-prepare-parameter.yaml
 
 This will begin an update on the overcloud Heat stack but without
-applying any of the TripleO configuration, as explained above. Once this
-`upgrade prepare` operation has successfully completed the heat stack will be
-in the UPDATE_COMPLETE state. At that point you can use `config download` to
-download and inspect the configuration ansible playbooks that will be used
-to deliver the upgrade in the next step:
+applying any of the TripleO configuration. Once this `upgrade prepare`
+operation has successfully completed the heat stack will be in the
+UPDATE_COMPLETE state. At that point you can use `config download` to
+download and inspect the configuration ansible playbooks that will be
+used to deliver the upgrade in the next step:
 
    .. code-block:: bash
 
@@ -164,10 +180,23 @@ to deliver the upgrade in the next step:
 .. _neutron_DVR: https://specs.openstack.org/openstack/neutron-specs/specs/juno/neutron-ovs-dvr.html
 
 
+openstack overcloud external-upgrade run (for container images)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Rocky
+   :class: qtor
+
+   In Rocky and beyond, we'll need to upload the container images to
+   the local registry after we've run `upgrade prepare`. Run:
+
+   .. code-block:: bash
+
+      openstack overcloud external-update run --tags container_image_prepare
+
 openstack overcloud upgrade run
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This will run the ansible playbooks to deliver the upgrade configuration.
+The `upgrade run` command runs the Ansible playbooks to deliver the upgrade configuration.
 By default, 3 playbooks are executed: the upgrade_steps_playbook, then the
 deploy_steps_playbook and finally the post_upgrade_steps_playbook. These
 playbooks are invoked on those overcloud nodes specified by the ``--roles`` or
@@ -182,7 +211,7 @@ step. For non controlplane nodes, such as Compute or Storage, you can use
 
 **Optionally** specify ``--playbook`` to manually step through the upgrade
 playbooks: You need to run all three in this order and as specified below
-(no path) for a full upgrade to Queens.
+(no path) for a full upgrade.
 
    .. code-block:: bash
 
@@ -192,7 +221,7 @@ playbooks: You need to run all three in this order and as specified below
 
 After all three playbooks have been executed without error on all nodes of
 the controller role the controlplane will have been fully upgraded to Queens.
-At a minimum an operator should check the health of the pacemaker cluster
+At a minimum an operator should check the health of the pacemaker cluster.
 
    .. code-block:: bash
 
@@ -240,58 +269,84 @@ don't want to start them all.
 
       openstack overcloud upgrade run --roles Controller --skip-tags validation
 
-openstack overcloud ceph-upgrade run
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+openstack overcloud external-upgrade run (for services)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This step is only necessary if Ceph was deployed in the Overcloud and it
-triggers an upgrade of the Ceph cluster which will be performed without
-taking down the cluster.
+This step is only necessary a service using an external installer was
+deployed in the Overcloud. Most typically this is the case of
+overclouds with Ceph.
+
+.. admonition:: Pike to Queens
+   :class: ptoq
+
+   Among the services with external installers, only upgrade of Ceph
+   is supported in the Queens release cycle. It has a specific
+   `ceph-upgrade` command. Run it as follows:
 
    .. note::
 
       It is especially important to remember that you **must** include all
-      environment files that were used to deploy the overcloud that you are about
-      to upgrade.
+      environment files that were used to deploy the overcloud.
 
    .. code-block:: bash
 
       openstack overcloud ceph-upgrade run --templates \
-        --container-registry-file /home/stack/containers-default-parameters.yaml \
+        -r /path/to/roles_data.yaml \
+        -n /path/to/network_data.yaml \
         -e <ALL Templates from overcloud-deploy.sh> \
-        -r /path/to/roles_data.yaml
+        -e containers-prepare-parameter.yaml
 
-At the end of the process, Ceph will be upgraded from Jewel to Luminous so
-there will be new containers for the `ceph-mgr` service running on the
-controlplane node.
+.. admonition:: Queens to Rocky
+   :class: qtor
+
+   More services with external installers can be upgraded to
+   Rocky. The `external-upgrade run` command accepts a ``--tags``
+   parameter which allows to limit the scope of the upgrade to
+   particular services. It is recommended to always use this
+   parameter for accurately scoping the upgrade.
+
+   For example, to upgrade Ceph, run the following command:
+
+   .. code-block:: bash
+
+      openstack overcloud external-upgrade run --tags ceph
+
+   .. note::
+
+      The `external-upgrade run` command does not update the Heat
+      stack, and as such it does not accept any environment files as
+      parameters. It uses playbooks generated during `upgrade
+      prepare`.
 
 openstack overcloud upgrade converge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, run the converge heat stack update. This will re-apply all Queens
-configuration across all nodes and unset all variables that were used during
-the upgrade. Until you have successfully completed this step, heat stack
-updates against the overcloud stack are expected to fail. You can read more
-about why this is the case in the queens-upgrade-dev-docs_.
+Finally, run the upgrade converge step. This will re-apply all
+configuration across all nodes and unset all variables that were used
+during the upgrade. Successful completion of this step is required to
+assert that the overcloud state is in sync with the latest TripleO
+Heat templates, which is a prerequisite for any further overcloud
+management (e.g. scaling).
 
    .. note::
 
-      It is especially important to remember that you **must** include all
-      environment files that were used to deploy the overcloud that you are about
-      to upgrade converge, including the list of Queens container image references
-      and the roles_data.yaml roles and services definition. You should omit
-      any repo switch commands and ensure that none of the environment files
-      you are about to use is specifying a value for UpgradeInitCommand.
+      It is especially important to remember that you **must** include
+      all environment files that were used to deploy the overcloud,
+      including the new container image parameter file. You should
+      omit any repo switch commands and ensure that none of the
+      environment files you are about to use is specifying a value for
+      UpgradeInitCommand.
 
    .. code-block:: bash
 
       openstack overcloud upgrade converge --templates
-        -e /home/stack/containers-default-parameters.yaml \
+        -r /path/to/roles_data.yaml \
+        -n /path/to/network_data.yaml \
         -e <ALL Templates from overcloud-deploy.sh> \
-        -r /path/to/roles_data.yaml
+        -e containers-prepare-parameter.yaml
 
-The Heat stack will be in the **UPDATE_IN_PROGRESS** state for the duration of
-the openstack overcloud upgrade converge. Once converge has completed
-successfully the Heat stack should also be in the **UPDATE_COMPLETE** state.
+Successful completion of the `upgrade converge` command concludes the
+major version upgrade.
 
 Upgrading the Overcloud to Ocata or Pike
 ----------------------------------------
@@ -307,7 +362,7 @@ in containers.
 
 .. note::
 
-   Upgrades to Pike or Queens will only be tested with containers. Baremetal
+   Upgrades to Pike and further will only be tested with containers. Baremetal
    deployments, which don't use containers, will be deprecated in Queens and
    have full support removed in Rocky.
 

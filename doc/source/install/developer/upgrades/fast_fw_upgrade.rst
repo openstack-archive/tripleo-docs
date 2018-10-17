@@ -6,6 +6,14 @@ proposed please refer to the relevant spec_. For a guide on running the FFU in
 your environment see the `ffu-docs`_. This document will explore some
 of the technical details of the Newton to Queens FFU specifically.
 
+You might find it helpful to consult this high-level diagram as you
+read on:
+
+.. image:: fast_fw_upgrade.png
+   :scale: 20 %
+   :alt: Fast forward upgrade workflow diagram
+   :target: ../../../_images/fast_fw_upgrade.png
+
 At a high level the FFU workflow consists of the following steps:
 
 1. Perform a `Minor update`_ on the environment (both undercloud and overcloud)

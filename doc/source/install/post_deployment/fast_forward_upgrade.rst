@@ -39,7 +39,7 @@ Undercloud upgrade to Ocata
    sudo yum localinstall -y https://trunk.rdoproject.org/centos7/current/${TRIPLEO_REPOS_RPM}
 
    ## Deploy repos via tripleo-repos
-   sudo tripleo-repos -b current ocata ceph
+   sudo tripleo-repos -b ocata current ceph
 
    ## Pre-upgrade stop services and update specific packages
    sudo systemctl stop openstack-* neutron-* httpd
@@ -52,7 +52,7 @@ Undercloud upgrade to Pike
 .. code-block:: bash
 
    ## Deploy repos via tripleo-repos
-   sudo tripleo-repos -b current pike ceph
+   sudo tripleo-repos -b pike current ceph
 
    ## Update tripleoclient and install ceph-ansible
    sudo yum -y install ceph-ansible
@@ -65,7 +65,7 @@ Undercloud upgrade to Queens
 .. code-block:: bash
 
    ## Deploy repos via tripleo-repos
-   sudo tripleo-repos -b current queens ceph
+   sudo tripleo-repos -b queens current ceph
 
    ## Update tripleoclient
    sudo yum -y update python-tripleoclient

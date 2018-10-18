@@ -37,6 +37,11 @@
   margin-bottom: 24px;
 }
 
+.admonition .admonition {
+    /* Don't keep shrinking the font for nested admonitions. */
+    font-size: 100%;
+}
+
 .admonition p {
   font-size: inherit;
 }

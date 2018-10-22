@@ -30,10 +30,10 @@ The overcloud upgrade workflow is mainly delivered through the
 subcommands: **prepare**, **run** and **converge**. Each subcommand
 has its own set of options which you can explore with ``--help``:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-          source /home/stack/stackrc
-          openstack overcloud upgrade run --help
+       source /home/stack/stackrc
+       openstack overcloud upgrade run --help
 
 The upgrade workflow essentially consists of the following steps:
 
@@ -105,17 +105,17 @@ UpgradeInitCommand_ tripleo-heat-templates parameter, that can be used to
 switch the yum repos in use by the nodes during the upgrade. This will likely
 be the same commands that were used to switch repositories on the undercloud.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      cat <<EOF > init-repo.yaml
-        parameter_defaults:
-        UpgradeInitCommand: |
-          set -e
-          #  -- REPLACE LINES WITH YOUR REPO SWITCH COMMANDS --
-          curl -L -o /etc/yum.repos.d/delorean.repo https://trunk.rdoproject.org/centos7-queens/current/delorean.repo
-          curl -L -o /etc/yum.repos.d/delorean-deps.repo https://trunk.rdoproject.org/centos7-queens/delorean-deps.repo
-          yum clean all
-        EOF
+   cat <<EOF > init-repo.yaml
+     parameter_defaults:
+     UpgradeInitCommand: |
+       set -e
+       #  -- REPLACE LINES WITH YOUR REPO SWITCH COMMANDS --
+       curl -L -o /etc/yum.repos.d/delorean.repo https://trunk.rdoproject.org/centos7-queens/current/delorean.repo
+       curl -L -o /etc/yum.repos.d/delorean-deps.repo https://trunk.rdoproject.org/centos7-queens/delorean-deps.repo
+       yum clean all
+     EOF
 
 The resulting init-repo.yaml will then be passed into the upgrade prepare using
 the -e option.
@@ -125,28 +125,28 @@ the -e option.
 openstack overcloud upgrade prepare
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   .. note::
+.. note::
 
-      Before running the overcloud upgrade prepare ensure you have a valid backup
-      of the current state, including the **undercloud** since there will be a
-      Heat stack update performed here.
+   Before running the overcloud upgrade prepare ensure you have a valid backup
+   of the current state, including the **undercloud** since there will be a
+   Heat stack update performed here.
 
-   .. note::
+.. note::
 
-      If you have enabled neutron_DVR_ in your deployment you must ensure that
-      compute nodes are connected to the External network via the
-      roles_data.yaml that you will pass using the -r parameter to upgrade prepare.
-      This is necessary to allow floating IP connectivity via the external api network.
+   If you have enabled neutron_DVR_ in your deployment you must ensure that
+   compute nodes are connected to the External network via the
+   roles_data.yaml that you will pass using the -r parameter to upgrade prepare.
+   This is necessary to allow floating IP connectivity via the external api network.
 
-   .. note::
+.. note::
 
-      After running the upgrade prepare and until successful completion
-      of the upgrade converge operation, stack updates to the deployment Heat
-      stack are expected to fail. That is, operations such as scaling to add
-      a new node or to apply any new TripleO configuration via Heat stack
-      update **must not** be performed on a Heat stack that has been prepared
-      for upgrade with the 'prepare' command and only consider doing so after
-      running the converge step. See the queens-upgrade-dev-docs_ for more.
+   After running the upgrade prepare and until successful completion
+   of the upgrade converge operation, stack updates to the deployment Heat
+   stack are expected to fail. That is, operations such as scaling to add
+   a new node or to apply any new TripleO configuration via Heat stack
+   update **must not** be performed on a Heat stack that has been prepared
+   for upgrade with the 'prepare' command and only consider doing so after
+   running the converge step. See the queens-upgrade-dev-docs_ for more.
 
 Run **overcloud upgrade prepare**. This command expects the full set
 of environment files that were passed into the deploy command, as well
@@ -154,20 +154,20 @@ as the roles_data.yaml and network_data.yaml, if you've customized
 those. Be sure to include environment files with the new container
 image parameter and Yum repository switch parameter.
 
-   .. note::
+.. note::
 
-      It is especially important to remember that you **must** include all
-      environment files that were used to deploy the overcloud including the
-      container image references file for the target version container images
+   It is especially important to remember that you **must** include all
+   environment files that were used to deploy the overcloud including the
+   container image references file for the target version container images
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade prepare --templates \
-        -r /path/to/roles_data.yaml \
-        -n /path/to/network_data.yaml \
-        -e <ALL Templates from overcloud-deploy.sh> \
-        -e init-repo.yaml \
-        -e containers-prepare-parameter.yaml
+   openstack overcloud upgrade prepare --templates \
+     -r /path/to/roles_data.yaml \
+     -n /path/to/network_data.yaml \
+     -e <ALL Templates from overcloud-deploy.sh> \
+     -e init-repo.yaml \
+     -e containers-prepare-parameter.yaml
 
 This will begin an update on the overcloud Heat stack but without
 applying any of the TripleO configuration. Once this `upgrade prepare`
@@ -176,10 +176,10 @@ UPDATE_COMPLETE state. At that point you can use `config download` to
 download and inspect the configuration ansible playbooks that will be
 used to deliver the upgrade in the next step:
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud config download --config-dir SOMEDIR
-      # playbooks will be downloaded to SOMEDIR directory
+   openstack overcloud config download --config-dir SOMEDIR
+   # playbooks will be downloaded to SOMEDIR directory
 
 .. _neutron_DVR: https://specs.openstack.org/openstack/neutron-specs/specs/juno/neutron-ovs-dvr.html
 
@@ -209,35 +209,35 @@ playbooks are invoked on those overcloud nodes specified by the ``--roles`` or
 step. For non controlplane nodes, such as Compute or Storage, you can use
 ``--nodes`` to specify a single node or list of nodes to upgrade.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade run --roles Controller
+   openstack overcloud upgrade run --roles Controller
 
 **Optionally** specify ``--playbook`` to manually step through the upgrade
 playbooks: You need to run all three in this order and as specified below
 (no path) for a full upgrade.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade run --roles Controller --playbook upgrade_steps_playbook.yaml
-      openstack overcloud upgrade run --roles Controller --playbook deploy_steps_playbook.yaml
-      openstack overcloud upgrade run --roles Controller --playbook post_upgrade_steps_playbook.yaml
+   openstack overcloud upgrade run --roles Controller --playbook upgrade_steps_playbook.yaml
+   openstack overcloud upgrade run --roles Controller --playbook deploy_steps_playbook.yaml
+   openstack overcloud upgrade run --roles Controller --playbook post_upgrade_steps_playbook.yaml
 
 After all three playbooks have been executed without error on all nodes of
 the controller role the controlplane will have been fully upgraded to Queens.
 At a minimum an operator should check the health of the pacemaker cluster.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      [root@overcloud-controller-0 ~]# pcs status | grep -C 10 -i "error\|fail"
+   [root@overcloud-controller-0 ~]# pcs status | grep -C 10 -i "error\|fail"
 
 The operator may also want to confirm that openstack and related service
 containers are all in a good state and using the target version (new) images
 passed during upgrade prepare.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      [root@overcloud-controller-0 ~]# docker ps -a
+   [root@overcloud-controller-0 ~]# docker ps -a
 
 For non controlplane nodes, such as Compute or ObjectStorage, you can use
 ``--nodes overcloud-compute-0`` to upgrade particular nodes, or even
@@ -245,9 +245,9 @@ For non controlplane nodes, such as Compute or ObjectStorage, you can use
 upgraded in parallel. Also note that you can still use the ``--roles`` parameter
 with non controlplane roles if that is preferred.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade run --nodes overcloud-compute-0
+   openstack overcloud upgrade run --nodes overcloud-compute-0
 
 Use of ``--nodes`` allows the operator to upgrade some subset, perhaps just one,
 compute or other non controlplane node and verify that the upgrade is
@@ -259,19 +259,19 @@ Again you can optionally step through the upgrade playbooks if you prefer. Be
 sure to run upgrade_steps_playbook.yaml then deploy_steps_playbook.yaml and
 finally post_upgrade_steps_playbook.yaml in that order.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade run --nodes overcloud-compute-1 \
-         --playbook upgrade_steps_playbook.yaml
-      # etc for the other 2 as above example for controller
+   openstack overcloud upgrade run --nodes overcloud-compute-1 \
+      --playbook upgrade_steps_playbook.yaml
+   # etc for the other 2 as above example for controller
 
 For re-run, you can specify ``--skip-tags`` validation to skip those step 0
 ansible tasks that check if services are running, in case you can't or
 don't want to start them all.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade run --roles Controller --skip-tags validation
+   openstack overcloud upgrade run --roles Controller --skip-tags validation
 
 openstack overcloud external-upgrade run (for services)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -363,22 +363,22 @@ assert that the overcloud state is in sync with the latest TripleO
 Heat templates, which is a prerequisite for any further overcloud
 management (e.g. scaling).
 
-   .. note::
+.. note::
 
-      It is especially important to remember that you **must** include
-      all environment files that were used to deploy the overcloud,
-      including the new container image parameter file. You should
-      omit any repo switch commands and ensure that none of the
-      environment files you are about to use is specifying a value for
-      UpgradeInitCommand.
+   It is especially important to remember that you **must** include
+   all environment files that were used to deploy the overcloud,
+   including the new container image parameter file. You should
+   omit any repo switch commands and ensure that none of the
+   environment files you are about to use is specifying a value for
+   UpgradeInitCommand.
 
-   .. code-block:: bash
+.. code-block:: bash
 
-      openstack overcloud upgrade converge --templates
-        -r /path/to/roles_data.yaml \
-        -n /path/to/network_data.yaml \
-        -e <ALL Templates from overcloud-deploy.sh> \
-        -e containers-prepare-parameter.yaml
+   openstack overcloud upgrade converge --templates
+     -r /path/to/roles_data.yaml \
+     -n /path/to/network_data.yaml \
+     -e <ALL Templates from overcloud-deploy.sh> \
+     -e containers-prepare-parameter.yaml
 
 Successful completion of the `upgrade converge` command concludes the
 major version upgrade.

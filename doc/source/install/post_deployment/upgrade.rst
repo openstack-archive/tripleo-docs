@@ -57,6 +57,10 @@ The upgrade workflow essentially consists of the following steps:
    This step is only necessary if your deployment contains services
    which are managed using external installers, e.g. Ceph.
 
+#. `openstack overcloud external-upgrade run (for online upgrades)`_
+   Run the part of service upgrades which can run while the cloud is
+   fully operational, e.g. online data migrations.
+
 #. `openstack overcloud upgrade converge`_.
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
@@ -317,6 +321,37 @@ overclouds with Ceph.
       stack, and as such it does not accept any environment files as
       parameters. It uses playbooks generated during `upgrade
       prepare`.
+
+openstack overcloud external-upgrade run (for online upgrades)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. admonition:: Queens to Rocky
+   :class: qtor
+
+   The offline (downtime inducing) part of upgrade has finished at this
+   point, and the cloud should be fully operational. Some services have
+   an online component to their upgrade procedure -- operations which
+   don't induce downtime and can run while the cloud operates
+   normally. For OpenStack services these are e.g. online data
+   migrations. Run all these online upgrade operations by executing the
+   following command:
+
+   .. code-block:: bash
+
+      openstack overcloud external-upgrade run --tags online_upgrade
+
+   .. note::
+
+      If desired, the online upgrades can be run per-service. E.g. to run
+      only Nova online data migrations, execute:
+
+      .. code-block:: bash
+
+         openstack overcloud external-upgrade run --tags online_upgrade_nova
+
+      However, when executing online upgrades in selective parts like
+      this, extra care must be taken to not miss any necessary online
+      upgrade operations.
 
 openstack overcloud upgrade converge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

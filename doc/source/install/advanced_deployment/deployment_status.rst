@@ -37,3 +37,28 @@ Deployment failures can also be shown with a new command::
     Heat CLI commands such as ``openstack stack failures list`` can still be used
     to show stack failures, however since Heat no longer applies software
     configuration, it will no longer show any errors related to configuration.
+
+Setting the status
+__________________
+The status of the deployment will be automatically set by the API used by the
+Mistral workflows. However, in some cases, it may be required to manually set
+the status to reflect what has been done manually outside of the API. The
+following commands can be used to manually set the status.
+
+Set the status to ``DEPLOY_SUCCESS``::
+
+      openstack workflow execution create tripleo.deployment.v1.set_deployment_status_success
+
+Set the status to ``DEPLOYING``::
+
+      openstack workflow execution create tripleo.deployment.v1.set_deployment_status_deploying
+
+Set the status to ``DEPLOY_FAILED``::
+
+      openstack workflow execution create tripleo.deployment.v1.set_deployment_status_failed
+
+The default plan name of overcloud will be used in the above commands. It can
+be overridden with any of the above commands if needed::
+
+
+      openstack workflow execution create tripleo.deployment.v1.set_deployment_status_success '{"plan":"my-cloud-name"}'

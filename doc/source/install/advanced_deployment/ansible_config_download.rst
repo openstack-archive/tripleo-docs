@@ -138,6 +138,8 @@ See ``openstack overcloud deploy --help`` for further help text.
 
 .. include:: deployment_output.rst
 
+.. _deployment_status:
+
 .. include:: deployment_status.rst
 
 .. include:: deployment_log.rst
@@ -361,6 +363,13 @@ values used by the mistral workflow that runs ``config-download``::
     retries = 8
     pipelining = True
 
+.. note::
+
+   When running ``ansible-playbook`` manually, the overcloud status as returned
+   by ``openstack overcloud status`` won't be automatically updated due to the
+   configuration being applied outside of the API.
+
+   See :ref:`deployment_status` for setting the status manually.
 
 Ansible project directory contents
 ----------------------------------
@@ -560,12 +569,39 @@ the ansible project directory.
 
 .. note::
 
-    Skipping tasks is only recommended for specific scenarios where the
-    deployer is aware of the impact of skipping or only running certain tasks.
+    Running specific tasks is an advanced use case and only recommended for
+    specific scenarios where the deployer is aware of the impact of skipping or
+    only running certain tasks.
 
     This can be useful during troubleshooting and debugging scenarios, but
     should be used with caution as it can result in an overcloud that is not
     fully configured.
+
+.. warning::
+
+   All tasks that are part of the deployment need to be run, and in the order
+   specified.  When skipping tasks with ``--tags``, ``-skip-tags``,
+   ``--start-at-task``, the deployment could be left in an inoperable state.
+
+   The functionality to skip tasks or only run certain tasks is meant to aid in
+   troubleshooting and iterating more quickly on failing deployments and
+   updates.
+
+   All changes to the deployed cloud must still be applied through the Heat
+   templates and environment files passed to the ``openstack overcloud deploy``
+   command. Doing so ensures that the deployed cloud is kept in sync with the
+   state of the templates and the state of the Heat stack.
+
+.. warning::
+
+   When skipping tasks, the overcloud must be in the state expected by the task
+   starting task. Meaning, the state of the overcloud should be the same as if
+   all the skipped tasks had been applied. Otherwise, the result of the tasks
+   that get executed will be undefined and could leave the cloud in an
+   inoperable state.
+
+   Likewise, the deployed cloud may not be left in its fully configured state
+   if tasks are skipped at the end of the deployment.
 
 Complete the :ref:`manual-config-download` steps to create the ansible project
 directory, or use the existing project directory at
@@ -659,6 +695,17 @@ To start the deployment at a specific task, use the ``ansible-playbook`` CLI
 argument ``--start-at-task``. To see a list of task names for a given playbook,
 ``--list-tasks`` can be used to list the task names.
 
+.. note::
+
+   Tasks that include the ``step`` variable or other ansible variables in the
+   task name do not work with ``--start-at-task`` due to a limitation in
+   ansible. For example the task with the name::
+
+         Start containers for step 1
+
+   won't work with ``--start-at-task`` since the step number is in the name
+   (1).
+
 Previewing changes
 ------------------
 Changes can be previewed to see what will be changed before any changes are
@@ -684,6 +731,24 @@ differences that would result from changes.
 See `Ansible Check Mode ("Dry Run")
 <https://docs.ansible.com/ansible/2.5/user_guide/playbooks_checkmode.html>`_
 for more details.
+
+Generating overcloudrc
+----------------------
+In some cases, it may be required to manually generate the ``overcloudrc.v3``
+file if ``ansible-playbook`` was used manually outside of the workflow.
+
+The following command can be used to generate the ``overcloudrc.v3`` file. Save
+the output of the command to the file where you want the contents saved::
+
+    openstack action execution run \
+      --save-result \
+      --run-sync \
+      tripleo.deployment.overcloudrc \
+      '{"container":"overcloud"}' \
+      | jq -r '.["result"]["overcloudrc.v3"]' \
+      > overcloudrc.v3
+
+If needed, substitute the name of the deployment for overcloud.
 
 config-download with Heat SoftwareDeployment outputs
 ----------------------------------------------------

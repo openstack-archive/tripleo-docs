@@ -326,11 +326,17 @@ command::
             - ip_address: 192.168.24.9
           subnets:
             - cidr: 192.168.24.0/24
+          network:
+            tags:
+              - 192.168.24.0/24
         compute0-ctlplane:
           fixed_ips:
             - ip_address: 192.168.24.8
           subnets:
             - cidr: 192.168.24..0/24
+          network:
+            tags:
+              - 192.168.24.0/24
 
 The value of the DeployedServerPortMap variable is a map. The keys correspond
 to the ``<short hostname>-ctlplane`` of the deployed servers. Specify the ip
@@ -356,16 +362,25 @@ from any CIDR::
             - ip_address: 192.168.100.1
           subnets:
             - cidr: 192.168.100.0/24
+          network:
+            tags:
+              - 192.168.100.0/24
         controller0-ctlplane:
           fixed_ips:
             - ip_address: 192.168.100.2
           subnets:
             - cidr: 192.168.100.0/24
+          network:
+            tags:
+              - 192.168.100.0/24
         compute0-ctlplane:
           fixed_ips:
             - ip_address: 192.168.100.3
           subnets:
             - cidr: 192.168.100.0/24
+          network:
+            tags:
+              - 192.168.100.0/24
 
 In the above example, notice how ``RedisVipPort`` is mapped to
 ``network/ports/noop.yaml``. This mapping is due to the fact that the

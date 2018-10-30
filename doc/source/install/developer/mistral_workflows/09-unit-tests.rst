@@ -4,7 +4,7 @@ Unit tests
 Now, let’s continue writing unit tests for the Mistral action we
 wrote before. Let’s add the
 **tripleo_common/tests/actions/test_undercloud.py** file with the
-following content in the **tripleo-comon** repository.
+following content in the **tripleo-common** repository.
 
 ::
 

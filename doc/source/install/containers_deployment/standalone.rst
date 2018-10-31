@@ -646,3 +646,301 @@ example::
                                             +------+------+      |
                                             |   switch    +------+
                                             +-------------+
+
+Example: 2 nodes, 2 NIC, Using remote Compute with Tenant and Provider Networks
+-------------------------------------------------------------------------------
+
+The following example uses two nodes and the split control plane
+method to simulate a distributed edge computing deployment. The first
+Heat stack deploys a controller node which could run in a Centralized
+Data Center. The second Heat stack deploys a second node which could
+run at another location on the Aggregation Edge Layer. The second node
+runs the nova-compute service, Ceph, and the cinder-volume service.
+Both nodes use the networking configuration found in the 2 NIC, Using
+Compute with Tenant and Provider Network example.
+
+Deploy the central controller node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To deploy the first node, follow the Deploying a Standalone OpenStack
+node section described earlier in the document but also include the
+following parameters:
+
+.. code-block:: yaml
+
+    parameter_defaults:
+      GlanceBackend: swift
+      StandaloneExtraConfig:
+        oslo_messaging_notify_use_ssl: false
+        oslo_messaging_rpc_use_ssl: false
+
+The above configures the Swift backend for Glance so that images are
+pulled by the remote compute node over HTTP and ensures that Oslo
+messaging does not use SSL for RPC and notifications. Note that in a
+production deployment this will result in sending unencrypted traffic
+over WAN connections.
+
+When configuring the network keep in mind that it will be necessary
+for both standalone systems to be able to communicate with each
+other. E.g. the $IP for the first node will be in the endpoint map
+that later will be extracted from the first node and passed as a
+parameter to the second node for it to access its endpoints. In this
+standalone example both servers share an L2 network. In a production
+edge deployment it may be necessary instead to route.
+
+When deploying the first node with ``openstack tripleo deploy``, pass
+the ``--keep-running`` option so the Heat processes continue to run.
+
+Extract deployment information from the controller node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Heat processes were kept running in the previous step because
+this allows the Heat stack to be queried after the deployment in order
+to extract parameters that the second node's deployment will need as
+input. To extract these parameters into separate files in a directory,
+(e.g. `DIR=export_control_plane`), which may then be exported to the
+second node, run the following:
+
+.. code-block:: bash
+
+  unset OS_CLOUD
+  export OS_AUTH_TYPE=none
+  export OS_ENDPOINT=http://127.0.0.1:8006/v1/admin
+
+  openstack stack output show standalone EndpointMap --format json \
+  | jq '{"parameter_defaults": {"EndpointMapOverride": .output_value}}' \
+  > $DIR/endpoint-map.json
+
+  openstack stack output show standalone AllNodesConfig --format json \
+  | jq '{"parameter_defaults": {"AllNodesExtraMapData": .output_value}}' \
+  > $DIR/all-nodes-extra-map-data.json
+
+  openstack stack output show standalone HostsEntry -f json \
+  | jq -r '{"parameter_defaults":{"ExtraHostFileEntries": .output_value}}' \
+  > $DIR/extra-host-file-entries.json
+
+In addition to the above create a file in the same directory,
+e.g. `$DIR/oslo.yaml`, containing Oslo overrides for the second
+compute node:
+
+.. code-block:: yaml
+
+  parameter_defaults:
+    StandaloneExtraConfig:
+      oslo_messaging_notify_use_ssl: false
+      oslo_messaging_rpc_use_ssl: false
+
+In addition to the parameters above, add the
+`oslo_messaging_notify_password` and `oslo_messaging_rpc_password`
+parameters. Their values may be extracted from
+`/etc/puppet/hieradata/service_configs.json` on the first node. The
+following command will do this for you:
+
+.. code-block:: bash
+
+  sudo egrep "oslo.*password" /etc/puppet/hieradata/service_configs.json \
+  | sed -e s/\"//g -e s/,//g >> $DIR/oslo.yaml
+
+Set a copy of the first node's passwords aside for the second node:
+
+.. code-block:: bash
+
+  cp $HOME/tripleo-undercloud-passwords.yaml $DIR/passwords.yaml
+
+Put a copy of the directory containing the extracted information,
+e.g. `$DIR`, on the second node to be deployed.
+
+Deploy the remote compute node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On a second node, follow the procedure at the beginning of this
+document to deploy a standalone OpenStack node with Ceph up to the
+point where you have the following files:
+
+- `$HOME/standalone_parameters.yaml`
+- `$HOME/containers-prepare-parameters.yaml`
+- `$HOME/ceph_parameters.yaml`
+
+When setting the `$IP` of the second node, keep in mind that it should
+have a way to reach the endpoints of the first node as found in the
+endpoint-map.json, which was extracted from the first node.
+
+Create an environment file, e.g. `$HOME/standalone_edge.yaml`, with the
+following content:
+
+.. code-block:: yaml
+
+  resource_registry:
+    OS::TripleO::Services::CACerts: OS::Heat::None
+    OS::TripleO::Services::CinderApi: OS::Heat::None
+    OS::TripleO::Services::CinderScheduler: OS::Heat::None
+    OS::TripleO::Services::Clustercheck: OS::Heat::None
+    OS::TripleO::Services::HAproxy: OS::Heat::None
+    OS::TripleO::Services::Horizon: OS::Heat::None
+    OS::TripleO::Services::Keystone: OS::Heat::None
+    OS::TripleO::Services::Memcached: OS::Heat::None
+    OS::TripleO::Services::MySQL: OS::Heat::None
+    OS::TripleO::Services::NeutronApi: OS::Heat::None
+    OS::TripleO::Services::NeutronDhcpAgent: OS::Heat::None
+    OS::TripleO::Services::NovaApi: OS::Heat::None
+    OS::TripleO::Services::NovaConductor: OS::Heat::None
+    OS::TripleO::Services::NovaConsoleauth: OS::Heat::None
+    OS::TripleO::Services::NovaIronic: OS::Heat::None
+    OS::TripleO::Services::NovaMetadata: OS::Heat::None
+    OS::TripleO::Services::NovaPlacement: OS::Heat::None
+    OS::TripleO::Services::NovaScheduler: OS::Heat::None
+    OS::TripleO::Services::NovaVncProxy: OS::Heat::None
+    OS::TripleO::Services::OsloMessagingNotify: OS::Heat::None
+    OS::TripleO::Services::OsloMessagingRpc: OS::Heat::None
+    OS::TripleO::Services::Redis: OS::Heat::None
+    OS::TripleO::Services::SwiftProxy: OS::Heat::None
+    OS::TripleO::Services::SwiftStorage: OS::Heat::None
+    OS::TripleO::Services::SwiftRingBuilder: OS::Heat::None
+
+  parameter_defaults:
+    CinderRbdAvailabilityZone: edge1
+    GlanceBackend: swift
+    GlanceCacheEnabled: true
+
+The above file disables additional resources which
+`/usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml`
+does not disable since it represents a compute node which will consume
+those resources from the earlier deployed controller node. It also
+sets the Glance blackened to Swift and enables Glance caching so that
+after images are pulled from the central node once, they do not need
+to be pulled again. Finally the above sets the Cinder RBD availability
+zone a separate availability zone for the remote compute and cinder
+volume service.
+
+Deploy the second node with the following:
+
+.. code-block:: bash
+
+    sudo openstack tripleo deploy \
+        --templates \
+        --local-ip=$IP/$NETMASK \
+        -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+        -e $HOME/containers-prepare-parameters.yaml \
+        -e $HOME/standalone_parameters.yaml \
+        -e $HOME/ceph_parameters.yaml \
+        -e $HOME/standalone_edge.yaml \
+        -e $HOME/export_control_plane/passwords.yaml \
+        -e $HOME/export_control_plane/endpoint-map.json \
+        -e $HOME/export_control_plane/all-nodes-extra-map-data.json \
+        -e $HOME/export_control_plane/extra-host-file-entries.json \
+        -e $HOME/export_control_plane/oslo.yaml \
+        --output-dir $HOME \
+        --standalone
+
+The example above assumes that ``export_control_plane`` is the name
+of the directory which contains the content extracted from the
+controller node.
+
+Discover the remote compute node from the central controller node
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After completing the prior steps, the `openstack` command will only
+work on the central node because of how the ``OS_CLOUD`` environment
+variable works with that nodes /root/.config/openstack folder, which
+in turn assumes that keystone is running the central node and not
+the edge nodes. To run `openstack` commands on edge nodes, override
+the auth URL to point to keystone on the central node.
+
+On the central controller node run the following command to discover
+the new compute node:
+
+.. code-block:: bash
+
+  sudo docker exec -it nova_api nova-manage cell_v2 discover_hosts --verbose
+
+List the available zones, hosts, and hypervisors and look for the new node:
+
+.. code-block:: bash
+
+    export OS_CLOUD=standalone
+    openstack availability zone list
+    openstack host list
+    openstack hypervisor list
+
+Take note of the zone and host list so that you can use that
+information to schedule an instance on the new compute node. The
+following example shows the result of deploying two new external
+compute nodes::
+
+  [root@overcloud0 ~]# sudo docker exec -it nova_api nova-manage cell_v2 discover_hosts --verbose
+  Found 2 cell mappings.
+  Skipping cell0 since it does not contain hosts.
+  Getting computes from cell 'default': 631301c8-1744-4beb-8aa0-6a90aef6cd2d
+  Checking host mapping for compute host 'overcloud0.localdomain': 0884a9fc-9ef6-451c-ab22-06f825484e5e
+  Checking host mapping for compute host 'overcloud1.localdomain': 00fb920d-ef12-4a2a-9aa4-ba987d8a5e17
+  Creating host mapping for compute host 'overcloud1.localdomain': 00fb920d-ef12-4a2a-9aa4-ba987d8a5e17
+  Checking host mapping for compute host 'overcloud2.localdomain': 3e3a3cd4-5959-405a-b632-0b64415c43f2
+  Creating host mapping for compute host 'overcloud2.localdomain': 3e3a3cd4-5959-405a-b632-0b64415c43f2
+  Found 2 unmapped computes in cell: 631301c8-1744-4beb-8aa0-6a90aef6cd2d
+  [root@overcloud0 ~]# openstack hypervisor list
+  +----+------------------------+-----------------+--------------+-------+
+  | ID | Hypervisor Hostname    | Hypervisor Type | Host IP      | State |
+  +----+------------------------+-----------------+--------------+-------+
+  |  1 | overcloud0.example.com | QEMU            | 192.168.24.2 | up    |
+  |  2 | overcloud1.example.com | QEMU            | 192.168.24.7 | up    |
+  |  3 | overcloud2.example.com | QEMU            | 192.168.24.8 | up    |
+  +----+------------------------+-----------------+--------------+-------+
+  [root@overcloud0 ~]#
+
+Note that the hostnames of the hypervisors above were set prior to the
+deployment.
+
+On the central controller node run the following to create a host
+aggregate for a remote compute node:
+
+.. code-block:: bash
+
+  openstack aggregate create HA-edge1 --zone edge1
+  openstack aggregate add host HA-edge1 overcloud1.localdomain
+
+To test, follow the example from "2 NIC, Using remote Compute with
+Tenant and Provider Networks", except when creating the instance use
+the `--availability-zone` option to schedule the instance on the new
+remote compute node:
+
+.. code-block:: bash
+
+  openstack server create --flavor tiny --image cirros \
+  --key-name demokp --network private --security-group basic \
+  myserver --availability-zone edge1
+
+On the first node, run the following command to create a volume on the
+second node:
+
+.. code-block:: bash
+
+  openstack volume create --size 1 --availability-zone edge1 myvol
+
+On the second node, verify that the instance is running locally and
+and that the Cinder volume was created on the local Ceph server::
+
+  [root@overcloud1 ~]# docker exec nova_libvirt virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+   1     instance-00000001              running
+
+  [root@overcloud1 ~]# docker exec -ti ceph-mon rbd -p volumes ls -l
+  NAME                                        SIZE PARENT FMT PROT LOCK
+  volume-f84ae4f5-cc25-4ed4-8a58-8b1408160e03 1GiB          2
+  [root@overcloud1 ~]#
+
+Topology Details
+~~~~~~~~~~~~~~~~
+
+Here's a basic diagram of where the connections occur in the system for this
+example::
+
+  +-------------------------+         +-------------------------+
+  |standalone|compute|edge|1|         |standalone|compute|edge|2|
+  +-----------------------+-+         +-+-----------------------+
+                          |             |
+                     +----+-------------+----------+
+                     |standalone|controller|central|
+                     +-----------------------------+

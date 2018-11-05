@@ -28,7 +28,7 @@ is enabled.
 
 Also, OVS-DPDK requires mandatory kernel parameters to be set before
 configuring the DPDK driver, like ``intel_iommu=on`` on Intel machines. In
-order to enable the configuration of kernel parametres to the host, host-
+order to enable the configuration of kernel parameters to the host, host-
 config-pre-network environment file has to be added for the deploy command.
 
 Adding the following arguments to the ``openstack overcloud deploy`` command

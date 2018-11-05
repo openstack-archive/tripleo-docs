@@ -222,32 +222,52 @@ and they are always executed before the corresponding container step.
 The list below represents the correlation between the baremetal and the
 containers steps. These steps are executed sequentially:
 
-#. Containers config files generated per hiera settings.
-#. Load Balancer configuration baremetal
+* Containers config files generated per hiera settings.
+* Host Prep
+* Load Balancer configuration baremetal
 
-   #. Step 1 baremetal
-   #. Step 1 containers
+   * Step 1 external steps (execute Ansible on Undercloud)
+   * Step 1 deployment steps (Ansible)
+   * Common Deployment steps
 
-#. Core Services (Database/Rabbit/NTP/etc.)
+     * Step 1 baremetal (Puppet)
+     * Step 1 containers
 
-   #. Step 2 baremetal
-   #. Step 2 containers
+* Core Services (Database/Rabbit/NTP/etc.)
 
-#. Early Openstack Service setup (Ringbuilder, etc.)
+   * Step 2 external steps (execute Ansible on Undercloud)
+   * Step 2 deployment steps (Ansible)
+   * Common Deployment steps
 
-   #. Step 3 baremetal
-   #. Step 3 containers
+     * Step 2 baremetal (Puppet)
+     * Step 2 containers
 
-#. General OpenStack Services
+* Early Openstack Service setup (Ringbuilder, etc.)
 
-   #. Step 4 baremetal
-   #. Step 4 containers
-   #. Keystone containers post initialization (tenant, service, endpoint creation)
+   * Step 3 external steps (execute Ansible on Undercloud)
+   * Step 3 deployment steps (Ansible)
+   * Common Deployment steps
 
-#. Service activation (Pacemaker)
+     * Step 3 baremetal (Puppet)
+     * Step 3 containers
 
-   #. Step 5 baremetal
-   #. Step 5 containers
+* General OpenStack Services
+
+   * Step 4 external steps (execute Ansible on Undercloud)
+   * Step 4 deployment steps (Ansible)
+   * Common Deployment steps
+
+     * Step 4 baremetal (Puppet)
+     * Step 4 containers (Keystone initialization occurs here)
+
+* Service activation (Pacemaker)
+
+   * Step 5 external steps (execute Ansible on Undercloud)
+   * Step 5 deployment steps (Ansible)
+   * Common Deployment steps
+
+     * Step 5 baremetal (Puppet)
+     * Step 5 containers
 
 
 Service Bootstrap

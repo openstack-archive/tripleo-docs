@@ -133,18 +133,30 @@ Instructions can be found `here
 featureset override
 -------------------
 
+In TripleO CI, we test each patchset using different jobs. These jobs
+are defined using `featureset config files
+<http://git.openstack.org/cgit/openstack/tripleo-quickstart/tree/config/general_config>`_.
+Each featureset config file is mapped to a job template that is defined in
+`tripleo-ci <http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/zuul.d>`_.
+Tempest tests are basically triggered in scenario jobs in order to post validate the
+a particular scenario deployment.
 The set of tempest tests that run for a given TripleO CI job is defined in the
 `featureset config files
-<https://github.com/openstack/tripleo-quickstart/tree/master/config/general_config>`_.
+<http://git.openstack.org/cgit/openstack/tripleo-quickstart/tree/config/general_config>`_.
 You may want to run a popular TripleO CI job with a custom set of Tempest
 tests and override the default Tempest run. This can be accomplished through
-`featureset_override` group of vars in Zuul job config. This setting allows
-projects to override featureset post deployment configuration. The overridable
-settings are:
+adding the `featureset_overrides` var to zuul job config `vars:` section.
+The list of custom featureset_override are defined in `zuul-v3.yaml
+<http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/playbooks/tripleo-ci/run-v3.yaml>`_.
+This setting allows projects to override featureset post deployment configuration.
+The overridable settings are:
 
  - `run_tempest`: To run tempest or not (true|false).
  - `tempest_whitelist`: List of tests you want to be executed.
  - `test_black_regex`: Set of tempest tests to skip.
+ - `tempest_format`: To run tempest using different format (packages, containers, venv).
+ - `tempest_extra_config`: A dict of additional tempest config to be overridden.
+ - `tempest_plugins`: A list of tempest plugins needs to be installed.
 
 For a given job `tripleo-ci-centos-7-scenario001-multinode-oooq-container`, you
 can create a new abstract layer job and overrides the tempest tests::
@@ -152,13 +164,20 @@ can create a new abstract layer job and overrides the tempest tests::
     - job:
         name: scn001-multinode-oooq-container-custom-tempest
         parent: tripleo-ci-centos-7-scenario001-multinode-oooq-container
-        abstract: true
         ...
         vars:
           featureset_override:
             run_tempest: true
             tempest_whitelist:
               - 'tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern'
+            test_black_regex:
+              - 'keystone_tempest_plugin'
+            tempest_format: 'containers'
+            tempest_extra_config: {'compute-feature-enabled.attach_encrypted_volume': 'True',
+                                   'auth.tempest_roles': '"Member"'}
+            tempest_plugins:
+              - 'python2-keystone-tests-tempest'
+              - 'python2-cinder-tests-tempest'
 
 In a similar way, for skipping Tempest run for the scenario001 job, you can do
 something like::
@@ -166,9 +185,45 @@ something like::
     - job:
         name: scn001-multinode-oooq-container-skip-tempest
         parent: tripleo-ci-centos-7-scenario001-multinode-oooq-container
-        abstract: true
         ...
         vars:
           featureset_override:
             run_tempest: false
 
+Below is the list of jobs based on `tripleo-puppet-ci-centos-7-standalone` which uses
+featureset_override and run specific tempest tests against puppet projects:
+
+* puppet-nova
+
+  - job name: puppet-nova-tripleo-standalone
+  - tempest_test: compute
+
+* puppet-horizon
+
+  - job name: puppet-horizon-tripleo-standalone
+  - tempest_test: horizon
+
+* puppet-keystone
+
+  - job name: puppet-keystone-tripleo-standalone
+  - tempest_test: keystone_tempest_plugin & identity
+
+* puppet-glance
+
+  - job name: puppet-glance-tripleo-standalone
+  - tempest_test: image
+
+* puppet-cinder
+
+  - job name: puppet-cinder-tripleo-standalone
+  - tempest_test: volume & cinder_tempest_tests
+
+* puppet-neutron
+
+  - job name: puppet-neutron-tripleo-standalone
+  - tempest_test: neutron_tempest_tests & network
+
+* puppet-swift
+
+  - job name: puppet-swift-tripleo-standalone
+  - tempest_test: object_storage

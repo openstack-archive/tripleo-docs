@@ -92,7 +92,7 @@ cluster::
     ServicesDefault:
       - OS::TripleO::Services::CACerts
       - OS::TripleO::Services::Timezone
-      - OS::TripleO::Services::Ntp
+      - OS::TripleO::Services::Timesync
       - OS::TripleO::Services::Snmp
       - OS::TripleO::Services::Kernel
       - OS::TripleO::Services::Pacemaker

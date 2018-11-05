@@ -20,7 +20,7 @@ Go to :doc:`architecture` to learn more.
 **Components**
 
 |project| is composed of set of official OpenStack components accompanied by
-few other open sourced plugins which are increasing |project| capabilities.
+few other open source plugins which increase |project|'s capabilities.
 
 Go to :doc:`components` to learn more.
 

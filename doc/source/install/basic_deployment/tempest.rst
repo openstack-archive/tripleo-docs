@@ -206,22 +206,19 @@ manually.
 
   * Create a public network::
 
-        $ openstack network create public --router:external=True \
-                                  --provider:network_type flat \
-                        --provider:physical_network datacenter
+        $ openstack network create public \
+            --external \
+            --provider-network-type flat \
+            --provider-physical-network datacentre
 
   * Create/Attach subnet to it::
 
         $ openstack subnet create ext-subnet \
-                        --allocation-pool \
-          start=192.168.24.150,end=192.168.24.250 \
-                          --no-dhcp \
-                          --gateway 192.168.24.1 \
-                          public 192.168.24.0/24
-
-  * Export public network id::
-
-        $ public_net_id=$(openstack network show {{ public_net_name }} -f value -c id)
+            --subnet-range 192.168.24.0/24 \
+            --allocation-pool start=192.168.24.150,end=192.168.24.250 \
+            --gateway 192.168.24.1 \
+            --no-dhcp \
+            --network public
 
 
 Installing Tempest RPM and its plugins
@@ -322,9 +319,11 @@ Source the overcloudrc file::
 
 Use :command:`discover-tempest-config` to generate tempest.conf automatically::
 
+    $ cd <path to tempest workspace>
+
     $ discover-tempest-config --out etc/tempest.conf \
       --deployer-input ~/tempest-deployer-input.conf \
-      --network-id $public_net_id \
+      --network-id $(openstack network show public -f value -c id) \
       --image <path/url to cirros image to use> \
       --debug \
       --remove network-feature-enabled.api_extensions=dvr \

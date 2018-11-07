@@ -28,7 +28,8 @@
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'openstackdocstheme'
+    'sphinxcontrib.mermaid',
+    'openstackdocstheme',
 ]
 
 

@@ -4,6 +4,7 @@
 # Doc requirements
 sphinx>=1.6.2 # BSD
 sphinx_rtd_theme==0.1.7
+sphinxcontrib-mermaid
 
 hacking<1.2.0,>=1.1.0
 

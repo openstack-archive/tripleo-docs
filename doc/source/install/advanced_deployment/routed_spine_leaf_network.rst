@@ -230,13 +230,20 @@ IP address when the following configuration is used::
 DHCP relay configuration (Example)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the following example ``dhcrelay`` from
+In the following examples ``dhcrelay`` from
 `ISC DHCP software <https://www.isc.org/downloads/dhcp/>`_ is started using
 configuration parameters to relay incoming DHCP request on interfaces:
 ``eth1``, ``eth2`` and ``eth3``. The undercloud DHCP servers are on the network
 segment connected to the ``eth0`` interface. The DHCP server used for
 ``introspection`` is listening on ip address: ``172.20.0.1`` and the DHCP
-server used for ``provisioning`` is listening on ip address: ``172.20.0.10``::
+server used for ``provisioning`` is listening on ip address: ``172.20.0.10``.
+
+Example, dhcrelay version 4.2.5 (in CentOS 7)::
+
+  dhcrelay -d --no-pid 172.20.0.10 172.20.0.1 \
+           -i eth0 -i eth1 -i eth2 -i eth3
+
+Example, dhcrelay version 4.3.6 (in Fedora 28)::
 
   dhcrelay -d --no-pid 172.20.0.10 172.20.0.1 \
            -iu eth0 -id eth1 -id eth2 -id eth3

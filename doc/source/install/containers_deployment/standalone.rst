@@ -57,6 +57,29 @@ Deploying a Standalone OpenStack node
          sudo dd if=/dev/zero of=/var/lib/ceph-osd.img bs=1 count=0 seek=7G
          sudo losetup /dev/loop3 /var/lib/ceph-osd.img
 
+      Create a systemd service that restores the device on startup.
+
+      .. code-block:: bash
+
+         cat <<EOF > /tmp/ceph-osd-losetup.service
+         [Unit]
+         Description=Ceph OSD losetup
+         After=syslog.target
+
+         [Service]
+         Type=oneshot
+         ExecStart=/bin/bash -c '/sbin/losetup /dev/loop3 || \
+         /sbin/losetup /dev/loop3 /var/lib/ceph-osd.img ; partprobe /dev/loop3'
+         ExecStop=/sbin/losetup -d /dev/loop3
+         RemainAfterExit=yes
+
+         [Install]
+         WantedBy=multi-user.target
+         EOF
+
+         sudo mv /tmp/ceph-osd-losetup.service /etc/systemd/system/
+         sudo systemctl enable ceph-osd-losetup.service
+
       Create a directory to back up the ceph-ansible fetch directory.
 
       .. code-block:: bash

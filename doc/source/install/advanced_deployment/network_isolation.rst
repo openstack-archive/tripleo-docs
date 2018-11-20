@@ -124,8 +124,9 @@ Workflow
 
 The procedure for enabling network isolation is this:
 
-#. Create network environment file (e.g. /home/stack/network-environment.yaml)
-#. Edit IP subnets and VLANs in the environment file to match local environment
+#. Create and edit network_data.yaml file for the cluster
+#. Generate templates from Jinja2
+#. Create network environment overrides file (e.g. ~/network-environment-overrides.yaml)
 #. Make a copy of the appropriate sample network interface configurations
 #. Edit the network interface configurations to match local environment
 #. Deploy overcloud with the proper parameters to include network isolation
@@ -135,62 +136,86 @@ the network-environment.yaml to enable network isolation. The sections
 after that deal with configuring the network interface templates. The final step
 will deploy the overcloud with network isolation and a custom environment.
 
-Create Network Environment File
--------------------------------
-The environment file will describe the network environment and will point to
-the network interface configuration files to use for the overcloud nodes.
-The subnets that will be used for the isolated networks need to be defined,
-along with the IP address ranges that should be used for IP assignment. These
-values must be customized for the local environment.
+Create and Edit network_data.yaml file for the Cluster
+------------------------------------------------------
 
-It is important for the ExternalInterfaceDefaultRoute to be reachable on the
-subnet that is used for ExternalNetCidr. This will allow the OpenStack Public
-APIs and the Horizon Dashboard to be reachable. Without a valid default route,
-the post-deployment steps cannot be performed.
+Copy the default ``network_data.yaml`` file and customize the networks, IP
+subnets, VLANs, etc., as per the cluster requirements::
+
+  $ cp /usr/share/openstack-tripleo-heat-templates/network_data.yaml ~/templates/network_data.yaml
+
+
+Generate Templates from Jinja2
+------------------------------
+
+With Queens cycle, the network configuration templates have been converted to
+Jinja2 templates, so that templates can be generated for each role with
+customized network data. A utility script is available to generate the
+templates based on the provided ``roles_data.yaml`` and ``network_data.yaml``
+inputs.
+
+Before generating the templates, ensure that the ``roles_data.yaml`` is
+generated as per the cluster requirements using the command::
+
+  $ openstack overcloud roles generate -o ~/templates/roles_data.yaml Controller Compute \
+        BlockStorage ObjectStorage CephStorage
 
 .. note::
-  The ``resource_registry`` section of the network-environment.yaml contains
-  pointers to the network interface configurations for the deployed roles.
-  These files must exist at the path referenced here, and will be copied
-  later in this guide.
+  If the default ``roles_data.yaml`` or ``network_data.yaml`` file suits the
+  needs of the cluster, then there is no need to generate/customize the files,
+  the default files can be used as is for generating the templates.
+
+To generate the templates, run::
+
+  $ /usr/share/openstack-tripleo-heat-templates/tools/process-templates.py \
+        -p /usr/share/openstack-tripleo-heat-templates \
+        -r ~/templates/roles_data.yaml \
+        -n ~/templates/network_data.yaml \
+        -o ~/generated-openstack-tripleo-heat-templates --safe
+
+Now the temporary directory ``~/generated-openstack-tripleo-heat-templates``
+contains the generated template files according to provided role and network
+data. Copy the required templates to a user specific template directory
+``~/templates`` to modify the content to suit the cluster needs. Some of the
+specific use of generated templates are explained by some of the below
+sections.
+
+Create Network Environment Overrides File
+-----------------------------------------
+
+The environment file will describe the network environment and will point to
+the network interface configuration files to use for the overcloud nodes.
+
+In order to configure the ``resource registry`` section of the network
+environment of the cluster, copy the generated
+``net-single-nic-with-vlans.yaml`` file to apply the required cluster specific
+changes, which overrides the defaults::
+
+  $ cp ~/generated-openstack-tripleo-heat-templates/environments/net-single-nic-with-vlans.yaml \
+        ~/templates/network-environment-overrides.yaml
+
+Add any other parameters which should be overridden from the defaults to this
+environment file. It is important for the ``ExternalInterfaceDefaultRoute`` to
+be reachable on the subnet that is used for ``ExternalNetCidr``. This will
+allow the OpenStack Public APIs and the Horizon Dashboard to be reachable.
+Without a valid default route, the post-deployment steps cannot be performed.
+
+.. note::
+  The ``resource_registry`` section of the
+  ``network-environment-overrides.yaml`` contains pointers to the network
+  interface configurations for the deployed roles. These files must exist at
+  the path referenced here, and will be copied later in this guide.
 
 Example::
 
   resource_registry:
-    OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/nic-configs/cinder-storage.yaml
-    OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/nic-configs/compute.yaml
-    OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/nic-configs/controller.yaml
-    OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/nic-configs/swift-storage.yaml
-    OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/nic-configs/ceph-storage.yaml
+    OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/cinder-storage.yaml
+    OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/templates/nic-configs/compute.yaml
+    OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/templates/nic-configs/controller.yaml
+    OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/swift-storage.yaml
+    OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/ceph-storage.yaml
 
   parameter_defaults:
-    # Customize all these values to match the local environment
-    InternalApiNetCidr: 172.17.0.0/24
-    StorageNetCidr: 172.18.0.0/24
-    StorageMgmtNetCidr: 172.19.0.0/24
-    TenantNetCidr: 172.16.0.0/24
-    ExternalNetCidr: 10.1.2.0/24
-    # CIDR subnet mask length for provisioning network
-    ControlPlaneSubnetCidr: '24'
-    InternalApiAllocationPools: [{'start': '172.17.0.10', 'end': '172.17.0.200'}]
-    StorageAllocationPools: [{'start': '172.18.0.10', 'end': '172.18.0.200'}]
-    StorageMgmtAllocationPools: [{'start': '172.19.0.10', 'end': '172.19.0.200'}]
-    TenantAllocationPools: [{'start': '172.16.0.10', 'end': '172.16.0.200'}]
-    # Use an External allocation pool which will leave room for floating IPs
-    ExternalAllocationPools: [{'start': '10.1.2.10', 'end': '10.1.2.50'}]
-    # Set to the router gateway on the external network
-    ExternalInterfaceDefaultRoute: 10.1.2.1
-    # Gateway router for the provisioning network (or Undercloud IP)
-    ControlPlaneDefaultRoute: 192.168.24.1
-    # Generally the IP of the Undercloud
-    EC2MetadataIp: 192.168.24.1
-    # Define the DNS servers (maximum 2) for the overcloud nodes
-    DnsServers: ["8.8.8.8","8.8.4.4"]
-    InternalApiNetworkVlanID: 201
-    StorageNetworkVlanID: 202
-    StorageMgmtNetworkVlanID: 203
-    TenantNetworkVlanID: 204
-    ExternalNetworkVlanID: 100
     # May set to br-ex if using floating IPs only on native VLAN on bridge br-ex
     NeutronExternalNetworkBridge: "''"
     NeutronNetworkType: 'vxlan,vlan'
@@ -217,18 +242,8 @@ of IPs to use as floating IPs for VM instances. Alternately, the floating IPs
 can be placed on a separate VLAN (which is configured by the operator
 post-deployment).
 
-Configure VLANs and Bonding Options
+Configure Bonding Options
 -----------------------------------
-The VLANs will need to be customized to match the environment. The values
-entered in the ``network-environment.yaml`` will be used in the network
-interface configuration templates covered below. For example::
-
-  # Customize the VLAN IDs to match the local environment
-  InternalApiNetworkVlanID: 10
-  StorageNetworkVlanID: 20
-  StorageMgmtNetworkVlanID: 30
-  TenantNetworkVlanID: 40
-  ExternalNetworkVlanID: 50
 
 The example bonding options will try to negotiate LACP, but will fallback to
 active-backup if LACP cannot be established::
@@ -287,21 +302,27 @@ Creating Custom Interface Templates
 In order to configure the network interfaces on each node, the network
 interface templates may need to be customized.
 
-Start by copying the configurations from one of the example directories. The
-first example copies the templates which include network bonding. The second
-example copies the templates which use a single network interface with
-multiple VLANs (this configuration is mostly intended for testing).
+Start by copying the generated configurations from one of the example
+directories. The first example copies the templates which include network
+bonding. The second example copies the templates which use a single network
+interface with multiple VLANs (this configuration is mostly intended for
+testing).
 
 To copy the bonded example interface configurations, run::
 
-    $ cp /usr/share/openstack-tripleo-heat-templates/network/config/bond-with-vlans/* ~/nic-configs
+    $ cp ~/generated-openstack-tripleo-heat-templates/network/config/bond-with-vlans/* \
+          ~/templates/nic-configs
 
 To copy the single NIC with VLANs example interface configurations, run::
 
-    $ cp /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans/* ~/nic-configs
+    $ cp ~/generated-openstack-tripleo-heat-templates/network/config/single-nic-vlans/* \
+          ~/templates/nic-configs
 
-Or, if you have custom NIC templates from another source, copy them to the location
-referenced in the ``resource_registry`` section of the environment file.
+Or, if you have custom NIC templates from another source, copy them to the
+location referenced in the ``resource_registry`` section of the environment
+file. And ensure that the whole ``parameters`` section of all the custom NIC
+templates are replaced with the ``parameters`` section of the generated
+NIC templates.
 
 Customizing the Interface Templates
 -----------------------------------
@@ -849,10 +870,11 @@ following deploy command should work for all of the subsequent examples::
 
     openstack overcloud deploy --templates \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
-    -e /home/stack/templates/network-environment.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
+    -e ~/templates/network-environment-overrides.yaml \
     --ntp-server pool.ntp.org
 
-To deploy VXLAN mode ``network-environment.yaml`` should contain the
+To deploy VXLAN mode ``network-environment-overrides.yaml`` should contain the
 following parameter values::
 
     NeutronNetworkType: vxlan

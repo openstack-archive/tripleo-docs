@@ -214,6 +214,12 @@ Additional configuration
     This value can be overridden per node by setting the ``boot_option``
     capability on both the node and a flavor.
 
+* ``IronicDefaultDeployInterface`` specifies the way a node is deployed, see
+  the `deploy interfaces documentation`_ for details. The default is ``iscsi``,
+  starting with the Rocky release the ``direct`` deploy is also configured out
+  of box. The ``ansible`` deploy interface requires extensive configuration as
+  described in :doc:`ansible_deploy_interface`.
+
 * ``IronicDefaultNetworkInterface`` specifies the network management
   implementation for bare metal nodes. The default value of ``flat`` means
   that the provisioning network is shared between all nodes, and will also be
@@ -242,6 +248,21 @@ Additional configuration
 * ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
   it's on by default. Also iPXE is required for UEFI boot support.
+
+* ``IronicImageDownloadSource`` when using the ``direct`` deploy interface this
+  option (introduced in the Stein release) specifies what serves as a source
+  for pulling the image from **ironic-python-agent**:
+
+  * ``swift`` (the default) pulls the image from an Object Storage service
+    (swift) temporary URL. This requires the Image service (glance) to be
+    backed by the Object Storage service. If the image is not in the *raw*
+    format, it will be converted in memory on the target node, so enough RAM
+    is required.
+
+  * ``http`` makes **ironic-conductor** cache the image on the local HTTP
+    server (the same as for iPXE) and serve it from there. The image gets
+    converted to *raw* format by default and thus can be served directly to the
+    target block device without in-memory conversion.
 
 Using a Custom Network for Overcloud Provisioning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1032,3 +1053,4 @@ Finally this volume can be used to back a baremetal instance::
 .. _images documentation: https://docs.openstack.org/ironic/latest/install/configure-glance-images.html
 .. _multi-tenant networking documentation: https://docs.openstack.org/ironic/latest/admin/multitenancy.html
 .. _networking-generic-switch: https://github.com/openstack/networking-generic-switch
+.. _deploy interfaces documentation: https://docs.openstack.org/ironic/latest/admin/interfaces/deploy.html

@@ -80,15 +80,22 @@ environment file::
 
     /usr/share/openstack-tripleo-heat-templates/environments/ipsec.yaml
 
-With this, your deployment command will similar to this::
+With this, your deployment command will be similar to this::
 
     openstack overcloud deploy \
         ...
         -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
         -e /home/stack/templates/network-environment.yaml \
-        -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml \
-        --config-download \
         -e /usr/share/openstack-tripleo-heat-templates/environments/ipsec.yaml
+
+.. note:: For the Queens release, you need to specify the config-download
+          related parameters yourself::
+
+              openstack overcloud deploy \
+                  ...
+                  -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml \
+                  --config-download \
+                  ...
 
 To change the default encryption algorithm, you can use an environment file
 that looks as follows::

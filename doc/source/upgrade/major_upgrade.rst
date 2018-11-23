@@ -20,7 +20,7 @@ as below:
    production environment.
 
 .. Undercloud upgrade section
-.. include:: ../../install/installation/updating.rst
+.. include:: undercloud.rst
 
 Upgrading the Overcloud to Queens and later
 -------------------------------------------
@@ -81,7 +81,7 @@ First we prepare an environment file for new container images:
    As part of the upgrade to Queens, the container images for the
    target release should be downloaded to the Undercloud. Please see
    the `openstack overcloud container image prepare`.
-   :doc:`../containers_deployment/overcloud` for more information.
+   :doc:`../install/containers_deployment/overcloud` for more information.
 
    The output of this step will be a Heat environment file that contains
    references to the latest container images. You will need to pass the path to
@@ -93,7 +93,7 @@ First we prepare an environment file for new container images:
 
    In Rocky we only generate a new environment file with
    ``ContainerImagePrepare`` parameter at this point in the workflow. See
-   :doc:`container image preparation documentation<../advanced_deployment/container_image_prepare>`.
+   :doc:`container image preparation documentation<../install/advanced_deployment/container_image_prepare>`.
    for details how to generate this environment file.
 
    The file is then passed to the `upgrade prepare` command, and
@@ -505,7 +505,7 @@ major-upgrade-composable-steps that come first, as described above.
       actions mentioned here to prepare your environment. In particular
       *image prepare* to generate the docker registry which you must include
       as one of the environment files specified below:
-      * :doc:`../containers_deployment/overcloud`
+      * :doc:`../install/containers_deployment/overcloud`
 
    .. __:
 
@@ -566,7 +566,7 @@ major-upgrade-composable-steps that come first, as described above.
       ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
       ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
       `ceph-ansible scenarios`_ or the :doc:`TripleO Ceph config guide
-      <../advanced_deployment/ceph_config>`
+      <../install/advanced_deployment/ceph_config>`
 
       The other parameters (for example ``CinderRbdPoolName``,
       ``CephClientUserName``, ...) will behave as they used to with puppet-ceph

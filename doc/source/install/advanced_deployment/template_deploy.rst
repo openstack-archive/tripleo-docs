@@ -58,7 +58,7 @@ so the deployment uses the local version::
     ``--environment-file`` option) whenever you make subsequent changes to the
     overcloud, such as :doc:`../post_deployment/scale_roles`,
     :doc:`../post_deployment/delete_nodes` or
-    :doc:`../post_deployment/package_update`.
+    :doc:`../../upgrade/minor_update`.
 
 .. _custom-template-location:
 

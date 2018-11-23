@@ -3,7 +3,7 @@ Minor version update
 ====================
 
 To get developer understanding of minor updates, first read the
-:doc:`operator docs for minor updates <../../post_deployment/package_update>`
+:doc:`operator docs for minor updates <../../minor_update>`
 and perhaps try to go through the update as an operator would, to get
 the basic idea.
 

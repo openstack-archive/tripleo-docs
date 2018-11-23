@@ -4,7 +4,7 @@ Updating Undercloud Components
 .. note::
    Instack-undercloud is deprecated in Rocky cycle. Instack undercloud can
    only be upgraded to containerized undercloud. See
-   :doc:`../containers_deployment/undercloud`
+   :doc:`../install/containers_deployment/undercloud`
    for backward compatibility related information.
 
 .. note::
@@ -12,7 +12,7 @@ Updating Undercloud Components
    keep in mind the special cases described in :ref:`notes-for-stack-updates`.
 
 #. Before upgrading the undercloud, it is highly suggested to perform
-   a :doc:`backup <../controlplane_backup_restore/01_undercloud_backup>`
+   a :doc:`backup <../install/controlplane_backup_restore/01_undercloud_backup>`
    of the undercloud and validate that a restore works fine.
 
 #. Remove all Delorean repositories:
@@ -33,7 +33,7 @@ Updating Undercloud Components
 
 #. Enable new Delorean repositories:
 
-   .. include:: ../repositories.txt
+   .. include:: ../install/repositories.txt
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.
@@ -126,5 +126,5 @@ Updating Undercloud Components
       If you added custom OVS ports to the undercloud (e.g. in a virtual
       testing environment) you may need to re-add them at this point.
 
-   .. _validations: ../validations/validations.html#running-a-group-of-validations
+   .. _validations: ../install/validations/validations.html#running-a-group-of-validations
    .. _tripleo-validations: https://github.com/openstack/tripleo-validations/tree/master/validations

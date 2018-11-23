@@ -82,7 +82,7 @@ To check the status of the Upgrades/Updates jobs, you need to click the
 `TripleO CI promotion jobs`_ link from `CI Status`_, where you will find
 the RDO cloud upgrades section:
 
-.. image:: ../../_images/rdo_upgrades_jobs.png
+.. image:: rdo_upgrades_jobs.png
 
 In this section the CI jobs have a color code, to show its
 current status in a glance::
@@ -143,7 +143,7 @@ for?
 
     fatal: [undercloud]: FAILED! => {"changed": true, "cmd": "set -o pipefail && /home/zuul/overcloud-upgrade.sh 2>&1
     | awk '{ print strftime(\"%Y-%m-%d %H:%M:%S |\"), $0; fflush(); }' > overcloud_upgrade_console.log",
-    "delta": "0:00:39.175219", "end": "2017-11-14 16:55:47.124998", "failed": true, "rc": 1, 
+    "delta": "0:00:39.175219", "end": "2017-11-14 16:55:47.124998", "failed": true, "rc": 1,
     "start": "2017-11-14 16:55:07.949779", "stderr": "", "stdout": "", "stdout_lines": [], "warnings": []}
 
   From this task, we can guess that something went wrong during the

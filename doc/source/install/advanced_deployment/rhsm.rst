@@ -24,9 +24,16 @@ to the deployment command::
 
     openstack overcloud deploy \
         <other cli args> \
+        -e ~/rhsm.yaml
+
+.. note::
+   This feature requires config-download to be enabled, which wasn't the
+   case in Queens.
+   If you're deploying on this release, make sure you deploy with
+   config-download enabled::
+
         -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml \
         --config-download
-        -e ~/rhsm.yaml
 
 The ``rhsm.yaml`` environment enables mapping the OS::TripleO::Services::Rhsm to
 the extraconfig service::
@@ -35,29 +42,24 @@ the extraconfig service::
       OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
     parameter_defaults:
       RhsmVars:
-        rhsm_repos:
-          - rhel-7-server-rpms
-          - rhel-7-server-extras-rpms
-          - rhel-ha-for-rhel-7-server-rpms
-          - rhel-7-server-openstack-13-rpms
-          - rhel-7-server-rhceph-3-mon-rpms
-          - rhel-7-server-rhceph-3-tools-rpms
-        rhsm_activation_key: 'secrete-key'
+        rhsm_activation_key: "secrete_key"
+        rhsm_org_id: "Default_Organization"
+        rhsm_server_hostname: "mysatserver.com"
+        rhsm_baseurl: "https://mysatserver.com/pulp/repos"
+        rhsm_method: satellite
+        rhsm_insecure: yes
 
 In some advanced use cases, you might want to configure RHSM for a specific role::
 
     parameter_defaults:
       ComputeHCIParameters:
         RhsmVars:
-          rhsm_repos:
-            - rhel-7-server-rpms
-            - rhel-7-server-extras-rpms
-            - rhel-ha-for-rhel-7-server-rpms
-            - rhel-7-server-openstack-13-rpms
-            - rhel-7-server-rhceph-3-osd-rpms
-            - rhel-7-server-rhceph-3-mon-rpms
-            - rhel-7-server-rhceph-3-tools-rpms
-          rhsm_activation_key: 'anothersecrete-key'
+          rhsm_activation_key: "secrete_key"
+          rhsm_org_id: "Default_Organization"
+          rhsm_server_hostname: "mysatserver.com"
+          rhsm_baseurl: "https://mysatserver.com/pulp/repos"
+          rhsm_method: satellite
+          rhsm_insecure: yes
 
 In that case, all nodes deployed with ComputeHCI will be configured with these RHSM parameters.
 
@@ -138,4 +140,6 @@ TripleO is using the Ansible role_ for Red Hat Subscription.
 
 .. _role: https://github.com/openstack/ansible-role-redhat-subscription
 
-You can find all available parameters in this repository.
+The role parameters aren't documented here to avoid duplication but it is
+recommended to take a look at them in the repository when using this feature
+in TripleO.

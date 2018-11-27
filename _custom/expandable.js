@@ -24,7 +24,6 @@ $(document).ready(function() {
     $(this).next('.content').slideToggle("fast");
 
     // save the state to cookies
-    var parent_id =
     $.cookie($(this).parent().prop('id'),
              $(this).parent().hasClass('displayed'),
              { path: '/' });

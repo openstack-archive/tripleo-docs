@@ -12,7 +12,7 @@ overcloud.
    Before upgrading the undercloud to Queens, make sure you have created a valid
    backup of the current undercloud and overcloud. The complete backup
    procedure can be found on:
-   :doc:`undercloud backup<../controlplane_backup_restore/00_index>`
+   :doc:`undercloud backup<../install/controlplane_backup_restore/00_index>`
 
 Undercloud FFU upgrade
 ----------------------
@@ -23,7 +23,7 @@ Undercloud FFU upgrade
    configurations. Before performing the Fast Forward Upgrade of the undercloud
    in production, test it in a matching staging environment, and create a backup
    of the undercloud in the production environment. Please refer to
-   :doc:`undercloud backup<../controlplane_backup_restore/01_undercloud_backup>`
+   :doc:`undercloud backup<../install/controlplane_backup_restore/01_undercloud_backup>`
    for proper documentation on undercloud backups.
 
 The undercloud FFU upgrade consists of 3 consecutive undercloud upgrades to
@@ -182,7 +182,7 @@ When moving from Newton to Queens, the setup will be changing from baremetal to
 containers. So as a part of the upgrade the container images for the target
 release should be downloaded to the Undercloud.
 Please see the `openstack overcloud container image prepare`
-:doc:`../containers_deployment/overcloud` for more information.
+:doc:`../install/containers_deployment/overcloud` for more information.
 
 The output of this step will be a Heat environment file that contains
 references to the latest container images. You will need to pass this file
@@ -284,7 +284,7 @@ openstack overcloud ffwd-upgrade prepare
    of the current state, including the **undercloud** since there will be a
    Heat stack update performed here. The complete backup procedure can be
    found on:
-   :doc:`undercloud backup<../controlplane_backup_restore/00_index>`
+   :doc:`undercloud backup<../install/controlplane_backup_restore/00_index>`
 
 
 .. note::
@@ -637,7 +637,7 @@ Following there is a list of all the changes needed:
    ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig`` and
    `CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
    ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
-   :doc:`TripleO Ceph config guide <../advanced_deployment/ceph_config>`
+   :doc:`TripleO Ceph config guide <../install/advanced_deployment/ceph_config>`
 
    The other parameters (for example ``CinderRbdPoolName``,
    ``CephClientUserName``, ...) will behave as they used to with puppet-ceph

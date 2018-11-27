@@ -36,14 +36,14 @@ the OpenStack release that you currently operate, perform these steps:
       Fetch latest container images to your undercloud registry and
       generate a Heat environment file pointing to new container
       images. This is done via workflow described in
-      :doc:`containerized deployment documentation<../containers_deployment/overcloud>`.
+      :doc:`containerized deployment documentation<../install/containers_deployment/overcloud>`.
 
    .. admonition:: Rocky
       :class: rocky
 
       Prepare an environment file with new ``ContainerImagePrepare``
       parameter. This is done via a command described in
-      :doc:`container image preparation documentation<../advanced_deployment/container_image_prepare>`.
+      :doc:`container image preparation documentation<../install/advanced_deployment/container_image_prepare>`.
 
 #. **Update preparation**
 

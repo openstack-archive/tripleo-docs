@@ -902,7 +902,7 @@ tenant VLANs were on a bridge named ``br-vlan``, then use these values in
     ``--environment-file`` option) whenever you make subsequent changes to the
     overcloud, such as :doc:`../post_deployment/scale_roles`,
     :doc:`../post_deployment/delete_nodes` or
-    :doc:`../post_deployment/package_update`.
+    :doc:`../../upgrade/minor_update`.
 
 Creating Floating IP Networks
 -----------------------------

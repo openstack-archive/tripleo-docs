@@ -17,7 +17,7 @@ directly on the host operating system. This reduces the required packages in
 the host to the bare minimum for running the container runtime and managing the
 base network layer.
 
-.. note:: Check the :doc:`../installation/installing` and :doc:`../installation/updating`
+.. note:: Check the :doc:`../installation/installing` and :doc:`../../upgrade/undercloud`
           sections for deploying and upgrading a containerized undercloud.
 
 .. note:: Check the :ref:`debug-containers` section for more tips and tricks for

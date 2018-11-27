@@ -1,13 +1,11 @@
 Undercloud Installation
 =======================
 
-This section contains instructions on how to install the undercloud and how to
-update components after installation.
+This section contains instructions on how to install the undercloud. For update
+or upgrade to a deployed undercloud see undercloud_upgrade_.
 
 .. _install_undercloud:
 
 .. include:: installing.rst
 
-.. include:: updating.rst
-
-#. Proceed with :ref:`package_update`
+.. _undercloud_upgrade: ../../upgrade/undercloud.html

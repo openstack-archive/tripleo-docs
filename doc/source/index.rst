@@ -25,14 +25,14 @@ Install Guide
 
   install/index
 
-Fast Forward Upgrade Guide
---------------------------
+Upgrades/Updates/FFWD-Upgrade
+-----------------------------
 
 .. toctree::
   :maxdepth: 3
   :includehidden:
 
-  fast_forward_upgrade/index
+  upgrade/index
 
 
 Documentation Conventions

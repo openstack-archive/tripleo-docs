@@ -47,7 +47,7 @@ Repositories that are part of TripleO
   shared with the UI.
 
 * tripleo-docs:
-  Where these docs are kept. :)
+  Where these docs are kept.
 
 * tripleo-image-elements:
   Image elements (snippets of puppet that prepare specific parts of the
@@ -94,7 +94,7 @@ interface functions along side the command line interface.
 
 - Ensure that any new feature is provided through Rest API in form of Mistral
   actions, workflow or by directly accessing an OpenStack service API.
-- Ensure that GUI and CLI can both operate this feature through this API
+- Ensure that GUI and CLI can both operate this feature through this API.
 - Start your feature work by creating Mistral action or Mistral workflow -
   defining inputs and outputs. This is necessary so that the CI and UI have
   feature parity and both use the same API calls to implement a given feature.
@@ -104,7 +104,7 @@ interface functions along side the command line interface.
   for more information.
 - Ensure there are unit tests where possible.
 - Maintain backwards compatibility with our existing template interfaces from
-  tripleo-heat-templates
+  tripleo-heat-templates.
 - New features should be reviewed by cores who have knowledge in that area of
   the codebase.
 - One should consider logging and support implications.  If you have new logs,

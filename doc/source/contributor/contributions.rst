@@ -34,7 +34,7 @@ Reporting Bugs
 upstream projects, please follow OpenStack's process of filing bugs.
 
 * Learn `how to report bugs in OpenStack
-  <https://wiki.openstack.org/wiki/Bugs>`_.
+  <https://docs.openstack.org/project-team-guide/bugs.html>`_.
 
 * If you want to file a bug against upstream project, you can find useful links
   in our list of :doc:`../install/introduction/components`.

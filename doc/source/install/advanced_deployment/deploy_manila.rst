@@ -79,7 +79,7 @@ If the storage network uses VLAN, include storage network in
     subnet doesn't overlap with IP allocation pool used for Overcloud storage
     nodes (controlled by ``StorageAllocationPools`` heat parameter).
     ``StorageAllocationPools`` is by default set to
-    ``[{'start': '172.16.1.4', 'end': '172.16.1.250'}]``. It may be neccessary
+    ``[{'start': '172.16.1.4', 'end': '172.16.1.250'}]``. It may be necessary
     to shrink this pool, for example::
 
         StorageAllocationPools: [{'start': '172.16.1.4', 'end': '172.16.1.99'}]

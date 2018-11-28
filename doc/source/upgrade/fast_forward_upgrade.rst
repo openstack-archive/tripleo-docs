@@ -144,7 +144,7 @@ Upgrading the overcloud from Newton to Queens
 .. note::
 
    Generic Fast Forward Upgrade testing in the overcloud cannot cover all
-   possible deployment configurations. Before performing Fast Foward Upgrade
+   possible deployment configurations. Before performing Fast Forward Upgrade
    testing in the overcloud, test it in a matching staging environment, and
    create a backup of the production environment (your controller nodes and your
    workloads).

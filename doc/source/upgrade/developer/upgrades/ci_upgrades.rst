@@ -96,7 +96,7 @@ you will find the CI job statistics and the last 100 (or less, it
 can be edited) job executions. Each of the job executions contains::
 
   - Date: Time and date the CI job was triggered
-  - Lenght: Job duration
+  - Length: Job duration
   - Reason: CI job result or failure reason.
   - Patch: Git ref of the patch tha triggered the job.
   - Logs: Link to the logs.
@@ -129,7 +129,7 @@ for?
 (1) Find the job result
 
   A good string to search is *PLAY RECAP*. At this point, all the
-  playbooks have been executed and a sumary of the runs per node
+  playbooks have been executed and a summary of the runs per node
   is displayed::
 
     PLAY RECAP *********************************************************************
@@ -147,7 +147,7 @@ for?
     "start": "2017-11-14 16:55:07.949779", "stderr": "", "stdout": "", "stdout_lines": [], "warnings": []}
 
   From this task, we can guess that something went wrong during the
-  overcloud upgrading proces. But, where can I find the log
+  overcloud upgrading process. But, where can I find the log
   *overcloud_upgrade_console.log* referenced in the task?
 
 (2) Undercloud logs

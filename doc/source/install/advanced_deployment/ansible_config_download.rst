@@ -97,7 +97,7 @@ The following steps are done to create the ``tripleo-admin`` user:
    deleted from ``~/.ssh/authorized_keys`` on each overcloud node, and the
    temporary keypair is then deleted from the undercloud.
 
-With these steps, the deployer-specified ssh key which is used for the inital
+With these steps, the deployer-specified ssh key which is used for the initial
 connection is never sent or stored by any API service.
 
 To override the deployer specified ssh private key and user, there are cli args

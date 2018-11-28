@@ -126,28 +126,6 @@ in an environment file:
      bare metal driver is ``pxe_ipmitool``. Also enabled by default are
      ``pxe_ilo`` and ``pxe_drac`` drivers.
 
-     .. admonition:: Virtual
-         :class: virtual
-
-         Starting with the Ocata release, testing on a virtual environment
-         requires using :doc:`../environments/virtualbmc`.
-
-         Before the Ocata release, a separate ``pxe_ssh`` driver has to be
-         enabled for virtual testing, for example::
-
-              parameter_defaults:
-                  IronicEnabledDrivers:
-                      - pxe_ssh
-
-         If you used **tripleo-quickstart** to build your environment, the
-         resulting configuration is a bit different::
-
-              parameter_defaults:
-                  IronicEnabledDrivers:
-                      - pxe_ssh
-                  ControllerExtraConfig:
-                      ironic::drivers::ssh::libvirt_uri: 'qemu:///session'
-
 * ``IronicCleaningDiskErase`` configures erasing hard drives
   before the first and after every deployment. There are two recommended
   values: ``full`` erases all data and ``metadata`` erases only disk metadata.
@@ -159,9 +137,16 @@ in an environment file:
       It is highly recommended to set this parameter to ``metadata``
       for virtual environments, as full cleaning can be extremely slow there.
 
-* ``NovaSchedulerDefaultFilters`` configures available scheduler filters.
-  For a hybrid deployment it's important to prepend
-  ``AggregateInstanceExtraSpecsFilter`` to the default list::
+.. admonition:: Stable Branches
+   :class: stable
+
+  ``NovaSchedulerDefaultFilters`` configures available scheduler filters.
+  Before the Stein release the ``AggregateInstanceExtraSpecsFilter`` could be
+  used to separate flavors targeting virtual and bare metal instances.
+  Starting with the Stein release a flavor can only target one of them, so
+  no additional actions are needed.
+
+  * In the Pike, Queens and Rocky releases you can use the following filters::
 
         parameter_defaults:
             NovaSchedulerDefaultFilters:
@@ -172,11 +157,11 @@ in an environment file:
                 - ComputeCapabilitiesFilter
                 - ImagePropertiesFilter
 
-  .. admonition:: Stable Branches
-     :class: stable
+    Alternatively, you can skip adding ``cpus`` and ``memory_mb`` to your bare
+    metal nodes. This will make the virtual flavors skip bare metal nodes.
 
-     Before the Pike release, this list had to also contain ``RamFilter`` and
-     ``DiskFilter``::
+  * Before the Pike release, this list had to also contain ``RamFilter`` and
+    ``DiskFilter``::
 
         parameter_defaults:
             NovaSchedulerDefaultFilters:
@@ -195,12 +180,6 @@ Additional configuration
 * ``IronicCleaningNetwork`` sets the name or UUID of the **overcloud** network
   to use for node cleaning. Initially is set to ``provisioning`` and should be
   set to an actual UUID later when `Configuring networks`_.
-
-  .. admonition:: Newton
-      :class: newton
-
-      In the Newton release this parameter was not available, and no default
-      value was set for the cleaning network.
 
   Similarly, there are ``IronicProvisioningNetwork`` and
   ``IronicRescuingNetwork``. See `Configuring networks`_ for details.
@@ -238,12 +217,9 @@ Additional configuration
     Please check with your switch vendor to learn if your switch and its
     ML2 driver support bare metal port binding.
 
-    Alternatively, you can use the networking-generic-switch_ ML2 plugin. It
-    supports a large variety of switch vendors and models, but it's not
-    currently supported by TripleO out-of-box.
-
-  This parameter was introduced in the Pike release, and only the ``flat``
-  networking is covered in this guide.
+    Alternatively, you can use the networking-ansible_ ML2 plugin, which
+    supports a large variety of switch vendors and models. It is supported
+    by TripleO starting with the Rocky release.
 
 * ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
   instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
@@ -536,19 +512,6 @@ setting ``IronicCleaningNetwork`` to the this UUID, for example::
  parameter_defaults:
      IronicCleaningNetwork: c71f4bfe-409b-4292-818f-21cdf910ee06
 
-.. admonition:: Newton
-   :class: newton
-
-   In the Newton release this parameter was not available, use
-   ``cleaning_network_uuid`` hieradata value instead, for example::
-
-        parameter_defaults:
-            ControllerExtraConfig:
-                ironic::conductor::cleaning_network_uuid: c71f4bfe-409b-4292-818f-21cdf910ee06
-
-   This variable does not support node names and does not have a default value
-   in this release.
-
 In the Pike release or newer, also set the provisioning network. You can use
 the same network or create a new one::
 
@@ -634,30 +597,34 @@ Creating host aggregates
 
 .. note::
     If you don't plan on using virtual instances, you can skip this step.
-    It also won't be required in the Queens release, once bare metal nodes
-    stop report CPU, memory and disk properties.
+    It also won't be required in the Stein release, after bare metal nodes
+    stopped report CPU, memory and disk properties.
 
-For a hybrid bare metal and virtual environment, you have to set up *host
-aggregates* for virtual and bare metal hosts. We will use a property
-called ``baremetal`` to link flavors to host aggregates::
+.. admonition:: Stable Branches
+   :class: stable
 
-    openstack aggregate create --property baremetal=true baremetal-hosts
-    openstack aggregate create --property baremetal=false virtual-hosts
-    openstack flavor set baremetal --property baremetal=true
+   For a hybrid bare metal and virtual environment before the Pike release
+   you have to set up *host aggregates* for virtual and bare metal hosts. You
+   can also optionally follow this procedure until the Stein release. We will
+   use a property called ``baremetal`` to link flavors to host aggregates::
 
-.. warning::
-    This association won't work without ``AggregateInstanceExtraSpecsFilter``
-    enabled as described in `Essential configuration`_.
+       openstack aggregate create --property baremetal=true baremetal-hosts
+       openstack aggregate create --property baremetal=false virtual-hosts
+       openstack flavor set baremetal --property baremetal=true
 
-.. warning::
-    Any property you set on flavors has to be duplicated on aggregates,
-    otherwise scheduling will fail.
+   .. warning::
+       This association won't work without ``AggregateInstanceExtraSpecsFilter``
+       enabled as described in `Essential configuration`_.
 
-Then for all flavors you've created for virtual instances set the same
-``baremetal`` property to ``false``, for example::
+   .. warning::
+       Any property you set on flavors has to be duplicated on aggregates,
+       otherwise scheduling will fail.
 
-    openstack flavor create --ram 1024 --disk 20 --vcpus 1 virtual
-    openstack flavor set virtual --property baremetal=false
+   Then for all flavors you've created for virtual instances set the same
+   ``baremetal`` property to ``false``, for example::
+
+       openstack flavor create --ram 1024 --disk 20 --vcpus 1 virtual
+       openstack flavor set virtual --property baremetal=false
 
 Creating instance images
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -728,7 +695,9 @@ Preparing inventory
 ~~~~~~~~~~~~~~~~~~~
 
 Your inventory file (e.g. ``overcloud-nodes.yaml`` from `Preparing
-undercloud`_) should be in the following format::
+undercloud`_) should be in the following format:
+
+.. code-block:: yaml
 
     nodes:
         - name: node-0
@@ -740,9 +709,7 @@ undercloud`_) should be in the following format::
             ipmi_port: <BMC PORT>
           resource_class: baremetal
           properties:
-            cpus: <CPU COUNT>
             cpu_arch: <CPU ARCHITECTURE>
-            memory_mb: <RAM SIZE IN MIB>
             local_gb: <ROOT DISK IN GIB>
             root_device:
                 serial: <ROOT DISK SERIAL>
@@ -779,11 +746,19 @@ undercloud`_) should be in the following format::
 
   .. note::
     More ports with ``pxe_enabled=false`` can be specified safely here. They
-    won't be used for provisioning, but they are used with advanced networking
-    (not covered in this guide).
+    won't be used for provisioning, but they are used with the ``neutron``
+    network interface.
 
-* The ``memory_mb`` and ``local_gb`` properties will not be mandatory any more
-  in the Queens release.
+.. admonition:: Stable Branch
+   :class: stable
+
+   * The ``memory_mb`` and ``cpus`` properties are mandatory before the Pike
+     release and can optionally be used before Stein.
+
+     .. warning::
+        Do not populate ``memory_mb`` and ``cpus`` before the Stein release if
+        you do **not** use host aggregates for separating virtual and bare
+        metal flavors as described in `Creating host aggregates`_.
 
 Enrolling nodes
 ~~~~~~~~~~~~~~~
@@ -831,29 +806,37 @@ cleaning has to be corrected before proceeding with deployment.
 Populating host aggregates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For hybrid bare metal and virtual case you need to specify which host
-belongs to which host aggregates (``virtual`` or ``baremetal`` as created in
-`Creating host aggregates`_).
-
-When the default host names are used, we can take advantage of the fact
-that every virtual host will have ``compute`` in its name. All bare metal
-hypervisors will be assigned to one (non-HA) or three (HA) controller hosts.
-So we can do the assignment with the following commands::
-
-    source overcloudrc
-    for vm_host in $(openstack hypervisor list -f value -c "Hypervisor Hostname" | grep compute);
-    do
-        openstack aggregate add host virtual-hosts $vm_host
-    done
-
-    openstack aggregate add host baremetal-hosts overcloud-controller-0.localdomain
-    # Ignore the following two for a non-HA environment
-    openstack aggregate add host baremetal-hosts overcloud-controller-1.localdomain
-    openstack aggregate add host baremetal-hosts overcloud-controller-2.localdomain
-
 .. note::
-    Every time you scale out compute nodes, you need to add newly added
-    hosts to the ``virtual-hosts`` aggregate.
+    If you don't plan on using virtual instances, you can skip this step.
+    It also won't be required in the Stein release, after bare metal nodes
+    stopped report CPU, memory and disk properties.
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   For hybrid bare metal and virtual case you need to specify which host
+   belongs to which host aggregates (``virtual`` or ``baremetal`` as created in
+   `Creating host aggregates`_).
+
+   When the default host names are used, we can take advantage of the fact
+   that every virtual host will have ``compute`` in its name. All bare metal
+   hypervisors will be assigned to one (non-HA) or three (HA) controller hosts.
+   So we can do the assignment with the following commands::
+
+       source overcloudrc
+       for vm_host in $(openstack hypervisor list -f value -c "Hypervisor Hostname" | grep compute);
+       do
+           openstack aggregate add host virtual-hosts $vm_host
+       done
+
+       openstack aggregate add host baremetal-hosts overcloud-controller-0.localdomain
+       # Ignore the following two for a non-HA environment
+       openstack aggregate add host baremetal-hosts overcloud-controller-1.localdomain
+       openstack aggregate add host baremetal-hosts overcloud-controller-2.localdomain
+
+   .. note::
+       Every time you scale out compute nodes, you need to add newly added
+       hosts to the ``virtual-hosts`` aggregate.
 
 Checking available resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -913,14 +896,6 @@ names) check their inventory::
 
     $ curl -sH "X-Auth-Token: $token" $endpoint/resource_providers/e22bc261-53be-43b3-848f-e29c728142d3/inventories | jq .inventories
     {
-      "DISK_GB": {
-        "max_unit": 50,
-        "min_unit": 1,
-        "step_size": 1,
-        "reserved": 0,
-        "total": 50,
-        "allocation_ratio": 1
-      },
       "CUSTOM_BAREMETAL": {
         "max_unit": 1,
         "min_unit": 1,
@@ -1052,5 +1027,5 @@ Finally this volume can be used to back a baremetal instance::
 .. _root device hints documentation: https://docs.openstack.org/ironic/latest/install/advanced.html#specifying-the-disk-for-deployment-root-device-hints
 .. _images documentation: https://docs.openstack.org/ironic/latest/install/configure-glance-images.html
 .. _multi-tenant networking documentation: https://docs.openstack.org/ironic/latest/admin/multitenancy.html
-.. _networking-generic-switch: https://github.com/openstack/networking-generic-switch
+.. _networking-ansible: https://github.com/openstack/networking-ansible
 .. _deploy interfaces documentation: https://docs.openstack.org/ironic/latest/admin/interfaces/deploy.html

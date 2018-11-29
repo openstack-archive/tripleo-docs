@@ -21,24 +21,6 @@ For example
   Enable the appropriate repos for the desired release, as indicated below.
   Do not enable any other repos not explicitly marked for that release.
 
-  .. admonition:: Newton
-     :class: newton mton
-
-     Enable the current Newton repositories
-
-     .. code-block:: bash
-
-         sudo -E tripleo-repos -b newton current
-
-     .. admonition:: Ceph
-        :class: ceph
-
-        Include the Ceph repo in the tripleo-repos call
-
-        .. code-block:: bash
-
-           sudo -E tripleo-repos -b newton current ceph
-
   .. admonition:: Ocata
      :class: ocata ntoo
 
@@ -92,6 +74,24 @@ For example
         .. code-block:: bash
 
            sudo -E tripleo-repos -b queens current ceph
+
+  .. admonition:: Rocky
+     :class: rocky mton
+
+     Enable the current Rocky repositories
+
+     .. code-block:: bash
+
+         sudo -E tripleo-repos -b rocky current
+
+     .. admonition:: Ceph
+        :class: ceph
+
+        Include the Ceph repo in the tripleo-repos call
+
+        .. code-block:: bash
+
+           sudo -E tripleo-repos -b rocky current ceph
 
 
 .. warning::

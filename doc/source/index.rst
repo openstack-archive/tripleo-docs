@@ -34,6 +34,14 @@ Upgrades/Updates/FFWD-Upgrade
 
   upgrade/index
 
+Developer Guide
+---------------
+
+.. toctree::
+  :maxdepth: 3
+  :includehidden:
+
+  developer/index
 
 Documentation Conventions
 =========================

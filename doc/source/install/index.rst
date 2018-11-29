@@ -23,4 +23,3 @@ TripleO Install Guide
   troubleshooting/troubleshooting
   validations/validations
   mistral-api/mistral-api
-  developer/developer

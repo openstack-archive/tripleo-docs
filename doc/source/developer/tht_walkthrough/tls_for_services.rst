@@ -224,7 +224,7 @@ Internal TLS
 How it works
 ~~~~~~~~~~~~
 
-If you haven't read the section :doc:`../../advanced_deployment/tls_everywhere`
+If you haven't read the section :doc:`../../install/advanced_deployment/tls_everywhere`
 it is highly recommended you read that first before continuing.
 
 As mentioned, the default CA is FreeIPA, which issues the certificates that the
@@ -387,7 +387,7 @@ template. This section will be in the same level as ``config_settings`` and
 Note that it merely outputs the metadata_settings section that the apache base
 stack already outputs. This will give the appropriate parameters to a hook that
 sets the nova metadata, which in turn will be taken by the *novajoin* service
-(which was mentioned in the :doc:`../../advanced_deployment/tls_everywhere`
+(which was mentioned in the :doc:`../../install/advanced_deployment/tls_everywhere`
 section) to generate the service principals for httpd for the host.
 
 .. _configuring-haproxy-internal-tls:

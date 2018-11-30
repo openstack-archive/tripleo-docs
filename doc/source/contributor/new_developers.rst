@@ -107,16 +107,17 @@ interface functions along side the command line interface.
   tripleo-heat-templates.
 - New features should be reviewed by cores who have knowledge in that area of
   the codebase.
-- One should consider logging and support implications.  If you have new logs,
+- One should consider logging and support implications. If you have new logs,
   would they be available via sosreport.
 - Error messages are easy to understand and work their way back to the user
   (stack traces are not sufficient).
-- Documentation should be updated if necessary.  New features need a
+- Documentation should be updated if necessary. New features need a
   tripleo-docs patch.
 - If any new dependencies are used for your feature, be sure they are properly
-  packaged and available in RDO.  You can ask on #rdo for help with this.
+  packaged and available in RDO. You can ask on #rdo (on freenode server) for
+  help with this.
 - If a Mistral workflow changes between releases, make version notes so that
-  users know how they might have to update their workflow call.  Make sure it's
+  users know how they might have to update their workflow call. Make sure it's
   backwards-compatible, or have at least one cycle deprecation period before
   removing the old way of doing things.
 
@@ -132,4 +133,3 @@ services.
 
 Please see the following guide on how to set up a containerized undercloud:
 https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/undercloud.html
-

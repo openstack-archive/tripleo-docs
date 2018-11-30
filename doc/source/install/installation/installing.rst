@@ -122,6 +122,9 @@ Installing the Undercloud
         --local-push-destination \
         --output-env-file ~/containers-prepare-parameter.yaml
 
+   .. note::
+      This command is available since Rocky.
+
    See :ref:`prepare-environment-containers` for details on using
    `containers-prepare-parameter.yaml` to control what can be done
    during the container images prepare phase of an undercloud install.

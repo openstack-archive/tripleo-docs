@@ -97,7 +97,7 @@ extra privileges/permissions to be used by the novajoin services. Assuming
 there's an already existing FreeIPA installation, we can use a script that
 comes with the python-novajoin package::
 
-    sudo /usr/libexec/novajoin-ipa-setup \
+    sudo novajoin-ipa-setup \
         --principal admin \
         --password < freeipa admin password > \
         --server < freeipa server hostname > \

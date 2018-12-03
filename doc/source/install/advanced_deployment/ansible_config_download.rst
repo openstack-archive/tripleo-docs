@@ -168,7 +168,7 @@ take precendence over the defaults::
 
     openstack overcloud deploy \
       ...
-      --override-config-file /home/stack/ansible.cfg
+      --override-ansible-cfg /home/stack/ansible.cfg
 
 
 config-download with deployed-server

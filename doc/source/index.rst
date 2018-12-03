@@ -91,11 +91,6 @@ Linux (RHEL). These steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
-.. admonition:: Newton
-   :class: newton
-
-   Step that should only be run when installing from the Newton stable branch.
-
 .. admonition:: Ocata
    :class: ocata
 
@@ -105,6 +100,16 @@ Linux (RHEL). These steps are marked as follows:
    :class: pike
 
    Step that should only be run when installing from the Pike stable branch.
+
+.. admonition:: Queens
+   :class: queens
+
+   Step that should only be run when installing from the Queens stable branch.
+
+.. admonition:: Rocky
+   :class: rocky
+
+   Step that should only be run when installing from the Rocky stable branch.
 
 .. admonition:: Validations
    :class: validations

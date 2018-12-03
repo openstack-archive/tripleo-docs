@@ -99,6 +99,20 @@ Updating Undercloud Components
 
       sudo yum update python-tripleoclient* openstack-tripleo-common openstack-tripleo-heat-templates
 
+#. As part of the undercloud install, an image registry is configured on port
+   `8787`.  This is used to increase reliability of overcloud image pulls, and
+   minimise overall network transfers. First it is highly suggested to perform
+   a backup of the initial `containers-prepare-parameter.yaml` file. Then
+   update the new `containers-prepare-parameter.yaml` file with the same
+   modifications made in the initial one::
+
+      openstack tripleo container image prepare default \
+        --local-push-destination \
+        --output-env-file ~/containers-prepare-parameter.yaml
+
+   .. note::
+      This command is available since Rocky.
+
 #. Run the undercloud upgrade command. This command will upgrade all packages
    and use puppet to apply new configuration and restart all OpenStack
    services

@@ -18,31 +18,27 @@ There are two ways to assign a profile to a node. You can assign it directly
 or specify one or many suitable profiles for the deployment command to choose
 from. It can be done either manually or using the introspection rules.
 
-.. note::
-    Do not miss the "boot_option" part from any commands below,
-    otherwise your deployment won't work as expected.
-
 Manual profile tagging
 ----------------------
 
 To assign a profile to a node directly, issue the following command::
 
-    openstack baremetal node set <UUID OR NAME> --property capabilities=profile:<PROFILE>,boot_option:local
+    openstack baremetal node set <UUID OR NAME> --property capabilities=profile:<PROFILE>
 
 Alternatively, you can provide a number of profiles as capabilities in form of
 ``<PROFILE>_profile:1``, which later can be automatically converted to one
 assigned profile (see `Use the flavors to deploy`_ for details). For example::
 
-    openstack baremetal node set <UUID OR NAME> --property capabilities=compute_profile:1,control_profile:1,boot_option:local
+    openstack baremetal node set <UUID OR NAME> --property capabilities=compute_profile:1,control_profile:1
 
 Finally, to clean all profile information from a node use::
 
-    openstack baremetal node set <UUID OR NAME> --property capabilities=boot_option:local
+    openstack baremetal node unset <UUID OR NAME> --property capabilities
 
 .. note::
-    We can not update only a single key from the capabilities dictionary, so we
-    need to specify both the profile and the boot_option above. Otherwise, the
-    boot_option key will get removed.
+    We can not update only a single key from the capabilities dictionary, so if
+    it contained more then just the profile information then this will need to
+    be set for the node.
 
 Also see :ref:`instackenv` for details on how to set profile in the
 ``instackenv.json`` file.
@@ -209,7 +205,7 @@ they can be created as follows.
   needs to have the property ``capabilities:profile`` set to the intended
   profile::
 
-    openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:boot_option"="local" --property "capabilities:profile"="my-profile" my-flavor
+    openstack flavor set --property "cpu_arch"="x86_64" --property "capabilities:profile"="my-profile" my-flavor
 
   .. note::
     The flavor name does not have to match the profile name, although it's

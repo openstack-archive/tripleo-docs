@@ -189,7 +189,6 @@ in, rather than working inline.
         "remove": false,
         "ramdisk_name": "bm-deploy-ramdisk",
         "kernel_name": "bm-deploy-kernel",
-        "instance_boot_option": "local",
         "nodes_json": [
             {
                 "pm_password": "$RSA_PRIVATE_KEY",
@@ -212,8 +211,8 @@ in, rather than working inline.
   will be removed.
 * ``ramdisk_name`` and ``kernel_name`` are the Glance names for the kernel and
   ramdisk to use for the nodes.
-* ``instance_boot_option`` defines whether to set instances for booting from
-  the local hard drive (local) or network (netboot).
+* If ``instance_boot_option`` is set, it defines whether to set instances for
+  booting from the local hard drive (local) or network (netboot).
 * The format of the nodes_json is documented in :ref:`instackenv`.
 
 .. code-block:: bash

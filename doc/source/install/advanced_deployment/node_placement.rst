@@ -21,7 +21,7 @@ by the Nova scheduler on deployment.
 This can either be done via the nodes json file when registering the nodes, or
 alternatively via manual adjustment of the node capabilities, e.g::
 
-    openstack baremetal node set <id> --property capabilities='node:controller-0,boot_option:local'
+    openstack baremetal node set <id> --property capabilities='node:controller-0'
 
 This has assigned the capability ``node:controller-0`` to the node, and this
 must be repeated (using a unique continuous index, starting from 0) for all

@@ -31,57 +31,57 @@ speed.
 Repositories that are part of TripleO
 -------------------------------------
 
-* tripleo-common:
+* `tripleo-common <https://git.openstack.org/cgit/openstack/tripleo-common/>`_:
   This is intended to be for TripleO libraries of common code including Mistral
   workflows and actions.  Unfortunately it has become a bit overrun with
   unrelated bits.  Work is ongoing to clean this up and split this into
   separate repositories.
 
-* tripleo-heat-templates:
+* `tripleo-heat-templates <https://git.openstack.org/cgit/openstack/tripleo-heat-templates>`_:
   This contains all the Heat templates necessary to deploy the overcloud (and
   hopefully soon the undercloud as well).
 
-* python-tripleoclient:
+* `python-tripleoclient <https://git.openstack.org/cgit/openstack/python-tripleoclient>`_:
   The CLI for deploying TripleO.  This contains some logic but remember that we
   want to call Mistral actions from here where needed so that the logic can be
   shared with the UI.
 
-* tripleo-docs:
+* `tripleo-docs <https://git.openstack.org/cgit/openstack/tripleo-docs>`_:
   Where these docs are kept.
 
-* tripleo-image-elements:
+* `tripleo-image-elements <https://git.openstack.org/cgit/openstack/tripleo-image-elements>`_:
   Image elements (snippets of puppet that prepare specific parts of the
   image) for building the undercloud and overcloud disk images.
 
-* tripleo-puppet-elements:
+* `tripleo-puppet-elements <https://git.openstack.org/cgit/openstack/tripleo-puppet-elements>`_:
   Puppet elements used to configure and deploy the overcloud.  These
   used during installation to set up the services.
 
-* puppet-tripleo:
+* `puppet-tripleo <https://git.openstack.org/cgit/openstack/puppet-tripleo>`_:
   Puppet is used to configure the services in TripleO.  This repository
   contains various puppet modules for doing this.
 
-* tripleo-quickstart:
+* `tripleo-quickstart <https://git.openstack.org/cgit/openstack/tripleo-quickstart>`_:
   Quickstart is an Ansible driven deployment for TripleO used in CI.  Most
   developers also use this to stand up instances for development as well.
 
-* tripleo-quickstart-extras:
+* `tripleo-quickstart-extras <https://git.openstack.org/cgit/openstack/tripleo-quickstart-extras>`_:
   Extended functionality for tripleo-quickstart allowing for end-to-end
   deployment and testing.
 
-* tripleo-ui:
+* `tripleo-ui <https://git.openstack.org/cgit/openstack/tripleo-ui>`_:
   The web based graphical user interface for deploying TripleO.
 
-* paunch:
+* `paunch <https://git.openstack.org/cgit/openstack/paunch>`_:
   This is a library that is used to deploy containers.  It is called from the
   Heat templates during installation to deploy our containerized services.
 
-* kolla:
+* `kolla <https://git.openstack.org/cgit/openstack/kolla>`_:
   We use the containers built by the Kolla project for services in TripleO.
   Any new containers or additions to existing containers should be submitted
   here.
 
-* diskimage-builder:
+* `diskimage-builder <https://git.openstack.org/cgit/openstack/diskimage-builder>`_:
   Disk image builder is used to build our base images for the TripleO
   deployment.
 

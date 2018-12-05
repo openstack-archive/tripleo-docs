@@ -81,7 +81,7 @@ Repositories that are part of TripleO
   Any new containers or additions to existing containers should be submitted
   here.
 
-* disk-imagebuilder:
+* diskimage-builder:
   Disk image builder is used to build our base images for the TripleO
   deployment.
 

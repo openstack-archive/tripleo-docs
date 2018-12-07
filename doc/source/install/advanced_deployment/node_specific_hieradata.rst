@@ -26,12 +26,12 @@ Ironic database.
 
 Then extract the machine unique UUID for the target node with a command like::
 
-  openstack baremetal introspection data save NODE-ID | jq .extra.system.product.uuid
+  openstack baremetal introspection data save NODE-ID | jq .extra.system.product.uuid | tr '[:upper:]' '[:lower:]'
 
 where `NODE-ID` is the target node Ironic UUID. The value returned by the above
 command will be a unique and immutable machine UUID which isn't related to the
 Ironic node UUID. For the next step, we'll assume the output was
-`32E87B4C-C4A7-418E-865B-191684A6883B`.
+`32e87b4c-c4a7-41be-865b-191684a6883b`.
 
 Creating the Heat environment file
 ----------------------------------
@@ -45,7 +45,7 @@ For ceph-ansible use::
 
   parameter_defaults:
     NodeDataLookup: |
-      {"32E87B4C-C4A7-418E-865B-191684A6883B": {"devices": ["/dev/sdc"]}}
+      {"32e87b4c-c4a7-41be-865b-191684a6883b": {"devices": ["/dev/sdc"]}}
 
 For puppet-ceph use::
 
@@ -54,7 +54,7 @@ For puppet-ceph use::
 
   parameter_defaults:
     NodeDataLookup: |
-      {"32E87B4C-C4A7-418E-865B-191684A6883B": {"ceph::profile::params::osds": {"/dev/sdc": {}}}}
+      {"32e87b4c-c4a7-41be-865b-191684a6883b": {"ceph::profile::params::osds": {"/dev/sdc": {}}}}
 
 In the above example we're customizing only a single key for a single node, but
 the structure is that of a UUID-mapped hash so it is possible to customize

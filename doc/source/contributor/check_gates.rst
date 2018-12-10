@@ -157,6 +157,12 @@ The overridable settings are:
  - `tempest_format`: To run tempest using different format (packages, containers, venv).
  - `tempest_extra_config`: A dict of additional tempest config to be overridden.
  - `tempest_plugins`: A list of tempest plugins needs to be installed.
+ - `standalone_environment_files`: List of environment files to be overriden
+   by the featureset configuration on standalone deployment. The environment
+   file should exist in tripleo-heat-templates repo.
+ - `test_white_regex`: Regex to be used by tempest
+ - `tempest_workers`: Numbers of parallel workers to run
+ - `standalone_container_cli`: Container cli to use
 
 For a given job `tripleo-ci-centos-7-scenario001-multinode-oooq-container`, you
 can create a new abstract layer job and overrides the tempest tests::
@@ -178,6 +184,14 @@ can create a new abstract layer job and overrides the tempest tests::
             tempest_plugins:
               - 'python2-keystone-tests-tempest'
               - 'python2-cinder-tests-tempest'
+            tempest_workers: 1
+            test_white_regex:
+              - 'tempest.api.identity'
+              - 'keystone_tempest_plugin'
+            standalone_environment_files:
+              - 'environments/low-memory-usage.yaml'
+              - 'ci/environments/scenario003-standalone.yaml'
+            standalone_container_cli: docker
 
 In a similar way, for skipping Tempest run for the scenario001 job, you can do
 something like::

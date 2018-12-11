@@ -606,10 +606,35 @@ environment variable, and corresponding ``$<role-name>_hosts`` variables.
 Overcloud deployment. These role names correspond to the name of the roles from
 the roles data file used during the deployment.
 
-Each ``$<role-name>_hosts`` variable is a space separated list of IP addresses
-that are the IP addresses of the deployed servers for the roles. For example,
-in the above command, 192.168.25.1 is the IP of Controller 0, 192.168.25.2 is
-the IP of Controller 1, etc.
+Each ``$<role-name>_hosts`` variable is a space separated **ordered** list of
+IP addresses that are the IP addresses of the deployed servers for the roles.
+For example, in the above command, 192.168.25.1 is the IP of Controller 0,
+192.168.25.2 is the IP of Controller 1, etc.
+
+.. Note:: The IP addresses for the hosts in the ``$<role-name>_hosts`` variable
+          must be **ordered** to avoid Heat agent configuration mismatch.
+
+          Start with the address for the node with the lowest node-index and
+          count from there. For example, when deployed server IP addresses are:
+
+          * overcloud-controller-0: 192.168.25.10
+          * overcloud-controller-1: 192.168.25.11
+          * overcloud-controller-2: 192.168.25.12
+          * overcloud-compute-0: 192.168.25.20
+          * overcloud-compute-1: 192.168.25.21
+
+          The variables must be set as follows.
+          (**The order of entries is critical!**)
+
+          For Controllers::
+
+            #                               controller-0  controller-1  controller-2
+            ControllerDeployedServer_hosts="192.168.25.10 192.168.25.11 192.168.25.12"
+
+          For Computes::
+
+            #                            compute-0     compute-1
+            ComputeDeployedServer_hosts="192.168.25.20 192.168.25.21"
 
 The script will take care of querying Heat for each request metadata url,
 configure the url in the agent configuration file on each deployed server, and

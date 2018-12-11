@@ -9,6 +9,10 @@ Each stage shows the inputs taken and the artifacts produced.
           Links for stable branches would include the stable release name,
           for example, `Pike stable release <https://trunk.rdoproject.org/centos7-pike/tripleo-ci-testing/>`_.
 
+.. mermaid:: promotions.mmd
+
+*Overview of the tags used during the tripleo promotions stages*
+
 1. **Upstream TripleO**
 
     `CI DLRN Master consistent

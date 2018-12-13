@@ -125,7 +125,7 @@ Updating Undercloud Components
        The undercloud is containerized by default as of Rocky. Therefore,
        an undercloud deployed on Queens (non-containerized) will be upgraded
        to a containerized undercloud on Rocky, by default.
-       To upgrade with instack undercloud, you'll need to upgrade with
+       To upgrade with instack undercloud in Rocky, you'll need to upgrade with
        ``--use-heat=False`` option. Note this isn't tested and not supported.
 
    .. note::

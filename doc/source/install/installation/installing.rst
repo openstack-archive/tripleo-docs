@@ -184,7 +184,8 @@ Installing the Undercloud
 
 .. note::
     To install a deprecated instack undercloud, you'll need to deploy
-    with ``--use-heat=False`` option.
+    with ``--use-heat=False`` option. It only works in Rocky
+    as instack-undercloud was retired in Stein.
 
 
 In Rocky, we will run all the OpenStack services in a moby container runtime

@@ -805,7 +805,7 @@ service will be bound to the host IP within the named network on each host.
 
 .. note::
   The services will be assigned to the networks according to the
-  ``ServiceNetMap`` in ``overcloud.yaml``. Unless these
+  ``ServiceNetMap`` in ``network/service_net_map.j2.yaml``. Unless these
   defaults need to be overridden, the ServiceNetMap does not need to be defined
   in the environment file.
 

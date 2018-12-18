@@ -197,6 +197,8 @@ openstack overcloud external-upgrade run (for container images)
 
       openstack overcloud external-update run --tags container_image_prepare
 
+.. _openstack-overcloud-upgrade-run:
+
 openstack overcloud upgrade run
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

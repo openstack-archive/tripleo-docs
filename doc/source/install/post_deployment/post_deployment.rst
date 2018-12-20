@@ -17,3 +17,4 @@ In this chapter you will find advanced management of various |project| areas.
    upload_single_image
    update_undercloud_ssh_keys
    fernet_key_rotation
+   updating_network_configuration_post_deployment

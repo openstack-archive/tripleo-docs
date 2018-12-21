@@ -1,5 +1,5 @@
-Developer Docs
-==============
+Upgrades Development
+====================
 
 This section is intended to give a better understanding of the upgrade/update
 process in TripleO. As well as a walkthrough for developers on the way upgrade

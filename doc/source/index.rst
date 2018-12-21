@@ -4,8 +4,7 @@ Welcome to |project| documentation
 TripleO is a project aimed at installing, upgrading and operating OpenStack
 clouds using OpenStack's own cloud facilities as the foundation - building on
 Nova, Ironic, Neutron and Heat to automate cloud management at datacenter
-scale.
-
+scale
 
 Contributor Guide
 -----------------
@@ -15,6 +14,7 @@ Contributor Guide
   :includehidden:
 
   contributor/index
+  developer/index
 
 Install Guide
 -------------
@@ -33,15 +33,6 @@ Upgrades/Updates/FFWD-Upgrade
   :includehidden:
 
   upgrade/index
-
-Developer Guide
----------------
-
-.. toctree::
-  :maxdepth: 3
-  :includehidden:
-
-  developer/index
 
 Documentation Conventions
 =========================

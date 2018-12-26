@@ -332,7 +332,7 @@ for a full list of CLI arguments and options.
 
 Run ansible-playbook
 ^^^^^^^^^^^^^^^^^^^^
-Once the configuration has been downloaded and the inventory genreated, run
+Once the configuration has been downloaded and the inventory generated, run
 ``ansible-playbook`` to configure the overcloud nodes::
 
     ansible-playbook \

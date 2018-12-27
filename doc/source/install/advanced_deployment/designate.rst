@@ -24,18 +24,17 @@ configure it.
                  the file automatically.
 
 * ``ns_records``: There should be one of these for each node running designate,
-                  and they should point at the public IP of the node.
+  and they should point at the public IP of the node.
 * ``nameservers``: There should be one of these for each node running BIND.
-                   The ``host`` value should be the public IP of the node.
+  The ``host`` value should be the public IP of the node.
 * ``targets``: There should be one of these for each node running BIND.  Each
-               target has the following attributes which need to be configured:
+  target has the following attributes which need to be configured:
 
   * ``masters``: There should be one of these for each node running
-                 designate-mdns.  The ``host`` value should be the public IP
-                 of the node.
+    designate-mdns.  The ``host`` value should be the public IP of the node.
   * ``options``: This specifies where the target BIND instance will be
-                 listening.  ``host`` should be the public IP of the node, and
-                 ``rndc_host`` should be the internal_api IP of the node.
+    listening.  ``host`` should be the public IP of the node, and
+    ``rndc_host`` should be the internal_api IP of the node.
 
 Because this configuration requires the node IPs to be known ahead of time, it
 is necessary to use predictable IPs.  Full details on configuring those can be

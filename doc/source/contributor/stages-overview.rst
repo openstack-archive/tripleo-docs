@@ -94,7 +94,7 @@ Each stage shows the inputs taken and the artifacts produced.
 
     *Tag the containers* as ``current-tripleo-rdo-internal``
 
-    Run futher downstream jobs (scale etc.)
+    Run further downstream jobs (scale etc.)
     rdo-promote-master-rdo_trunk-nonvoting
 
 5. **OSP Phase 0**

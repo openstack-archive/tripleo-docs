@@ -111,7 +111,8 @@ the following::
 
 The above will produce three OSDs which run on `/dev/sdb`, `/dev/sdc`,
 and `/dev/sdd` which all journal to `/dev/sde`. This same setup will
-be duplicated per Ceph storage node and assumes uniform hardware.
+be duplicated per Ceph storage node and assumes uniform hardware. If
+you do not have uniform hardware see :doc:`node_specific_hieradata`.
 
 The `parameter_defaults` like the above may be saved in an environment
 file "~/my-ceph-settings.yaml" and added to the deploy commandline::
@@ -155,8 +156,8 @@ rebalance a cluster, use an example like the following::
       osd_recovery_max_active: 3
       osd_max_backfills: 1
 
-Configure container settings with ceph-ansible
-----------------------------------------------
+Override Ceph container parameters
+----------------------------------
 
 The group variables `ceph_osd_docker_memory_limit`, which corresponds
 to ``docker run ... --memory``, and `ceph_osd_docker_cpu_limit`, which
@@ -166,14 +167,34 @@ an example of setting custom values to these parameters::
 
   parameter_defaults:
     CephAnsibleExtraConfig:
-      ceph_osd_docker_memory_limit: 3g
+      ceph_osd_docker_memory_limit: 5g
       ceph_osd_docker_cpu_limit: 1
+
+When collocating Ceph OSD services on the same nodes which run Nova
+compute services (also known as "hyperconverged deployments"),
+variations of the above may be made to ensure Ceph does not consume
+resources Nova may need.
+
+ .. admonition:: ceph-ansible 3.2 and newer
+    :class: ceph
+
+    As of ceph-ansible 3.2, the `ceph_osd_docker_memory_limit` and
+    `ceph_osd_docker_cpu_limit` are set by default to the max memory
+    and CPU of the host in order to ensure Ceph does not run out of
+    resources unless the user specifically overrides these values. The
+    3.2 version also introduced the boolean `is_hci` flag, which may
+    be set when using bluestore to automatically tune the bluestore
+    cache size as below::
+
+       parameter_defaults:
+         CephAnsibleExtraConfig:
+           is_hci: true
 
 Configure OSD settings with ceph-ansible
 ----------------------------------------
 
-To specify a set of dedicated block devices to use as Ceph OSDs, use
-a variation of the following::
+To specify which block devices will be used as Ceph OSDs, use a
+variation of the following::
 
   parameter_defaults:
     CephAnsibleDisksConfig:
@@ -181,17 +202,20 @@ a variation of the following::
         - /dev/sdb
         - /dev/sdc
         - /dev/sdd
-      dedicated_devices:
-        - /dev/sde
-        - /dev/sde
-        - /dev/sde
-      osd_scenario: non-collocated
+        - /dev/nvme0n1
+      osd_scenario: lvm
+      osd_objectstore: bluestore
 
-The above will produce three OSDs which run on `/dev/sdb`, `/dev/sdc`,
-and `/dev/sdd` which all journal to `/dev/sde`. This same setup will
-be duplicated per Ceph storage node and assumes uniform hardware.
-If the journals will reside on the same disks as the OSDs then the
-above should be changed to the following::
+Because `/dev/nvme0n1` is in a higher performing device class, e.g.
+it is an SSD and the other devices are spinning HDDs, the above will
+produce three OSDs which run on `/dev/sdb`, `/dev/sdc`, and
+`/dev/sdd` and they will use `/dev/nvme0n1` as a bluestore WAL device.
+The `ceph-volume` tool does this by using `the "batch" subcommand`_.
+This same setup will be duplicated per Ceph storage node and assumes
+uniform hardware. If you do not have uniform hardware see
+:doc:`node_specific_hieradata`. If the bluestore WAL data will reside
+on the same disks as the OSDs, then the above could be changed to the
+following::
 
   parameter_defaults:
     CephAnsibleDisksConfig:
@@ -199,7 +223,155 @@ above should be changed to the following::
         - /dev/sdb
         - /dev/sdc
         - /dev/sdd
-      osd_scenario: collocated
+      osd_scenario: lvm
+      osd_objectstore: bluestore
+
+.. warning:: `osd_scenario: lvm` is used above to default new
+             deployments to bluestore as configured, by `ceph-volume`,
+             and is only available with ceph-ansible 3.2, or newer,
+             and with Luminous, or newer. The parameters to support
+             filestore with ceph-ansible 3.2 are backwards-compatible
+             so existing filestore deployments should not simply have
+             their `osd_objectstore` or `osd_scenario` parameters
+             changed without taking steps to maintain both backends.
+
+.. admonition:: Filestore or ceph-ansible 3.1 (or older)
+    :class: ceph
+
+    Ceph Luminous supports both filestore and bluestore, but bluestore
+    deployments require ceph-ansible 3.2, or newer, and `ceph-volume`.
+    For older versions, if the `osd_scenario` is either `collocated` or
+    `non-collocated`, then ceph-ansible will use the `ceph-disk` tool,
+    in place of `ceph-volume`, to configure Ceph's filestore backend
+    in place of bluestore. A variation of the above example which uses
+    filestore and `ceph-disk` is the following::
+
+       parameter_defaults:
+         CephAnsibleDisksConfig:
+           devices:
+             - /dev/sdb
+             - /dev/sdc
+             - /dev/sdd
+           dedicated_devices:
+             - /dev/nvme0n1
+             - /dev/nvme0n1
+             - /dev/nvme0n1
+           osd_scenario: non-collocated
+           osd_objectstore: filestore
+
+    The above will produce three OSDs which run on `/dev/sdb`,
+    `/dev/sdc`, and `/dev/sdd`, and which all journal to three
+    partitions which will be created on `/dev/nvme0n1`. If the
+    journals will reside on the same disks as the OSDs, then
+    the above should be changed to the following::
+
+       parameter_defaults:
+         CephAnsibleDisksConfig:
+           devices:
+             - /dev/sdb
+             - /dev/sdc
+             - /dev/sdd
+           osd_scenario: collocated
+           osd_objectstore: filestore
+
+    It is unsupported to use `osd_scenario: collocated` or
+    `osd_scenario: non-collocated` with `osd_objectstore: bluestore`.
+
+Maintaining both Bluestore and Filestore Ceph Backends
+------------------------------------------------------
+
+For existing Ceph deployments, it is possible to scale new Ceph
+storage nodes which use bluestore while keeping the existing Ceph
+storage nodes using filestore.
+
+In order to support both filestore and bluestore in a deployment,
+the nodes which use filestore must continue to use the filestore
+parameters like the following::
+
+   parameter_defaults:
+     CephAnsibleDisksConfig:
+       devices:
+         - /dev/sdb
+         - /dev/sdc
+       dedicated_devices:
+         - /dev/nvme0n1
+         - /dev/nvme0n1
+       osd_scenario: non-collocated
+       osd_objectstore: filestore
+
+While the nodes which will use bluestore, all of the new nodes, must
+use bluestore parameters like the following::
+
+  parameter_defaults:
+    CephAnsibleDisksConfig:
+      devices:
+        - /dev/sdb
+        - /dev/sdc
+        - /dev/nvme0n1
+      osd_scenario: lvm
+      osd_objectstore: bluestore
+
+To resolve this difference, use :doc:`node_specific_hieradata` to
+map the filestore node's machine unique UUID to the filestore
+parameters, so that only those nodes are passed the filestore
+parmaters, and then set the default Ceph parameters, e.g. those
+found in `~/my-ceph-settings.yaml`, to the bluestore parameters.
+
+An example of what the `~/my-node-settings.yaml` file, as described in
+:doc:`node_specific_hieradata`, might look like for two nodes which
+will keep using filestore is the following::
+
+  parameter_defaults:
+    NodeDataLookup: |
+    {
+      "00000000-0000-0000-0000-0CC47A6EFDCC": {
+        "devices": [
+          "/dev/sdb",
+          "/dev/sdc"
+        ],
+        "dedicated_devices": [
+          "/dev/nvme0n1",
+          "/dev/nvme0n1"
+        ],
+        "osd_scenario": "non-collocated",
+        "osd_objectstore": "filestore"
+      },
+      "00000000-0000-0000-0000-0CC47A6F13FF": {
+        "devices": [
+          "/dev/sdb",
+          "/dev/sdc"
+        ],
+        "dedicated_devices": [
+          "/dev/nvme0n1",
+          "/dev/nvme0n1"
+        ],
+        "osd_scenario": "non-collocated",
+        "osd_objectstore": "filestore"
+      }
+    }
+
+Be sure to set every existing Ceph filestore server to the filestore
+parameters by its machine unique UUID. If the above is not done and
+the default parameter is set to `osd_scenario=lvm` for the existing
+nodes which were configured with `ceph-disk`, then these OSDs will not
+start after a restart of the systemd unit or a system reboot.
+
+The example above, makes bluestore the new default and filestore an
+exception per node. An alternative approach is to keep the default of
+filestore and `ceph-disk` and use :doc:`node_specific_hieradata` for
+adding new nodes which use bluestore and `ceph-volume`. A benefit of
+this is that there wouldn't be any configuration change for existing
+nodes. However, every scale operation with Ceph nodes would require
+the use of :doc:`node_specific_hieradata`. While the example above,
+of making filestore and `ceph-disk` the per-node exception, requires
+more work up front, it simplifies future scale up when completed. If
+the cluster will be migrated to all bluestore, through node scale down
+and scale up, then the amount of items in `~/my-node-settings.yaml`
+could be reduced for each scale down and scale up operation until the
+full cluster uses bluestore.
+
+Customize Ceph Placement Groups per OpenStack Pool
+--------------------------------------------------
 
 The number of OSDs in a Ceph deployment should proportionally affect
 the number of Ceph PGs per Pool as determined by Ceph's
@@ -210,9 +382,6 @@ the following::
   parameter_defaults:
     CephPoolDefaultSize: 3
     CephPoolDefaultPgNum: 128
-
-Customize OpenStack Ceph Pools
-------------------------------
 
 In addition to setting the default PG number for each pool created,
 each Ceph pool created for OpenStack can have its own PG number.
@@ -326,6 +495,7 @@ overcloud nodes that Ansible uses to configure Ceph.
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible
 .. _`ceph.yaml static hieradata`: https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/hieradata/ceph.yaml
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars
+.. _`the "batch" subcommand`: http://docs.ceph.com/docs/master/ceph-volume/lvm/batch
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`ceph osd pool create`: http://docs.ceph.com/docs/jewel/rados/operations/pools/#create-a-pool
 .. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html

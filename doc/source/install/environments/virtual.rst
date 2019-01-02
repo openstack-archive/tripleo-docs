@@ -9,6 +9,6 @@ needed to act as the host for the virtual machines.
              purposes only.  This method cannot be used for production-ready
              deployments.
 
-The tripleo-quickstart project is used for creating virtual envirionments
+The tripleo-quickstart project is used for creating virtual environments
 for use with TripleO. Please see that documentation at
 https://docs.openstack.org/developer/tripleo-quickstart/

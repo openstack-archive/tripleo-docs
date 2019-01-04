@@ -31,3 +31,4 @@ Documentation on how to enable and configure various features available in
    rhsm
    designate
    multiple_overclouds
+   tuned

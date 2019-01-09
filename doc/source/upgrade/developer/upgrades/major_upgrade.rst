@@ -4,7 +4,7 @@ Overcloud Major Upgrade Workflow and CLI
 The purpose of this documentation is to deep-dive into the code which
 delivers the major upgrade workflow in TripleO. For information about
 the steps an operator needs to perform when running this upgrade
-please see the operator_docs_.
+please see the :doc:`operator docs</upgrade/major_upgrade>`.
 
 The major upgrade workflow is delivered almost exclusively via Ansible
 playbook invocations on the overcloud nodes. Heat is used to generate
@@ -32,7 +32,6 @@ you read the following sections:
    :target: ../../../_images/major_upgrade.png
 
 .. _queens_upgrade_spec: https://github.com/openstack/tripleo-specs/blob/master/specs/queens/tripleo_ansible_upgrades_workflow.rst
-.. _operator_docs: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/upgrade.html
 .. _python-tripleoclient: https://github.com/openstack/python-tripleoclient/blob/master/tripleoclient/v1/overcloud_upgrade.py
 .. _tripleo-common: https://github.com/openstack/tripleo-common/blob/master/workbooks/package_update.yaml
 .. _tripleo-heat-templates: https://github.com/openstack/tripleo-heat-templates/blob/8277d675bc9496eb164f429fa265f79252166f2d/common/deploy-steps.j2#L604
@@ -77,7 +76,8 @@ for messages on the Zaqar_queue_ that is used by the mistral workflow.
 The operator must include all environment files previously used with
 the `overcloud deploy` command. It is especially important that the
 operator includes the environment file containing the references for
-the target version container images. See the operator_docs_ for
+the target version container images. See the 
+:doc:`operator docs</upgrade/major_upgrade>` for
 pointers to how that file is generated and for reference it will look
 something like
 
@@ -138,7 +138,8 @@ ansible inventory based on the Heat stack outputs, so that for example
 ``Controller`` and ``overcloud-controller-0`` are both valid values for
 the ansible-playbook |--limit| parameter.
 
-As documented in the run_user_docs_ and the nodes_or_roles_helptext_,
+As documented in the :ref:`openstack-overcloud-upgrade-run` and the 
+nodes_or_roles_helptext_,
 the operator *must* use ``--roles`` for the controllers. Upgrading the
 controlplane, one node at a time is currently not supported, mainly
 due to limitations in the pacemaker cluster upgrade which needs to
@@ -181,7 +182,6 @@ before declaring the upgrade-run-success_!
 .. _tripleo-ansible-inventory: https://github.com/openstack/tripleo-common/blob/cef9c406514fd0b01b7984b89334d8e8abd7a244/tripleo_common/inventory.py#L1
 .. |--limit| replace:: ``--limit``
 .. _--limit: https://docs.ansible.com/ansible/2.4/ansible-playbook.html#cmdoption-ansible-playbook-l
-.. _run_user_docs: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/upgrade.html#openstack-overcloud-upgrade-run
 .. _nodes_or_roles_helptext: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L111-L131
 .. _limit_hosts: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L207-L212
 .. _run_update_ansible_action: https://github.com/openstack/python-tripleoclient/blob/c7b7b4e3dcd34f9e51686065e328e73556967bab/tripleoclient/v1/overcloud_upgrade.py#L212-L217

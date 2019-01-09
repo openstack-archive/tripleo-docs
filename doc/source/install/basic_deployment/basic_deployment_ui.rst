@@ -45,7 +45,7 @@ undercloud was :doc:`set up with SSL <../advanced_deployment/ssl>`:
 The username is ``admin`` and the password can be obtained by running
 the following command on the undercloud::
 
-  $ sudo hiera admin_password
+  $ sudo hiera keystone::admin_password
 
 .. note:: On an undercloud deployed without SSL, the UI and API
    endpoints are deployed on the control plane which may not be

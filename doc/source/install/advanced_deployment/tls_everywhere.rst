@@ -82,6 +82,10 @@ There are several things to note from the aforementioned command:
   if needed. Note that you can also specify manually the forwarders for the DNS
   setup through the ``--forwarder`` option.
 
+.. warning:: Take special care to ensure that the $FreeIPAIP is reachable by
+             the undercloud and overcloud nodes. This requirement is commonly
+             overlooked or misunderstood.
+
 For more information on FreeIPA and its capabilities, please consult the
 `FreeIPA documentation`_
 

@@ -127,7 +127,7 @@ Install the undercloud
 Once the ``undercloud.conf`` is updated with the desired configuration, install
 the undercloud by running the following command::
 
-  openstack undercloud install
+  $ openstack undercloud install
 
 Once the ``undercloud`` is installed complete the post-install tasks such as
 uploading images and registering baremetal nodes. (For addition details
@@ -281,26 +281,117 @@ the ones used in the ``subnets`` option in the undercloud configuration.
    the baremetal port connected to ``leaf0`` use ``ctlplane``. The remaining
    ports use the ``leafX`` names::
 
-     openstack baremetal port set --physical-network ctlplane <port-uuid>
+     $ openstack baremetal port set --physical-network ctlplane <port-uuid>
 
-     openstack baremetal port set --physical-network leaf1 <port-uuid>
-     openstack baremetal port set --physical-network leaf2 <port-uuid>
-     openstack baremetal port set --physical-network leaf2 <port-uuid>
+     $ openstack baremetal port set --physical-network leaf1 <port-uuid>
+     $ openstack baremetal port set --physical-network leaf2 <port-uuid>
+     $ openstack baremetal port set --physical-network leaf2 <port-uuid>
 
 #. Make sure the nodes are in ``available`` state before deploying the
    overcloud::
 
-    openstack overcloud node provide --all-manageable
+    $ openstack overcloud node provide --all-manageable
+
+Create network data with multi-subnet networks
+----------------------------------------------
+
+Network data (``network_data.yaml``) is used to define the networks in the
+deployment. Each network has a base subnet defined by the network's
+properties: ``ip_subnet``, ``allocation_pools``, ``gateway_ip``, ``vlan`` etc.
+
+With support for routed networks (multiple subnets per network) the schema for
+network's was extended with the ``subnets`` property, a map of one or more
+additional subnets associated with the network. ``subnets`` property example::
+
+  subnets:
+    <subnet_name>:
+      vlan: '<vlan_id>'
+      ip_subnet: '<network_address>/<prefix>'
+      allocation_pools: [{'start': '<start_address>', 'end': '<end_address>'}]
+      gateway_ip: '<router_ip_address>'
+
+.. Note::  The name of the base subnet is ``name_lower`` with the suffix
+           ``_subnet`` appended. For example, the base subnet on the
+           ``InternalApi`` network will be named ``internal_api_subnet``. This
+           name is used when setting the subnet for a role to use the base
+           subnet. (See
+           `Create roles specific to each leaf (layer 2 segment)`_)
+
+Full networks data example::
+
+  - name: External
+    vip: true
+    name_lower: external
+    vlan: 100
+    ip_subnet: '10.0.0.0/24'
+    allocation_pools: [{'start': '10.0.0.4', 'end': '10.0.0.99'}]
+    gateway_ip: '10.0.0.254'
+  - name: InternalApi
+    name_lower: internal_api
+    vip: true
+    vlan: 10
+    ip_subnet: '172.17.0.0/24'
+    allocation_pools: [{'start': '172.17.0.10', 'end': '172.17.0.250'}]
+    gateway_ip: '172.17.0.254'
+    subnets:
+      internal_api_leaf1:
+        vlan: 11
+        ip_subnet: '172.17.1.0/24'
+        allocation_pools: [{'start': '172.17.1.10', 'end': '172.17.1.250'}]
+        gateway_ip: '172.17.1.254'
+  - name: Storage
+    vip: true
+    vlan: 20
+    name_lower: storage
+    ip_subnet: '172.18.0.0/24'
+    allocation_pools: [{'start': '172.18.0.10', 'end': '172.18.0.250'}]
+    gateway_ip: '172.18.0.254'
+    subnets:
+      storage_leaf1:
+        vlan: 21
+        ip_subnet: '172.18.1.0/24'
+        allocation_pools: [{'start': '172.18.1.10', 'end': '172.18.1.250'}]
+        gateway_ip: '172.18.1.254'
+  - name: StorageMgmt
+    name_lower: storage_mgmt
+    vip: true
+    vlan: 30
+    ip_subnet: '172.19.0.0/24'
+    allocation_pools: [{'start': '172.19.0.10', 'end': '172.19.0.250'}]
+    gateway_ip: '172.19.0.254'
+    subnets:
+      storage_mgmt_leaf1:
+        vlan: 31
+        ip_subnet: '172.19.1.0/24'
+        allocation_pools: [{'start': '172.19.1.10', 'end': '172.19.1.250'}]
+        gateway_ip: '172.19.1.254'
+  - name: Tenant
+    vip: false  # Tenant network does not use VIPs
+    name_lower: tenant
+    vlan: 40
+    ip_subnet: '172.16.0.0/24'
+    allocation_pools: [{'start': '172.16.0.10', 'end': '172.16.0.250'}]
+    gateway_ip: '172.16.0.254'
+    subnets:
+      tenant_leaf1:
+        vlan: 41
+        ip_subnet: '172.16.1.0/24'
+        allocation_pools: [{'start': '172.16.1.10', 'end': '172.16.1.250'}]
+        gateway_ip: '172.16.1.254'
 
 Create roles specific to each leaf (layer 2 segment)
 ----------------------------------------------------
 
 To aid in scheduling and to allow override of leaf specific parameters in
-``tripleo-heat-templates`` create new roles for each l2 leaf. The following is
-an example with one controller role, and two compute roles. Please refer to
-:doc:`custom_roles` for details on configuring custom roles.
+``tripleo-heat-templates`` create new roles for each l2 leaf. In the
+``networks`` property for each role, add the networks and associated subnet.
 
-Example ``roles_data``::
+The following is an example with one controller role, and two compute roles.
+Please refer to :doc:`custom_roles` for details on configuring custom roles.
+
+Example ``roles_data`` below. (The list of default services has been left out.)
+
+::
 
   #############################################################################
   # Role: Controller                                                          #
@@ -314,142 +405,20 @@ Example ``roles_data``::
       - primary
       - controller
     networks:
-      - External
-      - InternalApi
-      - Storage
-      - StorageMgmt
-      - Tenant
+      External:
+        subnet: external_subnet
+      InternalApi:
+        subnet: internal_api_subnet
+      Storage:
+        subnet: storage_subnet
+      StorageMgmt:
+        subnet: storage_mgmt_subnet
+      Tenant:
+        subnet: tenant_subnet
     HostnameFormatDefault: '%stackname%-controller-%index%'
     ServicesDefault:
       - OS::TripleO::Services::AodhApi
-      - OS::TripleO::Services::AodhEvaluator
-      - OS::TripleO::Services::AodhListener
-      - OS::TripleO::Services::AodhNotifier
-      - OS::TripleO::Services::AuditD
-      - OS::TripleO::Services::BarbicanApi
-      - OS::TripleO::Services::BarbicanBackendSimpleCrypto
-      - OS::TripleO::Services::BarbicanBackendDogtag
-      - OS::TripleO::Services::BarbicanBackendKmip
-      - OS::TripleO::Services::BarbicanBackendPkcs11Crypto
-      - OS::TripleO::Services::CACerts
-      - OS::TripleO::Services::CeilometerAgentCentral
-      - OS::TripleO::Services::CeilometerAgentNotification
-      - OS::TripleO::Services::CephExternal
-      - OS::TripleO::Services::CephMds
-      - OS::TripleO::Services::CephMgr
-      - OS::TripleO::Services::CephMon
-      - OS::TripleO::Services::CephRbdMirror
-      - OS::TripleO::Services::CephRgw
-      - OS::TripleO::Services::CertmongerUser
-      - OS::TripleO::Services::CinderApi
-      - OS::TripleO::Services::CinderBackendDellPs
-      - OS::TripleO::Services::CinderBackendDellSc
-      - OS::TripleO::Services::CinderBackendDellEMCUnity
-      - OS::TripleO::Services::CinderBackendDellEMCVMAXISCSI
-      - OS::TripleO::Services::CinderBackendNetApp
-      - OS::TripleO::Services::CinderBackendScaleIO
-      - OS::TripleO::Services::CinderBackendVRTSHyperScale
-      - OS::TripleO::Services::CinderBackup
-      - OS::TripleO::Services::CinderHPELeftHandISCSI
-      - OS::TripleO::Services::CinderScheduler
-      - OS::TripleO::Services::CinderVolume
-      - OS::TripleO::Services::Clustercheck
-      - OS::TripleO::Services::Collectd
-      - OS::TripleO::Services::Congress
-      - OS::TripleO::Services::Docker
-      - OS::TripleO::Services::Ec2Api
-      - OS::TripleO::Services::Etcd
-      - OS::TripleO::Services::ExternalSwiftProxy
-      - OS::TripleO::Services::Fluentd
-      - OS::TripleO::Services::GlanceApi
-      - OS::TripleO::Services::GnocchiApi
-      - OS::TripleO::Services::GnocchiMetricd
-      - OS::TripleO::Services::GnocchiStatsd
-      - OS::TripleO::Services::HAproxy
-      - OS::TripleO::Services::HeatApi
-      - OS::TripleO::Services::HeatApiCfn
-      - OS::TripleO::Services::HeatEngine
-      - OS::TripleO::Services::Horizon
-      - OS::TripleO::Services::Ipsec
-      - OS::TripleO::Services::IronicApi
-      - OS::TripleO::Services::IronicConductor
-      - OS::TripleO::Services::IronicPxe
-      - OS::TripleO::Services::Iscsid
-      - OS::TripleO::Services::Keepalived
-      - OS::TripleO::Services::Kernel
-      - OS::TripleO::Services::Keystone
-      - OS::TripleO::Services::LoginDefs
-      - OS::TripleO::Services::ManilaApi
-      - OS::TripleO::Services::ManilaBackendCephFs
-      - OS::TripleO::Services::ManilaBackendIsilon
-      - OS::TripleO::Services::ManilaBackendNetapp
-      - OS::TripleO::Services::ManilaBackendUnity
-      - OS::TripleO::Services::ManilaBackendVNX
-      - OS::TripleO::Services::ManilaBackendVMAX
-      - OS::TripleO::Services::ManilaScheduler
-      - OS::TripleO::Services::ManilaShare
-      - OS::TripleO::Services::Memcached
-      - OS::TripleO::Services::MongoDb
-      - OS::TripleO::Services::MySQL
-      - OS::TripleO::Services::MySQLClient
-      - OS::TripleO::Services::NeutronApi
-      - OS::TripleO::Services::NeutronBgpVpnApi
-      - OS::TripleO::Services::NeutronSfcApi
-      - OS::TripleO::Services::NeutronCorePlugin
-      - OS::TripleO::Services::NeutronDhcpAgent
-      - OS::TripleO::Services::NeutronL2gwAgent
-      - OS::TripleO::Services::NeutronL2gwApi
-      - OS::TripleO::Services::NeutronL3Agent
-      - OS::TripleO::Services::NeutronLbaasv2Agent
-      - OS::TripleO::Services::NeutronLinuxbridgeAgent
-      - OS::TripleO::Services::NeutronMetadataAgent
-      - OS::TripleO::Services::NeutronML2FujitsuCfab
-      - OS::TripleO::Services::NeutronML2FujitsuFossw
-      - OS::TripleO::Services::NeutronOvsAgent
-      - OS::TripleO::Services::NeutronVppAgent
-      - OS::TripleO::Services::NovaApi
-      - OS::TripleO::Services::NovaConductor
-      - OS::TripleO::Services::NovaConsoleauth
-      - OS::TripleO::Services::NovaIronic
-      - OS::TripleO::Services::NovaMetadata
-      - OS::TripleO::Services::NovaPlacement
-      - OS::TripleO::Services::NovaScheduler
-      - OS::TripleO::Services::NovaVncProxy
-      - OS::TripleO::Services::Timesync
-      - OS::TripleO::Services::ContainersLogrotateCrond
-      - OS::TripleO::Services::OctaviaApi
-      - OS::TripleO::Services::OctaviaHealthManager
-      - OS::TripleO::Services::OctaviaHousekeeping
-      - OS::TripleO::Services::OctaviaWorker
-      - OS::TripleO::Services::OpenDaylightApi
-      - OS::TripleO::Services::OpenDaylightOvs
-      - OS::TripleO::Services::OVNDBs
-      - OS::TripleO::Services::OVNController
-      - OS::TripleO::Services::Pacemaker
-      - OS::TripleO::Services::PankoApi
-      - OS::TripleO::Services::RabbitMQ
-      - OS::TripleO::Services::Redis
-      - OS::TripleO::Services::Rhsm
-      - OS::TripleO::Services::RsyslogSidecar
-      - OS::TripleO::Services::SaharaApi
-      - OS::TripleO::Services::SaharaEngine
-      - OS::TripleO::Services::Securetty
-      - OS::TripleO::Services::SensuClient
-      - OS::TripleO::Services::SkydiveAgent
-      - OS::TripleO::Services::SkydiveAnalyzer
-      - OS::TripleO::Services::Snmp
-      - OS::TripleO::Services::Sshd
-      - OS::TripleO::Services::SwiftProxy
-      - OS::TripleO::Services::SwiftDispersion
-      - OS::TripleO::Services::SwiftRingBuilder
-      - OS::TripleO::Services::SwiftStorage
-      - OS::TripleO::Services::Tacker
-      - OS::TripleO::Services::Timezone
-      - OS::TripleO::Services::TripleoFirewall
-      - OS::TripleO::Services::TripleoPackages
-      - OS::TripleO::Services::Tuned
-      - OS::TripleO::Services::Vpp
-      - OS::TripleO::Services::Zaqar
+      - OS::TripleO::Services:: [...]
   #############################################################################
   # Role: ComputeLeaf0                                                        #
   #############################################################################
@@ -458,53 +427,17 @@ Example ``roles_data``::
       Basic Compute Node role
     CountDefault: 1
     networks:
-      - InternalApi
-      - Tenant
-      - Storage
+      InternalApi:
+        subnet: internal_api_subnet
+      Tenant:
+        subnet: tenant_subnet
+      Storage:
+        subnet: storage_subnet
     HostnameFormatDefault: '%stackname%-compute-leaf0-%index%'
     disable_upgrade_deployment: True
     ServicesDefault:
       - OS::TripleO::Services::AuditD
-      - OS::TripleO::Services::CACerts
-      - OS::TripleO::Services::CephClient
-      - OS::TripleO::Services::CephExternal
-      - OS::TripleO::Services::CertmongerUser
-      - OS::TripleO::Services::Collectd
-      - OS::TripleO::Services::ComputeCeilometerAgent
-      - OS::TripleO::Services::ComputeNeutronCorePlugin
-      - OS::TripleO::Services::ComputeNeutronL3Agent
-      - OS::TripleO::Services::ComputeNeutronMetadataAgent
-      - OS::TripleO::Services::ComputeNeutronOvsAgent
-      - OS::TripleO::Services::Docker
-      - OS::TripleO::Services::Fluentd
-      - OS::TripleO::Services::Ipsec
-      - OS::TripleO::Services::Iscsid
-      - OS::TripleO::Services::Kernel
-      - OS::TripleO::Services::LoginDefs
-      - OS::TripleO::Services::MySQLClient
-      - OS::TripleO::Services::NeutronBgpVpnBagpipe
-      - OS::TripleO::Services::NeutronLinuxbridgeAgent
-      - OS::TripleO::Services::NeutronVppAgent
-      - OS::TripleO::Services::NovaCompute
-      - OS::TripleO::Services::NovaLibvirt
-      - OS::TripleO::Services::NovaMigrationTarget
-      - OS::TripleO::Services::Timesync
-      - OS::TripleO::Services::ContainersLogrotateCrond
-      - OS::TripleO::Services::OpenDaylightOvs
-      - OS::TripleO::Services::Rhsm
-      - OS::TripleO::Services::RsyslogSidecar
-      - OS::TripleO::Services::Securetty
-      - OS::TripleO::Services::SensuClient
-      - OS::TripleO::Services::SkydiveAgent
-      - OS::TripleO::Services::Snmp
-      - OS::TripleO::Services::Sshd
-      - OS::TripleO::Services::Timezone
-      - OS::TripleO::Services::TripleoFirewall
-      - OS::TripleO::Services::TripleoPackages
-      - OS::TripleO::Services::Tuned
-      - OS::TripleO::Services::Vpp
-      - OS::TripleO::Services::OVNController
-      - OS::TripleO::Services::OVNMetadataAgent
+      - OS::TripleO::Services:: [...]
   #############################################################################
   # Role: ComputeLeaf1                                                        #
   #############################################################################
@@ -513,53 +446,17 @@ Example ``roles_data``::
       Basic Compute Node role
     CountDefault: 1
     networks:
-      - Internal1
-      - Tenant1
-      - Storage1
+      InternalApi:
+        subnet: internal_api_leaf1
+      Tenant:
+        subnet: tenant_leaf1
+      Storage:
+        subnet: storage_leaf1
     HostnameFormatDefault: '%stackname%-compute-leaf1-%index%'
     disable_upgrade_deployment: True
     ServicesDefault:
       - OS::TripleO::Services::AuditD
-      - OS::TripleO::Services::CACerts
-      - OS::TripleO::Services::CephClient
-      - OS::TripleO::Services::CephExternal
-      - OS::TripleO::Services::CertmongerUser
-      - OS::TripleO::Services::Collectd
-      - OS::TripleO::Services::ComputeCeilometerAgent
-      - OS::TripleO::Services::ComputeNeutronCorePlugin
-      - OS::TripleO::Services::ComputeNeutronL3Agent
-      - OS::TripleO::Services::ComputeNeutronMetadataAgent
-      - OS::TripleO::Services::ComputeNeutronOvsAgent
-      - OS::TripleO::Services::Docker
-      - OS::TripleO::Services::Fluentd
-      - OS::TripleO::Services::Ipsec
-      - OS::TripleO::Services::Iscsid
-      - OS::TripleO::Services::Kernel
-      - OS::TripleO::Services::LoginDefs
-      - OS::TripleO::Services::MySQLClient
-      - OS::TripleO::Services::NeutronBgpVpnBagpipe
-      - OS::TripleO::Services::NeutronLinuxbridgeAgent
-      - OS::TripleO::Services::NeutronVppAgent
-      - OS::TripleO::Services::NovaCompute
-      - OS::TripleO::Services::NovaLibvirt
-      - OS::TripleO::Services::NovaMigrationTarget
-      - OS::TripleO::Services::Timesync
-      - OS::TripleO::Services::ContainersLogrotateCrond
-      - OS::TripleO::Services::OpenDaylightOvs
-      - OS::TripleO::Services::Rhsm
-      - OS::TripleO::Services::RsyslogSidecar
-      - OS::TripleO::Services::Securetty
-      - OS::TripleO::Services::SensuClient
-      - OS::TripleO::Services::SkydiveAgent
-      - OS::TripleO::Services::Snmp
-      - OS::TripleO::Services::Sshd
-      - OS::TripleO::Services::Timezone
-      - OS::TripleO::Services::TripleoFirewall
-      - OS::TripleO::Services::TripleoPackages
-      - OS::TripleO::Services::Tuned
-      - OS::TripleO::Services::Vpp
-      - OS::TripleO::Services::OVNController
-      - OS::TripleO::Services::OVNMetadataAgent
+      - OS::TripleO::Services:: [...]
 
 Configure node placement
 ------------------------
@@ -568,48 +465,155 @@ Use node placement to map the baremetal nodes to roles, with each role using a
 different set of local layer 2 segments. Please refer to :doc:`node_placement`
 for details on how to configure node placement.
 
-Add configuration to parameters_default
----------------------------------------
+Add role specific configuration to ``parameter_defaults``
+---------------------------------------------------------
 
-Before deploying the ``overcloud`` create an environment file that contains the
-required overrides. In the example below parameter overrides for the following
-four roles and ``Controller``, ``ComputeLeaf0``, ``ComputeLeaf1`` and
-``ComputeLeaf2``.
+In TripleO templates role specific parameters are defined using variables. One
+of the variables used is ``{{role.name}}``. The templates have parameters such
+as ``{{role.name}}Count``, ``Overcloud{{role.name}}Flavor``,
+``{{role.name}}ControlPlaneSubnet`` and many more. This enables per-role values
+for these parameters.
 
-.. Note:: In TripleO templates role specific parameters are defined using
-          variables. One of the variables used is ``{{role.name}}``. The
-          templates have parameters such as ``{{role.name}}Count``,
-          ``{{role.name}}Flavor``, ``{{role.name}}ControlPlaneSubnet`` and
-          many more. This enables per-role values for these parameters, like in
-          the example below where they are used to specify the
-          *ControlPlaneSubnet* node *Count* and *Flavor* to use for the
-          *per-leaf* roles.
+Before deploying the ``overcloud`` create an environment file (The examples in
+this document uses ``node_data.yaml`` for this.) that contains the required
+overrides. In the example below there are parameter overrides to specify the
+*Count*, *Flavor* and *ControlPlaneSubnet* to use for the following roles:
+
+* Controller
+* ComputeLeaf0
+* ComputeLeaf1
 
 Parameter override example::
 
   parameter_defaults:
-    ControlPlaneSubnet: leaf0
     OvercloudComputeLeaf0Flavor: compute-leaf0
     OvercloudComputeLeaf1Flavor: compute-leaf1
-    OvercloudComputeLeaf2Flavor: compute-leaf2
     ControllerCount: 3
     ComputeLeaf0Count: 5
     ComputeLeaf1Count: 5
-    ComputeLeaf2Count: 5
     ControllerControlPlaneSubnet: leaf0
     ComputeLeaf0ControlPlaneSubnet: leaf0
     ComputeLeaf1ControlPlaneSubnet: leaf1
-    ComputeLeaf2ControlPlaneSubnet: leaf2
+
+Network configuration templates
+-------------------------------
+
+Network configuration templates are dynamically generated, but depending on the
+hardware configuration, the sample configurations might not be an option. If
+this is the case, the dynamically generated network configuration templates can
+be generated manually providing a good starting point for manual customization.
+
+Use the ``process-templates.py`` tool to generate network config templates for
+all roles. For example::
+
+  $ /usr/share/openstack-tripleo-heat-templates/tools/process-templates.py \
+      -p /usr/share/openstack-tripleo-heat-templates \
+      -r /home/stack/roles_data.yaml \
+      -n /home/stack/network_data_subnets_routed.yaml \
+      -o /home/stack/processed_templates
+
+The generated example templates for each role can now be found under the
+``/home/stack/processed_templates/network/config/`` directory::
+
+  /home/stack/processed_templates/network/config/
+  ├── bond-with-vlans
+  │   ├── computeleaf0.yaml
+  │   ├── computeleaf1.yaml
+  │   ├── controller-no-external.yaml
+  │   ├── controller-v6.yaml
+  │   ├── controller.yaml
+  │   └── README.md
+  ├── multiple-nics
+  │   ├── compute-dvr.yaml
+  │   ├── computeleaf0.yaml
+  │   ├── computeleaf1.yaml
+  │   ├── controller-v6.yaml
+  │   ├── controller.yaml
+  │   └── README.md
+  ├── single-nic-linux-bridge-vlans
+  │   ├── computeleaf0.yaml
+  │   ├── computeleaf1.yaml
+  │   ├── controller-v6.yaml
+  │   ├── controller.yaml
+  │   └── README.md
+  └── single-nic-vlans
+      ├── computeleaf0.yaml
+      ├── computeleaf1.yaml
+      ├── controller-no-external.yaml
+      ├── controller-v6.yaml
+      ├── controller.yaml
+      └── README.md
+
+Inspect the generated template files to find out which sample is most similar
+to the specific deployments hardware configuration. Make copies, and edit the
+network configuration templates as needed.
+
+.. Note:: If compute nodes (or some other roles) in different leaf's have the
+          same hardware configuration and network needs, a single network
+          configuration template can be used for both roles. For example the
+          ``computeleaf0.yaml`` template could be copied as compute.yaml, and
+          be used for both compute roles (``computeleaf0`` and
+          ``computeleaf1``).
+
+Create a environement file (``network-environment-overrides.yaml``) with
+``resource_registry`` overrides to specify the network configuration templates
+to use. For example::
+
+  resource_registry:
+    # Port assignments for the Controller
+    OS::TripleO::Controller::Net::SoftwareConfig:
+      /home/stack/templates/controller.yaml
+    # Port assignments for the ComputeLeaf0
+    OS::TripleO::ComputeLeaf0::Net::SoftwareConfig:
+      /home/stack/templates/compute.yaml
+    # Port assignments for the ComputeLeaf1
+    OS::TripleO::ComputeLeaf1::Net::SoftwareConfig:
+      /home/stack/templates/compute.yaml
+
+
+Virtual IP addresses (VIPs)
+---------------------------
+
+If the a controller role which is hosting VIP's (Virtual IP addresses) is not
+using the base subnet of one or more networks, additional overrides to the
+``VipSubnetMap`` is required to ensure VIP's are created on the subnet
+associated with the L2 network segment the controller nodes is connected to.
+
+Example, specifying which subnet's to use when creating VIP's for the different
+networks::
+
+  parameter_defaults:
+    VipSubnetMap:
+      ctlplane: leaf1
+      redis: internal_api_leaf1
+      InternalApi: internal_api_leaf1
+      Storage: storage_leaf1
+      StorageMgmt: storage_mgmt_leaf1
+
+In this document the ctlplane subnet for the Controller is ``leaf0``. To set
+which subnet on the ctlplane network that will be used for cluster VIP's
+(Virtual IP addresses) the ``VipSubnetMap`` parameter must be overridden in an
+environment file. For example add the following to
+``network-environment-overrides.yaml``::
+
+  parameter_defaults:
+    VipSubnetMap:
+      ctlplane: leaf0
+
 
 Deploy the overcloud
 --------------------
 
 To deploy the overcloud, run the ``openstack overcloud deploy`` specifying the
-roles data file and environment file. For example::
+roles data file, the network data file and environment files. For example::
 
-  openstack overcloud deploy --templates \
-  -r /home/stack/roles_data.yaml \
-  -e /home/stack/environments/node_data.yaml
+  $ openstack overcloud deploy --templates \
+      -n /home/stack/templates/network_data_subnets_routed.yaml
+      -r /home/stack/templates/roles_data.yaml \
+      -e /home/stack/environments/node_data.yaml \
+      -e /usr/share/openstack-tripleo-heat-tempaltes/environments/network-isolation.yaml \
+      -e /usr/share/openstack-tripleo-heat-tempaltes/environments/network-environment.yaml \
+      -e /home/stack/environments/network-environment-overrides.yaml
 
 .. Note:: Remember to include other environment files that you might want for
           configuration of the overcloud.

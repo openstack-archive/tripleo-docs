@@ -210,8 +210,9 @@ Additional configuration
   fully manage networking for nodes, including plugging and unplugging
   the provision and cleaning network. The ``IronicProvisioningNetwork``
   parameter has to be configured in a similar way to ``IronicCleaningNetwork``
-  (and in most cases to the same value). See the `multi-tenant networking
-  documentation`_ for more details.
+  (and in most cases to the same value). See
+  `Configuring ml2-ansible for multi-tenant networking`_ for a brief example
+  and `multi-tenant networking documentation`_ for more details.
 
   .. note::
     Please check with your switch vendor to learn if your switch and its
@@ -716,6 +717,10 @@ undercloud`_) should be in the following format:
           ports:
             - address: <PXE NIC MAC>
               pxe_enabled: true
+              local_link_connection:
+                switch_id: <SWITCH MAC>
+                switch_info: <SWITCH NAME>
+                port_id: <INTERFACE NAME>
 
 * The ``driver`` field must be one of ``IronicEnabledDrivers`` or
   ``IronicEnabledHardwareTypes``, which we set when `Configuring and deploying
@@ -759,6 +764,18 @@ undercloud`_) should be in the following format:
         Do not populate ``memory_mb`` and ``cpus`` before the Stein release if
         you do **not** use host aggregates for separating virtual and bare
         metal flavors as described in `Creating host aggregates`_.
+
+* ``local_link_connection`` is required when using the `neutron` network
+  interface. This information is needed so ironic/neutron can identify which
+  interfaces on switches corresponding to the ports defined in ironic.
+
+  * ``switch_id`` the ID the switch uses to identify itself over LLDP(usually
+    the switch MAC).
+
+  * ``switch_info`` the name associated with the switch in ``ML2HostConfigs``
+    (see ML2HostConfigs in `ml2-ansible example`_)
+
+  * ``port_id`` the name associated with the interface on the switch.
 
 Enrolling nodes
 ~~~~~~~~~~~~~~~
@@ -1018,6 +1035,165 @@ This image can then be added to glance and a volume created from it::
 Finally this volume can be used to back a baremetal instance::
 
     $ openstack server create --flavor baremetal --volume centos-test-volume --key default centos-test
+
+Configuring ml2-ansible for multi-tenant networking
+---------------------------------------------------
+
+Ironic can be configured to use a neutron ML2 mechanism driver for baremetal
+port binding. In this example we use the ml2-ansible plugin to configure
+ports on a Juniper switch (the plugin supports multiple switch types) to ensure
+baremetal networks are isolated from each other.
+
+ml2-ansible configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following parameters must be configured in an environment file and used
+when deploying the overcloud:
+
+* ``ML2HostConfigs:`` this mapping contains a entry for each switch netansible
+  will configure, for each switch there should be a key(where the key is used
+  to identify the switch) and a mapping containing details specific to the
+  switch, the following details should be provided
+
+  * ``ansible_network_os``: network platform the switch corresponds to.
+  * ``ansible_host``: switch IP
+  * ``ansible_user``: user to connect to the switch as
+  * ``ansible_ssh_pass``: (optional, alternatively use a private key) password
+  * ``ansible_ssh_private_key_file``: (optional, alternatively use a password) private key
+  * ``manage_vlans``: (optional, boolean) - If the vlan networks have not been defined on
+    your switch and the ansible_user has permission to create them, this should be left as
+    ``true``. If not then you need to set to ``false`` and ensure they are created by a user
+    with the appropriate permissions.
+  * ``mac``: (optional) - Chassis MAC ID of the switch
+
+* ``IronicDefaultNetworkInterface`` set the default network type for nodes being
+  deployed. In most cases when using multi-tenant networking you'll want to set
+  this to ``neutron``. If the default isn't set to ``neutron`` here then the
+  ``network-interface`` needs to be set on a per node bases. This can be done with
+  the ``--network-interface`` parameter to either the ``node create`` or ``node set``
+  command.
+
+The overcloud deploy command must also include
+``-e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-ml2-ansible.yaml``
+in order to set ``OS::TripleO::Services::NeutronCorePlugin`` and ``NeutronMechanismDrivers``.
+
+ml2-ansible example
+~~~~~~~~~~~~~~~~~~~
+
+In this minimalistic example we have a baremetal node (ironic-0) being
+controlled by ironic in the overcloud. This node is connected to a juniper
+switch with ironic/neutron controlling the vlan id for the switch::
+
+
+         +-------------------------------+
+         |                       xe-0/0/7+-+
+         |            switch1            | |
+         |xe-0/0/1                       | |
+         +-------------------------------+ |
+            |                              |
+            |                              |
+      +---------------+        +-----------------+
+      |     |         |        |                 |
+      | br-baremetal  |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      |   Overcloud   |        |    Ironic-0     |
+      |               |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      |               |        |                 |
+      +---------------+        +-----------------+
+
+Switch config for xe-0/0/7 should be removed before deployment, and
+xe-0/0/1 shoud be a member of the vlan range 1200-1299::
+
+  xe-0/0/1 {
+      native-vlan-id XXX;
+      unit 0 {
+          family ethernet-switching {
+              interface-mode trunk;
+              vlan {
+                  members [ XXX 1200-1299 ];
+              }
+          }
+      }
+  }
+
+We first need to deploy ironic in the overcloud and include the following
+configuration::
+
+  parameter_defaults:
+    IronicProvisioningNetwork: baremetal
+    IronicCleaningNetwork: baremetal
+    IronicDefaultNetworkInterface: neutron
+    NeutronMechanismDrivers: openvswitch,ansible
+    NeutronNetworkVLANRanges: baremetal:1200:1299
+    NeutronFlatNetworks: datacentre,baremetal
+    NeutronBridgeMappings: datacentre:br-ex,baremetal:br-baremetal
+    ML2HostConfigs:
+      switch1:
+        ansible_network_os: junos
+        ansible_host: 10.9.95.25
+        ansible_user: ansible
+        ansible_ssh_pass: ansible_password
+        manage_vlans: false
+
+
+Once the overcloud is deployed, we need to create a network that will be used
+as a provisioning (and cleaning) network::
+
+  openstack network create --provider-network-type vlan --provider-physical-network baremetal \
+    --provider-segment 1200 baremetal
+  openstack subnet create --network baremetal --subnet-range 192.168.25.0/24 --ip-version 4 \
+    --allocation-pool start=192.168.25.30,end=192.168.25.50 baremetal-subnet
+
+.. note::
+  This network should be routed to the ctlplane network on the overcloud (while
+  on this network the ironic-0 will need access to the TFTP/HTTP and the ironic
+  API), one way to acheive this would be to set up a network representing the
+  ctlplane network and add a router between them::
+
+    openstack network create --provider-network-type flat --provider-physical-network \
+      baremetal ctlplane
+    openstack subnet create --network ctlplane --subnet-range 192.168.24.0/24 \
+      --ip-version 4 --gateway 192.168.24.254 --no-dhcp ctlplane-subnet
+    openstack router create provisionrouter
+    openstack router add subnet provisionrouter baremetal-subnet
+    openstack router add subnet provisionrouter ctlplane-subnet
+
+  Each overcloud controller will also need a route added to route traffic
+  bound for 192.168.25.0/24 via 192.168.24.254, this can be done in the
+  network template when deploying the overcloud.
+
+If not already provided in ``overcloud-nodes.yaml`` above, the
+local-link-connection  values for `switch_info`, `port_id` and `switch_id`
+can be provided here::
+
+  openstack baremetal port set --local-link-connection switch_info=switch1 \
+    --local-link-connection port_id=xe-0/0/7 \
+    --local-link-connection switch_id=00:00:00:00:00:00 <PORTID>
+
+The node can now be registered with ironic and cleaned in the usual way,
+once the node is available it can be used by another tenant in a regular
+VLAN network::
+
+  openstack network create tenant-net
+  openstack subnet create --network tenant-net --subnet-range 192.168.3.0/24 \
+    --allocation-pool start=192.168.3.10,end=192.168.3.20 tenant-subnet
+  openstack server create --flavor baremetal --image overcloud-full \
+    --key default --network tenant-net test1
+
+Assuming an external network is available the server can then be allocated a floating ip::
+
+  openstack router create external
+  openstack router add subnet external tenant-subnet
+  openstack router set --external-gateway external external
+  openstack floating ip create external
+  openstack server add floating ip test1 <IP>
+
 
 .. _IronicConductor role shipped with TripleO: https://git.openstack.org/cgit/openstack/tripleo-heat-templates/plain/roles/IronicConductor.yaml
 .. _driver configuration guide: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html

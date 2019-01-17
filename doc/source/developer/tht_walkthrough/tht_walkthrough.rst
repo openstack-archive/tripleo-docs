@@ -21,3 +21,4 @@ repositories, using part of the architecture defined in the `composable services
    design-patterns
    tls_for_services
    summary
+   service_template_sections

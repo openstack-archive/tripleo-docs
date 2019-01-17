@@ -1,3 +1,5 @@
+.. _routed_spine_leaf_network:
+
 Deploying Overcloud with L3 routed networking
 =============================================
 

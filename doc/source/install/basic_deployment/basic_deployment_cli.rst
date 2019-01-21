@@ -264,7 +264,7 @@ Load the images into the containerized undercloud Glance::
 
 To upload a single image, see :doc:`../post_deployment/upload_single_image`.
 
-If working with multiple atchitectures and/or plaforms with an architecure these
+If working with multiple architectures and/or plaforms with an architecure these
 attributes can be specified at upload time as in::
 
     openstack overcloud image upload
@@ -286,6 +286,8 @@ attributes can be specified at upload time as in::
 
 This will create 3 sets of images with in the undercloud image service for later
 use in deployment, see :doc:`../environments/baremetal`
+
+.. _node-registration:
 
 Register Nodes
 --------------

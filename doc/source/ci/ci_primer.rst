@@ -148,3 +148,12 @@ search for it by name using the rdo-codesearch_.
 .. _rdo-jobs-zuul.d: https://github.com/rdo-infra/rdo-jobs/tree/master/zuul.d
 .. _periodic-tripleo-ci-centos-7-multinode-1ctlr-featureset010-master: https://github.com/rdo-infra/rdo-jobs/blob/76daaff19a464614a002655bc85db4080607f1bf/zuul.d/multinode-jobs.yaml#L148
 .. _rdo-codesearch: https://codesearch.rdoproject.org/?q=periodic-tripleo-ci-centos-7-multinode-1ctlr-featureset010-master&i=nope&files=&repos=
+
+Contacting CI team
+------------------
+
+When in need you can contact the TripleO CI team members on one of the two
+irc channels on freenode #tripleo by mentioning ``@oooq`` keyword in your
+message as team members get notified about such messages. It is good to
+remember that those nicknames with ``|ruck`` and ``|rover`` suffix are on duty
+to look for CI status.

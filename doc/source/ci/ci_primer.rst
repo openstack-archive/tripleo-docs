@@ -25,7 +25,7 @@ submission merges. This then means that the job is broken in subsequent check ru
 Non tripleo-projects are not gated in tripleo. The promotion jobs
 represent the point at which we take the latest built tripleo packages and the
 latest built non-tripleo projects packages (like nova, neutron etc) and test these together.
-For more information about promotions refer to :doc:`Promotion Stages</contributor/stages-overview>`
+For more information about promotions refer to :doc:`Promotion Stages</ci/stages-overview>`
 
 Where do tripleo-ci jobs live
 -----------------------------
@@ -126,7 +126,7 @@ Where do tripleo promotion jobs live
 
 The tripleo promotions jobs are not defined in the tripleo-ci but instead live
 in the rdo-jobs_ repository. For more information about the promotion pipeline
-in TripleO refer to the :doc:`Promotion Stages</contributor/stages-overview>`
+in TripleO refer to the :doc:`Promotion Stages</ci/stages-overview>`
 
 Similar to the tripleo-ci jobs, they are defined in various files under the
 rdo-jobs-zuul.d_ directory and the job definitions look very similar to the

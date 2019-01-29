@@ -16,6 +16,15 @@ Contributor Guide
   contributor/index
   developer/index
 
+Tripleo CI Guide
+----------------
+
+.. toctree::
+  :maxdepth: 3
+  :includehidden:
+
+  ci/index
+
 Install Guide
 -------------
 

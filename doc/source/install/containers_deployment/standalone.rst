@@ -89,6 +89,25 @@ Deploying a Standalone OpenStack node
 #. Configure basic standalone parameters which include network configuration
    and some deployment options.
 
+   .. warning::
+      The standalone deployment requires one network interface on the deployment
+      machine  and **that interface will be reconfigured as per the parameters
+      you specify below**. The interface you want to use is specified by name
+      in the $INTERFACE parameter below and passed as the NeutronPublicInterface
+      in the standalone_parameters.yaml. If you only have one interface on your
+      machine be advised that it will be reconfigured to have the IP address
+      specified in $IP. If that is a remote box you may lose connectivity to it.
+      Any other network interfaces are left untouched.
+
+   For the standalone deployment we use a single NIC on the target machine
+   which is reconfigured and set as a member of an ovs bridge, **br-ctlplane**. Two
+   examples follow which can be copy/pasted as is - depending on your setup.
+   You should only have to change the name of the interface to match whatever
+   it is called on your system. Ideally you will have two network interfaces,
+   so that one is used for the standalone deployment, whilst the other will be
+   left untouched. This can be especially important if you are deploying on a
+   remote box (e.g. via ssh).
+
    The following configuration can be used for a system with 2 network
    interfaces. This configuration assumes the first interface is used for
    management and we will only configure the second interface. The deployment

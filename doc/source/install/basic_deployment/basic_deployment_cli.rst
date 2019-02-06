@@ -647,7 +647,7 @@ To use a VLAN, the following example should work. Customize the address ranges
 and VLAN id based on the environment::
 
     openstack network create public --external --provider-network-type vlan \
-    --provider-physical-network datacentre --provider-segment 195 \
+    --provider-physical-network datacentre --provider-segment 195
     openstack subnet create --allocation-pool start=172.16.23.140,end=172.16.23.240 \
     --network public --no-dhcp --gateway 172.16.23.251 \
     --subnet-range 172.16.23.128/25 public

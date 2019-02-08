@@ -8,5 +8,6 @@ TripleO CI Guide
   ci_primer
   reproduce-ci
   check_gates
+  standalone_scenario_jobs
   dlrn-promoter-overview
   stages-overview

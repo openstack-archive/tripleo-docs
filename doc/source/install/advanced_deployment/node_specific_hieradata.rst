@@ -44,8 +44,7 @@ or puppet-ceph (Ocata and older).
 For ceph-ansible use::
 
   parameter_defaults:
-    NodeDataLookup: |
-      {"32e87b4c-c4a7-41be-865b-191684a6883b": {"devices": ["/dev/sdc"]}}
+    NodeDataLookup: {"32e87b4c-c4a7-41be-865b-191684a6883b": {"devices": ["/dev/sdc"]}}
 
 For puppet-ceph use::
 
@@ -53,8 +52,7 @@ For puppet-ceph use::
     OS::TripleO::CephStorageExtraConfigPre: /path/to/tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml
 
   parameter_defaults:
-    NodeDataLookup: |
-      {"32e87b4c-c4a7-41be-865b-191684a6883b": {"ceph::profile::params::osds": {"/dev/sdc": {}}}}
+    NodeDataLookup: {"32e87b4c-c4a7-41be-865b-191684a6883b": {"ceph::profile::params::osds": {"/dev/sdc": {}}}}
 
 In the above example we're customizing only a single key for a single node, but
 the structure is that of a UUID-mapped hash so it is possible to customize

@@ -322,33 +322,25 @@ An example of what the `~/my-node-settings.yaml` file, as described in
 will keep using filestore is the following::
 
   parameter_defaults:
-    NodeDataLookup: |
-    {
-      "00000000-0000-0000-0000-0CC47A6EFDCC": {
-        "devices": [
-          "/dev/sdb",
-          "/dev/sdc"
-        ],
-        "dedicated_devices": [
-          "/dev/nvme0n1",
-          "/dev/nvme0n1"
-        ],
-        "osd_scenario": "non-collocated",
-        "osd_objectstore": "filestore"
-      },
-      "00000000-0000-0000-0000-0CC47A6F13FF": {
-        "devices": [
-          "/dev/sdb",
-          "/dev/sdc"
-        ],
-        "dedicated_devices": [
-          "/dev/nvme0n1",
-          "/dev/nvme0n1"
-        ],
-        "osd_scenario": "non-collocated",
-        "osd_objectstore": "filestore"
-      }
-    }
+    NodeDataLookup:
+      00000000-0000-0000-0000-0CC47A6EFDCC:
+        devices:
+          - /dev/sdb
+          - /dev/sdc
+        dedicated_devices:
+          - /dev/nvme0n1
+          - /dev/nvme0n1
+        osd_scenario: non-collocated
+        osd_objectstore: filestore
+      00000000-0000-0000-0000-0CC47A6F13FF:
+        devices:
+          - /dev/sdb
+          - /dev/sdc
+        dedicated_devices:
+          - /dev/nvme0n1
+          - /dev/nvme0n1
+        osd_scenario: non-collocated
+        osd_objectstore: filestore
 
 Be sure to set every existing Ceph filestore server to the filestore
 parameters by its machine unique UUID. If the above is not done and

@@ -33,3 +33,4 @@ Documentation on how to enable and configure various features available in
    multiple_overclouds
    tuned
    deploy_openshift
+   deploy_cellv2

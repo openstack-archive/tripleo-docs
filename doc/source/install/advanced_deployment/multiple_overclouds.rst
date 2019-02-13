@@ -32,33 +32,40 @@ Deploying Additional Overclouds
 -------------------------------
 
 Additional Overclouds can be deployed by specifying a new stack name and any
-parameters that are unique to the new cloud in a new deployment plan.
+necessary parameters in a new deployment plan. Networks for additional
+overclouds must be defined as :doc:`custom networks <./custom_networks>`
+with ``name_lower`` and ``service_net_map_replace`` directives for each
+overcloud to have unique networks in the resulting stack.
 
 If your first cloud was named ``overcloud`` and had the following
-``network-environment.yaml``::
+``network_data.yaml``::
 
-    grep VlanID overcloud/network-environment.yaml
-      InternalApiNetworkVlanID: 201
-      StorageNetworkVlanID: 202
-      StorageMgmtNetworkVlanID: 203
-      TenantNetworkVlanID: 204
-      ExternalNetworkVlanID: 100
+    cat overcloud/network_data.yaml
+     - name: InternalApi
+       name_lower: internal_api_cloud_1
+       service_net_map_replace: internal_api
+       vip: true
+       vlan: 201
+       ip_subnet: '172.17.0.0/24'
+       allocation_pools: [{'start': '172.17.0.4', 'end': '172.17.0.250'}]
 
-And your second Overcloud has a different set of VLANs, you would create a new
-``network-environment.yaml`` file with the appropriate values::
+You would create a new ``network_data.yaml`` with unique ``name_lower`` values
+and VLANs for each network, making sure to specify ``service_net_map_replace``::
 
-    grep VlanID overcloud-two/network-environment.yaml
-      InternalApiNetworkVlanID: 301
-      StorageNetworkVlanID: 302
-      StorageMgmtNetworkVlanID: 303
-      TenantNetworkVlanID: 304
-      ExternalNetworkVlanID: 100
+    cat overcloud-two/network_data.yaml
+     - name: InternalApi
+       name_lower: internal_api_cloud_2
+       service_net_map_replace: internal_api
+       vip: true
+       vlan: 301
+       ip_subnet: '172.21.0.0/24'
+       allocation_pools: [{'start': '172.21.0.4', 'end': '172.21.0.250'}]
 
-And deploy the second Overcloud as::
+Then deploy the second Overcloud as::
 
     openstack overcloud deploy --templates ~/overcloud-two/templates/ \
      --stack overcloud-two \
-     -e ~/overcloud-two/network-environment.yaml
+     -n ~/overcloud-two/network_data.yaml
 
 
 Managing Heat Templates

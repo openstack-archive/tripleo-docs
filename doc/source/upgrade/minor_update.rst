@@ -99,11 +99,11 @@ the OpenStack release that you currently operate, perform these steps:
 #. **Update run**
 
    Run the update procedure on a subset of nodes selected via the
-   ``--nodes`` parameter:
+   ``--limit`` parameter:
 
    .. code-block:: bash
 
-      openstack overcloud update run --nodes overcloud-controller-0
+      openstack overcloud update run --limit overcloud-controller-0
 
    You can specify a role name, e.g. 'Compute', to execute the minor
    update on all nodes of that role in a rolling fashion (`serial: 1`
@@ -224,10 +224,16 @@ the registry file generated from the first step above::
 
     openstack overcloud update --init-minor-update --container-registry-file latest-images.yaml
 
-3. Invoke the minor update on the nodes specified with the ``--nodes``
+3. Invoke the minor update on the nodes specified with the ``--limit``
 parameter::
 
-    openstack overcloud update --nodes controller-0
+    openstack overcloud update --limit controller-0
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   The `--limit` was introduced in the Stein release. In previous versions,
+   use `--nodes` or `--roles` parmeters.
 
 You can specify a role name, e.g. 'Compute', to execute the minor update on
 all nodes of that role in a rolling fashion (serial:1 is used on the playbooks).

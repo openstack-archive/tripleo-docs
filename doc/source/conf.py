@@ -13,6 +13,9 @@
 # import os
 # import sys
 
+from pyquery import PyQuery
+import requests
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -119,11 +122,64 @@ latex_elements = {
     # 'preamble': '',
     }
 
+
+def _get_name_version(index=1):
+    response = requests.get('https://releases.openstack.org/')
+    release_list = PyQuery(response.content)
+    all_tr = release_list('tr')
+    release = all_tr('td:first')[index]
+
+    return release.text_content()
+
+
+def get_oldest_version_name():
+    return _get_name_version(index=4)
+
+
+def get_before_oldest_version_name():
+    return _get_name_version(index=3)
+
+
+def get_before_latest_version_name():
+    return _get_name_version(index=2)
+
+
+def get_latest_version_name():
+    """Get the name of the last stable version"""
+    return _get_name_version()
+
+
+oldest_version_name = get_oldest_version_name()
+oldest_version_name_lower = oldest_version_name.lower()
+before_oldest_version_name = get_before_oldest_version_name()
+before_oldest_version_name_lower = before_oldest_version_name.lower()
+before_latest_version_name = get_before_latest_version_name()
+before_latest_version_name_lower = before_latest_version_name.lower()
+latest_version_name = get_latest_version_name()
+latest_version_name_lower = latest_version_name.lower()
 rst_prolog = """
-.. |project| replace:: %s
-.. |bug_tracker| replace:: %s
-.. |bug_tracker_url| replace:: %s
-""" % (project, bug_tracker, bug_tracker_url)
+.. |project| replace:: {project}
+.. |bug_tracker| replace:: {bug_tracker}
+.. |bug_tracker_url| replace:: {bug_tracker_url}
+.. |oldest_version_name| replace:: {oldest_version_name}
+.. |oldest_version_name_lower| replace:: {oldest_version_name_lower}
+.. |before_oldest_version_name| replace:: {before_oldest_version_name}
+.. |before_oldest_version_name_lower| replace:: {b_oldest_version_name_lower}
+.. |before_latest_version_name| replace:: {before_latest_version_name}
+.. |before_latest_version_name_lower| replace:: {b_latest_version_name_lower}
+.. |latest_version_name| replace:: {latest_version_name}
+.. |latest_version_name_lower| replace:: {latest_version_name_lower}
+""".format(
+    project=project, bug_tracker=bug_tracker, bug_tracker_url=bug_tracker_url,
+    oldest_version_name=oldest_version_name,
+    oldest_version_name_lower=oldest_version_name_lower,
+    before_oldest_version_name=before_oldest_version_name,
+    b_oldest_version_name_lower=before_oldest_version_name_lower,
+    before_latest_version_name=before_latest_version_name,
+    b_latest_version_name_lower=before_latest_version_name_lower,
+    latest_version_name=latest_version_name,
+    latest_version_name_lower=latest_version_name_lower
+)
 
 # openstackdocstheme options
 repository_name = 'openstack/tripleo-docs'

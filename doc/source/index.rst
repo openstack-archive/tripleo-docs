@@ -100,25 +100,28 @@ Linux (RHEL). These steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
-.. admonition:: Pike
-   :class: pike
+.. admonition:: |oldest_version_name|
+   :class: |oldest_version_name_lower|
 
-   Step that should only be run when installing from the Pike stable branch.
+   Step that should only be run when installing from the |oldest_version_name|
+   stable branch.
 
-.. admonition:: Queens
-   :class: queens
+.. admonition:: |before_oldest_version_name|
 
-   Step that should only be run when installing from the Queens stable branch.
+   Step that should only be run when installing from the
+   |before_oldest_version_name| stable branch.
 
-.. admonition:: Rocky
-   :class: rocky
+.. admonition:: |before_latest_version_name|
+   :class: |before_latest_version_name_lower|
 
-   Step that should only be run when installing from the Rocky stable branch.
+   Step that should only be run when installing from the
+   |before_latest_version_name| stable branch.
 
-.. admonition:: Stein
-   :class: stein
+.. admonition:: |latest_version_name|
+   :class: |latest_version_name_lower|
 
-   Step that should only be run when installing from the Stein stable branch.
+   Step that should only be run when installing from the |latest_version_name|
+   stable branch.
 
 .. admonition:: Validations
    :class: validations

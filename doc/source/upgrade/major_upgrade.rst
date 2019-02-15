@@ -205,15 +205,12 @@ openstack overcloud upgrade run
 The `upgrade run` command runs the Ansible playbooks to deliver the upgrade configuration.
 By default, 3 playbooks are executed: the upgrade_steps_playbook, then the
 deploy_steps_playbook and finally the post_upgrade_steps_playbook. These
-playbooks are invoked on those overcloud nodes specified by the ``--roles`` or
-``--nodes`` parameters, which are mutually exclusive. You are expected to use
-``--roles`` for controlplane nodes, since these need to be upgraded in the same
-step. For non controlplane nodes, such as Compute or Storage, you can use
-``--nodes`` to specify a single node or list of nodes to upgrade.
+playbooks are invoked on those overcloud nodes specified by the ``--limit``
+parameter.
 
 .. code-block:: bash
 
-   openstack overcloud upgrade run --roles Controller
+   openstack overcloud upgrade run --limit Controller
 
 **Optionally** specify ``--playbook`` to manually step through the upgrade
 playbooks: You need to run all three in this order and as specified below
@@ -221,9 +218,9 @@ playbooks: You need to run all three in this order and as specified below
 
 .. code-block:: bash
 
-   openstack overcloud upgrade run --roles Controller --playbook upgrade_steps_playbook.yaml
-   openstack overcloud upgrade run --roles Controller --playbook deploy_steps_playbook.yaml
-   openstack overcloud upgrade run --roles Controller --playbook post_upgrade_steps_playbook.yaml
+   openstack overcloud upgrade run --limit Controller --playbook upgrade_steps_playbook.yaml
+   openstack overcloud upgrade run --limit Controller --playbook deploy_steps_playbook.yaml
+   openstack overcloud upgrade run --limit Controller --playbook post_upgrade_steps_playbook.yaml
 
 After all three playbooks have been executed without error on all nodes of
 the controller role the controlplane will have been fully upgraded to Queens.
@@ -242,30 +239,20 @@ passed during upgrade prepare.
    [root@overcloud-controller-0 ~]# docker ps -a
 
 For non controlplane nodes, such as Compute or ObjectStorage, you can use
-``--nodes overcloud-compute-0`` to upgrade particular nodes, or even
+``--limit overcloud-compute-0`` to upgrade particular nodes, or even
 "compute0,compute1,compute3" for multiple nodes. Note these are again
-upgraded in parallel. Also note that you can still use the ``--roles`` parameter
-with non controlplane roles if that is preferred.
+upgraded in parallel. Also note that you can pass roles names to upgrade all
+nodes in a role at the same time is preferred.
 
 .. code-block:: bash
 
-   openstack overcloud upgrade run --nodes overcloud-compute-0
+   openstack overcloud upgrade run --limit overcloud-compute-0
 
-Use of ``--nodes`` allows the operator to upgrade some subset, perhaps just one,
+Use of ``--limit`` allows the operator to upgrade some subset, perhaps just one,
 compute or other non controlplane node and verify that the upgrade is
 successful. One may even migrate workloads onto the newly upgraded node and
 confirm there are no problems, before deciding to proceed with upgrading the
-remaining nodes that are still on Pike.
-
-Again you can optionally step through the upgrade playbooks if you prefer. Be
-sure to run upgrade_steps_playbook.yaml then deploy_steps_playbook.yaml and
-finally post_upgrade_steps_playbook.yaml in that order.
-
-.. code-block:: bash
-
-   openstack overcloud upgrade run --nodes overcloud-compute-1 \
-      --playbook upgrade_steps_playbook.yaml
-   # etc for the other 2 as above example for controller
+remaining nodes.
 
 For re-run, you can specify ``--skip-tags`` validation to skip those step 0
 ansible tasks that check if services are running, in case you can't or
@@ -273,7 +260,13 @@ don't want to start them all.
 
 .. code-block:: bash
 
-   openstack overcloud upgrade run --roles Controller --skip-tags validation
+   openstack overcloud upgrade run --limit Controller --skip-tags validation
+
+.. admonition:: Stable Branch
+   :class: stable
+
+   The --limit was introduced in the Stein release. In previous versions, use
+   --nodes or --roles parmeters.
 
 openstack overcloud external-upgrade run (for services)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

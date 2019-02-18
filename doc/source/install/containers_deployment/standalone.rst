@@ -17,6 +17,12 @@ Deploying a Standalone OpenStack node
 
        ssh <non-root-user>@<machine>
 
+#. Ensure a fully qualified hostname has been configured on the host being
+   deployed on. For example::
+
+       sudo hostnamectl set-hostname standalone.localdomain
+       sudo hostnamectl set-hostname standalone.localdomain --transient
+
 #. Enable needed repositories:
 
    .. admonition:: RHEL

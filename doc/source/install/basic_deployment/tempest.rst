@@ -695,8 +695,8 @@ Generate tempest.conf and run tempest tests within the container
 
 * In case you want to rerun the tempest tests, clean tempest workspace first::
 
-    $ sudo rm -rf /home/stack/container_tempest
-    $ mkdir /home/stack/container_tempest
+    $ sudo rm -rf /home/stack/tempest_workspace
+    $ mkdir /home/stack/tempest_workspace
 
   .. note::
     It's done with sudo because tempest in containers creates the files

@@ -32,4 +32,5 @@ Documentation on how to enable and configure various features available in
    designate
    multiple_overclouds
    tuned
+   distributed_compute_node
    deploy_openshift

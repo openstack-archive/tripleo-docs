@@ -304,10 +304,10 @@ Deployment
 Add the ironic environment file when deploying::
 
     openstack overcloud deploy --templates \
-        -e /usr/share/openstack-tripleo-heat-templates/environments/services/ironic.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/services/ironic-overcloud.yaml \
         -e ironic-config.yaml
 
-To deploy Ironic in containers (starting with the Pike release), use
+To deploy Ironic in containers for Pike-Rocky releases please, use
 ``/usr/share/openstack-tripleo-heat-templates/environments/services-docker/ironic.yaml``
 instead.
 

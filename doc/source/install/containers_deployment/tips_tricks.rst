@@ -128,6 +128,8 @@ The configuration options you will likely be interested in include:
   --user <name>         Start container as the specified user
   --overrides <name>    JSON configuration information used to override
                         default config values
+  --default-runtime     Default runtime for containers. Can be docker or
+                        podman.
 
 ``file`` is the name of the configuration file to use
 containing the configuration for the container you wish to use.

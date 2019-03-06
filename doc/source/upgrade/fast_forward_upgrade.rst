@@ -1,3 +1,5 @@
+.. _ffu-docs:
+
 Fast Forward Upgrade - Upgrading from Newton to Queens
 ======================================================
 

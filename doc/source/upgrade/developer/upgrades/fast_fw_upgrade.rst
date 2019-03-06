@@ -3,7 +3,7 @@ TripleO Fast Forward Upgrade (FFU) N -> N+3
 
 For a detailed background on how the Fast Forward Upgrade (FFU) workflow was
 proposed please refer to the relevant spec_. For a guide on running the FFU in
-your environment see the `ffu-docs`_. This document will explore some
+your environment see the :ref:`ffu-docs`. This document will explore some
 of the technical details of the Newton to Queens FFU specifically.
 
 You might find it helpful to consult this high-level diagram as you
@@ -71,7 +71,6 @@ required `docker configuration and environment`_ files, including the latest
 container images and making sure to set the to-be containerized services to refer
 to the equivalent `docker templates`_ for the Heat resource registry.
 
-.. _ffu-docs: https://review.openstack.org/#/c/549892/
 .. _Minor update: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/package_update.html
 .. _upgrade_steps_playbook: https://github.com/openstack/tripleo-heat-templates/blob/82f128f15b1b1eb7bf6ac7df0c6d01e5619309eb/common/deploy-steps.j2#L528
 .. _deploy_steps_playbook: https://github.com/openstack/tripleo-heat-templates/blob/82f128f15b1b1eb7bf6ac7df0c6d01e5619309eb/common/deploy-steps.j2#L382

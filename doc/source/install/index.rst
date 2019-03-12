@@ -12,6 +12,7 @@ TripleO Install Guide
   basic_deployment/basic_deployment_ui
   basic_deployment/tempest
   basic_deployment/tempest_plugins
+  basic_deployment/os_tempest
   containers_deployment/index
   post_deployment/post_deployment
   advanced_deployment/features

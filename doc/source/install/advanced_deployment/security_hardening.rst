@@ -223,40 +223,45 @@ comparison point to verify the integrity of the files and directories.
 The TripleO AIDE service allows an operator to populate entries into an AIDE
 configuration, which is then used by the AIDE service to create an integrity
 database. This can be achieved using an environment file with the following
-structure::
+example structure::
 
   resource_registry:
-  OS::TripleO::Services::Aide: ../puppet/services/aide.yaml
+    OS::TripleO::Services::Aide: ../puppet/services/aide.yaml
 
   parameter_defaults:
-  AideRules:
-  'TripleORules':
-    content: 'TripleORules = p+sha256'
-    order  : 1
-  'etc':
-    content: '/etc/ TripleORules'
-    order  : 2
-  'boot':
-    content: '/boot/ TripleORules'
-    order  : 3
-  'sbin':
-    content: '/sbin/ TripleORules'
-    order  : 4
-  'var':
-    content: '/var/ TripleORules'
-    order  : 5
-  'not var/log':
-    content: '!/var/log.*'
-    order  : 6
-  'not var/spool':
-    content: '!/var/spool.*'
-    order  : 7
-  'not /var/adm/utmp':
-    content: '!/var/adm/utmp$'
-    order: 8
-  'not nova instances':
-    content: '!/var/lib/nova/instances.*'
-    order: 9
+    AideRules:
+      'TripleORules':
+        content: 'TripleORules = p+sha256'
+        order  : 1
+      'etc':
+        content: '/etc/ TripleORules'
+        order  : 2
+      'boot':
+        content: '/boot/ TripleORules'
+        order  : 3
+      'sbin':
+        content: '/sbin/ TripleORules'
+        order  : 4
+      'var':
+        content: '/var/ TripleORules'
+        order  : 5
+      'not var/log':
+        content: '!/var/log.*'
+        order  : 6
+      'not var/spool':
+        content: '!/var/spool.*'
+        order  : 7
+      'not /var/adm/utmp':
+        content: '!/var/adm/utmp$'
+        order: 8
+      'not nova instances':
+        content: '!/var/lib/nova/instances.*'
+        order: 9
+
+.. note::
+   Operators should select their own required AIDE values, as the example list
+   above is not activley maintained or benchmarked. It only seeks to provide
+   an document the YAML structure required.
 
 If above environment file were saved as `aide.yaml` it could then be passed to
 the `overcloud deploy` command as follows::

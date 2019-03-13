@@ -156,39 +156,45 @@ rebalance a cluster, use an example like the following::
       osd_recovery_max_active: 3
       osd_max_backfills: 1
 
-Override Ceph container parameters
-----------------------------------
+Tuning Ceph OSD CPU and Memory
+------------------------------
 
-The group variables `ceph_osd_docker_memory_limit`, which corresponds
-to ``docker run ... --memory``, and `ceph_osd_docker_cpu_limit`, which
-corresponds to ``docker run ... --cpu-quota``, may be overridden
-depending on the hardware configuration and the system needs. Below is
-an example of setting custom values to these parameters::
+The group variable `ceph_osd_docker_cpu_limit`, which corresponds to
+``docker run ... --cpu-quota``, may be overridden depending on the
+hardware configuration and the system needs. Below is an example of
+setting custom values for this parameter::
 
   parameter_defaults:
     CephAnsibleExtraConfig:
-      ceph_osd_docker_memory_limit: 5g
       ceph_osd_docker_cpu_limit: 1
 
-When collocating Ceph OSD services on the same nodes which run Nova
-compute services (also known as "hyperconverged deployments"),
-variations of the above may be made to ensure Ceph does not consume
-resources Nova may need.
+.. warning:: Overriding the `ceph_osd_docker_memory_limit` variable
+             is not recommended. Use of ceph-ansible 3.2 or newer is
+             recommended as it will automatically tune this variable
+             based on hardware.
 
- .. admonition:: ceph-ansible 3.2 and newer
-    :class: ceph
+.. admonition:: ceph-ansible 3.2 and newer
+   :class: ceph
 
-    As of ceph-ansible 3.2, the `ceph_osd_docker_memory_limit` and
-    `ceph_osd_docker_cpu_limit` are set by default to the max memory
-    and CPU of the host in order to ensure Ceph does not run out of
-    resources unless the user specifically overrides these values. The
-    3.2 version also introduced the boolean `is_hci` flag, which may
-    be set when using bluestore to automatically tune the bluestore
-    cache size as below::
+   As of ceph-ansible 3.2, the `ceph_osd_docker_memory_limit` is set
+   by default to the max memory of the host in order to ensure Ceph
+   does not run out of resources. While it is technically possible to
+   override the bluestore `osd_memory_target` by setting it inside of
+   the `CephConfigOverrides` directive, it is better to let
+   ceph-ansible automatically tune this variable. Such tuning is
+   also influenced by the boolean `is_hci` flag. When collocating
+   Ceph OSD services on the same nodes which run Nova compute
+   services (also known as "hyperconverged deployments"), set
+   this variable as in the example below::
 
-       parameter_defaults:
-         CephAnsibleExtraConfig:
-           is_hci: true
+      parameter_defaults:
+        CephAnsibleExtraConfig:
+          is_hci: true
+
+   When using filestore in hyperconverged deployments, include the
+   "environments/tuned-ceph-filestore-hci.yaml" enviornment file to
+   set a :doc:`tuned profile <tuned>` designed for Ceph filestore.
+   Do not use this tuned profile with bluestore.
 
 Configure OSD settings with ceph-ansible
 ----------------------------------------

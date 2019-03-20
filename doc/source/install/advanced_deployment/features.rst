@@ -34,3 +34,4 @@ Documentation on how to enable and configure various features available in
    tuned
    distributed_compute_node
    deploy_openshift
+   deploy_cellv2

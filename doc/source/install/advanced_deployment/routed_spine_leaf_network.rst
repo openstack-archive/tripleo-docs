@@ -613,8 +613,8 @@ roles data file, the network data file and environment files. For example::
       -n /home/stack/templates/network_data_subnets_routed.yaml
       -r /home/stack/templates/roles_data.yaml \
       -e /home/stack/environments/node_data.yaml \
-      -e /usr/share/openstack-tripleo-heat-tempaltes/environments/network-isolation.yaml \
-      -e /usr/share/openstack-tripleo-heat-tempaltes/environments/network-environment.yaml \
+      -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
+      -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
       -e /home/stack/environments/network-environment-overrides.yaml
 
 .. Note:: Remember to include other environment files that you might want for

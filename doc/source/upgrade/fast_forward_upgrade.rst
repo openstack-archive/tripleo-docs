@@ -887,17 +887,6 @@ For DPDK environments:
      resource_registry:
        OS::TripleO::Services::ComputeNeutronOvsDpdk: ../docker/services/neutron-ovs-dpdk-agent.yaml
 
-   And remove the previous entry:
-
-   ::
-
-     resource_registry:
-       OS::TripleO::Services::ComputeNeutronOvsAgent: ../puppet/services/neutron-ovs-dpdk-agent.yaml
-
-   Please notice the naming change between `ComputeNeutronOvsAgent` and
-   `ComputeNeutronOvsDpdk`.
-
-
 For SR-IOV environments:
 
 1. In the resource registry section, override the NeutronSriovAgent service
@@ -907,10 +896,3 @@ For SR-IOV environments:
 
      resource_registry:
        OS::TripleO::Services::NeutronSriovAgent: ../docker/services/neutron-sriov-agent.yaml
-
-   And remove the previous entry:
-
-   ::
-
-     resource_registry:
-       OS::TripleO::Services::NeutronSriovAgent: ../puppet/services/neutron-sriov-agent.yaml

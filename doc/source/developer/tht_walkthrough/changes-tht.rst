@@ -45,14 +45,13 @@ The list of changes in THT are:
   puppet-tripleo repository.
 
 - Create a service type specific folder in the root services folder
-  (``puppet/services/time``).
+  (``deployment/time``).
 
-- Create a heat template for the service inside the puppet/services folder
-  (``puppet/services/time/ntp.yaml``).
+- Create a heat template for the service inside the deployment/time folder
+  (``deployment/time/ntp-baremetal-puppet.yaml``).
 
 - Optionally, create a common heat template to reuse common configuration
-  data, which is referenced from each per-service heat template
-  (``puppet/services/time/ntp-base.yaml``).
+  data, which is referenced from each per-service heat template.
 
 Step 1 - Updating puppet references
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -90,7 +89,7 @@ heat template file, as described above.
 By updating the resource registry we are forcing to use a nested template to
 configure our resources. In the example case the created resource
 (OS::TripleO::Services::Timesync), will point to the corresponding service yaml file
-(puppet/services/time/ntp.yaml).
+(deployment/time/ntp-baremetal-puppet.yaml).
 
 
 Step 3 - roles_data.yaml initial changes
@@ -158,13 +157,13 @@ THT changes for all the different roles are covered in:
 Step 4 - Create the services yaml files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Create: ``puppet/services/time/ntp.yaml``
+Create: ``deployment/time/ntp-baremetal-puppet.yaml``
 
 This file will have all the configuration details for the service to be
 configured.
 ::
 
-  heat_template_version: 2016-04-08
+  heat_template_version: rocky
   description: >
     NTP service deployment using puppet, this YAML file
     creates the interface between the HOT template

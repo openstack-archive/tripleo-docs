@@ -19,7 +19,7 @@ files.
 the different environments (With pacemaker and without pacemaker).
 ::
 
-  heat_template_version: 2016-04-08
+  heat_template_version: rocky
   description: >
     Configuration details for MongoDB service using composable roles
   parameters:
@@ -52,7 +52,7 @@ Referencing the common parameter:
 pacemaker.
 ::
 
-  heat_template_version: 2016-04-08
+  heat_template_version: rocky
   description: >
     MongoDb service deployment using puppet
   parameters:

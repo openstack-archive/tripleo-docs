@@ -160,9 +160,8 @@ Each service may define output variable(s) which control config file generation,
 initialization, and stepwise deployment of all the containers for this service.
 The following sections are available:
 
-* config_settings: This setting is generally inherited from the
-  puppet/services templates and may be appended to if required
-  to support the docker specific config settings.
+* config_settings: This setting containers hiera data that is used
+  to control how the Puppet modules generate config files for each service.
 
 * step_config: This setting controls the manifest that is used to
   create docker config files via puppet. The puppet tags below are

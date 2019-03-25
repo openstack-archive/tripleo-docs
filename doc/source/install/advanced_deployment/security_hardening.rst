@@ -89,7 +89,7 @@ SSH ``/etc/issue`` Banner text can be set using the following parameters in an
 environment file::
 
     resource_registry:
-      OS::TripleO::Services::Sshd: ../puppet/services/sshd.yaml
+      OS::TripleO::Services::Sshd: ../deployment/sshd/sshd-baremetal-puppet.yaml
 
     parameter_defaults:
       BannerText: |
@@ -175,7 +175,7 @@ the iptables rule on the appropriate node (controller, in case of rabbitmq)::
     -A INPUT -p tcp -m multiport --dports 4369,5672,25672 -m comment --comment "109 rabbitmq" -m state --state NEW -j ACCEPT
 
 Alternatively it's possible to get the information in tripleo service in the
-definition. In our case in `puppet/services/rabbitmq.yaml`::
+definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`::
 
     tripleo.rabbitmq.firewall_rules:
       '109 rabbitmq':
@@ -351,7 +351,7 @@ entries to the `/etc/securetty` file.
 An environment file can be used to set `/etc/securetty` entries as follows::
 
   resource_registry:
-    OS::TripleO::Services::Securetty: ../puppet/services/securetty.yaml
+    OS::TripleO::Services::Securetty: ../deployment/securetty/securetty-baremetal-puppet.yaml
 
   parameter_defaults:
     TtyValues:
@@ -378,7 +378,7 @@ Entries can be made to `/etc/login.defs` to enforce password characteristics
 for new users added to the system, for example::
 
   resource_registry:
-    OS::TripleO::Services::LoginDefs: ../puppet/services/login-defs.yaml
+    OS::TripleO::Services::LoginDefs: ../deployment/login-defs/login-defs-baremetal-puppet.yaml
 
   parameter_defaults:
     PasswordMaxDays: 60

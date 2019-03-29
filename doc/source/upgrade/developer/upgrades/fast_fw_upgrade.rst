@@ -157,7 +157,7 @@ And where the *fast_forward_upgrade_bootstrap_role_tasks.yaml* include the
            when: role_name == 'Compute' and ansible_hostname == Compute[0]
          ...etc
 
-.. _neutron-api: https://github.com/openstack/tripleo-heat-templates/blob/master/docker/services/neutron-api.yaml#L190
+.. _neutron-api: https://github.com/openstack/tripleo-heat-templates/blob/master/deployment/neutron/neutron-api-container-puppet.yaml#L415
 .. _spec: https://github.com/openstack/tripleo-specs/blob/master/specs/queens/fast-forward-upgrades.rst
 .. _deploy-steps.j2: https://github.com/openstack/tripleo-heat-templates/blob/master/common/deploy-steps.j2#L377
 .. _config-download: https://github.com/openstack/tripleo-common/blob/master/tripleo_common/utils/config.py

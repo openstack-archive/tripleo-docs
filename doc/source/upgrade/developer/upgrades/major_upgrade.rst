@@ -382,5 +382,5 @@ package_update.yaml and so that is what we need to update here:
        sudo systemctl restart openstack-mistral-engine.service
        sudo systemctl restart openstack-mistral-executor.service
 
-.. _rabbitmq_upgrade_tasks: https://github.com/openstack/tripleo-heat-templates/blob/9a2923210c2773e59175571f5ecbfe2b8682737a/docker/services/pacemaker/rabbitmq.yaml#L261
+.. _rabbitmq_upgrade_tasks: https://github.com/openstack/tripleo-heat-templates/blob/master/deployment/rabbitmq/rabbitmq-messaging-rpc-pacemaker-puppet.yaml#L305
 .. _562995: https://review.openstack.org/#/c/562995

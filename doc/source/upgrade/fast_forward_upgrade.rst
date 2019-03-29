@@ -610,15 +610,15 @@ Following there is a list of all the changes needed:
 
 
 7. In your resource_registry, check that you are using the containerized
-   services from the docker/services subdirectory of your core Heat template
+   services from the deployment subdirectory of your core Heat template
    collection. For example:
 
    ::
 
      resource_registry:
-       OS::TripleO::Services::CephMon: ../docker/services/ceph-ansible/ceph-mon.yaml
-       OS::TripleO::Services::CephOSD: ../docker/services/ceph-ansible/ceph-osd.yaml
-       OS::TripleO::Services::CephClient: ../docker/services/ceph-ansible/ceph-client.yaml
+       OS::TripleO::Services::CephMon: ../deployment/ceph-ansible/ceph-mon.yaml
+       OS::TripleO::Services::CephOSD: ../deployment/ceph-ansible/ceph-osd.yaml
+       OS::TripleO::Services::CephClient: ../deployment/ceph-ansible/ceph-client.yaml
 
 
 8. When upgrading to Queens, if Ceph has been deployed in the Overcloud, then
@@ -885,7 +885,7 @@ For DPDK environments:
    ::
 
      resource_registry:
-       OS::TripleO::Services::ComputeNeutronOvsDpdk: ../docker/services/neutron-ovs-dpdk-agent.yaml
+       OS::TripleO::Services::ComputeNeutronOvsDpdk: ../deployment/neutron/neutron-ovs-dpdk-agent-container-puppet.yaml
 
 For SR-IOV environments:
 
@@ -895,4 +895,4 @@ For SR-IOV environments:
    ::
 
      resource_registry:
-       OS::TripleO::Services::NeutronSriovAgent: ../docker/services/neutron-sriov-agent.yaml
+       OS::TripleO::Services::NeutronSriovAgent: ../deployment/neutron/neutron-sriov-agent-container-puppet.yaml

@@ -34,9 +34,6 @@ the team is working on. The list below is subject to change as squads change.
 | Integration                   | Group of people focusing on configuration management (eg: services)        |
 |                               | https://etherpad.openstack.org/p/tripleo-integration-squad-status          |
 +-------------------------------+----------------------------------------------------------------------------+
-| Security                      | Group of people focusing on security                                       |
-|                               | https://etherpad.openstack.org/p/tripleo-security-squad                    |
-+-------------------------------+----------------------------------------------------------------------------+
 | Edge                          | Group of people focusing on Edge/multi-site/multi-cloud                    |
 |                               | https://etherpad.openstack.org/p/tripleo-edge-squad-status                 |
 +-------------------------------+----------------------------------------------------------------------------+

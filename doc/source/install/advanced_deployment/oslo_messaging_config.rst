@@ -48,11 +48,11 @@ resource association for this defacto deployment configuration::
     RpcPort: 5672
 
   resource_registry:
-    OS::TripleO::Services::OsloMessagingNotify: ../../docker/services/messaging/notify-rabbitmq-shared.yaml
-    OS::TripleO::Services::OsloMessagingRpc: ../../docker/services/messaging/rpc-rabbitmq.yaml
+    OS::TripleO::Services::OsloMessagingNotify: ../../deployment/rabbitmq/rabbitmq-messaging-notify-shared-puppet.yaml
+    OS::TripleO::Services::OsloMessagingRpc: ../../deployment/rabbitmq/rabbitmq-messaging-rpc-container-puppet.yaml
 
-The `rpc-rabbitmq.yaml`_ instantiates the rabbitmq server backend
-while `notify-rabbitmq-shared.yaml`_ sets up the notification
+The `rabbitmq-messaging-rpc-container-puppet.yaml`_ instantiates the rabbitmq server backend
+while `rabbitmq-messaging-notify-container-puppet.yaml`_ sets up the notification
 transport configuration to use the same shared rabbitmq server.
 
 Deployment of Separate RPC and Notify Messaging Backends
@@ -86,8 +86,8 @@ overcloud deployment::
     RpcPort: 31459
 
   resource_registry:
-    OS::TripleO::Services::OsloMessagingNotify: ../../docker/services/messaging/notify-rabbitmq.yaml
-    OS::TripleO::Services::OsloMessagingRpc: ../../docker/services/messaging/rpc-qdrouterd.yaml
+    OS::TripleO::Services::OsloMessagingNotify: ../../deployment/rabbitmq/rabbitmq-messaging-notify-container-puppet.yaml
+    OS::TripleO::Services::OsloMessagingRpc: ../../deployment/messaging/rpc-qdrouterd-container-puppet.yaml
 
 The above will instantiate qdrouterd server(s) and configure them for
 use as the RPC transport and will also instantiate the rabbitmq backend
@@ -102,6 +102,6 @@ command to deploy with separate messaging backends::
   openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/messaging/rpc-qdrouterd-notify-rabbitmq-hybrid.yaml
 
 .. _`standard messaging`: https://github.com/openstack/tripleo-heat-templates/blob/master/environments/messaging/rpc-rabbitmq-notify-rabbitmq-shared.yaml
-.. _`rpc-rabbitmq.yaml`: https://github.com/openstack/tripleo-heat-templates/blob/master/docker/services/messaging/rpc-rabbitmq.yaml
-.. _`notify-rabbitmq-shared.yaml`: https://github.com/openstack/tripleo-heat-templates/blob/master/docker/services/messaging/notify-rabbitmq-shared.yaml
+.. _`rabbitmq-messaging-rpc-container-puppet.yaml`: https://github.com/openstack/tripleo-heat-templates/blob/master/deployment/rabbitmq/rabbitmq-messaging-rpc-container-puppet.yaml
+.. _`rabbitmq-messaging-notify-container-puppet.yaml`: https://github.com/openstack/tripleo-heat-templates/blob/master/deployment/rabbitmq/rabbitmq-messaging-notify-container-puppet.yaml
 .. _`hybrid messaging`: https://github.com/openstack/tripleo-heat-templates/blob/master/environments/messaging/rpc-qdrouterd-notify-rabbitmq-hybrid.yaml

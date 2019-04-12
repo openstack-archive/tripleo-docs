@@ -51,7 +51,10 @@ Loss of an edge site
 ^^^^^^^^^^^^^^^^^^^^
 
 Running Nova VM instances will keep running. If stopped running, you need the
-control plane back to recover the stopped or crashed workloads.
+control plane back to recover the stopped or crashed workloads. If Neutron DHCP
+agent is centralized, and we are forwarding DHCP requests to the central site,
+any VMs that are trying to renew their IPs will eventually time out and lose
+connectivity.
 
 .. note:: A single Compute service failure normally affects only its edge site
    without additional downtime induced for neighbor edge sites or the central
@@ -76,14 +79,32 @@ Network (OVN). There is also BGPVPN and its backend specific choices.
 Network recommendations
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Traditional provider networks with backbone routing at the edge may fulfill or
-complement a custom distributed routing solution, like L3 Spine-Leaf topology.
+Traditional or external provider networks with backbone routing at the edge may
+fulfill or complement a custom distributed routing solution, like L3 Spine-Leaf
+topology.
 
 .. note:: Neutron SDN backends that involve tunnelling may be sub-optimal for
    Edge DCN cases because of the known issues 1808594_ and 1808062_.
 
    .. _1808594: https://bugs.launchpad.net/tripleo/+bug/1808594
    .. _1808062: https://bugs.launchpad.net/tripleo/+bug/1808062
+
+For dynamic IPv4 and stateful IPv6 IPAM cases, you will also need DHCP on those
+provider networks in order to assign IPs to VM instances. External provider
+networks usually require no Neutron DHCP agents and handle IPAM (and
+routing) on its own. While for traditional or
+`Routed Provider Networks <https://docs.openstack.org/neutron/latest/admin/config-routed-networks.html>`_,
+when there is no L2 connectivity to edge over WAN, and Neutron DHCP agents are
+placed on controllers at the central site, you should have a DHCP relay on
+every provider network. Alternatively, DHCP agents need to be moved to the edge.
+Such setups also require highly reliable links between remote and central sites.
+
+.. note::  Neither of DHCP relays/agents at compute nodes, nor routed/external
+   provider networks are tested or automated via TripleO Heat Templates. You would
+   have to have those configured manually for your DCN environments.
+
+.. note:: OVN leverages DVR and does not require running Neutron DHCP/L3 agents,
+  which might as well simplify particular DCN setups.
 
 That said, when there is a network failure that disconnects the edge off the
 central site, there is no SLA for recovery time but only what the provider
@@ -95,11 +116,22 @@ back on various standards that are relevant here.
 Config-drive/cloud-init details
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The simplest solution we recommend for DCN would involve only provider networks
-at the edge. For that case, it is also recommended to use config-drive or
-another configuration mechanism other than cloud-init. Otherwise, the latter
-requires a `169.254.169.254/32` route for the provider routers to forward data
-to the metadata service.
+Config-drive uses virtual media capabilities of the BMC controller, so that no
+DHCP is required for VMs to obtain IP addresses at edge sites. This is
+the most straightforward solution. This does require that the WAN between the
+remote site and central site is live during deployment of a VM, but after that
+the VM can run independently without a connection to the central site.
+
+.. note:: Config-drive may be a tricky for VMs that do not support
+  cloud-init, like some appliance VMs. It may be that such ones (or other VMs
+  that do not support config-drive) will have to be configured with a static IP
+  that matches the Neutron port.
+
+The simplest solution we recommend for DCN would involve only external provider
+networks at the edge. For that case, it is also recommended to use either
+config-drive, or IPv6 SLAAC, or another configuration mechanism other than
+those requiring a `169.254.169.254/32` route for the provider routers to forward
+data to the metadata service.
 
 IPv6 details
 ^^^^^^^^^^^^

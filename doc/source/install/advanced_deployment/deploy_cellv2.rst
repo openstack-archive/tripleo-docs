@@ -11,6 +11,11 @@ Deploy an additional nova cell v2
 This guide assumes that you are ready to deploy a new overcloud, or have
 already installed an overcloud (min Stein release).
 
+.. note::
+
+   Starting with CentOS 8 and TripleO Stein release, podman is the CONTAINERCLI
+   to be used in the following steps.
+
 Initial Deploy
 --------------
 
@@ -289,7 +294,7 @@ Deploy the cell
           -e $HOME/$DIR/extra-host-file-entries.json \
           -e $HOME/$DIR/cell1.yaml
 
-     Wait for the deployment to finish::
+    Wait for the deployment to finish::
 
         openstack stack list
         +--------------------------------------+--------------+----------------------------------+-----------------+----------------------+----------------------+
@@ -335,10 +340,11 @@ Create the cell and discover compute nodes
     the IP of the cell controller in the ``database_connection`` and the
     ``transport_url`` extracted from previous step, like::
 
-        # CONTAINERCLI can be either /bin/docker or /bin/podman
-        export CONTAINERCLI='/bin/docker'
-
         ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+        # CONTAINERCLI can be either docker or podman
+        export CONTAINERCLI='docker'
+
         sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
         nova-manage cell_v2 create_cell --name computecell1 \
         --database_connection \
@@ -356,16 +362,28 @@ Create the cell and discover compute nodes
         nova-manage cell_v2 list_cells --verbose
 
     After the cell got created the nova services on all central controllers need to
-    be restarted::
+    be restarted.
+
+    Docker::
 
         ansible -i /usr/bin/tripleo-ansible-inventory Controller -b -a \
-        "$CONTAINERCLI restart nova_api nova_scheduler nova_conductor"
+        "docker restart nova_api nova_scheduler nova_conductor"
+
+    Podman::
+
+        ansible -i /usr/bin/tripleo-ansible-inventory Controller -b -a \
+        "systemctl restart tripleo_nova_api tripleo_nova_conductor tripleo_nova_scheduler"
+
 
 #. Perform cell host discovery
 
     Login to one of the overcloud controllers and run the cell host discovery::
 
         ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+        # CONTAINERCLI can be either docker or podman
+        export CONTAINERCLI='docker'
+
         sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
         nova-manage cell_v2 discover_hosts --by-service --verbose
         nova-manage cell_v2 list_hosts
@@ -391,10 +409,11 @@ a selected role. For more details on how to add nodes see :doc:`../post_deployme
 After the node got deployed, login to one of the overcloud controllers and run
 the cell host discovery::
 
-    # CONTAINERCLI can be either /bin/docker or /bin/podman
-    export CONTAINERCLI='/bin/docker'
-
     ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+    # CONTAINERCLI can be either docker or podman
+    export CONTAINERCLI='docker'
+
     sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
     nova-manage cell_v2 discover_hosts --by-service --verbose
     nova-manage cell_v2 list_hosts
@@ -406,10 +425,11 @@ As initial step migrate all instances off the compute.
 
 #. From one of the overcloud controllers, delete the computes from the cell::
 
-    # CONTAINERCLI can be either /bin/docker or /bin/podman
-    export CONTAINERCLI='/bin/docker'
-
     ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+    # CONTAINERCLI can be either docker or podman
+    export CONTAINERCLI='docker'
+
     sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
     nova-manage cell_v2 delete_host --cell_uuid <uuid> --host <compute>
 
@@ -427,7 +447,7 @@ As initial step migrate all instances off the compute.
         | 9cd04a8b-5e6c-428e-a643-397c9bebcc16 | computecell1-novacompute-0.site1.test |         11 |
         +--------------------------------------+---------------------------------------+------------+
 
-    openstack resource provider delete 9cd04a8b-5e6c-428e-a643-397c9bebcc16
+        openstack resource provider delete 9cd04a8b-5e6c-428e-a643-397c9bebcc16
 
 #. Delete the node from the cell stack
 
@@ -440,22 +460,31 @@ As initial step delete all instances from cell
 
 #. From one of the overcloud controllers, delete all computes from the cell::
 
-    # CONTAINERCLI can be either /bin/docker or /bin/podman
-    export CONTAINERCLI='/bin/docker'
-
     ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+    # CONTAINERCLI can be either docker or podman
+    export CONTAINERCLI='docker'
+
     sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
     nova-manage cell_v2 delete_host --cell_uuid <uuid> --host <compute>
 
 #. On the cell controller delete all deleted instances::
 
-    ssh heat-admin@<ctlplane ip cell control>
+    ssh heat-admin@<ctlplane ip cell controller>
+
+    # CONTAINERCLI can be either docker or podman
+    export CONTAINERCLI='docker'
+
     sudo $CONTAINERCLI exec -it -u root nova_conductor /bin/bash
     nova-manage db archive_deleted_rows --verbose
 
 #. From one of the overcloud controllers, delete the cell::
 
     ssh heat-admin@<ctlplane ip overcloud-controller-0>
+
+    # CONTAINERCLI can be either docker or podman
+    export CONTAINERCLI='docker'
+
     sudo $CONTAINERCLI exec -it -u root nova_api /bin/bash
     nova-manage cell_v2 delete_cell --cell_uuid <uuid>
 

@@ -12,3 +12,4 @@ TripleO CI Guide
   baremetal_jobs
   dlrn-promoter-overview
   stages-overview
+  emit_releases_file

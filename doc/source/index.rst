@@ -91,11 +91,6 @@ Linux (RHEL). These steps are marked as follows:
    Step that should only be run when choosing to use components from their
    stable branches rather than using packages/source based on current master.
 
-.. admonition:: Ocata
-   :class: ocata
-
-   Step that should only be run when installing from the Ocata stable branch.
-
 .. admonition:: Pike
    :class: pike
 
@@ -110,6 +105,11 @@ Linux (RHEL). These steps are marked as follows:
    :class: rocky
 
    Step that should only be run when installing from the Rocky stable branch.
+
+.. admonition:: Stein
+   :class: stein
+
+   Step that should only be run when installing from the Stein stable branch.
 
 .. admonition:: Validations
    :class: validations

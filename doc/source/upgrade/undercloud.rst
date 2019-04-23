@@ -140,5 +140,5 @@ Updating Undercloud Components
       If you added custom OVS ports to the undercloud (e.g. in a virtual
       testing environment) you may need to re-add them at this point.
 
-   .. _validations: ../install/validations/validations.html#running-a-group-of-validations
+   .. _validations: ../validations/index.html
    .. _tripleo-validations: https://github.com/openstack/tripleo-validations/tree/master/validations

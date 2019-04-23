@@ -167,7 +167,7 @@ Installing the Undercloud
    .. admonition:: Validations
       :class: validations
 
-      :doc:`../validations/validations` will be installed and
+      :doc:`../../validations/index` will be installed and
       configured during undercloud installation. You can set
       ``enable_validations = false`` in ``undercloud.conf`` to prevent
       that.

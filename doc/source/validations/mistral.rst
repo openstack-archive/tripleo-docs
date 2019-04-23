@@ -1,45 +1,8 @@
-Validations
-===========
+Running validations using mistral
+---------------------------------
 
-Since the Newton release, TripleO ships with extensible checks for
-verifying the undercloud configuration, hardware setup, and the
-deployment to find common issues early.
-
-The TripleO UI runs the validations automatically. While work is
-underway for having them in the command line workflow, too, they need
-to be run by calling a Mistral workflow currently.
-
-The validations are assigned into various groups that indicate when in
-the deployment workflow are they expected to run:
-
-* **prep** validations check the hardware configuration of the
-  undercloud node and should be run before ``openstack undercloud
-  install``.
-
-* **pre-introspection** should be run before we introspect nodes using
-  Ironic Inspector.
-
-* **pre-deployment** validations should be executed before ``openstack
-  overcloud deploy``
-
-* **post-deployment** should be run after the overcloud deployment has
-  finished.
-
-* **pre-upgrade** try to validate your undercloud before you upgrade it.
-
-Note that for most of these validations, a failure does not mean that
-you'll be unable to deploy or run OpenStack. But it can indicate
-potential issues with long-term or production setups. If you're
-running an environment for developing or testing TripleO, it's okay
-that some validations fail. In a production setup they should not.
-
-The list of all existing validations and their groups is on the
-`tripleo-validations documentation page`_.
-
-
-
-Running a single validation
----------------------------
+Running single validations
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to run one validation in particular (because you're trying
 things out or want to see whether you fixed the failure), you can run
@@ -77,7 +40,8 @@ summary.
 
 
 Custom validations
-------------------
+^^^^^^^^^^^^^^^^^^
+
 Support for `custom validations`_ has been added in the Rocky development cycle.
 It allows operators to add their own bespoke validations, in cases when it's
 not appropriate to include these in the set of default TripleO validations.
@@ -105,7 +69,7 @@ container holding the deployment plan.
 .. _running_validation_group:
 
 Running a group of validations
-------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The deployment documentation highlights places where you can run a
 specific group of validations. Here's how to run the
@@ -136,7 +100,7 @@ the method above::
   $ openstack action execution run tripleo.validations.list_validations '{"groups": ["pre-deployment"]}' | jq ".result[] | .id"
 
 Another example are the "pre-upgrade" validations which are added during the P
-development cycle (tracked with this blueprint_). These can be executed as
+development cycle. These can be executed as
 the example above but instead using the "pre-upgrade" group::
 
     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-upgrade"]}'
@@ -175,10 +139,3 @@ reasons that the validation fails. For example::
         "stderr": "",
         "stdout": "Task 'Fail if services were not running' failed:\nHost: localhost\nMessage: One of the undercloud services was not active. Please check openstack-heat-api first and then confirm the status of undercloud services in general before attempting to update or upgrade the environment.\n\nTask 'Fail if services were not running' failed:\nHost: localhost\nMessage: One of the undercloud services was not active. Please check openstack-ironic-api first and then confirm the status of undercloud services in general before attempting to update or upgrade the environment.\n\nTask 'Fail if services were not running' failed:\nHost: localhost\nMessage: One of the undercloud services was not active. Please check openstack-zaqar first and then confirm the status of undercloud services in general before attempting to update or upgrade the environment.\n\nTask 'Fail if services were not running' failed:\nHost: localhost\nMessage: One of the undercloud services was not active. Please check openstack-glance-api first and then confirm the status of undercloud services in general before attempting to update or upgrade the environment.\n\nTask 'Fail if services were not running' failed:\nHost: localhost\nMessage: One of the undercloud services was not active. Please check openstack-glance-api first and then confirm the status of undercloud services in general before attempting to update or upgrade the environment.\n\nFailure! The validation failed for all hosts:\n* localhost\n"
     }
-
-
-
-
-.. _blueprint: https://blueprints.launchpad.net/tripleo/+spec/pre-upgrade-validations
-.. _tripleo-validations documentation page: http://docs.openstack.org/developer/tripleo-validations/readme.html#existing-validations
-.. _custom validations: https://review.openstack.org/#/c/393775/

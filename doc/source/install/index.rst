@@ -22,5 +22,4 @@ TripleO Install Guide
   advanced_deployment/custom
   controlplane_backup_restore/00_index
   troubleshooting/troubleshooting
-  validations/validations
   mistral-api/mistral-api

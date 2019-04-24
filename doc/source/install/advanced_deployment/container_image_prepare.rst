@@ -17,7 +17,7 @@ independently managed registry. During deployment the environment parameter
 
 - Where to pull images from
 - Optionally, which local repository to push images to
-- How to discover the lasted versioned tag for each image
+- How to discover the latest versioned tag for each image
 
 In the following examples, the parameter `ContainerImagePrepare` will be
 specified in its own file `containers-prepare-parameter.yaml`.
@@ -110,6 +110,20 @@ deployment all images will be pulled from the remote registry then pushed to
 the specified registry. The resulting image parameters will also be modified to
 refer to the images in `push_destination` instead of `namespace`.
 
+.. admonition:: Stein and newer
+   :class: stein
+
+   Prior to Stein, Docker Registry v2 (provided by "Docker
+   Distribution" package), was the service running on tcp 8787.
+   In Stein it has been replaced with an Apache vhost called
+   "image-serve", which serves the containers on tcp 8787 and
+   supports podman or buildah pull commands. Though podman or buildah
+   tag, push, and commit commands are not supported, they are not
+   necessary because the same functionality may be achieved through
+   use of the "sudo openstack tripleo container image prepare"
+   commands described in this document.
+
+
 Running container image prepare
 ...............................
 The prepare operations are run at the following times:
@@ -122,6 +136,12 @@ The prepare operations are run at the following times:
    $HOME/containers-prepare-parameter.yaml`
    (see :ref:`overcloud-prepare-container-images`)
 #. Any other time when ``sudo openstack tripleo container image prepare`` is run
+
+As seen in the last of the above commands, ``sudo openstack tripleo
+container image prepare`` may be run without ``default`` to set up an
+undercloud registry without deploying the overcloud. It is run with
+``sudo`` because it needs to write to `/var/lib/image-serve` on the
+undercloud.
 
 
 Options available in heat parameter ContainerImagePrepare
@@ -240,7 +260,10 @@ include:
 The modification is done by invoking an ansible role on each image which needs
 to be modified. The role takes a source image, makes the requested changes,
 then tags the result. The prepare can then push the image and set the heat
-parameters to refer to the modified image.
+parameters to refer to the modified image. The modification is done in
+the undercloud registry so it is not possible to use this feature when
+using the Default registry, where images are pulled directly from a
+remote registry during deployment.
 
 The ansible role `tripleo-modify-image`_ conforms with the required role
 interface, and provides the required behaviour for the modify use-cases. Modification is controlled via modify-specific keys in the

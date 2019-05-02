@@ -2,9 +2,9 @@ Reproduce CI jobs for debugging and development
 ===============================================
 
 Reproducing any given CI job that is executed upstream is critical for
-development.  You will find a script called "reproducer-quickstart.sh" under
-the logs directory of any TripleO CI job that will assist you in recreating a
-TripleO Quickstart upstream job.
+development.  You will find a script called "reproducer-zuul-quickstart.sh"
+under the logs directory of any TripleO CI job that will assist you in
+recreating a TripleO Quickstart upstream job.
 
 Each script contains the same parameters used in the job and includes any
 deployment or CI related settings.  Any patches that were marked as
@@ -22,9 +22,6 @@ Install system dependencies
 Before execute the reproduce-quickstart it's necessary to install few
 dependencies on the system::
 
-* python3-pip
-* python3-virtualenv
-* ansible
 * python3-openstackclient
 * python3-heatclient
 
@@ -35,7 +32,9 @@ How to execute the reproducer-quickstart script
 
 Go to the "logs" directory of the job::
 
-    wget http://logs.openstack.org/07/472607/<snip>/f98d674/logs/reproducer-quickstart.sh
+    wget http://logs.openstack.org/34/653934/1/<snip>/05075b2/logs/reproducer-quickstart/reproducer-zuul-based-quickstart.tar
+    tar -xvf reproducer-zuul-based-quickstart.tar
+
 
 Be sure you have download the OpenStack RC file. To have more information you
 can check the documentation `here <https://docs.openstack.org/newton/user-guide
@@ -47,13 +46,7 @@ Source your OpenStack RC file::
 
 Execute the reproducer-quickstart.sh::
 
-    bash -x reproducer-quickstart.sh
-
-The following additional options are recommended::
-
-    bash -x reproducer-quickstart.sh --workspace /var/tmp/reproduce \
-    --create-virtualenv true --remove-stacks-keypairs true \
-    --nodestack-prefix repro
+    bash -x reproducer-zuul-based-quickstart.sh
 
 Please check the script's help command however the available options are::
 
@@ -62,34 +55,62 @@ Please check the script's help command however the available options are::
   -w, --workspace <dir>
                       directory where the virtualenv, inventory files, etc.
                       are created. Defaults to creating a directory in /tmp
-  -v, --create-virtualenv
-                      create a virtualenv to install Ansible and dependencies.
-                      Options to pass true/false. Defaults to true for OVB.
-                      Defaults to false for other deployment types.
-  -r, --remove-stacks-keypairs
-                      delete all Heat stacks (both Multinode and OVB created)
-                      in the tenant before deployment.
-                      Will also delete associated keypairs if they exist.
-                      Options to pass true/false.Defaults to false.
-  -p, --nodestack-prefix
-                      add a unique prefix for multinode and singlenode stacks
-                      Defaults to empty.
-  -a, --autorun
-                      Run job on prepared environment automatically
-                      Default is to stop after environment is ready
-  -h, --help          print this help and exit
+  -l, --libvirt
+                      Runs a 2-node multinode job or singlenode job on a
+                      single virthost using libvirt to create the nodes.
+                      If a singlenode reproducer is run, two VMs will still be created.
+  -c, --cloud-name
+                      Host cloud, specified in the clouds.yaml, to target
+                      Defaults to rdo-cloud
+  -cp, --clouds-yaml-path
+                      Full path to the clouds.yaml file
+                      Defaults to /home/$USER/.config/openstack/clouds.yaml
+  -ok, --ovb-key-name
+                      Name of the key to use in the host tenant for OVB deployments
+                      Defaults to tripleo-ci-team
+  -f, --force-post-failure
+                      Force job to fail so that the nodes will be held.
+                      Temporary solution
+  -ug, --upstream-gerrit-user
+                      Set the upstream gerrit user required to clone repos.
+                      Defaults to the current $USER
+  -rg, --rdo-gerrit-user
+                      Set the upstream RDO user required to clone RDO-related repos.
+                      Defaults to the current $USER
+  -k, --ssh-key
+                     private ssh key used to set up an access nodes.
+                     Defaults to id_rsa.
+  -kp, --ssh-key-public
+                     public ssh key used to set up an access nodes.
+                     Defaults to $USER_SSH_KEY.pub
+  -skp, --ssh-key-path
+                     Path to directory where user ssh keys are stored.
+                     Defaults to /home/$USER/.ssh
+  -ugk, --upstream-gerrit-key
+                     Set the upstream gerrit private key.
+                     Defaults to the $USER_SSH_KEY.
+  -rgk, --rdo-gerrit-key
+                     Set the upstream RDO user key.
+                     Defaults to the $USER_SSH_KEY.
+  -e, --extra-params
+                     File or/and parameters used to override default
+                     parameters for playbooks. Multiple files
+                     can be passed [-e @file1.yml -e @file2.yml ...]
+                     and arguments [-e var=value -e var2=value2 ...]
+  -h, --help         print this help and exit
 
 How does this script work
 -------------------------
 
 The script is generated by a `jinja2 template <https://github.com/openstack/
-tripleo-quickstart-extras/blob/master/roles/create-reproducer-script/templates/
-reproducer-quickstart.sh.j2>`_ that reads all the variables passed to the CI job
-and builds a custom script for each job.  There are two major steps to be
-familiar with in this script.  The first part of the script will provision the
-servers, networks and other infrastructure for the TripleO deployment.  The
-second part invokes the CI tools and scripts in the `same way the original CI
-job was executed <https://github.com/openstack-infra/tripleo-ci/blob/master/
+tripleo-quickstart-extras/blob/master/roles/create-zuul-based-reproducer/
+templates/reproducer-zuul-based-quickstart.sh.j2>`_ that reads all the
+variables passed to the CI job and builds a custom script for each job. There
+are two major steps to be familiar with in this script.  The first part of the
+script will provision the servers, networks and other infrastructure for the
+TripleO deployment. The second part invokes the CI tools and scripts in
+the `same way the original CI job was executed
+<https://github.com/openstack-infra/tripleo-ci/blob/master/
 toci_gate_test-oooq.sh>`_.
 
 Notes
@@ -110,5 +131,5 @@ Please open any issues or problems in
 `launchpad <https://bugs.launchpad.net/tripleo>`_ with the "quickstart" tag.
 
 The `devmode.sh <https://github.com/openstack/tripleo-quickstart/blob/master/
-devmode.sh>`_ script is deprecated.  The reproducer-quickstart.sh should be
+devmode.sh>`_ script is deprecated.  The reproducer-zuul-based-quickstart.sh should be
 used for upstream development and debugging of TripleO CI.

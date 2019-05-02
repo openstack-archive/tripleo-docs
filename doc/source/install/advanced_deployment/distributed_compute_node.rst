@@ -204,7 +204,7 @@ Extract the needed data from the stack outputs:
 
 The same passwords and secrets should be reused when deploying the additional
 compute stacks. These values can be saved from the existing control plane stack
-deployment with the following command::
+deployment with the following command:
 
 .. code-block:: bash
 

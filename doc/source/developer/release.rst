@@ -9,7 +9,7 @@ it's suggested to read the OpenStack Release Management guide_.
 Most of TripleO projects follows the cycle-trailing_ release model.
 The details can be found on the releases repository_.
 
-.. _repository: https://git.openstack.org/cgit/openstack/releases/tree/deliverables
+.. _repository: https://opendev.org/openstack/releases/src/branch/master/deliverables
 
 .. _cycle-trailing: https://releases.openstack.org/reference/release_models.html#cycle-trailing
 
@@ -42,7 +42,7 @@ For other projects, there is no need to update anything since the release will b
    https://docs.openstack.org/developer/puppet-openstack-guide/releases.html#how-to-release-puppet-modules
 
 .. Note::
-   TripleO UI requires some specific changes to be released too, see https://review.openstack.org/#/c/460664/
+   TripleO UI requires some specific changes to be released too, see https://review.opendev.org/#/c/460664/
    for an example.
 
 Once this is done, you can submit a patch in openstack/releases and per project create or modify the YAML.

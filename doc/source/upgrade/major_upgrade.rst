@@ -68,7 +68,7 @@ The upgrade workflow essentially consists of the following steps:
 Detailed infromation and pointers can be found in the relevant the
 queens-upgrade-dev-docs_.
 
-.. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.openstack.org/#/c/569443/
+.. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.opendev.org/#/c/569443/
 
 Prepare your environment files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

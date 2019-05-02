@@ -8,7 +8,7 @@ other specific tests useful in validating an OpenStack deployment.
 Current State of Tempest
 ------------------------
 
-Source code : https://git.openstack.org/cgit/openstack/tempest/
+Source code : https://opendev.org/openstack/tempest/
 
 Tempest Version release wise:
 +++++++++++++++++++++++++++++
@@ -173,7 +173,7 @@ configuration, the following is the default::
 
 .. note::
   Here is the list of
-  `validate-tempest role variables <http://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/roles/validate-tempest/README.md>`_
+  `validate-tempest role variables <https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/roles/validate-tempest/README.md>`_
   which can be modified using extra-vars.
 
 

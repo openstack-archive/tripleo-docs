@@ -145,7 +145,7 @@ variables for controlling behaviour of `os_tempest`:
 It runs `tempest.yaml` playbook which sets the rest of the `os_tempest`
 variables needed for execution on top of an environment deployed by one of the
 TripleO CI jobs. The
-`content of the playbook can be seen here <https://git.openstack.org/cgit/openstack/tripleo-quickstart-extras/tree/playbooks/tempest.yml>`_.
+`content of the playbook can be seen here <https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/playbooks/tempest.yml>`_.
 
 If you want to set some of the variables mentioned above differently you need
 to override them by adding those variables to your job definition.

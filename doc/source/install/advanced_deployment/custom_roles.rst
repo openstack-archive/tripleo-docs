@@ -63,7 +63,7 @@ The steps to define your custom roles configuration are:
 2. Create a new role file with your custom role.
 
 Additional details about the format for the roles file can be found in the
-`README.rst <http://git.openstack.org/cgit/openstack/tripleo-heat-templates/tree/roles/README.rst>`_
+`README.rst <https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/roles/README.rst>`_
 in the roles/ directory from `tripleo-heat-templates`. The filename should
 match the name of the role. For example if adding a new role named `Galera`,
 the role file name should be `Galera.yaml`. The file should at least contain
@@ -137,5 +137,5 @@ cluster::
   instead.
 
 
-.. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates
+.. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
 .. _jinja2: http://jinja.pocoo.org/docs/dev/

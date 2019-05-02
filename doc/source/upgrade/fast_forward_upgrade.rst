@@ -104,7 +104,7 @@ performed.
    .. code-block:: bash
 
       git clone -b  stable/newton \
-      https://git.openstack.org/openstack/tripleo-heat-templates tripleo-heat-templates-newton
+      https://git.opendev.org/openstack/tripleo-heat-templates tripleo-heat-templates-newton
 
 3. Use a new `plan-environment.yaml` file. As undercloud CLI calls have been
    upgraded, they will request that file. It needs to be on
@@ -175,7 +175,7 @@ The Queens upgrade workflow essentially consists of the following steps:
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
 
-.. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.openstack.org/#/c/569443/
+.. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.opendev.org/#/c/569443/
 
 Prepare your environment - Get container images
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

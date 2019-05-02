@@ -23,7 +23,7 @@ Getting Started
 Documentation for the TripleO project is hosted on the OpenStack Gerrit
 site. You can view all open and resolved issues in the
 ``openstack/tripleo-docs`` project at `TripleO
-Reviews <https://review.openstack.org/#/q/project:openstack/tripleo-docs>`__.
+Reviews <https://review.opendev.org/#/q/project:openstack/tripleo-docs>`__.
 
 General information about contributing to the OpenStack documentation
 available at `OpenStack Documentation Contributor

@@ -304,8 +304,8 @@ example:
        # backup tht in case you want to revert - or just yum re-install ;)
        sudo cp -r /usr/share/openstack-tripleo-heat-templates \
            /usr/share/openstack-tripleo-heat-templates.ORIG
-       # Apply patch from gerrit e.g. https://review.openstack.org/#/c/563073/
-       curl -4sSL 'https://review.openstack.org/changes/563073/revisions/current/patch?download' | \
+       # Apply patch from gerrit e.g. https://review.opendev.org/#/c/563073/
+       curl -4sSL 'https://review.opendev.org/changes/563073/revisions/current/patch?download' | \
            base64 -d | \
            sudo patch -d /usr/share/openstack-tripleo-heat-templates/ -p1
 
@@ -336,8 +336,8 @@ Patching python-tripleoclient:
        git clone https://github.com/openstack/python-tripleoclient.git -b stable/queens ~/python-tripleoclient
        pushd ~/python-tripleoclient
 
-       # Apply patches from gerrit e.g. https://review.openstack.org/#/c/564267
-       curl "https://review.openstack.org/changes/564267/revisions/current/patch" | \
+       # Apply patches from gerrit e.g. https://review.opendev.org/#/c/564267
+       curl "https://review.opendev.org/changes/564267/revisions/current/patch" | \
              base64 --decode > /home/stack/"564267.patch"
        patch -N -p1 -b -z .first < /home/stack/564267.patch
        # Remove current version and re-install
@@ -358,8 +358,8 @@ Patching tripleo-common:
        # tripleo-common - clone from source, patch from gerrit and install
        git clone https://github.com/openstack/tripleo-common -b stable/queens
        pushd ~/tripleo-common
-       # Apply patches from gerrit e.g. https://review.openstack.org/#/c/562995
-       curl "https://review.openstack.org/changes/562995/revisions/current/patch" | \
+       # Apply patches from gerrit e.g. https://review.opendev.org/#/c/562995
+       curl "https://review.opendev.org/changes/562995/revisions/current/patch" | \
             base64 --decode > /home/stack/"562995.patch"
        patch -N -p1 -b -z .first < /home/stack/562995.patch
        # Remove current version and re install
@@ -383,4 +383,4 @@ package_update.yaml and so that is what we need to update here:
        sudo systemctl restart openstack-mistral-executor.service
 
 .. _rabbitmq_upgrade_tasks: https://github.com/openstack/tripleo-heat-templates/blob/master/deployment/rabbitmq/rabbitmq-messaging-rpc-pacemaker-puppet.yaml#L305
-.. _562995: https://review.openstack.org/#/c/562995
+.. _562995: https://review.opendev.org/#/c/562995

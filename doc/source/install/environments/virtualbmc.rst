@@ -137,6 +137,6 @@ To validate after updating deployment and verify everything is populated properl
 
     openstack baremetal node validate $NODE_UUID_OR_NAME | grep power
 
-.. _VirtualBMC: https://git.openstack.org/cgit/openstack/virtualbmc
+.. _VirtualBMC: https://opendev.org/openstack/virtualbmc
 .. _IPMI: https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface
 .. _BMC: https://en.wikipedia.org/wiki/Baseboard_management_controller

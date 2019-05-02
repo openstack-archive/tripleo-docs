@@ -58,7 +58,7 @@ Parenting from upstream and RDO repos
 -------------------------------------
 
 Jobs that run from internal Zuul can parent off, and use resources (jobs,
-roles etc.) from, upstream (review.openstack.org) and RDO
+roles etc.) from, upstream (review.opendev.org) and RDO
 (review.rdoproject.org) repos. As such, duplication can be kept to a minimum
 and jobs that run internally on baremetal hardware can maintain parity with
 OVB jobs run in RDO Cloud.

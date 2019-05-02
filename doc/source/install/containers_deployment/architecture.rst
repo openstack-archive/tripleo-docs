@@ -113,7 +113,7 @@ The `TripleO Heat Templates`_ repo is where most of the logic resides in the for
 of heat templates. These templates define each service, the containers'
 configuration and the initialization or post-execution operations.
 
-.. _TripleO Heat Templates: http://git.openstack.org/cgit/openstack/tripleo-heat-templates
+.. _TripleO Heat Templates: https://opendev.org/openstack/tripleo-heat-templates
 
 Understanding container related files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -12,7 +12,7 @@
 .. _tripleo-upgrade:
     https://github.com/redhat-openstack/tripleo-upgrade
 .. _integrate:
-    https://review.openstack.org/#/q/topic:link_tripleo_upgrade
+    https://review.opendev.org/#/q/topic:link_tripleo_upgrade
 .. _James Slagle:
     http://lists.openstack.org/pipermail/openstack-dev/2017-February/112993.html
 .. _traas:

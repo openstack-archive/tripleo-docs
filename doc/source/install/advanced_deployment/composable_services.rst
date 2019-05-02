@@ -55,4 +55,4 @@ The same approach can be used for any role.
   and thus control-plane services on this role may present problems during
   major upgrades between releases.
 
-.. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates
+.. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates

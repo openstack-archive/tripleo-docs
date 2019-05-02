@@ -42,7 +42,7 @@ structure (``manifests/profile/base/time/ntp.pp``) as:
   ) {
     #step assigned for core modules.
     #(Check for further referencies about the configuration steps)
-    #http://git.openstack.org/cgit/openstack/tripleo-heat-templates/tree/puppet/services/README.rst
+    #https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/puppet/services/README.rst
     if ($step >= 2){
       #We will call the NTP puppet class and assign our configuration values.
       #If needed additional Puppet packages can be added/installed by using the repo tripleo-puppet-elements

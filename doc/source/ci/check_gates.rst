@@ -135,19 +135,19 @@ featureset override
 
 In TripleO CI, we test each patchset using different jobs. These jobs
 are defined using `featureset config files
-<http://git.openstack.org/cgit/openstack/tripleo-quickstart/tree/config/general_config>`_.
+<https://opendev.org/openstack/tripleo-quickstart/src/branch/master/config/general_config>`_.
 Each featureset config file is mapped to a job template that is defined in
-`tripleo-ci <http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/zuul.d>`_.
+`tripleo-ci <https://opendev.org/openstack-infra/tripleo-ci/src/branch/master/zuul.d>`_.
 Tempest tests are basically triggered in scenario jobs in order to post validate the
 a particular scenario deployment.
 The set of tempest tests that run for a given TripleO CI job is defined in the
 `featureset config files
-<http://git.openstack.org/cgit/openstack/tripleo-quickstart/tree/config/general_config>`_.
+<https://opendev.org/openstack/tripleo-quickstart/src/branch/master/config/general_config>`_.
 You may want to run a popular TripleO CI job with a custom set of Tempest
 tests and override the default Tempest run. This can be accomplished through
 adding the `featureset_overrides` var to zuul job config `vars:` section.
 The list of custom featureset_override are defined in `zuul-v3.yaml
-<http://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/playbooks/tripleo-ci/run-v3.yaml>`_.
+<https://opendev.org/openstack-infra/tripleo-ci/src/branch/master/playbooks/tripleo-ci/run-v3.yaml>`_.
 This setting allows projects to override featureset post deployment configuration.
 The overridable settings are:
 

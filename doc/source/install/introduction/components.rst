@@ -43,7 +43,7 @@ diskimage-builder is an image building tool. It is used by
 **How to contribute**
 
 See the diskimage-builder `README.rst
-<https://git.openstack.org/cgit/openstack/diskimage-builder/tree/README.rst>`_
+<https://opendev.org/openstack/diskimage-builder/src/branch/master/README.rst>`_
 for a further explanation of the tooling. Submit your changes via
 OpenStack Gerrit (see `OpenStack Developer's Guide
 <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -52,7 +52,7 @@ OpenStack Gerrit (see `OpenStack Developer's Guide
 
 * Upstream Project Documentation: http://docs.openstack.org/developer/diskimage-builder/
 * Bugs: https://bugs.launchpad.net/diskimage-builder
-* Git repository: https://git.openstack.org/cgit/openstack/diskimage-builder/
+* Git repository: https://opendev.org/openstack/diskimage-builder/
 
 
 dib-utils
@@ -68,7 +68,7 @@ Submit your changes via OpenStack Gerrit (see `OpenStack Developer's Guide
 **Useful links**
 
 * Bugs: https://bugs.launchpad.net/diskimage-builder
-* Git repository: https://git.openstack.org/cgit/openstack/dib-utils/
+* Git repository: https://opendev.org/openstack/dib-utils/
 
 
 os-\*-config
@@ -100,10 +100,10 @@ development environment. Submit your changes via OpenStack Gerrit (see
 
 * Git repositories:
 
-  * os-collect-config: https://git.openstack.org/cgit/openstack/os-collect-config
-  * os-refresh-config https://git.openstack.org/cgit/openstack/os-refresh-config
-  * os-apply-config https://git.openstack.org/cgit/openstack/os-apply-config
-  * os-net-config https://git.openstack.org/cgit/openstack/os-net-config
+  * os-collect-config: https://opendev.org/openstack/os-collect-config
+  * os-refresh-config https://opendev.org/openstack/os-refresh-config
+  * os-apply-config https://opendev.org/openstack/os-apply-config
+  * os-net-config https://opendev.org/openstack/os-net-config
 
 tripleo-image-elements
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -119,7 +119,7 @@ Submit your changes via OpenStack Gerrit (see
 
 **Useful links**
 
-* Git repository: https://git.openstack.org/cgit/openstack/tripleo-image-elements
+* Git repository: https://opendev.org/openstack/tripleo-image-elements
 
 
 Installer
@@ -144,7 +144,7 @@ Submit your changes via OpenStack Gerrit (see
 
 **Useful links**
 
-* Git repository: https://git.openstack.org/cgit/openstack/instack
+* Git repository: https://opendev.org/openstack/instack
 * Bugs: https://launchpad.net/tripleo
 
 instack-undercloud
@@ -160,7 +160,7 @@ Submit your changes via OpenStack Gerrit (see
 
 **Useful links**
 
-* Git repository: https://git.openstack.org/cgit/openstack/instack-undercloud
+* Git repository: https://opendev.org/openstack/instack-undercloud
 * Bugs: https://launchpad.net/tripleo
 
 tripleo-incubator
@@ -176,7 +176,7 @@ Submit your changes via OpenStack Gerrit (see
 **Useful links**
 
 * Documentation: http://docs.openstack.org/developer/tripleo-incubator/index.html
-* Git repository: https://git.openstack.org/cgit/openstack/tripleo-incubator
+* Git repository: https://opendev.org/openstack/tripleo-incubator
 * Bugs: https://launchpad.net/tripleo
 
 
@@ -243,7 +243,7 @@ development environment in a similar way to Ironic.
 
 **Useful links**
 
-* Source: https://git.openstack.org/cgit/openstack/virtualbmc
+* Source: https://opendev.org/openstack/virtualbmc
 * Bugs: https://bugs.launchpad.net/virtualbmc
 
 
@@ -287,7 +287,7 @@ producing disk images ready to be configured by Puppet via Heat.
 
 **Useful links**
 
-* Upstream Project: https://git.openstack.org/cgit/openstack/heat-templates
+* Upstream Project: https://opendev.org/openstack/heat-templates
 * Bugs: https://bugs.launchpad.net/heat-templates
 * Blueprints: https://blueprints.launchpad.net/heat-templates
 
@@ -308,7 +308,7 @@ are deployed via Heat.
 
 **Useful links**
 
-* Upstream Project: https://git.openstack.org/cgit/openstack/tripleo-heat-templates
+* Upstream Project: https://opendev.org/openstack/tripleo-heat-templates
 * Bugs: https://bugs.launchpad.net/tripleo
 * Blueprints: https://blueprints.launchpad.net/tripleo
 
@@ -327,7 +327,7 @@ nova provides a cloud computing fabric controller.
 
 **Useful links**
 
-* Git repository: https://git.openstack.org/cgit/openstack/nova
+* Git repository: https://opendev.org/openstack/nova
 * Bugs: https://bugs.launchpad.net/nova
 * Blueprints: https://blueprints.launchpad.net/nova
 
@@ -368,7 +368,7 @@ for Puppet-enabled images.
 
 **Useful links**
 
-* Upstream Project: https://git.openstack.org/cgit/openstack/tripleo-puppet-elements
+* Upstream Project: https://opendev.org/openstack/tripleo-puppet-elements
 * Bugs: https://bugs.launchpad.net/tripleo
 * Blueprints: https://blueprints.launchpad.net/tripleo
 
@@ -396,7 +396,7 @@ command with consistent syntax and behaviour.
 
 **Useful links**
 
-* Upstream Project: http://git.openstack.org/cgit/openstack/python-openstackclient
+* Upstream Project: https://opendev.org/openstack/python-openstackclient
 * Bugs: https://bugs.launchpad.net/python-openstackclient
 * Blueprints: https://blueprints.launchpad.net/python-openstackclient
 * Human interface guide: http://docs.openstack.org/developer/python-openstackclient/humaninterfaceguide.html
@@ -412,13 +412,13 @@ like node introspection, overcloud image building and uploading, etc.
 * python-tripleoclient uses `tox <https://tox.readthedocs.org/en/latest/>`_
   to manage the development environment, see the
   `python-tripleoclient documentation
-  <http://git.openstack.org/cgit/openstack/python-tripleoclient/tree/CONTRIBUTING.rst>`_
+  <https://opendev.org/openstack/python-tripleoclient/src/branch/master/CONTRIBUTING.rst>`_
   for details. Submit your changes via
-  `Gerrit <https://review.openstack.org/#/q/project:openstack/python-tripleoclient,n,z>`_.
+  `Gerrit <https://review.opendev.org/#/q/project:openstack/python-tripleoclient,n,z>`_.
 
 **Useful links**
 
-* Project: https://git.openstack.org/cgit/openstack/python-tripleoclient
+* Project: https://opendev.org/openstack/python-tripleoclient
 
 ..
     <GLOBAL_LINKS>
@@ -432,7 +432,7 @@ TripleO UI is the web interface for TripleO.
 
 **How to contribute**
 
-* See the `documentation <http://git.openstack.org/cgit/openstack/tripleo-ui/tree/README.md>`_
+* See the `documentation <https://opendev.org/openstack/tripleo-ui/src/branch/master/README.md>`_
   for details.
 
 
@@ -448,7 +448,7 @@ Pre and post-deployment validations for the deployment workflow.
 
 **Useful links**
 
-* Upstream Project: http://git.openstack.org/cgit/openstack/tripleo-validations/
+* Upstream Project: https://opendev.org/openstack/tripleo-validations/
 * Bugs: https://bugs.launchpad.net/tripleo/+bugs?field.tag=validations
 * Documentation for individual validations: http://docs.openstack.org/developer/tripleo-validations/readme.html#existing-validations
 

@@ -196,6 +196,25 @@ setting custom values for this parameter::
    set a :doc:`tuned profile <tuned>` designed for Ceph filestore.
    Do not use this tuned profile with bluestore.
 
+.. admonition:: ceph-ansible 4.0 and newer
+   :class: ceph
+
+   Stein's default Ceph is Nautilus, which introduced the Messenger v2 protocol.
+   ceph-ansible 4.0 and newer added a parameter in order to:
+
+   * enable or disable the v1 protocol
+   * define the port used to bind the process
+
+   Ceph Nautilus enables both v1 and v2 protocols by default and v1 is maintained
+   for backward compatibility.
+   To disable v1 protocol, set the variables as in the example below:
+
+      parameter_defaults:
+        CephAnsibleExtraConfig:
+          mon_host_v1:
+            enabled: False
+
+
 Configure OSD settings with ceph-ansible
 ----------------------------------------
 

@@ -56,12 +56,17 @@ Deploying a Standalone OpenStack node
    .. admonition:: Ceph
       :class: ceph
 
-      Create a block device to be used as an OSD.
+      Create a block device with logical volumes to be used as an OSD.
 
       .. code-block:: bash
 
          sudo dd if=/dev/zero of=/var/lib/ceph-osd.img bs=1 count=0 seek=7G
          sudo losetup /dev/loop3 /var/lib/ceph-osd.img
+         sudo pvcreate /dev/loop3
+         sudo vgcreate vg2 /dev/loop3
+         sudo lvcreate -n data-lv2 -l 597 vg2
+         sudo lvcreate -n db-lv2 -l 597 vg2
+         sudo lvcreate -n wal-lv2 -l 597 vg2
 
       Create a systemd service that restores the device on startup.
 
@@ -210,24 +215,29 @@ Deploying a Standalone OpenStack node
       :class: ceph
 
       Create an additional environment file which directs ceph-ansible
-      to use the block device and fecth directory backup created
-      earlier. In the same file pass additional Ceph parameters
-      for the OSD scenario and Ceph networks. Set the placement group
-      and replica count to values which fit the number of OSDs being
-      used, e.g. 32 and 1 are used for testing with only one OSD.
+      to use the block device with logical volumes and fecth directory
+      backup created earlier. In the same file pass additional Ceph
+      parameters for the OSD scenario and Ceph networks. Set the
+      placement group and replica count to values which fit the number
+      of OSDs being used, e.g. 32 and 1 are used for testing with only
+      one OSD.
 
       .. code-block:: bash
 
          cat <<EOF > $HOME/ceph_parameters.yaml
          parameter_defaults:
            CephAnsibleDisksConfig:
-             devices:
-               - /dev/loop3
-             journal_size: 1024
+             osd_scenario: lvm
+             osd_objectstore: bluestore
+             lvm_volumes:
+               - data: data-lv2
+                 data_vg: vg2
+                 db: db-lv2
+                 db_vg: vg2
+                 wal: wal-lv2
+                 wal_vg: vg2
            LocalCephAnsibleFetchDirectoryBackup: /root/ceph_ansible_fetch
            CephAnsibleExtraConfig:
-             osd_scenario: collocated
-             osd_objectstore: filestore
              cluster_network: 192.168.24.0/24
              public_network: 192.168.24.0/24
            CephPoolDefaultPgNum: 32

@@ -34,24 +34,6 @@ For example
   Enable the appropriate repos for the desired release, as indicated below.
   Do not enable any other repos not explicitly marked for that release.
 
-  .. admonition:: Ocata
-     :class: ocata ntoo
-
-     Enable the current Ocata repositories
-
-     .. code-block:: bash
-
-        sudo -E tripleo-repos -b ocata current
-
-     .. admonition:: Ceph
-        :class: ceph
-
-        Include the Ceph repo in the tripleo-repos call
-
-        .. code-block:: bash
-
-            sudo -E tripleo-repos -b ocata current ceph
-
   .. admonition:: Pike
      :class: pike otop
 
@@ -68,7 +50,7 @@ For example
 
         .. code-block:: bash
 
-           sudo -E tripleo-repos -b pike current ceph
+            sudo -E tripleo-repos -b pike current ceph
 
   .. admonition:: Queens
      :class: queens ptoq
@@ -89,13 +71,13 @@ For example
            sudo -E tripleo-repos -b queens current ceph
 
   .. admonition:: Rocky
-     :class: rocky mton
+     :class: rocky qtor
 
      Enable the current Rocky repositories
 
      .. code-block:: bash
 
-         sudo -E tripleo-repos -b rocky current
+        sudo -E tripleo-repos -b rocky current
 
      .. admonition:: Ceph
         :class: ceph
@@ -105,6 +87,24 @@ For example
         .. code-block:: bash
 
            sudo -E tripleo-repos -b rocky current ceph
+
+  .. admonition:: Stein
+     :class: stein rtos
+
+     Enable the current Stein repositories
+
+     .. code-block:: bash
+
+         sudo -E tripleo-repos -b stein current
+
+     .. admonition:: Ceph
+        :class: ceph
+
+        Include the Ceph repo in the tripleo-repos call
+
+        .. code-block:: bash
+
+           sudo -E tripleo-repos -b stein current ceph
 
   .. admonition:: Fedora 28
      :class: fedora28

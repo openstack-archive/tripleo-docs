@@ -48,7 +48,7 @@ following::
     - set:
         ceph_image: daemon
         ceph_namespace: docker.io/ceph
-        ceph_tag: v3.0.3-stable-3.0-luminous-centos-7-x86_64
+        ceph_tag: v4.0.0-stable-4.0-nautilus-centos-7-x86_64
         name_prefix: centos-binary-
         name_suffix: ''
         namespace: docker.io/tripleomaster
@@ -93,7 +93,7 @@ following::
       set:
         ceph_image: daemon
         ceph_namespace: docker.io/ceph
-        ceph_tag: v3.0.3-stable-3.0-luminous-centos-7-x86_64
+        ceph_tag: v4.0.0-stable-4.0-nautilus-centos-7-x86_64
         name_prefix: centos-binary-
         name_suffix: ''
         namespace: docker.io/tripleomaster
@@ -167,6 +167,12 @@ combination of labels. For this case, a template format can be specified
 instead::
 
       tag_from_label: {version}-{release}
+
+It's possible to use the above feature while also disabling it only
+for a subset of images by using an `includes` and `excludes` list as
+described later in this document. This is useful when using the above
+but also using containers from external projects which doen't follow
+the same convention like Ceph.
 
 Copying images with push_destination
 ....................................
@@ -242,6 +248,27 @@ addition to the filtering which is determined by roles and containerized
 services in the plan. `includes` matches take precedence over `excludes`
 matches, followed by role/service filtering. The image name must contain the
 value within it to be considered a match.
+
+The `includes` and `excludes` list is useful when pulling OpenStack
+images using `tag_from_label: '{version}-{release}'` while also
+pulling images which are not tagged the same way. The following
+example shows how to do this with Ceph::
+
+  ContainerImagePrepare:
+  - push_destination: true
+    set:
+      namespace: docker.io/tripleomaster
+      name_prefix: centos-binary-
+      name_suffix: ''
+      tag: current-tripleo
+    tag_from_label: '{version}-{release}'
+    excludes: [ceph]
+  - push_destination: true
+    set:
+      ceph_image: ceph
+      ceph_namespace: docker.io/ceph
+      ceph_tag: latest
+    includes: [ceph]
 
 Modifying images during prepare
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

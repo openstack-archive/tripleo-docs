@@ -60,5 +60,6 @@ currently installed validations.
   cli
   mistral
   ansible
+  in-flight
 
 .. _tripleo-validations documentation page: http://docs.openstack.org/developer/tripleo-validations/readme.html

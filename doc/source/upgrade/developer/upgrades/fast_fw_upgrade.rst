@@ -74,7 +74,7 @@ to the equivalent `docker templates`_ for the Heat resource registry.
 .. _Minor update: https://docs.openstack.org/tripleo-docs/latest/install/post_deployment/package_update.html
 .. _upgrade_steps_playbook: https://github.com/openstack/tripleo-heat-templates/blob/82f128f15b1b1eb7bf6ac7df0c6d01e5619309eb/common/deploy-steps.j2#L528
 .. _deploy_steps_playbook: https://github.com/openstack/tripleo-heat-templates/blob/82f128f15b1b1eb7bf6ac7df0c6d01e5619309eb/common/deploy-steps.j2#L382
-.. _fast_forward_upgrade_playbook: https://review.openstack.org/#/c/499221/20/common/deploy-steps.j2@541
+.. _fast_forward_upgrade_playbook: https://review.opendev.org/#/c/499221/20/common/deploy-steps.j2@541
 .. _docker configuration and environment: https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/overcloud.html#preparing-the-environment
 .. _docker templates: https://github.com/openstack/tripleo-heat-templates/blob/750fa306ce41c949928d5a3a7253aff99dd1af8f/environments/docker.yaml#L7-L58
 .. _ceph-ansible: https://github.com/ceph/ceph-ansible
@@ -98,7 +98,7 @@ config-download_ mechanism and written to disk as an ansible playbook.
 The *fast_forward_upgrade_tasks* defined for a given service can use the
 **step** and **release** variables to specify when a given task should be
 executed. At a high level the fast_forward_upgrade_playbook consists of two
-loops - there is a very good explanation in `/#/c/499221 <https://review.openstack.org/#/c/499221/>`_
+loops - there is a very good explanation in `/#/c/499221 <https://review.opendev.org/#/c/499221/>`_
 commit message, but an outer loop for the release (first Ocata tasks then Pike
 tasks) and then an inner loop for the steps within each release.
 

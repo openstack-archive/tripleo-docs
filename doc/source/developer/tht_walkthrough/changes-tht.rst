@@ -31,7 +31,7 @@ purpose.
   of the base configuration (such as rabbit credentials).
   Using a base template in those cases means we don't need to
   duplicate that configuration.
-  Refer to: https://review.openstack.org/#/c/313577/ for further details.
+  Refer to: https://review.opendev.org/#/c/313577/ for further details.
   Also, refer to :ref:`duplicated-parameters` for an use-case description.
 
 Changes list
@@ -138,13 +138,13 @@ follows::
 
 THT changes for all the different roles are covered in:
 
-- https://review.openstack.org/#/c/310421/ (tripleo-heat-templates controller)
+- https://review.opendev.org/#/c/310421/ (tripleo-heat-templates controller)
 
-- https://review.openstack.org/#/c/330916/ (tripleo-heat-templates compute)
+- https://review.opendev.org/#/c/330916/ (tripleo-heat-templates compute)
 
-- https://review.openstack.org/#/c/330921/ (tripleo-heat-templates cephstorage)
+- https://review.opendev.org/#/c/330921/ (tripleo-heat-templates cephstorage)
 
-- https://review.openstack.org/#/c/330923/ (tripleo-heat-templates objectstorage)
+- https://review.opendev.org/#/c/330923/ (tripleo-heat-templates objectstorage)
 
 .. note::
 

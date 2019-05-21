@@ -1195,7 +1195,7 @@ Assuming an external network is available the server can then be allocated a flo
   openstack server add floating ip test1 <IP>
 
 
-.. _IronicConductor role shipped with TripleO: https://git.openstack.org/cgit/openstack/tripleo-heat-templates/plain/roles/IronicConductor.yaml
+.. _IronicConductor role shipped with TripleO: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/roles/IronicConductor.yaml
 .. _driver configuration guide: https://docs.openstack.org/ironic/latest/install/enabling-drivers.html
 .. _driver-specific documentation: https://docs.openstack.org/ironic/latest/admin/drivers.html
 .. _bare metal flavor documentation: https://docs.openstack.org/ironic/latest/install/configure-nova-flavors.html

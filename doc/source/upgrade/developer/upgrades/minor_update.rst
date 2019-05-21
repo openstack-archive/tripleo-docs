@@ -150,7 +150,7 @@ providing these outputs in your composable service template:
 * ``post_update_tasks`` -- these are executed after deployment tasks on
   the node being updated.
 
-.. _Paunch: https://git.openstack.org/cgit/openstack/paunch/tree/README.rst
+.. _Paunch: https://opendev.org/openstack/paunch/src/branch/master/README.rst
 
 Update tasks are generally meant to bring the service into a stopped
 state (sometimes with pre-fetched new images, this is necessary for

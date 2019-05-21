@@ -112,7 +112,7 @@ SSH keys by accessing the nova metadata server, see
 `/usr/share/openstack-tripleo-heat-templates/firstboot/userdata_example.yaml`
 on the undercloud node or the tripleo-heat-templates_ repo.
 
-.. _tripleo-heat-templates: https://git.openstack.org/openstack/tripleo-heat-templates
+.. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
 
 Per-node extra configuration
 ----------------------------

@@ -82,7 +82,7 @@ we can expect it to be defined in both gate and check.
 .. _zuul.d: https://github.com/openstack-infra/tripleo-ci/tree/master/zuul.d
 .. _scenario-standalone-jobs: https://github.com/openstack-infra/tripleo-ci/blob/101074b2e804f97880440a3e62351844f390b2f2/zuul.d/standalone-jobs.yaml#L86-L88
 .. _openstack-codesearch: http://codesearch.openstack.org/?q=tripleo-ci-centos-7-scenario003-standalone&i=nope&files=&repos=
-.. _zuul_builds: http://zuul.openstack.org/builds?job_name=tripleo-ci-centos-7-scenario003-standalone
+.. _zuul_builds: http://zuul.opendev.org/builds?job_name=tripleo-ci-centos-7-scenario003-standalone
 
 Zuul queues - gate vs check
 ---------------------------

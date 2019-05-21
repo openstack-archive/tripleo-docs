@@ -45,22 +45,22 @@ Gerrit patches used in this example
 
 The gerrit patches used to describe this walkthrough are:
 
-- https://review.openstack.org/#/c/310725/ (puppet-tripleo)
+- https://review.opendev.org/#/c/310725/ (puppet-tripleo)
 
-- https://review.openstack.org/#/c/310421/ (tripleo-heat-templates controller)
+- https://review.opendev.org/#/c/310421/ (tripleo-heat-templates controller)
 
-- https://review.openstack.org/#/c/330916/ (tripleo-heat-templates compute)
+- https://review.opendev.org/#/c/330916/ (tripleo-heat-templates compute)
 
-- https://review.openstack.org/#/c/330921/ (tripleo-heat-templates cephstorage)
+- https://review.opendev.org/#/c/330921/ (tripleo-heat-templates cephstorage)
 
-- https://review.openstack.org/#/c/330923/ (tripleo-heat-templates objectstorage)
+- https://review.opendev.org/#/c/330923/ (tripleo-heat-templates objectstorage)
 
 
 Change prerequisites
 ~~~~~~~~~~~~~~~~~~~~~
 
 The controller services are defined and configured via Heat resource chains. In
-the proposed patch (https://review.openstack.org/#/c/259568) controller
+the proposed patch (https://review.opendev.org/#/c/259568) controller
 services will be wired to a new Heat feature that allows it to dynamically include
 a set of nested stacks representing individual services via a Heat resource
 chain. The current example will use this interface to decompose the controller

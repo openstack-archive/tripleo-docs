@@ -20,12 +20,12 @@ Contributing to this Documentation
 -----------------------------------
 
 |project| User Documentation lives on
-`git.openstack.org <http://git.openstack.org/cgit/openstack/tripleo-docs/>`_
+`git.opendev.org <https://opendev.org/openstack/tripleo-docs/>`_
 and is mirrored on
 `GitHub under the OpenStack organization <https://github.com/openstack/tripleo-docs>`_.
 
 Learn `how to contribute into TripleO Docs
-<http://git.openstack.org/cgit/openstack/tripleo-docs/tree/README.rst>`_.
+<https://opendev.org/openstack/tripleo-docs/src/branch/master/README.rst>`_.
 
 Reporting Bugs
 --------------

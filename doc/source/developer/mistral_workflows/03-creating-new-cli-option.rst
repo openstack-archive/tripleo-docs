@@ -80,5 +80,5 @@ until we receive a message from the Mistral workflow
 **tripleo.undercloud_backup.v1.prepare_environment** that indicates if
 the invoked workflow ended correctly.
 
-.. _gerrit review: https://review.openstack.org/#/c/466213
+.. _gerrit review: https://review.opendev.org/#/c/466213
 

@@ -119,6 +119,6 @@ The steps to define your custom networks are:
      modify the ``network_data.yaml`` file in place, then deploy via
      ``--templates <copy of tht>``.
 
-.. _tripleo-heat-templates: https://git.openstack.org/cgit/openstack/tripleo-heat-templates
-.. _network_data.yaml: https://git.openstack.org/cgit/openstack/tripleo-heat-templates/tree/network_data.yaml
+.. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
+.. _network_data.yaml: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network_data.yaml
 .. _jinja2: http://jinja.pocoo.org/docs/dev/

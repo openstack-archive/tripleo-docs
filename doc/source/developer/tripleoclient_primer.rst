@@ -36,13 +36,13 @@ sections. First we see how to identify *where* in the tripleoclient code a given
 command is defined, and then *how* the command works, highlighting a recurring
 pattern common to all TripleO commands.
 
-.. _python-tripleoclient: https://git.openstack.org/cgit/openstack/python-tripleoclient/
-.. _tripleo-common: https://git.openstack.org/cgit/openstack/tripleo-common/
-.. _overcloud_containers.yaml: https://git.openstack.org/cgit/openstack/tripleo-common/tree/container-images/overcloud_containers.yaml?id=827af753884e15326863ff2207b2ac95d4ad595b#n1
-.. _Kolla: https://git.openstack.org/cgit/openstack/kolla
-.. _tripleo-build-containers-centos-7: http://zuul.openstack.org/builds?job_name=tripleo-build-containers-centos-7
-.. _build.sh.j2: https://git.openstack.org/cgit/openstack-infra/tripleo-ci/tree/playbooks/tripleo-buildcontainers/templates/build.sh.j2?id=69212e1cd8726396c232b493f1aec79480459666#n5
-.. _setup.cfg: https://git.openstack.org/cgit/openstack/python-tripleoclient/tree/setup.cfg?id=73cc43898cfcc8b99ce736f734fc5b514f5bc6e9#n46
+.. _python-tripleoclient: https://opendev.org/openstack/python-tripleoclient/
+.. _tripleo-common: https://opendev.org/openstack/tripleo-common/
+.. _overcloud_containers.yaml: https://opendev.org/openstack/tripleo-common/src/branch/master/container-images/overcloud_containers.yaml?id=827af753884e15326863ff2207b2ac95d4ad595b#n1
+.. _Kolla: https://opendev.org/openstack/kolla
+.. _tripleo-build-containers-centos-7: http://zuul.opendev.org/builds?job_name=tripleo-build-containers-centos-7
+.. _build.sh.j2: https://opendev.org/openstack-infra/tripleo-ci/src/branch/master/playbooks/tripleo-buildcontainers/templates/build.sh.j2?id=69212e1cd8726396c232b493f1aec79480459666#n5
+.. _setup.cfg: https://opendev.org/openstack/python-tripleoclient/src/branch/master/setup.cfg?id=73cc43898cfcc8b99ce736f734fc5b514f5bc6e9#n46
 
 
 TripleO commands: *where*
@@ -70,7 +70,7 @@ used in the tripleoclient namespace for this comand. For **overcloud_container_i
 defined in a class called **BuildImage** inside the `tripleoclient/v1/container_image.py`_
 file.
 
-.. _`tripleoclient/v1/container_image.py`: https://git.openstack.org/cgit/openstack/python-tripleoclient/tree/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n100
+.. _`tripleoclient/v1/container_image.py`: https://opendev.org/openstack/python-tripleoclient/src/branch/master/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n100
 
 TripleO commands: *how*
 -----------------------
@@ -131,6 +131,6 @@ python namespace to find the definition of **build_images** in the
         cmd = ['kolla-build']
     ...
 
-.. _get_parser: https://git.openstack.org/cgit/openstack/python-tripleoclient/tree/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n119
-.. _take_action:  https://git.openstack.org/cgit/openstack/python-tripleoclient/tree/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n184
-.. _`tripleo_common/image/kolla_builder.py`: https://git.openstack.org/cgit/openstack/tripleo-common/tree/tripleo_common/image/kolla_builder.py?id=3db41939a370ef3bbd2c6b60ca24e6e8e4b6e30a#n441
+.. _get_parser: https://opendev.org/openstack/python-tripleoclient/src/branch/master/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n119
+.. _take_action:  https://opendev.org/openstack/python-tripleoclient/src/branch/master/tripleoclient/v1/container_image.py?id=0132e7d08240d8a9d5839cc4345574d44ec2b278#n184
+.. _`tripleo_common/image/kolla_builder.py`: https://opendev.org/openstack/tripleo-common/src/branch/master/tripleo_common/image/kolla_builder.py?id=3db41939a370ef3bbd2c6b60ca24e6e8e4b6e30a#n441

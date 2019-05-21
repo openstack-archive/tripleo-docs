@@ -88,8 +88,8 @@ Finally we use a task in the tripleo-ci-run-test-role_ to pass the scenario
 environment file into the standalone deployment command using the standalone
 role standalone_custom_env_files_ parameter.
 
-.. _scenario012: https://review.openstack.org/634723
-.. _dedicated-featureset: https://review.openstack.org/636355
+.. _scenario012: https://review.opendev.org/634723
+.. _dedicated-featureset: https://review.opendev.org/636355
 .. _standalone-featureset052: https://github.com/openstack/tripleo-quickstart/blob/6585d6320ca4f0c37ae62dfc60fe2eb0cd42647c/config/general_config/featureset052.yml#L2
 .. _scenario001-job: https://github.com/openstack-infra/tripleo-ci/blob/1d890565feeeea6ce637cf0384da822926480f07/zuul.d/standalone-jobs.yaml#L376
 .. _scenario002-job: https://github.com/openstack-infra/tripleo-ci/blob/1d890565feeeea6ce637cf0384da822926480f07/zuul.d/standalone-jobs.yaml#L401

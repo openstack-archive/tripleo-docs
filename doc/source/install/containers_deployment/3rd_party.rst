@@ -107,7 +107,7 @@ The `TripleO Heat Templates`_ repo is where most of the logic resides in the for
 of heat templates. These templates define each service, the containers'
 configuration and the initialization or post-execution operations.
 
-.. _TripleO Heat Templates: http://git.openstack.org/cgit/openstack/tripleo-heat-templates
+.. _TripleO Heat Templates: https://opendev.org/openstack/tripleo-heat-templates
 
 The docker templates can be found under the `docker` sub directory in the
 `tripleo-heat-templates` root. The services files are under the

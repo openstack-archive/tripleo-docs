@@ -22,4 +22,4 @@ For additional testing, you can use the `Python snippet`_ to call
 Mistral client from the Undercloud node available in gist.github.com.
 
 .. _Python snippet: https://gist.github.com/ccamacho/354f798102710d165c1f6167eb533caf#file-mistral_client_snippet-py
-.. _instack_undercloud/undercloud.py: https://git.openstack.org/cgit/openstack/instack-undercloud/tree/instack_undercloud/undercloud.py
+.. _instack_undercloud/undercloud.py: https://opendev.org/openstack/instack-undercloud/src/branch/master/instack_undercloud/undercloud.py

@@ -142,7 +142,6 @@ the process, the validations will be run by the undercloud processes.
 Refer to the Ansible section for running directly the validations
 over baremetal nodes `validations_no_undercloud`_.
 
-
 Configuration Files
 ^^^^^^^^^^^^^^^^^^^
 

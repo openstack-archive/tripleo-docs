@@ -4,6 +4,32 @@ Tips and Tricks for containerizing services
 This document contains a list of tips and tricks that are useful when
 containerizing an OpenStack service.
 
+Important Notes
+---------------
+
+Podman
+------
+
+Prior to Stein, containerized OpenStack deployments used Docker.
+
+Starting with the Stein release, Docker is no longer part of OpenStack,
+and Podman has taken its place.  The notes here are regarding Stein and later,
+with Rocky and earlier docker commands clearly marked.
+
+sudo
+----
+
+On CentOS 7, podman cannot function with administrative privileges due to
+user namespaces not being enabled in an older kernel.  The workaround is
+simply to run podman commands with sudo as a prefix.
+
+If you see the following, simply remember to add sudo to your command::
+
+    $ podman ps
+    cannot clone: Invalid argument
+    user namespaces are not enabled in /proc/sys/user/max_user_namespaces
+    ERRO[0000] cannot re-exec process
+
 Monitoring containers
 ---------------------
 
@@ -12,7 +38,14 @@ executed and what not. The puppet containers are created and removed
 automatically unless they fail. For all the other containers, it's enough to
 monitor the output of the command below::
 
-    $ watch -n 0.5 docker ps -a --filter label=managed_by=docker-cmd
+    $ watch -n 0.5 sudo podman ps -a --filter label=managed_by=paunch
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ watch -n 0.5 docker ps -a --filter label=managed_by=docker-cmd
 
 .. _debug-containers:
 
@@ -21,13 +54,37 @@ Viewing container logs
 
 You can view the output of the main process running in a container by running::
 
-    $ docker logs $CONTAINER_ID_OR_NAME
+    $ sudo podman logs $CONTAINER_ID_OR_NAME
 
-Ideally all containerized processes would log everything to
-stdout/stderr and the above command would suffice. Not all services
-are quite there yet, so we export traditional logs from containers
-into the `/var/log/containers` directory on the host, where you can
-look at them.
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ docker logs $CONTAINER_ID_OR_NAME
+
+From Stein release, standard out and standard error from containers are
+captured in `/var/log/containers/stdouts`.
+
+We export traditional logs from containers into the `/var/log/containers`
+directory on the host, where you can look at them.
+
+systemd and podman
+------------------
+
+Throughout this document you'll find references to direct podman commands
+for things like restarting services.  These are valid and supported methods,
+but it's worth noting that services are tied into the systemd management
+system, which is often the preferred way to operate.
+
+Restarting nova_scheduler for example::
+
+    $ sudo systemctl restart triplo_nova_scheduler
+
+Stopping a container with systemd::
+
+    $ sudo systemctl stop tripleo_nova_scheduler
+
 
 .. _toggle_debug:
 
@@ -36,26 +93,57 @@ Toggle debug
 
 For services that support `reloading their configuration at runtime`_::
 
-    $ sudo docker exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
-    $ sudo docker kill -s SIGHUP nova_scheduler
+    $ sudo podman exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
+    $ sudo podman kill -s SIGHUP nova_scheduler
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ sudo docker exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
+     $ sudo docker kill -s SIGHUP nova_scheduler
 
 .. _reloading their configuration at runtime: https://storyboard.openstack.org/#!/story/2001545
 
 Restart the container to turn back the configuration to normal::
 
-    $ sudo docker restart nova_scheduler
+    $ sudo podman restart nova_scheduler
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ sudo docker restart nova_scheduler
 
 Otherwise, if the service does not yet support reloading its configuration, it
 is necessary to change the configuration on the host filesystem and restart the
 container::
 
     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug true
-    $ sudo docker restart nova_scheduler
+    $ sudo podman restart nova_scheduler
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug true
+     $ sudo docker restart nova_scheduler
 
 Apply the inverse change to restore the default log verbosity::
 
     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug false
-    $ sudo docker restart nova_scheduler
+    $ sudo podman restart nova_scheduler
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug false
+     $ sudo docker restart nova_scheduler
 
 Debugging container failures
 ----------------------------
@@ -66,30 +154,43 @@ The following commands are useful for debugging containers.
   metadata. It provides info about the bind mounts on the container, the
   container's labels, the container's command, etc::
 
-    $ docker inspect $CONTAINER_ID_OR_NAME
+    $ sudo podman inspect $CONTAINER_ID_OR_NAME
 
-  There's no shortcut for *rebuilding* the command that was used to run the
-  container but, it's possible to do so by using the `docker inspect` command
-  and the format parameter::
+  .. admonition:: Rocky
+     :class: stable
 
-   $ docker inspect --format='{{range .Config.Env}} -e "{{.}}" {{end}} {{range .Mounts}} -v {{.Source}}:{{.Destination}}{{if .Mode}}:{{.Mode}}{{end}}{{end}} -ti {{.Config.Image}}' $CONTAINER_ID_OR_NAME
+     ::
 
-  Copy the output from the command above and append it to the one below, which
-  will run the same container with a random name and remove it as soon as the
-  execution exits::
+       $ docker inspect $CONTAINER_ID_OR_NAME
 
-    $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
+* **top**: Viewing processes running within a container is trivial with Podman::
+
+    $ sudo podman top $CONTAINER_ID_OR_NAME
 
 * **exec**: Running commands on or attaching to a running container is extremely
   useful to get a better understanding of what's happening in the container.
   It's possible to do so by running the following command::
 
-    $ docker exec -ti $CONTAINER_ID_OR_NAME /bin/bash
+    $ sudo podman exec -ti $CONTAINER_ID_OR_NAME /bin/bash
+
+  .. admonition:: Rocky
+     :class: stable
+
+     ::
+
+       $ docker exec -ti $CONTAINER_ID_OR_NAME /bin/bash
 
   Replace the `/bin/bash` above with other commands to run oneshot commands. For
   example::
 
-    $ docker exec -ti mysql mysql -u root -p $PASSWORD
+    $ sudo podman exec -ti mysql mysql -u root -p $PASSWORD
+
+  .. admonition:: Rocky
+     :class: stable
+
+     ::
+
+       $ docker exec -ti mysql mysql -u root -p $PASSWORD
 
   The above will start a mysql shell on the mysql container.
 
@@ -99,8 +200,24 @@ The following commands are useful for debugging containers.
   filesystem structure from the container will allow for checking other logs
   files that may not be in the mounted volumes::
 
-    $ docker export $CONTAINER_ID_OR_NAME | tar -C /tmp/$CONTAINER_ID_OR_NAME -xvf -
+    $ sudo podman export $CONTAINER_ID_OR_NAME -o $CONTAINER_ID_OR_NAME.tar
 
+  .. admonition:: Rocky
+     :class: stable
+
+     ::
+
+        There's no shortcut for *rebuilding* the command that was used to run the
+        container but, it's possible to do so by using the `docker inspect` command
+        and the format parameter
+
+        $ docker inspect --format='{{range .Config.Env}} -e "{{.}}" {{end}} {{range .Mounts}} -v {{.Source}}:{{.Destination}}{{if .Mode}}:{{.Mode}}{{end}}{{end}} -ti {{.Config.Image}}' $CONTAINER_ID_OR_NAME
+
+        Copy the output from the command above and append it to the one below, which
+        will run the same container with a random name and remove it as soon as the
+        execution exits::
+
+        $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
 
 Debugging with Paunch
 ---------------------
@@ -151,7 +268,7 @@ are using.  This config id corresponds to which file you will find the
 container configuration in.
 
 Note that if you wish to replace a currently running container you will
-want to ``docker rm`` the running container before starting a new one.
+want to ``sudo podman rm -f`` the running container before starting a new one.
 
 Here is an example of using ``paunch debug`` to start a root shell inside the
 heat api container:
@@ -263,11 +380,11 @@ in a container on an existing deployment.
 
 For example let's update packages for the mariadb container::
 
-    (undercloud) [stack@undercloud ~]$ docker images | grep mariadb
+    (undercloud) [stack@undercloud ~]$ sudo podman images | grep mariadb
     192.168.24.1:8787/tripleomaster/centos-binary-mariadb    latest     035a8237c376    2 weeks ago    723.5 MB
 
-So docker image `035a8237c376` is the one we need to base our work on. Since
-docker images are supposed to be immutable we will base our work off of
+So container image `035a8237c376` is the one we need to base our work on. Since
+container images are supposed to be immutable we will base our work off of
 `035a8237c376` and create a new one::
 
     mkdir -p galera-workaround

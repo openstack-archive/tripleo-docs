@@ -22,11 +22,13 @@ Install system dependencies
 Before execute the reproduce-quickstart it's necessary to install few
 dependencies on the system::
 
-* pip
-* virtualenv
+* python3-pip
+* python3-virtualenv
 * ansible
-* python-openstackclient
-* python-heatclient
+* python3-openstackclient
+* python3-heatclient
+
+If you use Python 2 change python3 by python2 in the package name.
 
 How to execute the reproducer-quickstart script
 -----------------------------------------------

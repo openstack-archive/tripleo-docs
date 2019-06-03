@@ -207,7 +207,7 @@ setting custom values for this parameter::
 
    Ceph Nautilus enables both v1 and v2 protocols by default and v1 is maintained
    for backward compatibility.
-   To disable v1 protocol, set the variables as in the example below:
+   To disable v1 protocol, set the variables as in the example below::
 
       parameter_defaults:
         CephAnsibleExtraConfig:

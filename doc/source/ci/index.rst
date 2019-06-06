@@ -13,3 +13,4 @@ TripleO CI Guide
   dlrn-promoter-overview
   stages-overview
   emit_releases_file
+  ruck_rover_primer

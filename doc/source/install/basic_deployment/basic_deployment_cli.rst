@@ -123,17 +123,31 @@ created on the undercloud, one should use a non-root user.
 
       ::
 
-         export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/tripleo-centos-ceph-jewel.repo"
+         export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/tripleo-centos-ceph*.repo"
 
    .. admonition:: Stable Branch
       :class: stable
 
-      .. admonition:: Newton
-         :class: newton
+      .. admonition:: Queens
+         :class: queens
 
          ::
 
-            export STABLE_RELEASE="newton"
+            export STABLE_RELEASE="queens"
+
+         .. admonition:: Ceph
+            :class: ceph
+
+            ::
+
+               export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/tripleo-centos-ceph*.repo"
+
+      .. admonition:: Rocky
+         :class: rocky
+
+         ::
+
+            export STABLE_RELEASE="rocky"
 
          .. admonition:: Ceph
             :class: ceph
@@ -142,12 +156,12 @@ created on the undercloud, one should use a non-root user.
 
                export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/tripleo-centos-ceph-jewel.repo"
 
-      .. admonition:: Ocata
-         :class: ocata
+      .. admonition:: Stein
+         :class: stein
 
          ::
 
-            export STABLE_RELEASE="ocata"
+            export STABLE_RELEASE="stein"
 
          .. admonition:: Ceph
             :class: ceph

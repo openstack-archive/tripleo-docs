@@ -389,3 +389,29 @@ original image default user::
 
 ..  _Delorean repository: https://trunk.rdoproject.org/centos7-master/ac/82/ac82ea9271a4ae3860528eaf8a813da7209e62a6_28eeb6c7/
 ..  _tripleo-modify-image: https://github.com/openstack/ansible-role-tripleo-modify-image
+
+
+Modify with Python source code installed via pip from OpenDev Gerrit
+....................................................................
+
+
+If you would like to build an image and apply your patch in a Python project in
+OpenStack, you can use this example::
+
+  ContainerImagePrepare:
+  - push_destination: true
+    ...
+    includes:
+    - heat-api
+    modify_role: tripleo-modify-image
+    modify_append_tag: "-devel"
+    modify_vars:
+      tasks_from: dev_install.yml
+      source_image: docker.io/tripleomaster/centos-binary-heat-api:current-tripleo
+      refspecs:
+        -
+          project: heat
+          refspec: refs/changes/12/1234/3
+    ...
+
+It will produce a modified image with Python source code installed via pip.

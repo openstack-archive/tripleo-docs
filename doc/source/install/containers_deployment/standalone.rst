@@ -53,6 +53,10 @@ Deploying a Standalone OpenStack node
     openstack tripleo container image prepare default \
       --output-env-file $HOME/containers-prepare-parameters.yaml
 
+   .. note::
+      Update containers-prepare-parameters.yaml for your own needs.
+      See :ref:`prepare-environment-containers` for more details.
+
    .. admonition:: Ceph
       :class: ceph
 

@@ -14,7 +14,7 @@ overcloud.
    Before upgrading the undercloud to Queens, make sure you have created a valid
    backup of the current undercloud and overcloud. The complete backup
    procedure can be found on:
-   :doc:`undercloud backup<../install/controlplane_backup_restore/00_index>`
+   :doc:`undercloud backup<../backup_and_restore/00_index>`
 
 Undercloud FFU upgrade
 ----------------------
@@ -25,7 +25,7 @@ Undercloud FFU upgrade
    configurations. Before performing the Fast Forward Upgrade of the undercloud
    in production, test it in a matching staging environment, and create a backup
    of the undercloud in the production environment. Please refer to
-   :doc:`undercloud backup<../install/controlplane_backup_restore/01_undercloud_backup>`
+   :doc:`undercloud backup<../backup_and_restore/01_undercloud_backup>`
    for proper documentation on undercloud backups.
 
 The undercloud FFU upgrade consists of 3 consecutive undercloud upgrades to
@@ -286,7 +286,7 @@ openstack overcloud ffwd-upgrade prepare
    of the current state, including the **undercloud** since there will be a
    Heat stack update performed here. The complete backup procedure can be
    found on:
-   :doc:`undercloud backup<../install/controlplane_backup_restore/00_index>`
+   :doc:`undercloud backup<../backup_and_restore/00_index>`
 
 
 .. note::

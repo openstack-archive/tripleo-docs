@@ -23,3 +23,4 @@ the dependencies resolution might select to remove critical packages like `syste
   02_overcloud_backup
   03_undercloud_restore
   04_overcloud_restore
+  05_rear

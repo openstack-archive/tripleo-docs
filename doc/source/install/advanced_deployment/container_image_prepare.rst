@@ -212,6 +212,20 @@ The values in the `set` map are used when evaluating the file
 as a Jinja2 template. This file contains the list of every container image and
 how it relates to TripleO services and heat parameters.
 
+Authenticated Registries
+........................
+
+If a container registry requires a username and password, then those
+values may be passed using the following syntax::
+
+  ContainerImagePrepare:
+  - push_destination: 192.168.24.1:8787
+    set:
+      namespace: quay.io/...
+      ...
+  ContainerImageRegistryCredentials:
+    'quay.io': {'<your_quay_username>': '<your_quay_password>'}
+
 Layering image preparation entries
 ..................................
 

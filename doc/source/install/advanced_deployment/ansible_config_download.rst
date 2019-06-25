@@ -363,6 +363,20 @@ values used by the mistral workflow that runs ``config-download``::
     retries = 8
     pipelining = True
 
+.. admonition:: Ceph
+   :class: ceph
+
+   When config-download configures Ceph, Ansible executes ceph-ansible
+   from within the config-download external_deploy_steps_tasks
+   playbook. When config-download is run manually the `ssh_args`
+   argument above will not be inherited by the second Ansible
+   execution. To pass Ansible environment variables to this execution
+   use a Heat environment file like the following::
+
+     parameter_defaults:
+       CephAnsibleEnvironmentVariables:
+         ANSIBLE_HOST_KEY_CHECKING: 'False'
+
 .. note::
 
    When running ``ansible-playbook`` manually, the overcloud status as returned

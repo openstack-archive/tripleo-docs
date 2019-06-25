@@ -2,10 +2,11 @@
 
 Ansible config-download differences
 ===================================
+Starting with the Queens release, it is possible to use Ansible to apply the
+overcloud configuration. In the Rocky release, this method is the new default
+behavior.
 
-In the Queens release, the default deployment changed to use Ansible to apply
-software configuration to overcloud nodes using **config-download**. The
-feature is fully documented at
+The feature is fully documented at
 :doc:`../advanced_deployment/ansible_config_download`, while this page details
 the differences to the deployer experience with config-download.
 

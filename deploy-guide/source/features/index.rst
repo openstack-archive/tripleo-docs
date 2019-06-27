@@ -31,6 +31,7 @@ Documentation on additional features for |project|.
    ops_tools
    oslo_messaging_config
    ovs_dpdk_config
+   sriov_deployment
    rhsm
    role_specific_parameters
    routed_spine_leaf_network

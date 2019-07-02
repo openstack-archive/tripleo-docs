@@ -12,7 +12,7 @@ Updating Undercloud Components
    keep in mind the special cases described in :ref:`notes-for-stack-updates`.
 
 #. Before upgrading the undercloud, it is highly suggested to perform
-   a :doc:`backup <../install/controlplane_backup_restore/01_undercloud_backup>`
+   a :doc:`backup <../backup_and_restore/01_undercloud_backup>`
    of the undercloud and validate that a restore works fine.
 
 #. Remove all Delorean repositories:

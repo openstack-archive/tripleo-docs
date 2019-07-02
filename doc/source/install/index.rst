@@ -20,6 +20,5 @@ TripleO Install Guide
   advanced_deployment/baremetal_nodes
   advanced_deployment/backends
   advanced_deployment/custom
-  controlplane_backup_restore/00_index
   troubleshooting/troubleshooting
   mistral-api/mistral-api

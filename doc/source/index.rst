@@ -52,6 +52,15 @@ Validations
 
   validations/index
 
+Backup and restore
+------------------
+
+.. toctree::
+  :maxdepth: 3
+  :includehidden:
+
+  backup_and_restore/00_index
+
 Documentation Conventions
 =========================
 

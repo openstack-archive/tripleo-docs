@@ -308,16 +308,19 @@ the container:
   172ed68eb44ab20551a70a3e33c90a02014f530e42cd7b30255da4577c8ed80c
 
 
-Debugging docker-puppet.py
---------------------------
+Debugging container-puppet.py
+-----------------------------
 
-The :ref:`docker-puppet.py` script manages the config file generation and
-puppet tasks for each service.  This also exists in the `docker` directory
+The :ref:`container-puppet.py` script manages the config file generation and
+puppet tasks for each service.  This also exists in the `common` directory
 of tripleo-heat-templates.  When writing these tasks, it's useful to be
 able to run them manually instead of running them as part of the entire
 stack. To do so, one can run the script as shown below::
 
-  CONFIG=/path/to/task.json /path/to/docker-puppet.py
+  CONFIG=/path/to/task.json /path/to/container-puppet.py
+
+.. note:: Prior to the Train cycle, container-puppet.py was called
+   docker-puppet.py which was located in the `docker` directory.
 
 The json file must follow the following form::
 
@@ -340,7 +343,7 @@ Using a more realistic example. Given a `puppet_config` section like this::
         config_image: {get_param: DockerGlanceApiConfigImage}
 
 
-Would generated a json file called `/var/lib/docker-puppet/docker-puppet-tasks2.json` that looks like::
+Would generated a json file called `/var/lib/container-puppet/container-puppet-tasks2.json` that looks like::
 
     [
         {
@@ -353,24 +356,24 @@ Would generated a json file called `/var/lib/docker-puppet/docker-puppet-tasks2.
 
 
 Setting the path to the above json file as the `CONFIG` environment
-variable passed to `docker-puppet.py` will create a container using
+variable passed to `container-puppet.py` will create a container using
 the `centos-binary-glance-api:latest` image and it and run puppet on a
 catalog restricted to the given puppet `puppet_tags`.
 
 As mentioned above, it's possible to create custom json files and call
-`docker-puppet.py` manually, which makes developing and debugging puppet
+`container-puppet.py` manually, which makes developing and debugging puppet
 steps easier.
 
-`docker-puppet.py` also supports the environment variable `SHOW_DIFF`,
+`container-puppet.py` also supports the environment variable `SHOW_DIFF`,
 which causes it to print out a docker diff of the container before and
 after the configuration step has occurred.
 
-By default `docker-puppet.py` runs things in parallel.  This can make
+By default `container-puppet.py` runs things in parallel.  This can make
 it hard to see the debug output of a given container so there is a
 `PROCESS_COUNT` variable that lets you override this.  A typical debug
-run for docker-puppet might look like::
+run for container-puppet might look like::
 
-    SHOW_DIFF=True PROCESS_COUNT=1 CONFIG=glance_api.json ./docker-puppet.py
+    SHOW_DIFF=True PROCESS_COUNT=1 CONFIG=glance_api.json ./container-puppet.py
 
 Testing a code fix in a container
 ---------------------------------

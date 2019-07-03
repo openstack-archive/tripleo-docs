@@ -121,7 +121,9 @@ create a custom heat environment file that contains your override.  To swap out
 the cinder container from our previous example we would add::
 
     parameter_defaults:
-        DockerCinderVolumeImage: centos-binary-cinder-volume-vendorx:rev1
+        ContainerCinderVolumeImage: centos-binary-cinder-volume-vendorx:rev1
+
+.. note:: Image parameters were named Docker*Image prior to the Train cycle.
 
 
 3rd party kernel modules

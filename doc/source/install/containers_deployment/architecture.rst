@@ -14,25 +14,36 @@ parts that allow for deploying OpenStack in containers using TripleO.
 Containers runtime deployment and configuration notes
 -----------------------------------------------------
 
-TripleO deploys the containers runtime and image components from the docker
-packages. The installed components include the docker daemon system service and
-`OCI`_ compliant `Moby`_ and `Containerd`_ - the building blocks for the
-container system.
+TripleO has transitioned to the `podman`_ container runtime. Podman does not
+use a persistent daemon to manage containers. TripleO wraps the container
+service execution in systemd managed services. These services are named
+tripleo_<container name>. Prior to Stein TripleO deployed the containers
+runtime and image components from the docker packages. The installed components
+include the docker daemon system service and `OCI`_ compliant `Moby`_ and
+`Containerd`_ - the building blocks for the container system.
 
-Containers control plane includes `Paunch`_ and `Dockerd`_ for the
+Containers control plane includes `Paunch`_ and systemd for the
 stateless services, and Pacemaker `Bundle`_ for the containerized stateful
 services, like the messaging system or database.
 
+.. _podman: https://podman.io/
 .. _OCI: https://www.opencontainers.org/
 .. _Moby: https://mobyproject.org/
 .. _Containerd: https://github.com/containerd/containerd
-.. _dockerd: https://docs.docker.com/engine/reference/commandline/dockerd/
 .. _Bundle: https://wiki.clusterlabs.org/wiki/Bundle_Walk-Through
 
-There are ``Docker*`` configuration parameters in TripleO Heat Templates
-available for operators. Those options may be used to override defaults for the
-main docker daemon system service, or help to debug containerized TripleO
-deployments. Parameter override example::
+Currently we provide a ``ContainerCli`` parameter which can be used to switch
+between podman and docker container runtimes.  The default for the undercloud
+is podman, while the default for the overcloud is docker due to pacemaker
+limitations when running under CentOS 7. We expect to switch to podman by
+default for the overcloud once CentOS 8 becomes the default.
+
+We have provided various ``Container*`` configuration parameters in TripleO
+Heat Templates for operators to tune some of the container based settings.
+There are still some ``Docker*`` configuration parameters in TripleO Heat
+Templates available for operators which are left over for the Docker based
+deployment or historical reasons.
+Parameter override example::
 
   parameter_defaults:
     DockerDebug: true
@@ -49,6 +60,8 @@ deployments. Parameter override example::
 
   .. note:: Make sure the default CIDR assigned for the `docker0` bridge interface
       does not conflict to other network ranges defined for your deployment.
+
+  .. note:: These options have no effect when using podman.
 
 * ``DockerInsecureRegistryAddress``, ``DockerRegistryMirror`` allow you to
   specify a custom registry mirror which can optionally be accessed insecurely
@@ -130,10 +143,10 @@ This file is a jinja template and it's rendered before the deployment is
 started. This file defines the resources that are executed before and after the
 container initialization.
 
-.. _docker-puppet.py:
+.. _container-puppet.py:
 
-docker-puppet.py
-................
+container-puppet.py
+...................
 
 This script is responsible for generating the config files for each service. The
 script is called from the `deploy-steps.j2` file and it takes a `json` file as
@@ -141,9 +154,12 @@ configuration. The json files passed to this script are built out of the
 `puppet_config` parameter set in every service template (explained in the
 `Docker specific settings`_ section).
 
-The `docker-puppet.py` execution results in a oneshot container being executed
+The `container-puppet.py` execution results in a oneshot container being executed
 (usually named `puppet-$service_name`) to generate the configuration options or
 run other service specific initialization tasks. Example: Create Keystone endpoints.
+
+.. note:: container-puppet.py was previously docker-puppet.py prior to the Train
+   cycle.
 
 Anatomy of a containerized service template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,18 +218,19 @@ The following sections are available:
     used along with this manifest to generate a config directory for
     this container.
 
-* docker_puppet_tasks: This section provides data to drive the
-  docker-puppet.py tool directly. The task is executed only once
+* container_puppet_tasks: This section provides data to drive the
+  container-puppet.py tool directly. The task is executed only once
   within the cluster (not on each node) and is useful for several
   puppet snippets we require for initialization of things like
-  keystone endpoints, database users, etc. See docker-puppet.py
-  for formatting.
+  keystone endpoints, database users, etc. See container-puppet.py
+  for formatting. NOTE: these tasks were docker_puppet_tasks prior to the
+  Train cycle.
 
 
-Docker steps
-............
+Container steps
+...............
 
-Similar to baremetal, docker containers are brought up in a stepwise manner. The
+Similar to baremetal, containers are brought up in a stepwise manner. The
 current architecture supports bringing up baremetal services alongside of
 containers. Therefore, baremetal steps may be required depending on the service
 and they are always executed before the corresponding container step.
@@ -274,7 +291,7 @@ Service Bootstrap
 
 Bootstrapping services is a one-shot operation for most services and it's done
 by defining a separate container that shares the same structure as the main
-service container commonly defined under the `docker_step` number 3 (see `Docker
+service container commonly defined under the `docker_step` number 3 (see `Container
 steps`_ section above).
 
 Unlike normal service containers, the bootstrap container should be run in the

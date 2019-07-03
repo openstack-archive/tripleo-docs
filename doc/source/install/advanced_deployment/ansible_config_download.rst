@@ -465,7 +465,7 @@ Overcloud deploy step tasks for [1,2,3,4,5]
   tags: overcloud, deploy_setps
 Overcloud common deploy step tasks [1,2,3,4,5]
   Applies the common tasks done at each step to include puppet host
-  configuration, ``docker-puppet.py``, and ``paunch`` (container configuration).
+  configuration, ``container-puppet.py``, and ``paunch`` (container configuration).
 
   tags: overcloud, deploy_setps
 Server Post Deployments

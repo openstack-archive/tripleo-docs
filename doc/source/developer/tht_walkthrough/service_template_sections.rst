@@ -438,7 +438,7 @@ Here's an example of the container definition::
 
    step_2:
      etcd:
-       image: {get_param: DockerEtcdImage}
+       image: {get_param: ContainerEtcdImage}
        net: host
        privileged: false
        restart: always
@@ -456,13 +456,13 @@ This is what we're telling TripleO to do:
 
 * Start the container on step 2
 
-* Use the container image coming from the ``DockerEtcdImage`` heat parameter.
+* Use the container image coming from the ``ContainerEtcdImage`` heat parameter.
 
 * For the container, use the host's network.
 
 * The container is not `privileged`_.
 
-* Docker will use the ``/openstack/healthcheck`` endpoint for healthchecking
+* The container will use the ``/openstack/healthcheck`` endpoint for healthchecking
 
 * We tell it what volumes to mount
 
@@ -486,8 +486,8 @@ This is what we're telling TripleO to do:
       directives as part of the kolla entry point. If we don't set this, it
       will only be executed the first time we run the container.
 
-``docker_puppet_tasks`` section
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``container_puppet_tasks`` section
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 These are containerized puppet executions that are meant as bootstrapping
 tasks. They typically run on a "bootstrap node", meaning, they only run on one
@@ -499,6 +499,8 @@ The format for this is quite similar to the one described in ``puppet_config``
 section, except for the fact that you can set several of these, and they also
 run as part of the steps (you can specify several of these, divided by the
 ``step_<step number>`` keys).
+
+.. note:: This was docker_puppet_tasks prior to the Train cycle.
 
 
 .. References

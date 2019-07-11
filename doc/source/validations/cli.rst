@@ -4,10 +4,9 @@ CLI support for validations
 The following section describes the options
 when running or listing the existing validations.
 
-.. note:: Both running or listing validations are
-  supported currently only by calling Mistral.
-  It is expected to have support to call the
-  Ansible playbooks directly.
+.. note:: Validations can be performed either by calling Mistral or by calling
+  ``ansible-playbook``. By default, the latter is used. However, listing
+  validations are supported currently only by calling Mistral.
 
 Running validations
 ^^^^^^^^^^^^^^^^^^^
@@ -40,7 +39,7 @@ For example you can run this as:
 
   openstack tripleo validator run --validation-name check-ftype,512e
 
-`--group`: This option allows to run specific group
+``--group``: This option allows to run specific group
 validations, if more than one group is required, then
 separate the group names with commas. The default value for this option
 is ['pre-deployment'].
@@ -49,6 +48,10 @@ Run this option for example like:
 .. code-block:: bash
 
   openstack tripleo validator run --group pre-upgrade,prep
+
+``--use-mistral``: This options allows to execute either groups or a set of
+specific validations by calling Mistral instead of using ``ansible-playbook``,
+which is the default.
 
 Listing validations
 ^^^^^^^^^^^^^^^^^^^

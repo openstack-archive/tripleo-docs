@@ -12,7 +12,7 @@ supported since the Pike release. This method requires the deployer
 to procure a CA server on a separate node. FreeIPA is recommended for this.
 
 However, there are cases where a deployers authorized CA does not have an
-interface that can automatically request certificates. Fuirthermore, it may
+interface that can automatically request certificates. Furthermore, it may
 not be possible to add another node to the network for various other reasons.
 For these cases, IPSec is a viable, alternative solution.
 

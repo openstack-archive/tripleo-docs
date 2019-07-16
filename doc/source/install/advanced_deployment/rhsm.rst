@@ -39,7 +39,8 @@ The ``rhsm.yaml`` environment enables mapping the OS::TripleO::Services::Rhsm to
 the extraconfig service::
 
     resource_registry:
-      OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
+      # Before Train cycle, the file is in /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
+      OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/deployment/rhsm/rhsm-baremetal-ansible.yaml
     parameter_defaults:
       RhsmVars:
         rhsm_activation_key: "secrete_key"
@@ -97,7 +98,8 @@ from::
 To::
 
     resource_registry:
-      OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
+      # Before Train cycle, the file is in /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
+      OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/deployment/rhsm/rhsm-baremetal-ansible.yaml
 
 The following table shows a migration path from the old
 rhe-registration parameters to the new RhsmVars:

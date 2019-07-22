@@ -12,6 +12,5 @@ OpenStack projects.
    cinder_netapp
    ceph_config
    ceph_external
-   neutron_midonet
    domain_specific_ldap_backends
    swift_external

@@ -55,7 +55,7 @@ Each stage shows the inputs taken and the artifacts produced.
     https://hub.docker.com/r/tripleomaster/centos-binary-heat-api/tags/
 
     Logs from the DLRN Promoter can be accessed on http://38.145.34.55//.
-    We also use a `Grafana dashboard <http://dashboard-ci.tripleo.org/d/cEEjGFFmz/cockpit?orgId=1>`_
+    We also use a `Grafana dashboard <http://cockpit-ci.tripleo.org/>`_
     and sova for `CI Status <http://cistatus.tripleo.org/>`_  to monitor jobs.
 
 3. **RDO Phase 1**

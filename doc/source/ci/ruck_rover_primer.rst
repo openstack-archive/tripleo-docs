@@ -29,7 +29,7 @@ Ruck
 The ruck monitors the various jobs across the various tripleo related repos
 both upstream tripleo-ci and rdo-infra jobs and periodics for promotions. The
 grafana dashboard at
-`http://dashboard-ci.tripleo.org/d/cEEjGFFmz/cockpit?orgId=1`_ is one of the
+`http://cockpit-ci.tripleo.org/`_ is one of the
 tools used by the ruck to monitor jobs (and many other things, more info on
 grafana below).
 
@@ -111,7 +111,7 @@ The TripleO squad has developed two main tools to help the ruck and rover
 do their job efficiently. They are known within the squad as 'grafana' and
 'sova' (the names of the underlying code in each case):
 
-* grafana: `http://dashboard-ci.tripleo.org/d/cEEjGFFmz/cockpit?orgId=1`_
+* grafana: `http://cockpit-ci.tripleo.org/`_
 * sova: `http://cistatus.tripleo.org/`_
 * etherpad: $varies
 
@@ -184,7 +184,7 @@ red.
 .. _`TripleO launchpad bugs`: https://bugs.launchpad.net/tripleo/+bugs?orderby=-datecreated&start=0
 .. _ci-config-dlrnapi-promoter-config: https://github.com/rdo-infra/ci-config/blob/master/ci-scripts/dlrnapi_promoter/config/CentOS-7/
 .. _master.ini: https://github.com/rdo-infra/ci-config/blob/7e8c40e2b2b686cc2d1d3e86cf8f9cbbd646a1c3/ci-scripts/dlrnapi_promoter/config/CentOS-7/master.ini#L16-L43
-.. _`http://dashboard-ci.tripleo.org/d/cEEjGFFmz/cockpit?orgId=1`: http://dashboard-ci.tripleo.org/d/cEEjGFFmz/cockpit?orgId=1
+.. _`http://cockpit-ci.tripleo.org/`: http://cockpit-ci.tripleo.org/
 .. _`http://cistatus.tripleo.org/`: http://cistatus.tripleo.org/
 .. _`CI Team Structure`: https://specs.openstack.org/openstack/tripleo-specs/specs/policy/ci-team-structure.html
 .. _`zuul based job reproducer`: https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/roles/create-zuul-based-reproducer/README.md

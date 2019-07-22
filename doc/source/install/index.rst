@@ -8,6 +8,7 @@ TripleO Install Guide
   introduction/introduction
   environments/environments
   installation/installation
+  advanced_deployment/undercloud_minion
   basic_deployment/basic_deployment_cli
   basic_deployment/basic_deployment_ui
   basic_deployment/tempest

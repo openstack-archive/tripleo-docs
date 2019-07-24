@@ -318,11 +318,6 @@ Extract the needed data from the stack outputs:
     | jq '{"parameter_defaults": {"EndpointMapOverride": .output_value}}' \
     > endpoint-map.json
 
-  # AllNodesConfig: Node specific hieradata (hostnames, etc) set on all nodes
-  openstack stack output show control-plane AllNodesConfig --format json \
-    | jq '{"parameter_defaults": {"AllNodesExtraMapData": .output_value}}' \
-    > all-nodes-extra-map-data.json
-
   # GlobalConfig: Service specific hieradata set on all nodes
   openstack stack output show $STACK GlobalConfig --format json \
     | jq '{"parameter_defaults": {"GlobalConfigExtraMapData": .output_value}}' \
@@ -332,6 +327,15 @@ Extract the needed data from the stack outputs:
   openstack stack output show control-plane HostsEntry -f json \
     | jq -r '{"parameter_defaults":{"ExtraHostFileEntries": .output_value}}' \
     > extra-host-file-entries.json
+
+Save the hieradata from the stack for input into the compute stacks:
+
+.. code-block:: bash
+
+  # AllNodesConfig: Node specific hieradata (hostnames, etc) set on all nodes
+  cat /var/lib/mistral/control-plane/group_vars/overcloud.json \
+    | jq '{"parameter_defaults": {"AllNodesExtraMapData": .}}' \
+    > all-nodes-extra-map-data.json
 
 The same passwords and secrets should be reused when deploying the additional
 compute stacks. These values can be saved from the existing control plane stack
@@ -638,11 +642,6 @@ configuration data from the ``control-plane`` stack::
     | jq '{"parameter_defaults": {"EndpointMapOverride": .output_value}}' \
     > endpoint-map.json
 
-  # AllNodesConfig: Node specific hieradata (hostnames, etc) set on all nodes
-  openstack stack output show control-plane AllNodesConfig --format json \
-    | jq '{"parameter_defaults": {"AllNodesExtraMapData": .output_value}}' \
-    > all-nodes-extra-map-data.json
-
   # GlobalConfig: Service specific hieradata set on all nodes
   openstack stack output show $STACK GlobalConfig --format json \
     | jq '{"parameter_defaults": {"GlobalConfigExtraMapData": .output_value}}' \
@@ -652,6 +651,11 @@ configuration data from the ``control-plane`` stack::
   openstack stack output show control-plane HostsEntry -f json \
     | jq -r '{"parameter_defaults":{"ExtraHostFileEntries": .output_value}}' \
     > extra-host-file-entries.json
+
+  # AllNodesConfig: Node specific hieradata (hostnames, etc) set on all nodes
+  cat /var/lib/mistral/control-plane/group_vars/overcloud.json \
+    | jq '{"parameter_defaults": {"AllNodesExtraMapData": .}}' \
+    > all-nodes-extra-map-data.json
 
   openstack object save control-plane plan-environment.yaml
   python -c "import yaml; data=yaml.safe_load(open('plan-environment.yaml').read()); print yaml.dump(dict(parameter_defaults=data['passwords']))" > passwords.yaml

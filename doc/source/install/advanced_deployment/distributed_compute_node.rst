@@ -156,8 +156,8 @@ DCN with only ephemeral storage is available for Nova Compute services.
 That is up to the edge cloud applications to be designed to provide enhanced
 data availability, locality awareness and/or replication mechanisms.
 
-Deloying DCN
-------------
+Deploying DCN
+-------------
 
 Deploying the DCN architecture requires consideration as it relates to the
 undercloud, roles, networks, and availability zones configuration. This section
@@ -1015,3 +1015,31 @@ and ``edge-1`` are created and available::
     | cinder-volume    | compute-2@tripleo_ceph  | edge-1  | enabled | up    | 2019-04-01T17:38:28.000000 |
     +------------------+-------------------------+---------+---------+-------+----------------------------+
     (control-plane) [centos@scale ~]$
+
+
+Updating DCN
+------------
+
+Each stack in a multi-stack DCN deployment must be updated to perform a full
+minor update across the entire deployment.
+
+The minor update procedure as detailed in :ref:`package_update` be run for
+each stack in the deployment.
+
+The control-plane or central stack should be updated first by completing all
+the steps from the minor update procedure.
+
+Once the central stack is updated, re-run the export commands from
+:ref:`export_dcn` to recreate the required input files for each separate
+DCN stack.
+
+.. note::
+
+   When re-running the export commands, save the generated files in a new
+   directory so that the previous versions are not overwritten. In the event
+   that a separate DCN stack needs a stack update operation performed prior to
+   the minor update procedure, the previous versions of the exported files
+   should be used.
+
+Each separate DCN stack can then be updated individually as required. There is
+no requirement as to the order of which DCN stack is updated first.

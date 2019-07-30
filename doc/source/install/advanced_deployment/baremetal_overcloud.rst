@@ -1153,7 +1153,7 @@ as a provisioning (and cleaning) network::
 .. note::
   This network should be routed to the ctlplane network on the overcloud (while
   on this network the ironic-0 will need access to the TFTP/HTTP and the ironic
-  API), one way to acheive this would be to set up a network representing the
+  API), one way to achieve this would be to set up a network representing the
   ctlplane network and add a router between them::
 
     openstack network create --provider-network-type flat --provider-physical-network \

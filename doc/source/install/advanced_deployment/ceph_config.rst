@@ -140,21 +140,25 @@ The above example may be used to change any of the defaults found in
 `ceph-ansible/group_vars`_.
 
 If a parameter to override is not an available group variable, then
-global settings in the `ceph.conf` may be set directly using
+`ceph.conf` sections settings may be set directly using
 `CephConfigOverrides` like the following::
 
   parameter_defaults:
     CephConfigOverrides:
-      max_open_files: 131072
+      global:
+        max_open_files: 131072
+      osd:
+        osd_journal_size: 40960
 
 To change the backfill and recovery operations that Ceph uses to
 rebalance a cluster, use an example like the following::
 
   parameter_defaults:
     CephConfigOverrides:
-      osd_recovery_op_priority: 3
-      osd_recovery_max_active: 3
-      osd_max_backfills: 1
+      global:
+        osd_recovery_op_priority: 3
+        osd_recovery_max_active: 3
+        osd_max_backfills: 1
 
 Tuning Ceph OSD CPU and Memory
 ------------------------------

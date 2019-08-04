@@ -11,4 +11,4 @@ needed to act as the host for the virtual machines.
 
 The tripleo-quickstart project is used for creating virtual environments
 for use with TripleO. Please see that documentation at
-https://docs.openstack.org/developer/tripleo-quickstart/
+https://docs.openstack.org/tripleo-quickstart/

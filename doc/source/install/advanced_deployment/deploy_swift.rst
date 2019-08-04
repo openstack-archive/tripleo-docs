@@ -64,14 +64,14 @@ adding two Swift nodes::
 After we have deployed again with this new environment we will have two Swift
 nodes that need to be added to the ring we created during the initial
 deployment. Follow the instructions on `Managing the Rings
-<http://docs.openstack.org/developer/swift/admin_guide.html#managing-the-rings>`_
+<https://docs.openstack.org/swift/admin_guide.html#managing-the-rings>`_
 to add the new devices to the rings and copy the new rings to *all* nodes in
 the Swift cluster.
 
 .. note::
 
     Also read the section on `Scripting ring creation
-    <http://docs.openstack.org/developer/swift/admin_guide.html#scripting-ring-creation>`_
+    <https://docs.openstack.org/swift/admin_guide.html#scripting-ring-creation>`_
     to automate this process of scaling the Swift cluster.
 
 

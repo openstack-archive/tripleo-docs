@@ -81,4 +81,4 @@ The command below will deploy a containerized overcloud on top of a baremetal un
 
     bash quickstart.sh --config=~/.quickstart/config/general_config/containers_minimal.yml $VIRTHOST
 
-..  _TripleO Quickstart: https://docs.openstack.org/developer/tripleo-quickstart/
+..  _TripleO Quickstart: https://docs.openstack.org/tripleo-quickstart/

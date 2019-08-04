@@ -14,9 +14,9 @@ following deployment phases:
     syntax, and makes use of heat environment_ files.  See the upstream
     heat documentation_ for further information.
 
-.. _HOT: http://docs.openstack.org/developer/heat/template_guide/hot_guide.html
-.. _environment: http://docs.openstack.org/developer/heat/template_guide/environment.html
-.. _documentation: http://docs.openstack.org/developer/heat/template_guide/index.html
+.. _HOT: https://docs.openstack.org/heat/template_guide/hot_guide.html
+.. _environment: https://docs.openstack.org/heat/template_guide/environment.html
+.. _documentation: https://docs.openstack.org/heat/template_guide/index.html
 
 Firstboot extra configuration
 -----------------------------
@@ -67,7 +67,7 @@ scripts, combined via the MultipartMime_ resource::
         value: {get_resource: userdata}
     EOF
 
-.. _MultipartMime: http://docs.openstack.org/developer/heat/template_guide/openstack.html#OS::Heat::MultipartMime
+.. _MultipartMime: https://docs.openstack.org/heat/template_guide/openstack.html#OS::Heat::MultipartMime
 
 .. note::
 
@@ -190,7 +190,7 @@ For a more complete example showing how to apply a personalized map of per-node 
 to each node, see `/usr/share/openstack-tripleo-heat-templates/puppet/extraconfig/pre_deploy/per_node.yaml`
 or the tripleo-heat-templates_ repo.
 
-.. _SoftwareConfig: http://docs.openstack.org/developer/heat/template_guide/software_deployment.html
+.. _SoftwareConfig: https://docs.openstack.org/heat/template_guide/software_deployment.html
 
 
 Post-Deploy extra configuration

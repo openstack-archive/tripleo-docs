@@ -508,5 +508,5 @@ run as part of the steps (you can specify several of these, divided by the
 .. _heat resource chain object: https://docs.openstack.org/heat/pike/template_guide/openstack.html#OS::Heat::ResourceChain
 .. _common/services.yaml: https://github.com/openstack/tripleo-heat-templates/blob/stable/queens/common/services.yaml#L44
 .. _container image prepare workflow: https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/overcloud.html#preparing-overcloud-images
-.. _paunch: https://docs.openstack.org/developer/paunch/readme.html
+.. _paunch: https://docs.openstack.org/paunch/readme.html
 .. _privileged: https://www.linux.com/blog/learn/sysadmin/2017/5/lazy-privileged-docker-containers

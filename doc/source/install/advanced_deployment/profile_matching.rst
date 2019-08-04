@@ -212,4 +212,4 @@ they can be created as follows.
     highly recommended.
 
 
-.. _Introspection rules: http://docs.openstack.org/developer/ironic-inspector/usage.html#introspection-rules
+.. _Introspection rules: https://docs.openstack.org/ironic-inspector/usage.html#introspection-rules

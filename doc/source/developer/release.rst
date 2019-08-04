@@ -20,7 +20,7 @@ This page will document the process of releasing TripleO projects.
 The first step is to update ReNo_ configuration file for some projects: tripleo-image-elements,
 tripleo-puppet-elements, tripleo-heat-templates and puppet-tripleo.
 
-.. _ReNo: https://docs.openstack.org/developer/reno
+.. _ReNo: https://docs.openstack.org/reno
 
 Edit releasenotes/source/conf.py file and change this line::
 
@@ -39,7 +39,7 @@ For other projects, there is no need to update anything since the release will b
 
 .. Note::
    Puppet OpenStack modules release management is documented here:
-   https://docs.openstack.org/developer/puppet-openstack-guide/releases.html#how-to-release-puppet-modules
+   https://docs.openstack.org/puppet-openstack-guide/releases.html#how-to-release-puppet-modules
 
 .. Note::
    TripleO UI requires some specific changes to be released too, see https://review.opendev.org/#/c/460664/

@@ -130,7 +130,7 @@ network to the instance.
     Cloud-init by default configures only first network interface to use DHCP
     which means that user intances will not have network interface for storage
     network autoconfigured. You can configure it manually or use
-    `dhcp-all-interfaces <https://docs.openstack.org/developer/diskimage-builder/elements/dhcp-all-interfaces/README.html>`_.
+    `dhcp-all-interfaces <https://docs.openstack.org/diskimage-builder/elements/dhcp-all-interfaces/README.html>`_.
 
 Deploying the Overcloud with an External Backend
 ------------------------------------------------

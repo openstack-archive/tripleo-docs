@@ -50,7 +50,7 @@ OpenStack Gerrit (see `OpenStack Developer's Guide
 
 **Useful links**
 
-* Upstream Project Documentation: http://docs.openstack.org/developer/diskimage-builder/
+* Upstream Project Documentation: https://docs.openstack.org/diskimage-builder/
 * Bugs: https://bugs.launchpad.net/diskimage-builder
 * Git repository: https://opendev.org/openstack/diskimage-builder/
 
@@ -163,23 +163,6 @@ Submit your changes via OpenStack Gerrit (see
 * Git repository: https://opendev.org/openstack/instack-undercloud
 * Bugs: https://launchpad.net/tripleo
 
-tripleo-incubator
-^^^^^^^^^^^^^^^^^
-tripleo-incubator contains various scripts to aid in deploying a TripleO cloud.
-
-**How to contribute**
-
-Submit your changes via OpenStack Gerrit (see
-`OpenStack Developer's Guide
-<http://docs.openstack.org/infra/manual/developers.html>`_).
-
-**Useful links**
-
-* Documentation: http://docs.openstack.org/developer/tripleo-incubator/index.html
-* Git repository: https://opendev.org/openstack/tripleo-incubator
-* Bugs: https://launchpad.net/tripleo
-
-
 Node Management
 ---------------
 ironic
@@ -195,14 +178,14 @@ virtual machines which act as bare metal nodes via special driver ``pxe_ssh``.
 
 Ironic uses `tox <https://tox.readthedocs.org/en/latest/>`_ to manage the
 development environment, see the `Developer Quick-Start
-<http://docs.openstack.org/developer/ironic/dev/dev-quickstart.html>`_,
+<https://docs.openstack.org/ironic/dev/dev-quickstart.html>`_,
 `Ironic Developer Guidelines
 <https://wiki.openstack.org/wiki/Ironic/Developer_guidelines>`_
 and `OpenStack Developer's Guide`_ for details.
 
 **Useful links**
 
-* Upstream Project: http://docs.openstack.org/developer/ironic/index.html
+* Upstream Project: https://docs.openstack.org/ironic/index.html
 * Bugs: https://bugs.launchpad.net/ironic
 * Blueprints: https://blueprints.launchpad.net/ironic
 
@@ -260,7 +243,7 @@ talking to other components (e.g. Nova).
 **How to contribute**
 
 * Use `devstack with Heat
-  <http://docs.openstack.org/developer/heat/getting_started/on_devstack.html>`_
+  <https://docs.openstack.org/heat/getting_started/on_devstack.html>`_
   to set up a development environment. Submit your changes via
   OpenStack Gerrit (see `OpenStack Developer's Guide
   <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -280,7 +263,7 @@ producing disk images ready to be configured by Puppet via Heat.
 **How to contribute**
 
 * Use `devtest with Puppet
-  <http://docs.openstack.org/developer/tripleo-incubator/puppet.html>`_
+  <https://docs.openstack.org/tripleo-incubator/puppet.html>`_
   to set up a development environment. Submit your changes via
   OpenStack Gerrit (see `OpenStack Developer's Guide
   <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -301,7 +284,7 @@ are deployed via Heat.
 **How to contribute**
 
 * Use `devtest with Puppet
-  <http://docs.openstack.org/developer/tripleo-incubator/puppet.html>`_
+  <https://docs.openstack.org/tripleo-incubator/puppet.html>`_
   to set up a development environment. Submit your changes via
   OpenStack Gerrit (see `OpenStack Developer's Guide
   <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -320,7 +303,7 @@ nova provides a cloud computing fabric controller.
 **How to contribute**
 
 * Read the
-  `Development Quickstart <http://docs.openstack.org/developer/nova/development.environment.html>`_
+  `Development Quickstart <https://docs.openstack.org/nova/development.environment.html>`_
   to set up a development environment. Submit your changes via OpenStack
   Gerrit (see 
   `OpenStack Developer's Guide <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -341,7 +324,7 @@ via the tripleo-heat-templates.
 **How to contribute**
 
 * Use `devtest with Puppet
-  <http://docs.openstack.org/developer/tripleo-incubator/puppet.html>`_
+  <https://docs.openstack.org/tripleo-incubator/puppet.html>`_
   to set up a development environment. Submit your changes via
   OpenStack Gerrit (see `OpenStack Developer's Guide
   <http://docs.openstack.org/infra/manual/developers.html>`_).
@@ -362,7 +345,7 @@ for Puppet-enabled images.
 **How to contribute**
 
 * Use `devtest with Puppet
-  <http://docs.openstack.org/developer/tripleo-incubator/puppet.html>`_
+  <https://docs.openstack.org/tripleo-incubator/puppet.html>`_
   to set up a development environment. Submit your changes via
   OpenStack Gerrit (see `OpenStack Developer's Guide`_).
 
@@ -399,7 +382,7 @@ command with consistent syntax and behaviour.
 * Upstream Project: https://opendev.org/openstack/python-openstackclient
 * Bugs: https://bugs.launchpad.net/python-openstackclient
 * Blueprints: https://blueprints.launchpad.net/python-openstackclient
-* Human interface guide: http://docs.openstack.org/developer/python-openstackclient/humaninterfaceguide.html
+* Human interface guide: https://docs.openstack.org/python-openstackclient/humaninterfaceguide.html
 
 python-tripleoclient
 ^^^^^^^^^^^^^^^^^^^^
@@ -450,7 +433,7 @@ Pre and post-deployment validations for the deployment workflow.
 
 * Upstream Project: https://opendev.org/openstack/tripleo-validations/
 * Bugs: https://bugs.launchpad.net/tripleo/+bugs?field.tag=validations
-* Documentation for individual validations: http://docs.openstack.org/developer/tripleo-validations/readme.html#existing-validations
+* Documentation for individual validations: https://docs.openstack.org/tripleo-validations/readme.html#existing-validations
 
 .. note:: When reporting an issue, make sure you add the
           ``validations`` tag.

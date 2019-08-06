@@ -271,7 +271,7 @@ the ``manageable`` state for it to work.
 
 .. note::
     See `Ironic cleaning documentation
-    <http://docs.openstack.org/developer/ironic/deploy/cleaning.html>`_ for
+    <https://docs.openstack.org/ironic/deploy/cleaning.html>`_ for
     more details.
 
 To remove partitions from all disks on a given node, use the following
@@ -350,8 +350,8 @@ Deployment progress can be tracked via the Heat API. It is possible to either
 follow the Heat events or simply wait for the Heat stack status to change.
 
 
-.. _Mistral: http://docs.openstack.org/developer/mistral/
-.. _python-mistralclient: http://docs.openstack.org/developer/mistral/guides/mistralclient_guide.html
-.. _REST API: http://docs.openstack.org/developer/mistral/developer/webapi/index.html
-.. _Zaqar: http://docs.openstack.org/developer/zaqar/
-.. _API Reference Documentation: http://docs.openstack.org/developer/tripleo-common/reference/index.html
+.. _Mistral: https://docs.openstack.org/mistral/
+.. _python-mistralclient: https://docs.openstack.org/mistral/guides/mistralclient_guide.html
+.. _REST API: https://docs.openstack.org/mistral/developer/webapi/index.html
+.. _Zaqar: https://docs.openstack.org/zaqar/
+.. _API Reference Documentation: https://docs.openstack.org/tripleo-common/reference/index.html

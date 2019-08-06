@@ -115,7 +115,7 @@ the discovery process:
 
 See :doc:`profile_matching` for more examples on introspection rules.
 
-.. _ironic-inspector discovery documentation: https://docs.openstack.org/developer/ironic-inspector/usage.html#discovery
+.. _ironic-inspector discovery documentation: https://docs.openstack.org/ironic-inspector/usage.html#discovery
 
 Scanning BMC range
 ------------------

@@ -3,7 +3,7 @@ Bare Metal Node States
 
 This document provides a brief explanation of the bare metal node states that
 TripleO uses or might use. Please refer to `the Ironic documentation
-<http://docs.openstack.org/developer/ironic/>`_ for more details.
+<https://docs.openstack.org/ironic/>`_ for more details.
 
 enroll
 ------

@@ -103,4 +103,4 @@ with the Mitaka release. Also note that the ``name`` field, while convenient,
 
 Do not forget to re-run the introspection after setting the root device hints.
 
-.. _Ironic root device hints documentation: http://docs.openstack.org/developer/ironic/deploy/install-guide.html#specifying-the-disk-for-deployment
+.. _Ironic root device hints documentation: https://docs.openstack.org/ironic/deploy/install-guide.html#specifying-the-disk-for-deployment

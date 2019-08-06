@@ -376,6 +376,7 @@ values used by the mistral workflow that runs ``config-download``::
      parameter_defaults:
        CephAnsibleEnvironmentVariables:
          ANSIBLE_HOST_KEY_CHECKING: 'False'
+         ANSIBLE_PRIVATE_KEY_FILE: '/home/stack/.ssh/id_rsa'
 
 .. note::
 

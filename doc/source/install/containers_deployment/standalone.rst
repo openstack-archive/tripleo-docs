@@ -33,7 +33,7 @@ Deploying a Standalone OpenStack node
           sudo yum install -y yum-utils
           sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
-   .. include:: ../repositories.txt
+   .. include:: ../repositories.rst
 
 #. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 

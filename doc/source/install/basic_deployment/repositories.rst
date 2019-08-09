@@ -3,4 +3,4 @@
 Repository Enablement
 =====================
 
-.. include:: ../repositories.txt
+.. include:: ../repositories.rst

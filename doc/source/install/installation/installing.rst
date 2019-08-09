@@ -71,10 +71,8 @@ Installing the Undercloud
           sudo yum install -y yum-utils
           sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
-   .. include:: ../repositories.txt
+   .. include:: ../repositories.rst
 
-.. We need to manually continue our list numbering here since the above
-  "include" directive breaks the numbering.
 
 #. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 

@@ -33,7 +33,7 @@ Updating Undercloud Components
 
 #. Enable new Delorean repositories:
 
-   .. include:: ../install/repositories.txt
+   .. include:: ../install/repositories.rst
 
 .. We need to manually continue our list numbering here since the above
   "include" directive breaks the numbering.

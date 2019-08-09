@@ -111,6 +111,7 @@ html_theme = 'openstackdocs'
 
 # -- Options for LaTeX output ------------------------------------------------
 
+
 def _get_name_version(index=1):
     response = requests.get('https://releases.openstack.org/')
     release_list = PyQuery(response.content)

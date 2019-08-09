@@ -109,7 +109,7 @@ created on the undercloud, one should use a non-root user.
 
 #. Install the ``current-tripleo`` delorean repository and deps repository:
 
-   .. include:: ../repositories.txt
+   .. include:: ../repositories.rst
 
 
 3. Export environment variables

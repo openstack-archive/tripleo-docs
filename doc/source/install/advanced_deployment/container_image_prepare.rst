@@ -171,7 +171,7 @@ instead::
 It's possible to use the above feature while also disabling it only
 for a subset of images by using an `includes` and `excludes` list as
 described later in this document. This is useful when using the above
-but also using containers from external projects which doen't follow
+but also using containers from external projects which doesn't follow
 the same convention like Ceph.
 
 Copying images with push_destination

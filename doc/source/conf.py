@@ -33,7 +33,11 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinxcontrib.mermaid',
     'openstackdocstheme',
+    'sphinxcontrib.rsvgconverter',
 ]
+
+# Disable usage of xindy https://bugzilla.redhat.com/show_bug.cgi?id=1643664
+latex_use_xindy = False
 
 
 # The suffix of source filenames.
@@ -137,6 +141,19 @@ def get_latest_version_name():
     """Get the name of the last stable version"""
     return _get_name_version()
 
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title, author, documentclass
+# [howto/manual]).
+latex_documents = [
+    ('index',
+     'doc-tripleo-docs.tex',
+     u'TripleO Documentation',
+     u'OpenStack Foundation', 'manual'),
+]
+
+# Allow deeper levels of nesting for \begin...\end stanzas
+latex_elements = {'maxlistdepth': 10, 'extraclassoptions': 'openany,oneside'}
 
 oldest_version_name = get_oldest_version_name()
 oldest_version_name_lower = oldest_version_name.lower()

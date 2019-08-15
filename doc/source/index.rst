@@ -16,6 +16,24 @@ Contributor Guide
   contributor/index
   developer/index
 
+|project| Architecture
+----------------------
+
+.. toctree::
+  :maxdepth: 3
+  :includehidden:
+
+  install/introduction/architecture.rst
+
+|project| Components
+----------------------
+
+.. toctree::
+  :maxdepth: 2
+  :includehidden:
+
+  install/introduction/components.rst
+
 Tripleo CI Guide
 ----------------
 

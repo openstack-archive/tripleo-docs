@@ -44,7 +44,7 @@ repository.
 
 ::
 
-    tox -edocs
+    tox -edocs,pdf-docs,deploy-guide
 
 Now you have the documentation generated for the various available
 formats from the local source. The resulting documentation will be

@@ -10,7 +10,7 @@ TripleO Install Guide
   installation/installation
   advanced_deployment/undercloud_minion
   basic_deployment/basic_deployment_cli
-  basic_deployment/basic_deployment_ui
+  deprecated/basic_deployment_ui
   basic_deployment/tempest
   basic_deployment/tempest_plugins
   basic_deployment/os_tempest

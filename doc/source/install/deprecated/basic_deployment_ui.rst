@@ -1,7 +1,10 @@
 .. _basic-deployment-ui:
 
-Basic Deployment (UI)
-=====================
+(DEPRECATED) Basic Deployment (UI)
+==================================
+
+.. note:: The tripleo-ui is no longer available as of Stein. This documentation
+   is deprecated.
 
 This document will show you how to access the |project| UI and perform
 a simple deployment with some customizations. Validations are

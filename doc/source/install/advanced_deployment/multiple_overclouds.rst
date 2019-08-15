@@ -26,7 +26,7 @@ Deploy the Undercloud :doc:`as usual <../installation/installation>`.
 First Overcloud
 ---------------
 
-The first Overcloud can be deployed as usual using the :doc:`cli <../basic_deployment/basic_deployment_cli>` or :doc:`UI <../basic_deployment/basic_deployment_ui>`.
+The first Overcloud can be deployed as usual using the :doc:`cli <../basic_deployment/basic_deployment_cli>`.
 
 Deploying Additional Overclouds
 -------------------------------

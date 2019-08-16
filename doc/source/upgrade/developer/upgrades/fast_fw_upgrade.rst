@@ -2,8 +2,13 @@ TripleO Fast Forward Upgrade (FFU) N -> N+3
 ----------------------------------------------------
 
 For a detailed background on how the Fast Forward Upgrade (FFU) workflow was
-proposed please refer to the relevant spec_. For a guide on running the FFU in
-your environment see the :ref:`ffu-docs`. This document will explore some
+proposed please refer to the relevant spec_. 
+
+.. TODO(aschultz): update to deployment guide
+.. For a guide on running the FFU in
+.. your environment see the :ref:`ffu-docs`.
+
+This document will explore some
 of the technical details of the Newton to Queens FFU specifically.
 
 You might find it helpful to consult this high-level diagram as you

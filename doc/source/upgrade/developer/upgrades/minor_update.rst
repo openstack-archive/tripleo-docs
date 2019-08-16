@@ -2,10 +2,11 @@
 Minor version update
 ====================
 
-To get developer understanding of minor updates, first read the
-:doc:`operator docs for minor updates <../../minor_update>`
-and perhaps try to go through the update as an operator would, to get
-the basic idea.
+.. TOOD(aschultz): update to reference in the deploy guide
+.. To get developer understanding of minor updates, first read the
+.. :doc:`operator docs for minor updates <../../minor_update>`
+.. and perhaps try to go through the update as an operator would, to get
+.. the basic idea.
 
 Assuming operator-level familiarity with the minor updates, let's look
 at individual pieces in more detail.

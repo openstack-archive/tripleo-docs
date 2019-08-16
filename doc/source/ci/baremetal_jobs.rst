@@ -3,8 +3,11 @@ Baremetal jobs
 
 This section gives an overview and some details on the baremetal CI jobs. The
 baremetal deployment is intended as a multinode real world "production-like"
-environment for TripleO - see :doc:`../install/environments/baremetal`
-for more information on setting up a baremetal environment.
+environment for TripleO.
+
+.. TODO(aschultz): fix this when deploy-guide is published
+.. - see :doc:`../install/environments/baremetal`
+.. for more information on setting up a baremetal environment.
 
 The baremetal jobs, previously running in the RDO Phase 2 of the promotion
 pipeline from Jenkins servers, now are triggered from an internal Software

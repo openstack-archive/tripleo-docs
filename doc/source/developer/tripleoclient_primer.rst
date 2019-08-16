@@ -19,9 +19,12 @@ The example used here is::
     openstack overcloud container image build
 
 This command is used to build the container images listed in the
-tripleo-common file overcloud_containers.yaml_ using Kolla_. See :doc:`Building
-Containers</install/containers_deployment/3rd_party>` for more information on
-how to use this command as an operator.
+tripleo-common file overcloud_containers.yaml_ using Kolla_. 
+
+.. TODO(aschultz): update with deployment guide link
+.. See :doc:`Building
+.. Containers</install/containers_deployment/3rd_party>` for more information on
+.. how to use this command as an operator.
 
 One of the TipleO CI jobs that executes this command is the
 tripleo-build-containers-centos-7_ job. This job invokes the overcloud container

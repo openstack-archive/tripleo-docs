@@ -27,20 +27,24 @@ The validations are optional but strongly recommended.
 
 #. Make sure you have your environment ready and undercloud running:
 
-   * :doc:`../environments/environments`
-   * :doc:`../installation/installing`
+.. TODO(aschultz): Update reference to deploy guide
+..   * :doc:`../environments/environments`
+..   * :doc:`../installation/installing`
 
 #. Make sure the images are uploaded in Glance on the undercloud:
 
-   * :ref:`basic-deployment-cli-get-images`
-   * :ref:`basic-deployment-cli-upload-images`
+.. TODO(aschultz): Update reference to deploy guide
+..   * :ref:`basic-deployment-cli-get-images`
+..   * :ref:`basic-deployment-cli-upload-images`
 
 Access the UI
 -------------
 
 The UI is accessible on the undercloud URL. With the default settings
 the URLs may look like the following, depending on whether the
-undercloud was :doc:`set up with SSL <../advanced_deployment/ssl>`:
+undercloud was set up with SSL:
+
+.. TODO(aschultz): update reference to deploy guide` <../advanced_deployment/ssl>`:
 
 * http://192.168.24.1:3000 if it was not
 * https://192.168.24.2 if set up with SSL
@@ -137,7 +141,10 @@ Register Nodes
 Navigate to the **Nodes** tab in the top bar and click on the
 *Register Nodes* button. New nodes can be added in two ways:
 
-* Importing an :ref:`instackenv.json <instackenv>` file
+.. TODO(aschultz): update with reference to deploy guide
+.. * Importing an :ref:`instackenv.json <instackenv>` file
+
+* Importing an instackenv.json file
 * Manually defining nodes via the *Add New* button.
 
 Introspect Nodes
@@ -154,8 +161,9 @@ Once introspection is completed, nodes need to be "provided" in order
 to move to the ``available`` state and be available for
 deployments. Select the nodes and click on the *Provide Nodes* button.
 
-.. note:: For more information about node states, see
-   :doc:`../advanced_deployment/node_states`.
+.. TODO(aschultz): update this reference to deploy guide
+.. #.. note:: For more information about node states, see
+.. #  :doc:`../advanced_deployment/node_states`.
 
 Tag Nodes
 ^^^^^^^^^

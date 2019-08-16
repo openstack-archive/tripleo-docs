@@ -1,5 +1,7 @@
-Deploying OpenShift
-===================
+(DEPRECATED) Deploying OpenShift
+================================
+
+.. note:: This functionality was removed as of Train.
 
 You can use TripleO to deploy OpenShift clusters onto baremetal nodes.
 TripleO deploys the operating system onto the nodes and uses
@@ -12,7 +14,10 @@ Define the OpenShift roles
 TripleO installs OpenShift services using composable roles for
 `OpenShiftMaster`, `OpenShiftWorker`, and `OpenShiftInfra`. When you import
 a baremetal node using `instackenv.json`, you can tag it to use a certain
-composable role. See :doc:`custom_roles` for more information.
+composable role.
+
+.. TODO(aschultz): update this with deploy guide link
+.. See :doc:`custom_roles` for more information.
 
 1. Generate the OpenShift roles:
 
@@ -109,7 +114,9 @@ This procedure describes how to enroll a physical node as an OpenShift node.
         "name": "OpenShiftInfra_1"
     }]
 
-4. Import and introspect the TripleO nodes as you :ref:`normally would <node-registration>` for your
+.. TOOD(aschultz): include reference to deploy guide
+
+4. Import and introspect the TripleO nodes as you normally would for your
    deployment. For example:
 
 .. code-block:: bash
@@ -141,8 +148,9 @@ This procedure describes how to enroll a physical node as an OpenShift node.
 Configure the container registry
 ********************************
 
-Follow :doc:`container_image_prepare` to configure TripleO for the container
-image preparatio.
+.. TODO(aschultz): include reference to deploy guide
+.. Follow :doc:`container_image_prepare` to configure TripleO for the container
+.. image preparatio.
 
 This generally means generating a `/home/stack/containers-prepare-parameter.yaml` file:
 

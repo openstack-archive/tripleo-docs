@@ -252,8 +252,10 @@ unusable.
 
 This second mode allows users to ensure that their different hardware types end
 up running their intended role, though requires either manual node tagging or
-using introspection rules to tag nodes (see
-:doc:`../advanced_deployment/profile_matching`).
+using introspection rules to tag nodes
+
+.. TODO(aschutlz): update reference to deploy guide
+.. (see :doc:`../advanced_deployment/profile_matching`).
 
 
 

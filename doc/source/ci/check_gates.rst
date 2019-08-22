@@ -146,10 +146,10 @@ The set of tempest tests that run for a given TripleO CI job is defined in the
 You may want to run a popular TripleO CI job with a custom set of Tempest
 tests and override the default Tempest run. This can be accomplished through
 adding the `featureset_overrides` var to zuul job config `vars:` section.
-The list of custom featureset_override are defined in `zuul-v3.yaml
-<https://opendev.org/openstack-infra/tripleo-ci/src/branch/master/playbooks/tripleo-ci/run-v3.yaml>`_.
+The allowed featureset_override are defined in the `tripleo-ci run-test role
+<https://opendev.org/openstack/tripleo-ci/src/commit/5a902b351f3728a95e4a989527178c66815bdc54/roles/run-test/tasks/main.yaml#L8>`_.
 This setting allows projects to override featureset post deployment configuration.
-The overridable settings are:
+Some of the overridable settings are:
 
  - `run_tempest`: To run tempest or not (true|false).
  - `tempest_whitelist`: List of tests you want to be executed.
@@ -163,6 +163,8 @@ The overridable settings are:
  - `test_white_regex`: Regex to be used by tempest
  - `tempest_workers`: Numbers of parallel workers to run
  - `standalone_container_cli`: Container cli to use
+ - `tempest_private_net_provider_type`: The Neutron type driver that should be
+   used by tempest tests.
 
 For a given job `tripleo-ci-centos-7-scenario001-multinode-oooq-container`, you
 can create a new abstract layer job and overrides the tempest tests::

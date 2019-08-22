@@ -4,10 +4,9 @@ Overcloud Major Upgrade Workflow and CLI
 The purpose of this documentation is to deep-dive into the code which
 delivers the major upgrade workflow in TripleO. For information about
 the steps an operator needs to perform when running this upgrade
-please see the overator docs.
+please see the `operator docs <major_upgrade_deploy_guide_>`_.
 
-.. TODO(aschultz): Update to deploy guide
-.. :doc:`operator docs</upgrade/major_upgrade>`.
+.. _major_upgrade_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/post_deployment/upgrade/major_upgrade.html
 
 The major upgrade workflow is delivered almost exclusively via Ansible
 playbook invocations on the overcloud nodes. Heat is used to generate
@@ -81,10 +80,9 @@ the `overcloud deploy` command. It is especially important that the
 operator includes the environment file containing the references for
 the target version container images.
 
-.. TODO(aschultz): update to deploy guide
-.. See the doc:`operator docs</upgrade/major_upgrade>` for
-.. pointers to how that file is generated and for reference it will look
-.. something like
+See the `operator docs <major_upgrade_deploy_guide_>`_ for
+pointers to how that file is generated and for reference it will look
+something like
 
     .. code-block:: bash
 
@@ -143,7 +141,9 @@ ansible inventory based on the Heat stack outputs, so that for example
 ``Controller`` and ``overcloud-controller-0`` are both valid values for
 the ansible-playbook |--limit| parameter.
 
-.. TODO(aschultz): add ref to deploy-guide "openstack overcloud upgrade run"
+See `overcloud upgrade run <overcloud_upgrade_run_>`_ for additional information.
+
+.. _overcloud_upgrade_run: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/post_deployment/upgrade/major_upgrade.html#openstack-overcloud-upgrade-run
 
 As documented in the major upgrade documentation and the nodes_or_roles_helptext_,
 the operator *must* use ``--roles`` for the controllers. Upgrading the

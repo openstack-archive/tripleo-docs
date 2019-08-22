@@ -3,11 +3,8 @@ Baremetal jobs
 
 This section gives an overview and some details on the baremetal CI jobs. The
 baremetal deployment is intended as a multinode real world "production-like"
-environment for TripleO.
-
-.. TODO(aschultz): fix this when deploy-guide is published
-.. - see :doc:`../install/environments/baremetal`
-.. for more information on setting up a baremetal environment.
+environment for TripleO. - see `Baremetal deploy guide <baremetal_deploy_guide_>`_
+for more information on setting up a baremetal environment.
 
 The baremetal jobs, previously running in the RDO Phase 2 of the promotion
 pipeline from Jenkins servers, now are triggered from an internal Software
@@ -20,6 +17,7 @@ have better coverage on issues seen in production environments. It also
 allows an aproximation of OVB jobs running in RDO cloud in order to get an
 "apples-to-apples" comparison to eliminate infra issues.
 
+.. _baremetal_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/provisioning/index.html
 
 Where
 -----
@@ -27,7 +25,7 @@ Where
 The hardware is maintained internally and cannot be accessed by upstream
 Zuul or RDO Cloud. The internal Software Factory instance provides a version
 of infra upstream tools as Zuul, Gerrit and Nodepool for running the defined
-baremetal jobs. Refer to `Software_Factory_documentation_` for more details.
+baremetal jobs. Refer to `Software Factory Documentation <Software_Factory_documentation_>`_ for more details.
 
 The jobs will use hardware_environments/<env name>/instackenv.json file and the
 hardware_environments/<env name>/network_configs/single_nic_vlans settings file.

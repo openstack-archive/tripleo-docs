@@ -14,10 +14,9 @@ Define the OpenShift roles
 TripleO installs OpenShift services using composable roles for
 `OpenShiftMaster`, `OpenShiftWorker`, and `OpenShiftInfra`. When you import
 a baremetal node using `instackenv.json`, you can tag it to use a certain
-composable role.
+composable role.  See `Custom Roles <custom_roles_deploy_guide_>`_ for more information.
 
-.. TODO(aschultz): update this with deploy guide link
-.. See :doc:`custom_roles` for more information.
+.. _custom_roles_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/features/custom_roles.html
 
 1. Generate the OpenShift roles:
 
@@ -148,9 +147,10 @@ This procedure describes how to enroll a physical node as an OpenShift node.
 Configure the container registry
 ********************************
 
-.. TODO(aschultz): include reference to deploy guide
-.. Follow :doc:`container_image_prepare` to configure TripleO for the container
-.. image preparatio.
+Follow `container image preparation <container_image_preparation_deploy_guide_>`_ to configure TripleO for the
+container image preparation.
+
+.. _container_image_preparation_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/container_image_prepare.html
 
 This generally means generating a `/home/stack/containers-prepare-parameter.yaml` file:
 

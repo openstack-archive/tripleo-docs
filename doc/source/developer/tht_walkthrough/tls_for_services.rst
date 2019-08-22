@@ -224,9 +224,8 @@ Internal TLS
 How it works
 ~~~~~~~~~~~~
 
-.. TODO(aschultz): fix this when deployment guide is published
-.. If you haven't read the section :doc:`../../install/advanced_deployment/tls_everywhere`
-.. it is highly recommended you read that first before continuing.
+If you haven't read the section `TLS Everywhere <tls_everywhere_deploy_guide_>`_
+it is highly recommended you read that first before continuing.
 
 As mentioned, the default CA is FreeIPA, which issues the certificates that the
 nodes request, and they do the requests via certmonger.
@@ -390,8 +389,9 @@ stack already outputs. This will give the appropriate parameters to a hook that
 sets the nova metadata, which in turn will be taken by the *novajoin* service
 generate the service principals for httpd for the host.
 
-.. TODO(aschultz): add See deployment guide tls_everywhere link
+See the `TLS Everywhere Deploy Guide <tls_everywhere_deploy_guide_>`_
 
+.. _tls_everywhere_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/features/ssl.html#tls-everywhere-for-the-overcloud
 .. _configuring-haproxy-internal-tls:
 
 Configuring HAProxy to use TLS for your service

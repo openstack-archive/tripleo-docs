@@ -27,24 +27,28 @@ The validations are optional but strongly recommended.
 
 #. Make sure you have your environment ready and undercloud running:
 
-.. TODO(aschultz): Update reference to deploy guide
-..   * :doc:`../environments/environments`
-..   * :doc:`../installation/installing`
+   * `Environment Setup <environment_setup_deploy_guide_>`_
+   * `Undercloud Installation <undercloud_installation_deploy_guide_>`_
+
+.. _environment_setup_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/environments/index.html
+.. _undercloud_installation_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/install_undercloud.html
 
 #. Make sure the images are uploaded in Glance on the undercloud:
 
-.. TODO(aschultz): Update reference to deploy guide
-..   * :ref:`basic-deployment-cli-get-images`
-..   * :ref:`basic-deployment-cli-upload-images`
+   * `Get Images <get_images_deploy_guide_>`_
+   * `Upload Images <upload_images_deploy_guide_>`_
+
+.. _get_images_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/install_overcloud.html#get-images
+.. _upload_images_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/install_overcloud.html#upload-images
 
 Access the UI
 -------------
 
 The UI is accessible on the undercloud URL. With the default settings
 the URLs may look like the following, depending on whether the
-undercloud was set up with SSL:
+undercloud was set up with `SSL <undercloud_ssl_>`_:
 
-.. TODO(aschultz): update reference to deploy guide` <../advanced_deployment/ssl>`:
+.. _undercloud_ssl: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/features/ssl.html#undercloud-ssl
 
 * http://192.168.24.1:3000 if it was not
 * https://192.168.24.2 if set up with SSL
@@ -141,8 +145,9 @@ Register Nodes
 Navigate to the **Nodes** tab in the top bar and click on the
 *Register Nodes* button. New nodes can be added in two ways:
 
-.. TODO(aschultz): update with reference to deploy guide
-.. * Importing an :ref:`instackenv.json <instackenv>` file
+  * Importing an `instackenv.json <instackenv_file_>`_ file
+
+.. _instackenv_file: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/environments/baremetal.html#instackenv-json
 
 * Importing an instackenv.json file
 * Manually defining nodes via the *Add New* button.
@@ -161,9 +166,9 @@ Once introspection is completed, nodes need to be "provided" in order
 to move to the ``available`` state and be available for
 deployments. Select the nodes and click on the *Provide Nodes* button.
 
-.. TODO(aschultz): update this reference to deploy guide
-.. #.. note:: For more information about node states, see
-.. #  :doc:`../advanced_deployment/node_states`.
+.. note:: For more information about node states, see `Node States <node_states_>`_.
+
+.. _node_states: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/provisioning/node_states.html
 
 Tag Nodes
 ^^^^^^^^^

@@ -25,6 +25,12 @@ few other open source plugins which increase |project|'s capabilities.
 Go to :doc:`components` to learn more.
 
 
+**Deployment Guide**
+
+See additional information about how to deploy TripleO in the `Deploy Guide <tripleo_deploy_guide_>`_.
+
+.. _tripleo_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/
+
 .. toctree::
    :hidden:
 

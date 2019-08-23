@@ -3,11 +3,8 @@ Standalone Scenario jobs
 
 This section gives an overview and some details on the standalone scenario ci
 jobs. The standalone deployment is intended as a one node development
-environment for TripleO.
-
-.. TODO(aschultz): fix this when deploy-guide is published
-.. - see :doc:`../install/containers_deployment/standalone`
-.. for more information on setting up a standalone environment.
+environment for TripleO. - see the `Standalone Deploy Guide <standalone_deploy_guide_>`_
+for more information on setting up a standalone environment.
 
 A 'scenario' is a concept used in TripleO
 to describe a collection of services - see the service-testing-matrix_ for more
@@ -23,6 +20,7 @@ the multinode jobs to the more resource friendly standalone versions.
 
 .. _service-testing-matrix: https://github.com/openstack/tripleo-heat-templates/blob/master/README.rst#service-testing-matrix
 .. _openstack-dev-thread: http://lists.openstack.org/pipermail/openstack-dev/2018-October/136192.html
+.. _standalone_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/standalone.html
 
 
 Where

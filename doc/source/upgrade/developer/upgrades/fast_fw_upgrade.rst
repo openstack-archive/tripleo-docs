@@ -2,11 +2,11 @@ TripleO Fast Forward Upgrade (FFU) N -> N+3
 ----------------------------------------------------
 
 For a detailed background on how the Fast Forward Upgrade (FFU) workflow was
-proposed please refer to the relevant spec_. 
+proposed please refer to the relevant spec_.
 
-.. TODO(aschultz): update to deployment guide
-.. For a guide on running the FFU in
-.. your environment see the :ref:`ffu-docs`.
+For a guide on running the FFU in your environment see the `FFU Deploy Guide <ffu_deploy_guide_>`_.
+
+.. _ffu_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/post_deployment/upgrade/fast_forward_upgrade.html
 
 This document will explore some
 of the technical details of the Newton to Queens FFU specifically.
@@ -68,7 +68,7 @@ Ceph related upgrade and deployment will be applied here with calls to
 ceph-ansible_.
 
 Amongst other things, the P..Q upgrade_tasks stop and disable those systemd
-services that are being migrated to run in containers. The Queens deploy_steps_playbook_
+services that are being migrated to run in containers. The Queens `deploy steps playbook <deploy_steps_playbook_>`_
 will then apply the required puppet and docker configuration to start the
 containers for those services. For this to be possible the Heat stack update
 which starts step 3 and that generates the ansible playbooks must include the

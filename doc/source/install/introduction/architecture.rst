@@ -252,11 +252,9 @@ unusable.
 
 This second mode allows users to ensure that their different hardware types end
 up running their intended role, though requires either manual node tagging or
-using introspection rules to tag nodes
+using introspection rules to tag nodes (see `Profile Matching <profile_matching_deploy_guide_>`_).
 
-.. TODO(aschutlz): update reference to deploy guide
-.. (see :doc:`../advanced_deployment/profile_matching`).
-
+.. _profile_matching_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/provisioning/profile_matching.html
 
 
 Deployment Planning

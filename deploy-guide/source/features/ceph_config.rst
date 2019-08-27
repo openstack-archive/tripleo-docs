@@ -512,6 +512,34 @@ overcloud nodes that Ansible uses to configure Ceph.
     Deployment with `ceph-ansible` requires that OSDs run on dedicated
     block devices.
 
+
+Adding Ceph Dashboard to a Overcloud deployment
+------------------------------------------------
+
+Starting from Ceph Nautilus the ceph dashboard component is available and
+fully automated by TripleO.
+To deploy the ceph dashboard include the ceph-dashboard.yaml environment
+file as in the following example:
+
+    openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-dashboard.yaml
+
+The command above will include the ceph dashboard related services and
+generates all the `ceph-ansible` required variables to trigger the playbook
+execution for both deployment and configuration of this component.
+When the deployment has been completed the Ceph dashboard containers,
+including prometheus and grafana, will be running on the controller nodes
+and will be accessible using the port 3100 for grafana and 9090 for prometheus;
+since this service is only internal and doesn’t listen on the public vip, users
+can reach grafana using the controller provisioning network vip on the specified
+port.
+The resulting deployment will be composed by an external stack made by grafana,
+prometheus, alertmanager, node-exporter containers and the ceph dashboard mgr
+module that acts as the backend for this external stack, pushing the grafana
+layouts and providing the ceph cluster specific metrics.
+The grafana frontend is fully integrated with the tls-everywhere framework, hence
+providing the tls environments files will trigger the certificate request for
+grafana: the generated crt and key files are then passed to ceph-ansible.
+
 .. _`puppet-ceph`: https://github.com/openstack/puppet-ceph
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible
 .. _`ceph.yaml static hieradata`: https://github.com/openstack/tripleo-heat-templates/blob/master/puppet/hieradata/ceph.yaml

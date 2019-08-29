@@ -42,11 +42,11 @@ Deploying a Standalone OpenStack node
    .. admonition:: Ceph
       :class: ceph
 
-      Install the ceph-ansible package and util-linux.
+      Install the packages necessary to deploy Ceph.
 
       .. code-block:: bash
 
-         sudo yum install -y ceph-ansible util-linux
+         sudo yum install -y ceph-ansible util-linux lvm2
 
 #. Generate a file with the default ContainerImagePrepare value::
 

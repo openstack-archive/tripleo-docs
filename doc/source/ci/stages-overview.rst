@@ -62,7 +62,7 @@ Each stage shows the inputs taken and the artifacts produced.
 
     https://ci.centos.org/job/rdo_trunk-promote-master-current-tripleo/
 
-    Get https://trunk-primary.rdoproject.org/centos7-pike/current-tripleo/delorean.repo
+    Get https://trunk.rdoproject.org/centos7-master/current-tripleo/delorean.repo
 
     Run tests  - if tests report success ->
     *Promote* from current-tripleo -> current-tripleo-rdo using DLRN Promoter

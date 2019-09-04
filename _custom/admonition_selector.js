@@ -21,7 +21,7 @@ $(document).ready(function() {
       // check value of cookies and set state to the related element
       if ($.cookie($(this).attr("id")) == "true") {
         $(this).prop("checked", true);
-      } else if (($.cookie($(this).attr("id")) == "false")) {
+      } else {
         $(this).prop("checked", false);
       }
 

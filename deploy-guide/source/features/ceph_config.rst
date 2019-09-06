@@ -519,7 +519,7 @@ Adding Ceph Dashboard to a Overcloud deployment
 Starting from Ceph Nautilus the ceph dashboard component is available and
 fully automated by TripleO.
 To deploy the ceph dashboard include the ceph-dashboard.yaml environment
-file as in the following example:
+file as in the following example::
 
     openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-dashboard.yaml
 
@@ -539,6 +539,23 @@ layouts and providing the ceph cluster specific metrics.
 The grafana frontend is fully integrated with the tls-everywhere framework, hence
 providing the tls environments files will trigger the certificate request for
 grafana: the generated crt and key files are then passed to ceph-ansible.
+This feature will also work with composable networks.
+In order to isolate the monitoring access for security purposes, operators can
+take advantage of composable networks and access grafana through a separate network
+vip. By doing this, it's not necessary to access the provisioning network and separate
+authorization profiles may be implemented.
+To deploy the overcloud with the ceph dashboard composable network we need first
+to generate the controller specific role created for this scenario::
+
+    openstack overcloud roles generate -o /home/stack/roles_data.yaml ControllerStorageDashboard Compute BlockStorage ObjectStorage CephStorage
+
+Finally, run the overcloud deploy command including the new generated `roles_data.yaml`
+and the `network_data_dashboard.yaml` file that will trigger the generation of this
+new network.
+The final overcloud command must look like the following::
+
+    openstack overcloud deploy --templates -r /home/stack/roles_data.yaml -n /usr/share/openstack-tripleo-heat-templates/network_data_dashboard.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e ~/my-ceph-settings.yaml
+
 
 .. _`puppet-ceph`: https://github.com/openstack/puppet-ceph
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible

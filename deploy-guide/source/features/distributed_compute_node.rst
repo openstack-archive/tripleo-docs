@@ -1043,3 +1043,72 @@ DCN stack.
 
 Each separate DCN stack can then be updated individually as required. There is
 no requirement as to the order of which DCN stack is updated first.
+
+Running Ansible across multiple DCN stacks
+------------------------------------------
+
+.. warning::
+   This currently is only supported in Train or newer versions.
+
+Each DCN stack should usually be updated individually. However if you
+need to run Ansible on nodes deployed from more than one DCN stack,
+then the `tripleo-ansible-inventory` command's `--stack` option
+supports being passed more than one stack. If more than one stack is
+passed, then a single merged inventory will be generated which
+contains the union of the nodes in those stacks. For example, if you
+were to run the following::
+
+  tripleo-ansible-inventory --static-yaml-inventory inventory.yaml --stack central,edge0
+
+then you could use the genereated inventory.yaml as follows::
+
+  (undercloud) [stack@undercloud ~]$ ansible -i inventory.yaml -m ping central
+  central-controller-0 | SUCCESS => {
+      "ansible_facts": {
+          "discovered_interpreter_python": "/usr/bin/python"
+      },
+      "changed": false,
+      "ping": "pong"
+  }
+  (undercloud) [stack@undercloud ~]$ ansible -i inventory.yaml -m ping edge0
+  edge0-distributedcomputehci-0 | SUCCESS => {
+      "ansible_facts": {
+          "discovered_interpreter_python": "/usr/bin/python"
+      },
+      "changed": false,
+      "ping": "pong"
+  }
+  (undercloud) [stack@undercloud ~]$ ansible -i inventory.yaml -m ping all
+  undercloud | SUCCESS => {
+      "changed": false,
+      "ping": "pong"
+  }
+  edge0-distributedcomputehci-0 | SUCCESS => {
+      "ansible_facts": {
+          "discovered_interpreter_python": "/usr/bin/python"
+      },
+      "changed": false,
+      "ping": "pong"
+  }
+  central-controller-0 | SUCCESS => {
+      "ansible_facts": {
+          "discovered_interpreter_python": "/usr/bin/python"
+      },
+      "changed": false,
+      "ping": "pong"
+  }
+  (undercloud) [stack@undercloud ~]$
+
+When multiple stacks are passed as input a host group is created
+after each stack which refers to all of the nodes in that stack.
+In the example above, edge0 has only one node from the
+DistributedComputeHci role and central has only one node from the
+Controller role.
+
+The inventory will also have a host group created for every item in
+the cross product of stacks and roles. For example,
+central_Controller, edge0_Compute, edge1_Compute, etc. This is done
+in order to avoid name collisions, e.g. Compute would refer to all
+nodes in the Compute role, but when there's more than one stack
+edge0_Compute and edge1_Compute refer to different Compute nodes
+based on the stack from which they were deployed.

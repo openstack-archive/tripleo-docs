@@ -466,7 +466,7 @@ Use a subnet range outside of the ``allocation_pool`` defined in
       172.21.2.0/24 --gateway 172.21.2.1  --allocation-pool \
       start=172.21.2.201,end=172.21.2.250 provisioning-subnet
 
-As defined in ``Preparing networking``, you can create a tenant nework along
+As defined in ``Preparing networking``, you can create a tenant network along
 with a ``default-router`` to link the provisioning and tenant networks.
 
 Configuring networks

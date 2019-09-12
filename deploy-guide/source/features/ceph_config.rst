@@ -64,6 +64,42 @@ replace both of the ones above with threes, or greater, in order to
 have at least three storage nodes and at least three back up copies of
 each object at minimum.
 
+Configuring nova-compute ephemeral backend per role
+---------------------------------------------------
+
+NovaEnableRdbBackend can be configured on a per-role basis allowing compute
+hosts to be deployed with a subset using RBD ephemeral disk. The
+remaining hosts continue using the default local ephemeral disk.
+
+.. note::
+
+    For best performacne images to be deployed to RBD ephemeral computes should be in RAW format while images to be deployed to local ephemeral computes should be QCOW2 format.
+
+
+Generate roles_data including the provided ComputeLocalEphemeral and
+ComputeRBDEphemeral roles as described in the :ref:`custom_roles`
+documentation.
+
+Configure the role counts, for example "nodes.yaml"::
+
+    parameter_defaults:
+      ComputeLocalEphemeralCount: 10
+      ComputeRBDEphemeralCount: 10
+
+Alternatively the "NovaEnableRbdBackend" parameter can be set as a role
+parameter on any Compute role, for example::
+
+    parameter_defaults:
+      ComputeParameters:
+        NovaEnableRbdBackend: true
+      MyCustomComputeParameters:
+        NovaEnableRbdBackend: false
+
+Deploy using the per-role ceph-ansible environment file
+"environments/ceph-ansible/ceph-ansible-per-role.yaml"::
+
+    openstack overcloud deploy --templates -r my_roles_data.yaml -e nodes.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible-per-role.yaml
+
 Customizing ceph.conf with puppet-ceph
 --------------------------------------
 

@@ -5,9 +5,11 @@ This document lists the main components of |project|, and gives some
 description of how each component is used. There are links to additional sources
 of information throughout the document.
 
-.. contents::
-   :depth: 3
-   :backlinks: none
+.. only:: html
+
+  .. contents::
+     :depth: 3
+     :backlinks: none
 
 
 Architecture Overview

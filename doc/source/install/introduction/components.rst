@@ -1,9 +1,11 @@
 |project| Components
 ======================
 
-.. contents::
-   :depth: 2
-   :backlinks: none
+.. only:: html
+
+  .. contents::
+     :depth: 2
+     :backlinks: none
 
 This section contains a list of components that |project| uses. The components
 are organized in categories, and include a basic description, useful links, and

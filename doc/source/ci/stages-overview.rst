@@ -4,12 +4,25 @@ Promotion Stages
 The list below shows each stage within the RDO promotion workflow.
 Each stage shows the inputs taken and the artifacts produced.
 
-.. note:: All the links shown in the diagram refer to the Master release.
+.. note:: All of the shown links refer to the Master release.
 
           Links for stable branches would include the stable release name,
           for example, `Pike stable release <https://trunk.rdoproject.org/centos7-pike/tripleo-ci-testing/>`_.
 
-.. mermaid:: promotions.mmd
+
+.. only:: latex
+
+  .. parsed-literal::
+
+     master --**build-packages**-->
+     current-consistent -->-- `tripleo-ci promotion <http://cistatus.tripleo.org/promotion/>`_ -->
+     current-tripleo -->-- `rdo phase1 promotion <http://cistatus.tripleo.org/phase1/>`_ -->
+     current-tripleo-rdo -->-- `rdo phase2 promotion <http://cistatus.tripleo.org/phase2/>`_ -->
+     current-tripleo-rdo-internal
+
+.. only:: html
+
+  .. mermaid:: promotions.mmd
 
 *Overview of the tags used during the tripleo promotions stages*
 

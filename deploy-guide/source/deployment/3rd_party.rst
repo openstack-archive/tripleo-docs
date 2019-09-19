@@ -74,6 +74,10 @@ Use the following command to build all of the container images used in TripleO::
         --config-file /usr/share/tripleo-common/container-images/overcloud_containers.yaml \
         --kolla-config-file /etc/kolla/kolla-build.conf
 
+.. note:: Add --use-buildah argument to use Buildah instead of Docker.
+          It'll be the default once CentOS8 becomes the testing platform during the Train cycle
+          and onward.
+
 Or use `kolla-build` to build the images yourself, which provides more
 flexibility and allows you to rebuild selectively just the images matching
 a given name, for example to build only the heat images with the TripleO

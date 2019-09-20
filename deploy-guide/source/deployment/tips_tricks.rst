@@ -254,7 +254,7 @@ TripleO creates configuration files for starting containers in
 ``/var/lib/tripleo-config/``.  If you look in this directory
 you will see a number of files corresponding with the steps in
 TripleO heat templates.  Most of the time, you will likely want to use
-``/var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json``
+``/var/lib/tripleo-config/hashed-container-startup-config-step_4.json``
 as it contains most of the final startup configurations for the running
 containers.
 
@@ -275,7 +275,7 @@ heat api container:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --interactive --shell --user root --container heat_api --action run
+  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --interactive --shell --user root --container heat_api --action run
 
 This will drop you into an interactive session inside the heat api container,
 starting /bin/bash running as root.
@@ -284,7 +284,7 @@ To see how this container is started by TripleO:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --container heat_api --action print-cmd
+  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --container heat_api --action print-cmd
 
   docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleomaster/centos-binary-heat-api:latest
 
@@ -293,7 +293,7 @@ edit it and rerun it with different a different configuration:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --container heat_api --action dump-json > heat_api.json
+  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --container heat_api --action dump-json > heat_api.json
 
 You can then use ``heat_api.json`` as your ``--file`` argument after
 editing it to your liking.
@@ -304,7 +304,7 @@ the container:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-docker-container-startup-config-step_4.json --overrides '{"health-cmd": "/usr/bin/curl -f http://localhost:8004/v1/", "health-interval": "30s"}' --container heat_api --action run
+  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --overrides '{"health-cmd": "/usr/bin/curl -f http://localhost:8004/v1/", "health-interval": "30s"}' --container heat_api --action run
   172ed68eb44ab20551a70a3e33c90a02014f530e42cd7b30255da4577c8ed80c
 
 

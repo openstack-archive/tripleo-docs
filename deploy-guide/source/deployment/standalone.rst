@@ -160,7 +160,7 @@ Deploying a Standalone OpenStack node
         #NeutronEnableForceMetadata: true
         StandaloneEnableRoutedNetworks: false
         StandaloneHomeDir: $HOME
-        StandaloneLocalMtu: 1500
+        InterfaceLocalMtu: 1500
         # Needed if running in a VM, not needed if on baremetal
         NovaComputeLibvirtType: qemu
       EOF
@@ -210,7 +210,7 @@ Deploying a Standalone OpenStack node
         #NeutronEnableForceMetadata: true
         StandaloneEnableRoutedNetworks: false
         StandaloneHomeDir: $HOME
-        StandaloneLocalMtu: 1500
+        InterfaceLocalMtu: 1500
         # Needed if running in a VM, not needed if on baremetal
         NovaComputeLibvirtType: qemu
       EOF

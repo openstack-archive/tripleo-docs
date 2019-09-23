@@ -62,4 +62,4 @@ currently installed validations.
   ansible
   in-flight
 
-.. _tripleo-validations documentation page: https://docs.openstack.org/tripleo-validations/readme.html
+.. _tripleo-validations documentation page: https://docs.openstack.org/tripleo-validations/latest/readme.html

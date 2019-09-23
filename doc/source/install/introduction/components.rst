@@ -307,7 +307,7 @@ nova provides a cloud computing fabric controller.
 * Read the
   `Development Quickstart <https://docs.openstack.org/nova/development.environment.html>`_
   to set up a development environment. Submit your changes via OpenStack
-  Gerrit (see 
+  Gerrit (see
   `OpenStack Developer's Guide <http://docs.openstack.org/infra/manual/developers.html>`_).
 
 **Useful links**
@@ -435,7 +435,7 @@ Pre and post-deployment validations for the deployment workflow.
 
 * Upstream Project: https://opendev.org/openstack/tripleo-validations/
 * Bugs: https://bugs.launchpad.net/tripleo/+bugs?field.tag=validations
-* Documentation for individual validations: https://docs.openstack.org/tripleo-validations/readme.html#existing-validations
+* Documentation for individual validations: https://docs.openstack.org/tripleo-validations/latest/readme.html#existing-validations
 
 .. note:: When reporting an issue, make sure you add the
           ``validations`` tag.

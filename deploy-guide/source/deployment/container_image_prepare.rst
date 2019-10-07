@@ -226,6 +226,11 @@ values may be passed using the following syntax::
   ContainerImageRegistryCredentials:
     'quay.io': {'<your_quay_username>': '<your_quay_password>'}
 
+.. note:: If the `ContainerImageRegistryCredentials` contain the credentials
+    for a registry whose name matches the `ceph_namespace` parameter, those
+    credentials will be extracted and passed to ceph-ansible as the
+    `ceph_docker_registry_username` and `ceph_docker_registry_password` parameters.
+
 Layering image preparation entries
 ..................................
 

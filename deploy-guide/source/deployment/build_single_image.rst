@@ -10,16 +10,6 @@ one of them. Use the following commands if you want to do it::
 If the target image exist, this commands ends silently. Make sure to delete a
 previous version of the image to run the command as you expect.
 
-Moreover, you can build the image with an extra element of your choice using the
-``--builder-extra-args`` argument::
-
-   openstack overcloud image build --type overcloud-full \
-       --builder-extra-args overcloud-network-midonet
-
-.. note::
-    Make sure the element is available in the ``$ELEMENTS_PATH`` environment
-    variable
-
 Uploading the New Single Image
 ------------------------------
 

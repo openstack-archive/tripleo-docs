@@ -712,14 +712,28 @@ argument ``--start-at-task``. To see a list of task names for a given playbook,
 
 .. note::
 
-   Tasks that include the ``step`` variable or other ansible variables in the
-   task name do not work with ``--start-at-task`` due to a limitation in
+   Some tasks that include the ``step`` variable or other ansible variables in
+   the task name do not work with ``--start-at-task`` due to a limitation in
    ansible. For example the task with the name::
 
          Start containers for step 1
 
    won't work with ``--start-at-task`` since the step number is in the name
    (1).
+
+When using ``--start-at-task``, the tasks that gather facts and load global
+variables for the playbook execution are skipped by default. Skipping those
+tasks can cause unexpected errors in later tasks. To avoid errors, those tasks
+can be forced to execute when using ``--start-at-task`` by including the
+following options to the ``ansible-playbook`` command::
+
+      ansible-playbook \
+        <other options > \
+        -e gather_facts=true \
+        -e @global_vars.yaml
+
+The ``global_vars.yaml`` variable file exists in the config-download directory
+that was either generated manually or under ``/var/lib/mistral``.
 
 Previewing changes
 ------------------

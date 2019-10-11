@@ -357,27 +357,6 @@ reuse the environment file used to set the values for the control plane stack.
 
   Care should be taken to keep the file as secured as possible.
 
-Create an environment file for setting necessary oslo messaging configuration
-overrides:
-
-.. code-block:: yaml
-
-  parameter_defaults:
-    <<Role>>ExtraConfig:
-      oslo_messaging_notify_use_ssl: false
-      oslo_messaging_rpc_use_ssl: false
-
-In the above example, replace `<<Role>>` with the actual role name that is being
-deployed at the distributed site. For example, if the role was called
-`Compute`, the environment file would be:
-
-.. code-block:: yaml
-
-  parameter_defaults:
-    ComputeExtraConfig:
-      oslo_messaging_notify_use_ssl: false
-      oslo_messaging_rpc_use_ssl: false
-
 .. _reuse_networks_dcn:
 
 Reusing networks from the overcloud
@@ -494,6 +473,16 @@ in the ``edge-0`` stack to the ``edge-0`` AZ::
       parameter_defaults:
          NovaComputeAvailabilityZone: edge-0
 
+Additionally, the ``OS::TripleO::NovaAZConfig`` service must be enabled by
+including the following ``resource_registry`` mapping::
+
+      resource_registry:
+        OS::TripleO::Services::NovaAZConfig: tripleo-heat-templates/deployment/nova/nova-az-config.yaml
+
+Or, the following environment can be included which sets the above mapping::
+
+      environments/nova-az-config.yaml
+
 It's also possible to configure the AZ for a compute node by adding it to a
 host aggregate after the deployment is completed. The following commands show
 creating a host aggregate, an associated AZ, and adding compute nodes to a
@@ -534,6 +523,26 @@ This example shows an environment file setting the AZ for the backend in the
 
       parameter_defaults:
          CinderStorageAvailabilityZone: edge0
+
+Deploying Ceph with HCI
+########################
+When deploying Ceph while using the ``DistributedComputeHCI`` roles, the
+environment file to enable ceph should be used::
+
+      environments/ceph-ansible/ceph-ansible.yaml
+
+Sample environments
+###################
+
+There are sample environments that are included in ``tripleo-heat-templates``
+for setting many of the parameter values and ``resource_registry`` mappings. These
+environments are located within the ``tripleo-heat-templates`` directory at::
+
+      environments/dcn.yaml
+      environments/dcn-hci.yaml
+
+The environments are not all-inclusive and do not set all needed values and
+mappings, but can be used as a guide when deploying DCN.
 
 Example: DCN deployment with pre-provisioned nodes, shared networks, and multiple stacks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

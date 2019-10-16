@@ -253,8 +253,39 @@ Wait for the deployment to finish:
 
 .. _cell_create_cell:
 
-Create the cell and discover compute nodes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Create the cell and discover compute nodes (ansible playbook)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+An ansible role and playbook is available to automate the one time tasks
+to create a cell after the deployment steps finished successfully. In
+addition :ref:`cell_create_cell_manual` explains the tasks being automated
+by this ansible way.
+
+.. code-block:: bash
+
+    source stackrc
+    mkdir inventories
+    for i in $(openstack stack list -f value -c 'Stack Name'); do \
+      /usr/bin/tripleo-ansible-inventory \
+      --static-yaml-inventory inventories/${i}.yaml --stack ${i}; \
+    done
+
+    ansible-playbook -i inventories \
+      /usr/share/ansible/tripleo-playbooks/create-nova-cell-v2.yaml \
+      -e tripleo_cellv2_cell_name=cell1 \
+      -e tripleo_cellv2_containercli=docker
+
+The playbook requires two parameters `tripleo_cellv2_cell_name` to provide
+the name of the new cell and until docker got dropped `tripleo_cellv2_containercli`
+to specify either if podman or docker is used.
+
+.. _cell_create_cell_manual:
+
+Create the cell and discover compute nodes (manual way)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The following describes the manual needed steps to finalize the cell
+deployment of a new cell. These are the steps automated in the ansible
+playbook mentioned in :ref:`cell_create_cell`.
+
 Get control plane and cell controller IPs:
 
 .. code-block:: bash

@@ -14,3 +14,4 @@ TripleO CI Guide
   stages-overview
   emit_releases_file
   ruck_rover_primer
+  chasing_promotions

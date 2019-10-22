@@ -187,8 +187,7 @@ command.::
       <other cli arguments> \
       --disable-validations \
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-environment-centos.yaml \
-      -r /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-server-roles-data.yaml
+      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-environment-centos.yaml
 
 The ``--disable-validations`` option disables the basic Nova, Ironic, and
 Glance related validations executed by python-tripleoclient. These validations
@@ -203,25 +202,13 @@ The ``deployed-server-bootstrap-centos.yaml`` environment triggers execution of
 a bootstrap script on the deployed servers to install further needed packages
 and make other configurations necessary for Overcloud deployment.
 
-The custom roles file, ``deployed-server-roles-data.yaml`` contains the custom
-roles used during the deployment. Further customization of the roles data is
-possible when using deployed servers. When doing so, be sure to include the
-``disable_constraints`` key on each defined role as seen in
-``deployed-server-roles-data.yaml``. This key disables the Heat defined
-constraints in the generated role templates. These constraints validate
-resources such as Nova flavors and Glance images, resources that are not needed
-when using deployed servers. An example role using ``disable_constraints``
-looks like::
+.. note::
 
-    - name: ControllerDeployedServer
-      disable_constraints: True
-      CountDefault: 1
-      ServicesDefault:
-        - OS::TripleO::Services::CACerts
-        - OS::TripleO::Services::CephMon
-        - OS::TripleO::Services::CephExternal
-        - OS::TripleO::Services::CephRgw
-        ... <additional services>
+   Previously a custom roles file was needed when using deployed-server. The
+   custom roles file was located in the templates directory at
+   deployed-server/deployed-server-roles-data.yaml. The custom roles file
+   addressed setting ``disable_constraints: true`` on each of the roles. This
+   is no longer required starting in the train release.
 
 Optionally include an environment to set the ``DeploymentSwiftDataMap``
 paramter called ``deployment-swift-data-map.yaml``::

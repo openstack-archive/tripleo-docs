@@ -186,8 +186,7 @@ command.::
     openstack overcloud deploy \
       <other cli arguments> \
       --disable-validations \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-environment-centos.yaml
+      -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml
 
 The ``--disable-validations`` option disables the basic Nova, Ironic, and
 Glance related validations executed by python-tripleoclient. These validations
@@ -198,10 +197,6 @@ The ``deployed-server.yaml`` environment takes advantage of the template
 composition nature of Heat and tripleo-heat-templates to substitute
 ``OS::Heat::DeployedServer`` resources in place of ``OS::Nova::Server``.
 
-The ``deployed-server-bootstrap-centos.yaml`` environment triggers execution of
-a bootstrap script on the deployed servers to install further needed packages
-and make other configurations necessary for Overcloud deployment.
-
 .. note::
 
    Previously a custom roles file was needed when using deployed-server. The
@@ -209,6 +204,15 @@ and make other configurations necessary for Overcloud deployment.
    deployed-server/deployed-server-roles-data.yaml. The custom roles file
    addressed setting ``disable_constraints: true`` on each of the roles. This
    is no longer required starting in the train release.
+
+.. note::
+
+   Previously, environment files were used to enable bootstrap tasks on the
+   deployed servers. These files were
+   environments/deployed-server-bootstrap-environment-centos.yaml and
+   environments/deployed-server-bootstrap-environment-rhel.yaml. Starting in
+   the train release, these environment files are no longer required and they
+   have been removed from tripleo-heat-templates.
 
 Optionally include an environment to set the ``DeploymentSwiftDataMap``
 paramter called ``deployment-swift-data-map.yaml``::

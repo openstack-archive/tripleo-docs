@@ -11,6 +11,10 @@ This command updates the heat stack with updated numbers and list of resource
 IDs (which represent nodes) to be deleted.
 
 .. note::
+   If you are :ref:`baremetal_provision` then follow those instructions for
+   scaling down instead of using ``openstack overcloud node delete``.
+
+.. note::
    If you passed any extra environment files when you created the overcloud (for
    instance, in order to configure :doc:`network isolation
    <../features/network_isolation>`), you must pass them again here

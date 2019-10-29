@@ -263,7 +263,7 @@ to the following::
 .. References
 
 .. _certmonger: https://pagure.io/certmonger
-.. _Nova vendordata plugin: https://docs.openstack.org/nova/vendordata.html
-.. _novajoin: https://github.com/openstack/novajoin
+.. _Nova vendordata plugin: https://docs.openstack.org/nova/latest/user/metadata.html#vendordata
+.. _novajoin: https://opendev.org/x/novajoin
 .. _FreeIPA documentation: https://www.freeipa.org/page/Documentation
 .. _IdM container: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/using_containerized_identity_management_services/

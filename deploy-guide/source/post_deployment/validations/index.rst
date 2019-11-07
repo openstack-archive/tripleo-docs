@@ -6,7 +6,7 @@ verifying the Undercloud configuration, hardware setup, and the
 Overcloud deployment to find common issues early.
 
 The TripleO UI runs the validations automatically. Since
-Rocky is possible to run the validations using the TripleO
+Stein, it is possible to run the validations using the TripleO
 CLI.
 
 .. note:: The TripleO UI is marked for deprecation beginning with

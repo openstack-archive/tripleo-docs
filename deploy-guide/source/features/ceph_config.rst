@@ -564,7 +564,7 @@ generates all the `ceph-ansible` required variables to trigger the playbook
 execution for both deployment and configuration of this component.
 When the deployment has been completed the Ceph dashboard containers,
 including prometheus and grafana, will be running on the controller nodes
-and will be accessible using the port 3100 for grafana and 9090 for prometheus;
+and will be accessible using the port 3100 for grafana and 9092 for prometheus;
 since this service is only internal and doesn’t listen on the public vip, users
 can reach grafana using the controller provisioning network vip on the specified
 port.

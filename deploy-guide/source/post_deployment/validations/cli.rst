@@ -1,12 +1,8 @@
 CLI support for validations
 ===========================
 
-The following section describes the options
-when running or listing the existing validations.
-
-.. note:: Validations can be performed either by calling Mistral or by calling
-  ``ansible-playbook``. By default, the latter is used. However, listing
-  validations are supported currently only by calling Mistral.
+The following section describes the options when running or listing the existing
+validations.
 
 Running validations
 ^^^^^^^^^^^^^^^^^^^
@@ -16,17 +12,17 @@ implementation allows to run them using the following CLI options:
 
 .. code-block:: bash
 
-  openstack tripleo validator run [options]
+  $ openstack tripleo validator run [options]
 
-``--plan``: This option allows to execute the validations overriding the default
-plan name.  The default value is set to ``overcloud``.  To override this options
-use for example:
+``--plan, --stack``: This option allows to execute the validations overriding the
+default plan name.  The default value is set to ``overcloud``.  To override this
+options use for example:
 
 .. code-block:: bash
 
-  openstack tripleo validator run --plan mycloud
+  $ openstack tripleo validator run --plan mycloud
 
-``--validation-name``: This options allows to execute a set of specific
+``--validation``: This options allows to execute a set of specific
 validations. Specify them as <validation_id>[,<validation_id>,...] which means a
 comma separated list. The default value for this option is [].
 
@@ -34,7 +30,7 @@ For example you can run this as:
 
 .. code-block:: bash
 
-  openstack tripleo validator run --validation-name check-ftype,512e
+  $ openstack tripleo validator run --validation check-ftype,512e
 
 ``--group``: This option allows to run specific group validations, if more than
 one group is required, then separate the group names with commas. The default
@@ -44,56 +40,101 @@ Run this option for example like:
 
 .. code-block:: bash
 
-  openstack tripleo validator run --group pre-upgrade,prep
+  $ openstack tripleo validator run --group pre-upgrade,prep
 
 ``--extra-vars``: This option allows to add a dictionary of extra variables to a
 run of a group or specific validations.
 
 .. code-block:: bash
 
-  openstack tripleo validator run \
+  $ openstack tripleo validator run \
                 --extra-vars '{"min_undercloud_ram_gb": 24, "min_undercloud_cpu_count": 8}' \
-                --validation-name undercloud-ram,undercloud-cpu
+                --validation undercloud-ram,undercloud-cpu
 
-``--extra-vars-file``: This option allows to add a valid ``JSON`` or ``YAML``
+``--extra-vars-file``: This
+option allows to add a valid ``JSON`` or ``YAML``
 file containg extra variables to a run of a group or specific validations.
 
 .. code-block:: bash
 
-  openstack tripleo validator run \
+  $ openstack tripleo validator run \
                 --extra-vars-file /home/stack/envvars.json \
-                --validation-name undercloud-ram,undercloud-cpu
+                --validation undercloud-ram,undercloud-cpu
 
-``--use-mistral``: This options allows to execute either groups or a set of
-specific validations by calling Mistral instead of using ``ansible-playbook``,
-which is the default.
+``--workers, -w``: This option will configure the maximum of threads that can be
+used to execute the given validation.
 
-Listing validations
-^^^^^^^^^^^^^^^^^^^
+.. code-block:: bash
+
+  $ openstack tripleo validator run \
+                --extra-vars-file /home/stack/envvars.json \
+                --validation undercloud-ram,undercloud-cpu \
+                --workers 3
+
+Getting the list of the Groups of validations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To get the list of all groups used by tripleo-validations and get their
+description, the user can type the following command:
+
+.. code-block:: bash
+
+   $ openstack tripleo validator group info
+
+``--format, -f``: This option allows to change the default output for listing
+the validations.  The options are csv, value, json, yaml or table.
+
+.. code-block:: bash
+
+  $ openstack tripleo validator group info --format json
+
+Getting a list of validations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Validations can be listed by groups and depending which validations will be
-listed, the output might be configured as a table, json or yaml.  The user can
+listed, the output might be configured as a table, json or yaml. The user can
 list the validations using the following command:
 
 .. code-block:: bash
 
-  openstack tripleo validator list [options]
+  $ openstack tripleo validator list [options]
 
-``--output``: This option allows to change the default output for listing the
-validations.  The options are json, yaml or table.  Run this option for example
-like:
-
-.. code-block:: bash
-
-  openstack tripleo validator list --output json
-
-``--parameters``: This option allows to get only the available ``Ansible``
-variables for the validations
+``--group``: This option allows to list specific group validations, if more than
+one group is required, then separate the group names with commas.
 
 .. code-block:: bash
 
-  openstack tripleo validator list --parameters --validation-name undercloud-ram,undercloud-cpu
-  Waiting for messages on queue 'tripleo' with no timeout.
+  $ openstack tripleo validator list --group prep,pre-introspection
+
+``--format, -f``: This option allows to change the default output for listing
+the validations.  The options are csv, value, json, yaml or table.
+
+.. code-block:: bash
+
+  $ openstack tripleo validator list --format json
+
+Getting detailed information about a validation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To get a full description of a validation, the user can run the following
+command:
+
+.. code-block:: bash
+
+  $ openstack tripleo validator show dns
+
+Getting the parameters list for a validation or a group of validations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To get all the available ``Ansible`` variables for one or more validations:
+
+``--validation``: This options allows to execute a set of specific
+validations. Specify them as <validation_id>[,<validation_id>,...] which means a
+comma separated list. The default value for this option is [].
+
+.. code-block:: bash
+
+  openstack tripleo validator show parameter --validation undercloud-ram,undercloud-cpu
   {
       "undercloud-cpu": {
           "parameters": {
@@ -107,7 +148,68 @@ variables for the validations
       }
   }
 
-``--create-vars-file``: This option allows to generate a valid ``JSON`` or
+``--group``: This option allows to list specific group validations, if more than
+one group is required, then separate the group names with commas.
+
+.. code-block:: bash
+
+  openstack tripleo validator show parameter --group prep
+  {
+      "512e": {
+          "parameters": {}
+      },
+      "service-status": {
+          "parameters": {}
+      },
+      "tls-everywhere-prep": {
+          "parameters": {}
+      },
+      "undercloud-cpu": {
+          "parameters": {
+              "min_undercloud_cpu_count": 8
+          }
+      },
+      "undercloud-disk-space": {
+          "parameters": {
+              "volumes": [
+                  {
+                      "min_size": 10,
+                      "mount": "/var/lib/docker"
+                  },
+                  {
+                      "min_size": 3,
+                      "mount": "/var/lib/config-data"
+                  },
+                  {
+                      "min_size": 3,
+                      "mount": "/var/log"
+                  },
+                  {
+                      "min_size": 5,
+                      "mount": "/usr"
+                  },
+                  {
+                      "min_size": 20,
+                      "mount": "/var"
+                  },
+                  {
+                      "min_size": 25,
+                      "mount": "/"
+                  }
+              ]
+          }
+      },
+      "undercloud-ram": {
+          "parameters": {
+              "min_undercloud_ram_gb": 24
+          }
+      },
+      "undercloud-selinux-mode": {
+          "parameters": {}
+      }
+  }
+
+``--download``: This option allows to generate a valid ``JSON`` or
 ``YAML`` file containing the available ``Ansible`` variables for the validations.
 
 To generate a ``JSON`` or ``YAML`` file containing for the variables of the
@@ -115,24 +217,18 @@ To generate a ``JSON`` or ``YAML`` file containing for the variables of the
 
 .. code-block:: bash
 
-  openstack tripleo validator list --parameters \
-                                   --create-vars-file [json|yaml] /home/stack/envvars \
-                                   --validation-name undercloud-ram,undercloud-cpu
+  openstack tripleo validator show parameter \
+                                   --download [json|yaml] /home/stack/envvars \
+                                   --validation undercloud-ram,undercloud-cpu
 
 To generate a ``JSON`` or ``YAML`` file containing for the variables of the
 validations belonging to the ``prep`` and ``pre-introspection`` groups:
 
 .. code-block:: bash
 
-  openstack tripleo validator list --parameters \
-                                   --create-vars-file [json|yaml] /home/stack/envvars \
+  openstack tripleo validator show parameter \
+                                   --download [json|yaml] /home/stack/envvars \
                                    --group prep,pre-introspection
 
-
-``--group``: This option allows to filter and list specific group validations,
-if more than one group is required to be listed, separate the group names with
-commas. By default all group validations will be listed.
-
-.. code-block:: bash
-
-  openstack tripleo validator list --group pre-upgrade,prep
+``--format, -f``: This option allows to change the default output for listing
+the validations parameters.  The options are json or yaml.

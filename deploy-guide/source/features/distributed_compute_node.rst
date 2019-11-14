@@ -183,33 +183,33 @@ This section describes the steps required to configure the undercloud for DCN.
 Using direct deploy instead of iSCSI
 ____________________________________
 
-In a default undercloud configuration, ironic deploys nodes using the `iscsi`
-deploy interface. When using the `iscsi` deploy interface, the deploy ramdisk
-publishes the node’s disk as an iSCSI target, and the `ironic-conductor`
+In a default undercloud configuration, ironic deploys nodes using the ``iscsi``
+deploy interface. When using the ``iscsi`` deploy interface, the deploy ramdisk
+publishes the node’s disk as an iSCSI target, and the ``ironic-conductor``
 service then copies the image to this target.
 
 For a DCN deployment, network latency is often a concern between the undercloud
 and the distributed compute nodes. Considering the potential for latency, the
-distributed compute nodes should be configured to use the `direct` deploy
+distributed compute nodes should be configured to use the ``direct`` deploy
 interface in the undercloud. This process is described later in this guide
 under :ref:`configure-deploy-interface`.
 
-When using the `direct` deploy interface, the deploy ramdisk will download the
+When using the ``direct`` deploy interface, the deploy ramdisk will download the
 image over HTTP from the undercloud's Swift service, and copy it to the node’s
 disk. HTTP is more resilient when dealing with network latency than iSCSI, so
-using the `direct` deploy interface provides a more stable node deployment
+using the ``direct`` deploy interface provides a more stable node deployment
 experience for distributed compute nodes.
 
 Configure the Swift temporary URL key
 _____________________________________
 
 Images are served by Swift and are made available to nodes using an HTTP URL,
-over the `direct` deploy interface. To allow Swift to create temporary URLs, it
+over the ``direct`` deploy interface. To allow Swift to create temporary URLs, it
 must be configured with a temporary URL key. The key value is used for
 cryptographic signing and verification of the temporary URLs created by Swift.
 
 The following commands demonstrate how to configure the setting. In this
-example, `uuidgen` is used to randomly create a key value. You should choose a
+example, ``uuidgen`` is used to randomly create a key value. You should choose a
 unique key value that is a difficult to guess value. For example::
 
     source ~/stackrc
@@ -225,7 +225,7 @@ This section describes how to configure the deploy interface for new and
 existing nodes.
 
 For new nodes, the deploy interface can be specified directly in the JSON
-structure for each node. For example, see the `“deploy_interface”: “direct”`
+structure for each node. For example, see the ``“deploy_interface”: “direct”``
 setting below::
 
     {
@@ -263,7 +263,7 @@ setting below::
        ]
     }
 
-Existing nodes can be updated to use the `direct` deploy interface. For
+Existing nodes can be updated to use the ``direct`` deploy interface. For
 example::
 
     openstack baremetal node set --deploy-interface direct 4b64a750-afe3-4236-88d1-7bb88c962666
@@ -291,8 +291,8 @@ deploying it in a separate stack allows for separation of management and
 operations.
 
 It is suggested to give each stack an explicit name. For example, the control
-plane stack could be called `control-plane` and set by passing `--stack
-control-plane` to the `openstack overcloud deploy` command.
+plane stack could be called ``control-plane`` and set by passing ``--stack
+control-plane`` to the ``openstack overcloud deploy`` command.
 
 .. _deploy_dcn:
 
@@ -320,7 +320,7 @@ Extract the needed data from the control plane stack:
 
 .. note::
 
-  The `control-plane-export.yaml` generated in the previous command contains
+  The ``control-plane-export.yaml`` generated in the previous command contains
   sensitive security data such as passwords and TLS certificates that are used
   in the overcloud deployment. Some passwords in the file may be removed if
   they are not needed by DCN. For example, the passwords for RabbitMQ, MySQL,
@@ -340,23 +340,51 @@ and VIP resources between stacks if desired. Only a single Heat stack can own a
 resource and be responsible for its creation and deletion, however the
 resources can be reused in other stacks.
 
-To reuse network related resources between stacks, the following parameters
-have been added to the network definitions in the `network_data.yaml` file
-format::
+ManageNetworks
+##############
+The ``ManageNetworks`` parameter can be set to ``false`` so that the same
+``network_data.yaml`` file can be used across all the stacks. When
+``ManageNetworks`` is set to false, ports will be created for the nodes in the
+separate stacks on the existing networks that were already created in the
+``control-plane`` stack.
+
+When ``ManageNetworks`` is used, it's a global option for the whole stack and
+applies to all of the network, subnet, and segment resources.
+
+To use ``ManageNetworks``, create an environment file which sets the parameter
+value to ``false``::
+
+      parameter_defaults:
+        ManageNetworks: false
+
+External UUID's
+###############
+If more fine grained control over which networks should be reused from the
+``control-plane`` stack is needed, then various ``external_resource_*`` fields
+can be added to ``network_data.yaml``. When these fields are present on
+network, subnet, segment, or vip resources, Heat will mark the resources in the
+separate stack as being externally managed, and it won't try to any create,
+update, or delete operations on those resources.
+
+``ManageNetworks`` should not be set when when the ``external_resource_*``
+fields are used.
+
+The external resource fields that can be used in ``network_data.yaml`` are as
+follows::
 
       external_resource_network_id: Existing Network UUID
       external_resource_subnet_id: Existing Subnet UUID
       external_resource_segment_id: Existing Segment UUID
       external_resource_vip_id: Existing VIP UUID
 
-These parameters can be set on each network definition in the
-`network_data.yaml` file used for the deployment of the separate stack.
+These fields can be set on each network definition in the
+`network_data.yaml`` file used for the deployment of the separate stack.
 
 Not all networks need to be reused or shared across stacks. The
-`external_resource_*` parameters can be set for only the networks that are
+`external_resource_*` fields can be set for only the networks that are
 meant to be shared, while the other networks can be newly created and managed.
 
-For example, to reuse the `internal_api` network from the control plane stack
+For example, to reuse the ``internal_api`` network from the control plane stack
 in a separate stack, run the following commands to show the UUIDs for the
 related network resources:
 
@@ -367,8 +395,9 @@ related network resources:
       openstack port show internal_api_virtual_ip -c id -f value
 
 Save the values shown in the output of the above commands and add them to the
-network definition for the `internal_api` network in the `network_data.yaml`
-file for the separate stack. An example network definition would look like:
+network definition for the ``internal_api`` network in the
+``network_data.yaml`` file for the separate stack. An example network
+definition would look like:
 
 .. code-block:: bash
 
@@ -387,33 +416,34 @@ file for the separate stack. An example network definition would look like:
 .. note::
 
       When *not* sharing networks between stacks, each network defined in
-      `network_data.yaml` must have a unique name across all deployed stacks.
+      ``network_data.yaml`` must have a unique name across all deployed stacks.
       This requirement is necessary since regardless of the stack, all networks are
       created in the same tenant in Neutron on the undercloud.
 
-      For example, the network name `internal_api` can't be reused between
+      For example, the network name ``internal_api`` can't be reused between
       stacks, unless the intent is to share the network between the stacks.
-      The network would need to be given a different `name` and `name_lower`
-      property such as `InternalApiCompute0` and `internal_api_compute_0`.
+      The network would need to be given a different ``name`` and
+      ``name_lower`` property such as ``InternalApiCompute0`` and
+      ``internal_api_compute_0``.
 
 
 DCN related roles
 _________________
-Different roles are provided within `tripleo-heat-templates`, depending on the
+Different roles are provided within ``tripleo-heat-templates``, depending on the
 configuration and desired services to be deployed at each distributed site.
 
-The default compute role at `roles/Compute.yaml` can be used if that is
+The default compute role at ``roles/Compute.yaml`` can be used if that is
 sufficient for the use case.
 
 Two additional roles are also available for deploying compute nodes with
 co-located persistent storage at the distributed site.
 
-The first is `roles/DistributedCompute.yaml`. This role includes the default
+The first is ``roles/DistributedCompute.yaml``. This role includes the default
 compute services, but also includes the cinder volume service. The cinder
 volume service would be configured to talk to storage that is local to the
 distributed site for persistent storage.
 
-The second is `roles/DistributedComputeHCI.yaml`. This role includes the
+The second is ``roles/DistributedComputeHCI.yaml``. This role includes the
 default computes services, the cinder volume service, and also includes the
 Ceph services for deploying a Ceph cluster at the distributed site. Using this
 role, both the compute services and ceph services are deployed on the same
@@ -499,7 +529,7 @@ This example shows an environment file setting the AZ for the backend in the
          CinderStorageAvailabilityZone: edge0
 
 Deploying Ceph with HCI
-########################
+#######################
 When deploying Ceph while using the ``DistributedComputeHCI`` roles, the
 environment file to enable ceph should be used::
 
@@ -1005,7 +1035,7 @@ Running Ansible across multiple DCN stacks
 
 Each DCN stack should usually be updated individually. However if you
 need to run Ansible on nodes deployed from more than one DCN stack,
-then the `tripleo-ansible-inventory` command's `--stack` option
+then the ``tripleo-ansible-inventory`` command's ``--stack`` option
 supports being passed more than one stack. If more than one stack is
 passed, then a single merged inventory will be generated which
 contains the union of the nodes in those stacks. For example, if you

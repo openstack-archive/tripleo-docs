@@ -292,6 +292,35 @@ Deploying a Standalone OpenStack node
      export OS_CLOUD=standalone
      openstack endpoint list
 
+#. Cleanup a deployment
+
+   If you want to remove the services and files installed by Standalone, after
+   a deployment failure or just to re-deploy from scratch, you can run the
+   following script:
+
+   .. code-block:: bash
+
+     #!/bin/bash
+     echo "Tearing down TripleO environment"
+     if type pcs &> /dev/null; then
+         sudo pcs cluster destroy
+     fi
+     if type podman &> /dev/null; then
+         echo "Removing podman containers and images (takes times...)"
+         sudo podman rm -af
+         sudo podman rmi -af
+     fi
+     sudo rm -rf \
+         /var/lib/tripleo-config \
+         /var/lib/config-data /var/lib/container-config-scripts \
+         /var/lib/container-puppet \
+         /var/lib/heat-config \
+         /var/lib/image-serve \
+         /var/lib/containers \
+         /etc/systemd/system/tripleo* \
+         /var/lib/mysql/*
+     sudo systemctl daemon-reload
+
 Manual deployments with ansible
 -------------------------------
 

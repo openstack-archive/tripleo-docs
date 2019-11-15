@@ -233,9 +233,22 @@ used for undercloud deployment are stored in the tempdir
     ``undercloud-passwords.conf``.
 
 .. note::
-    The used undercloud installation command can be rerun to reapply changes from
-    ``undercloud.conf`` to the undercloud. Note that this should **not** be done
-    if an overcloud has already been deployed or is in progress.
+    The undercloud installation command can be rerun to reapply changes from
+    ``undercloud.conf`` to the undercloud. Note that this should be done with
+    caution if an overcloud has already been deployed or is in progress as some
+    configuration changes could affect the overcloud. These changes include but
+    are not limited to:
+
+    #. Package repository changes on the undercloud, followed by running the
+       installation command could update the undercloud such that further
+       management operations are not possible on the overcloud until the
+       overcloud update or upgrade procedure is followed.
+    #. Reconfiguration of the undercloud container registry if the
+       overcloud is using the undercloud as the source for container images.
+    #. Networking configuration changes on the undercloud which may affect
+       the overcloud's ability to connect to the undercloud for
+       instance metadata services.
+
 
 .. note::
     If running ``docker`` commands as a stack user after an undercloud install fail

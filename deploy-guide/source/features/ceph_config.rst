@@ -458,15 +458,18 @@ the following::
 
   parameter_defaults:
     CephPools:
-      - {"name": backups, "pg_num": 512, "pgp_num": 512}
-      - {"name": volumes, "pg_num": 1024, "pgp_num": 1024, "rule_name": 'replicated_rule', "erasure_profile": '', "expected_num_objects": 6000}
-      - {"name": vms, "pg_num": 512, "pgp_num": 512}
-      - {"name": images, "pg_num": 128, "pgp_num": 128}
+      - {"name": backups, "pg_num": 512, "pgp_num": 512, "application": rbd}
+      - {"name": volumes, "pg_num": 1024, "pgp_num": 1024, "application": rbd, "rule_name": 'replicated_rule', "erasure_profile": '', "expected_num_objects": 6000}
+      - {"name": vms, "pg_num": 512, "pgp_num": 512, "application": rbd}
+      - {"name": images, "pg_num": 128, "pgp_num": 128, "application": rbd}
 
 In the above example, PG numbers for each pool differ based on the
 OpenStack use case from `pgcalc`_. The example above also passes
 additional options as described in the `ceph osd pool create`_
-documentation to the volumes pool used by Cinder.
+documentation to the volumes pool used by Cinder. A TripleO validation
+(described in `Validating Ceph Configuration`_) may be used to verify
+that the PG numbers satisfy Ceph's PG overdose protection check before
+the deployment starts.
 
 Override Ansible run options
 ----------------------------
@@ -603,6 +606,115 @@ The final overcloud command must look like the following::
 
     openstack overcloud deploy --templates -r /home/stack/roles_data.yaml -n /usr/share/openstack-tripleo-heat-templates/network_data_dashboard.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e ~/my-ceph-settings.yaml
 
+Validating Ceph Configuration
+-----------------------------
+
+The tripleo-validations framework contains validations for Ceph
+which may be run before deployment to save time debugging possible
+failures.
+
+Create an inventory on the undercloud which refers to itself::
+
+  echo "undercloud ansible_connection=local" > inventory
+
+Set Ansible environment variables::
+
+  BASE="/usr/share/openstack-tripleo-validations"
+  export ANSIBLE_RETRY_FILES_ENABLED=false
+  export ANSIBLE_KEEP_REMOTE_FILES=1
+  export ANSIBLE_CALLBACK_PLUGINS="${BASE}/callback_plugins"
+  export ANSIBLE_ROLES_PATH="${BASE}/roles"
+  export ANSIBLE_LOOKUP_PLUGINS="${BASE}/lookup_plugins"
+  export ANSIBLE_LIBRARY="${BASE}/library"
+
+See what Ceph validations are available::
+
+  ls $BASE/playbooks | grep ceph
+
+Run a Ceph validation with command like the following::
+
+  ansible-playbook -i inventory $BASE/playbooks/ceph-ansible-installed.yaml
+
+For Stein and newer it is possible to run validations using the
+`openstack tripleo validator run` command with a syntax like the
+following::
+
+  openstack tripleo validator run --validation ceph-ansible-installed
+
+The `ceph-ansible-installed` validation warns if the `ceph-ansible`
+RPM is not installed on the undercloud. This validation is also run
+automatically during deployment unless validations are disabled.
+
+Ceph Placement Group Validation
+-------------------------------
+
+Ceph will refuse to take certain actions if they are harmful to the
+cluster. E.g. if the placement group numbers are not correct for the
+amount of available OSDs, then Ceph will refuse to create pools which
+are required for OpenStack. Rather than wait for the deployment to
+reach the point where Ceph is going to be configured only to find out
+that the deployment failed because the parameters were not correct,
+you may run a validation before deployment starts to quickly determine
+if Ceph will create your OpenStack pools based on the overrides which
+will be passed to the overcloud.
+
+.. note::
+
+   Unless there are at least 8 OSDs, the TripleO defaults will
+   cause the deployment to fail unless you modify the CephPools,
+   CephPoolDefaultSize, or CephPoolDefaultPgNum parameters. This
+   validation will help you find the appropriate values.
+
+To run the `ceph-pg` validation, configure your environment as
+described in the previous section but also run the following
+command to switch Ansible's `hash_behaviour` from `replace`
+(the default) to `merge`. This is done to make Ansible behave
+the same way that TripleO Heat Templates behaves when multiple
+environment files are passed with the `-e @file.yaml` syntax::
+
+  export ANSIBLE_HASH_BEHAVIOUR=merge
+
+Then use a command like the following::
+
+  ansible-playbook -i inventory $BASE/playbooks/ceph-pg.yaml -e @ceph.yaml -e num_osds=36
+
+The `num_osds` parameter is required. This value should be the number
+of expected OSDs that will be in the Ceph deployment. It should be
+equal to the number of devices and lvm_volumes under
+`CephAnsibleDisksConfig` multiplied by the number of nodes running the
+`CephOSD` service (e.g. nodes in the CephStorage role, nodes in the
+ComputeHCI role, and any custom roles, etc.). This value should also
+be adjusted to compensate for the number of OSDs used by nodes with
+node-specific overrides as covered earlier in this document.
+
+In the above example, `ceph.yaml` should be the same file passed to
+the overcloud deployment, e.g. `opesntack overcloud deploy ... -e
+ceph.yaml`, as covered earlier in this document. As many files as
+required may be passed using `-e @file.yaml` in order to get the
+following parameters passed to the `ceph-pg` validation.
+
+* CephPoolDefaultSize
+* CephPoolDefaultPgNum
+* CephPools
+
+If the above parameters are not passed, then the TripleO defaults will
+be used for the parameters above.
+
+The above example is based only on Ceph pools created for RBD. If Ceph
+RGW and/or Manila via NFS Ganesha is also being deployed, then simply
+pass the same environment files for enabling these services you would
+as if you were running `openstack overcloud deploy`. For example::
+
+  export THT=/usr/share/openstack-tripleo-heat-templates/
+  ansible-playbook -i inventory $BASE/playbooks/ceph-pg.yaml \
+    -e @$THT/environments/ceph-ansible/ceph-rgw.yaml \
+    -e @$THT/environments/ceph-ansible/ceph-mds.yaml \
+    -e @$THT/environments/manila-cephfsganesha-config.yaml \
+    -e @ceph.yaml -e num_osds=36
+
+In the above example, the validation will simulate the creation of the
+pools required for the RBD, RGW and MDS services and the validation
+will fail if the placement group numbers are not correct.
 
 .. _`puppet-ceph`: https://github.com/openstack/puppet-ceph
 .. _`ceph-ansible`: https://github.com/ceph/ceph-ansible

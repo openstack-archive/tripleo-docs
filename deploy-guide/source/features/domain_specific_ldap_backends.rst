@@ -83,12 +83,6 @@ keys:
 * **user_default_project_id_attribute**: LDAP attribute mapped to
   default_project_id for users.
 
-* **user_allow_create**: Allow user creation in LDAP backend. (boolean value)
-
-* **user_allow_update**: Allow user updates in LDAP backend. (boolean value)
-
-* **user_allow_delete**: Allow user deletion in LDAP backend. (boolean value)
-
 * **user_pass_attribute**: LDAP attribute mapped to password.
 
 * **user_enabled_emulation**: If true, Keystone uses an alternative method to
@@ -119,12 +113,6 @@ keys:
 
 * **group_attribute_ignore**: List of attributes stripped off the group on
   update. (list value)
-
-* **group_allow_create**: Allow group creation in LDAP backend. (boolean value)
-
-* **group_allow_update**: Allow group update in LDAP backend. (boolean value)
-
-* **group_allow_delete**: Allow group deletion in LDAP backend. (boolean value)
 
 * **group_additional_attribute_mapping**: Additional attribute mappings for
   groups. Attribute mapping format is <ldap_attr>:<user_attr>, where ldap_attr
@@ -192,9 +180,6 @@ domain called ``tripleodomain`` would look as follows::
           user_filter: "(memberOf=cn=OSuser,ou=Groups,dc=tripleo,dc=example,dc=com)"
           user_objectclass: person
           user_id_attribute: cn
-          user_allow_create: false
-          user_allow_update: false
-          user_allow_delete: false
 
 This will create a file in the default domain directory
 **/etc/keystone/domains** with the name **keystone.tripleodomain.conf**. And
@@ -269,18 +254,12 @@ following template as a configuration::
           user_id_attribute: uid
           user_name_attribute: uid
           user_mail_attribute: mail
-          user_allow_create: false
-          user_allow_update: false
-          user_allow_delete: false
           group_tree_dn: cn=groups,cn=accounts,$SUFFIX
           group_objectclass: groupOfNames
           group_id_attribute: cn
           group_name_attribute: cn
           group_member_attribute: member
           group_desc_attribute: description
-          group_allow_create: false
-          group_allow_update: false
-          group_allow_delete: false
           user_enabled_attribute: nsAccountLock
           user_enabled_default: False
           user_enabled_invert: true

@@ -123,7 +123,7 @@ Each cell has some mandatory parameters which need to be set using an
 environment file.
 Add the following content into a parameter file for the cell, e.g. `cell1/cell1.yaml`:
 
-.. code-block:: yaml
+.. code-block::
 
   resource_registry:
     # since the same networks are used in this example, the
@@ -134,9 +134,11 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
     OS::TripleO::Network::StorageMgmt: OS::Heat::None
     OS::TripleO::Network::Tenant: OS::Heat::None
     OS::TripleO::Network::Management: OS::Heat::None
+    OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+    OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
 
   parameter_defaults:
-    # new CELL Parameter to reflect that this is an additional CELL
+    # CELL Parameter to reflect that this is an additional CELL
     NovaAdditionalCell: True
 
     # The DNS names for the VIPs for the cell
@@ -150,9 +152,13 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
     OvercloudCellControllerFlavor: cellcontroller
     OvercloudComputeFlavor: compute
 
-    # number of controllers/computes in the cell
+    # Number of controllers/computes in the cell
     CellControllerCount: 1
     ComputeCount: 1
+
+    # Compute names need to be uniq across cells. Make sure to have a uniq
+    # hostname format for cell nodes
+    ComputeHostnameFormat: 'cell1-compute-%index%'
 
     # default gateway
     ControlPlaneStaticRoutes:
@@ -165,6 +171,12 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
 The above file disables creating networks as the networks from the overcloud stack
 are reused. It also specifies that this will be an additional cell using parameter
 `NovaAdditionalCell`.
+
+.. note::
+
+  Compute hostnames need to be uniq across cells. Make sure to use
+  `ComputeHostnameFormat` to have uniq hostnames.
+
 
 Create the network configuration for `cellcontroller` and add to environment file
 _________________________________________________________________________________
@@ -260,19 +272,27 @@ to create a cell after the deployment steps finished successfully. In
 addition :ref:`cell_create_cell_manual` explains the tasks being automated
 by this ansible way.
 
+.. note::
+
+  When using multiple additional cells, don't place all inventories of the cells
+  in one directory. The current version of the `create-nova-cell-v2.yaml` playbook
+  uses `CellController[0]` to get the `database_connection` and `transport_url`
+  to create the new cell. When all cell inventories get added to the same directory
+  `CellController[0]` might not be the correct cell controller for the new cell.
+
 .. code-block:: bash
 
-    source stackrc
-    mkdir inventories
-    for i in $(openstack stack list -f value -c 'Stack Name'); do \
-      /usr/bin/tripleo-ansible-inventory \
-      --static-yaml-inventory inventories/${i}.yaml --stack ${i}; \
-    done
+  source stackrc
+  mkdir inventories-cell1
+  for i in overcloud cell1; do \
+    /usr/bin/tripleo-ansible-inventory \
+    --static-yaml-inventory inventories/${i}.yaml --stack ${i}; \
+  done
 
-    ansible-playbook -i inventories \
-      /usr/share/ansible/tripleo-playbooks/create-nova-cell-v2.yaml \
-      -e tripleo_cellv2_cell_name=cell1 \
-      -e tripleo_cellv2_containercli=docker
+  ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_SSH_RETRIES=3 ansible-playbook -i inventories \
+    /usr/share/ansible/tripleo-playbooks/create-nova-cell-v2.yaml \
+    -e tripleo_cellv2_cell_name=cell1 \
+    -e tripleo_cellv2_containercli=docker
 
 The playbook requires two parameters `tripleo_cellv2_cell_name` to provide
 the name of the new cell and until docker got dropped `tripleo_cellv2_containercli`

@@ -14,7 +14,8 @@ the cell host discovery:
 
 .. code-block:: bash
 
-  CTRL_IP=$(openstack server list -f value -c Networks --name overcloud-controller-0 | sed 's/ctlplane=//')
+  CTRL=overcloud-controller-0
+  CTRL_IP=$(openstack server list -f value -c Networks --name $CTRL | sed 's/ctlplane=//')
 
   # CONTAINERCLI can be either docker or podman
   export CONTAINERCLI='docker'
@@ -27,16 +28,27 @@ the cell host discovery:
   ssh heat-admin@${CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_api \
   nova-manage cell_v2 list_hosts
 
+  # add new node to the availability zone
+  source overcloudrc
+  (overcloud) $ openstack aggregate add host <cell name> <compute host>
+
+.. note::
+
+  Optionally the cell uuid cal be specificed to the `discover_hosts` and
+  `list_hosts` command to only target against a specific cell.
+
 Delete a compute from a cell
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As initial step migrate all instances off the compute.
+* As initial step migrate all instances off the compute.
 
-#. From one of the overcloud controllers, delete the computes from the cell:
+* From one of the overcloud controllers, delete the computes from the cell:
 
   .. code-block:: bash
 
-    CTRL_IP=$(openstack server list -f value -c Networks --name overcloud-controller-0 | sed 's/ctlplane=//')
+    source stackrc
+    CTRL=overcloud-controller-0
+    CTRL_IP=$(openstack server list -f value -c Networks --name $CTRL | sed 's/ctlplane=//')
 
     # CONTAINERCLI can be either docker or podman
     export CONTAINERCLI='docker'
@@ -49,15 +61,15 @@ As initial step migrate all instances off the compute.
     ssh heat-admin@${CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_api \
     nova-manage cell_v2 delete_host --cell_uuid <uuid> --host <compute>
 
-#. Delete the node from the cell stack
+* Delete the node from the cell stack
 
   See :doc:`../post_deployment/delete_nodes`.
 
-#. Delete the resource providers from placement
+* Delete the resource providers from placement
 
   This step is required as otherwise adding a compute node with the same hostname
   will make it to fail to register and update the resources with the placement
-  service.::
+  service.:
 
   .. code-block:: bash
 
@@ -74,13 +86,14 @@ As initial step migrate all instances off the compute.
 Delete a cell
 ~~~~~~~~~~~~~
 
-As initial step delete all instances from cell
+* As initial step delete all instances from the cell.
 
-#. From one of the overcloud controllers, delete all computes from the cell:
+* From one of the overcloud controllers, delete all computes from the cell:
 
   .. code-block:: bash
 
-    CTRL_IP=$(openstack server list -f value -c Networks --name overcloud-controller-0 | sed 's/ctlplane=//')
+    CTRL=overcloud-controller-0
+    CTRL_IP=$(openstack server list -f value -c Networks --name $CTRL | sed 's/ctlplane=//')
 
     # CONTAINERCLI can be either docker or podman
     export CONTAINERCLI='docker'
@@ -93,23 +106,25 @@ As initial step delete all instances from cell
     ssh heat-admin@${CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_api \
     nova-manage cell_v2 delete_host --cell_uuid <uuid> --host <compute>
 
-#. On the cell controller delete all deleted instances from the database:
+* On the cell controller delete all deleted instances from the database:
 
   .. code-block:: bash
 
-    CELL_CTRL_IP=$(openstack server list -f value -c Networks --name cellcontrol-0 | sed 's/ctlplane=//')
+    CELL_CTRL=cell1-cellcontrol-0
+    CELL_CTRL_IP=$(openstack server list -f value -c Networks --name $CELL_CTRL | sed 's/ctlplane=//')
 
     # CONTAINERCLI can be either docker or podman
     export CONTAINERCLI='docker'
 
     ssh heat-admin@${CELL_CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_conductor \
-    nova-manage db archive_deleted_rows --verbose
+    nova-manage db archive_deleted_rows --until-complete --verbose
 
-#. From one of the overcloud controllers, delete the cell:
+* From one of the overcloud controllers, delete the cell:
 
   .. code-block:: bash
 
-    CTRL_IP=$(openstack server list -f value -c Networks --name overcloud-controller-0 | sed 's/ctlplane=//')
+    CTRL=overcloud-controller-0
+    CTRL_IP=$(openstack server list -f value -c Networks --name $CTRL | sed 's/ctlplane=//')
 
     # CONTAINERCLI can be either docker or podman
     export CONTAINERCLI='docker'
@@ -122,7 +137,7 @@ As initial step delete all instances from cell
     ssh heat-admin@${CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_api \
     nova-manage cell_v2 delete_cell --cell_uuid <uuid>
 
-#. Delete the cell stack:
+* Delete the cell stack:
 
   .. code-block:: bash
 
@@ -133,15 +148,16 @@ As initial step delete all instances from cell
     If the cell consist of a controller and compute stack, delete as a first step the
     compute stack and then the controller stack.
 
-#. From a system which can reach the placement endpoint, delete the resource providers from placement
+* From a system which can reach the placement endpoint, delete the resource providers from placement
 
     This step is required as otherwise adding a compute node with the same hostname
-    will make it to fail to register and update the resources with the placement
-    service:
+    will make it to fail to register as a resource with the placement service.
+    In case of Centos/RHEL 8 the required packages is `python3-osc-placement`:
 
   .. code-block:: bash
 
     sudo yum install python2-osc-placement
+    source overcloudrc
     openstack resource provider list
     +--------------------------------------+---------------------------------------+------------+
     | uuid                                 | name                                  | generation |
@@ -165,7 +181,8 @@ the steps from the minor update procedure.
 Once the control plane stack is updated, re-run the export command to recreate the
 required input files for each separate cell stack.
 
-.. note:
+.. note::
+
   Before re-running the export command, backup the previously used input file so that
   the previous versions are not overwritten. In the event that a separate cell stack
   needs a stack update operation performed prior to the minor update procedure, the

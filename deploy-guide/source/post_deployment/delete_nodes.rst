@@ -10,6 +10,13 @@ You can delete specific nodes from an overcloud with command::
 This command updates the heat stack with updated numbers and list of resource
 IDs (which represent nodes) to be deleted.
 
+.. admonition:: Train
+   :class: train
+
+   In Train, we added a user confirmation to the scale down command to
+   prevent accidental node removal.
+   To skip it, please use "--yes".
+
 .. note::
    If you are :ref:`baremetal_provision` then follow those instructions for
    scaling down instead of using ``openstack overcloud node delete``.
@@ -29,4 +36,4 @@ IDs (which represent nodes) to be deleted.
 .. note::
    A list of nova instance IDs can be listed with command::
 
-       nova list
+       openstack server list

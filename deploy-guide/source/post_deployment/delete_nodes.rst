@@ -11,8 +11,10 @@ This command updates the heat stack with updated numbers and list of resource
 IDs (which represent nodes) to be deleted.
 
 .. note::
-   If you are :ref:`baremetal_provision` then follow those instructions for
-   scaling down instead of using ``openstack overcloud node delete``.
+  If you are :ref:`baremetal_provision` then follow those
+  scale-down instructions to call ``openstack overcloud node delete`` with a
+  ``--baremetal-deployment`` argument instead of passing a list of nodes to
+  delete as arguments.
 
 .. note::
    If you passed any extra environment files when you created the overcloud (for

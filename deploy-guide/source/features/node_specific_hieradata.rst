@@ -58,6 +58,57 @@ In the above example we're customizing only a single key for a single node, but
 the structure is that of a UUID-mapped hash so it is possible to customize
 multiple and different keys for multiple nodes.
 
-Finally, add such an environment file to the deploy commandline::
+Generating the Heat environment file for Ceph devices
+-----------------------------------------------------
+
+The tools directory of tripleo-heat-templates
+(`/usr/share/openstack-tripleo-heat-templates/tools/`) contains a
+utility called `make_ceph_disk_list.py` which can be used to create
+a valid JSON Heat environment file automatically from Ironic's
+introspection data.
+
+Export the introspection data from Ironic for the Ceph nodes to be
+deployed::
+
+  openstack baremetal introspection data save oc0-ceph-0 > ceph0.json
+  openstack baremetal introspection data save oc0-ceph-1 > ceph1.json
+  ...
+
+Copy the utility to the stack user's home directory on the undercloud
+and then use it to generate a `node_data_lookup.json` file which may
+be passed during openstack overcloud deployment::
+
+  ./make_ceph_disk_list.py -i ceph*.json -o node_data_lookup.json -k by_path
+
+Pass the introspection data file from `openstack baremetal
+introspection data save` for all nodes hosting Ceph OSDs to the
+utility as you may only define `NodeDataLookup` once during a
+deployment. The `-i` option can take an expression like `*.json` or a
+list of files as input.
+
+The `-k` option defines the key of ironic disk data structure to use
+to identify the disk to be used as an OSD. Using `name` is not
+recommended as it will produce a file of devices like `/dev/sdd` which
+may not always point to the same device on reboot. Thus, `by_path` is
+recommended and is the default if `-k` is not specified.
+
+Ironic will have one of the available disks on the system reserved as
+the root disk. The utility will always exlude the root disk from the
+list of devices genereated.
+
+Use `./make_ceph_disk_list.py --help` to see other available options.
+
+Deploying with NodeDataLookup
+-----------------------------
+
+Add the environment file described in the previous section to the
+deploy commandline::
 
   openstack overcloud deploy [other overcloud deploy options] -e ~/my-node-settings.yaml
+
+or::
+
+  openstack overcloud deploy [other overcloud deploy options] -e ~/node_data_lookup.json
+
+JSON is the recommended format (instead of JSON embedded in YAML)
+because you may use `jq` to validate the entire file before deployment.

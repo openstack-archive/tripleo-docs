@@ -291,6 +291,17 @@ following::
       osd_scenario: lvm
       osd_objectstore: bluestore
 
+The example above configures the devices list using the disk
+name, e.g. `/dev/sdb`, based on the `sd` driver. This method of
+referring to block devices is not guaranteed to be consistent on
+reboots so a disk normally identified by `/dev/sdc` may be named
+`/dev/sdb` later. Another way to refer to block devices is `by-path`
+which is persistent accross reboots. The `by-path` names for your
+disks are in the Ironic introspection data. A utility exists to
+generate a Heat environment file from Ironic introspection data
+with a devices list for each of the Ceph nodes in a deployment
+automatically as described in :doc:`node_specific_hieradata`.
+
 .. warning:: `osd_scenario: lvm` is used above to default new
              deployments to bluestore as configured, by `ceph-volume`,
              and is only available with ceph-ansible 3.2, or newer,

@@ -71,6 +71,18 @@ Installation Steps
 
     scp tripleo-undercloud-outputs.yaml tripleo-undercloud-passwords.yaml <non-root-user>@<minion-machine>:
 
+#. (Optional) Copy Undercloud CA certificate if SSL is enabled.
+
+   On the undercloud::
+
+    scp /etc/pki/ca-trust/source/anchors/cm-local-ca.pem <non-root-user>@<minion-machine>:
+
+   On the minion::
+
+    sudo update-ca-trust enable
+    sudo cp cm-local-ca.pem /etc/pki/ca-trust/source/anchors/undercloud-ca.pem
+    sudo update-ca-trust extract
+
 #. Prepare the configuration file::
 
     cp /usr/share/python-tripleoclient/minion.conf.sample ~/minion.conf

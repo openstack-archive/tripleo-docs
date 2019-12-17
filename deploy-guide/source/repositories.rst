@@ -5,14 +5,6 @@
    and commands appearing below should not be taken as indication that this
    is fully supported by TripleO - we're still working on it!
 
-.. admonition:: Fedora 28
-   :class: fedora28
-
-   For Fedora 28 you will need to download the python3-tripleo-repos from
-   https://trunk.rdoproject.org/fedora/current/::
-
-       sudo yum install -y https://trunk.rdoproject.org/fedora/current/python3-tripleo-repos-<version>.fc28.noarch.rpm
-
 #. Download and install the python2-tripleo-repos RPM from
    `the current RDO repository <https://trunk.rdoproject.org/centos7/current/>`_.
    For example
@@ -105,24 +97,6 @@
          .. code-block:: bash
 
             sudo -E tripleo-repos -b stein current ceph
-
-   .. admonition:: Fedora 28
-      :class: fedora28
-
-      Enable the current Fedora 28 repositories
-
-      .. code-block:: bash
-
-         sudo -E tripleo-repos -d fedora current
-
-      .. admonition:: Ceph
-         :class: ceph
-
-         Include the Ceph repo in the tripleo-repos call
-
-         .. code-block:: bash
-
-            sudo -E tripleo-repos -d fedora current ceph
 
 .. warning::
 

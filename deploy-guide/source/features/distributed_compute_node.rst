@@ -357,6 +357,20 @@ value to ``false``::
       parameter_defaults:
         ManageNetworks: false
 
+When using ``ManageNetworks``, all network resources (except for ports)
+are managed in the central stack. When the central stack is deployed,
+``ManageNetworks`` should be left unset (or set to True). When a child stack
+is deployed, it is then set to false so that the child stack does not attempt
+to manage the already existing network resources.
+
+Additionally, when adding new network resources, such as entire new leaves when
+deploying spine/leaf, the central stack must first be updated with the new
+``network_data.yaml`` that contains the new leaf definitions. Even though the
+central stack is not directly using the new network resources, it still is
+responsible for creating and managing them. Once the new network resources are
+made available in the central stack, a child stack (such as a new edge site)
+could be deployed using the new networks.
+
 External UUID's
 ###############
 If more fine grained control over which networks should be reused from the

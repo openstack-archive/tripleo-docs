@@ -3,7 +3,7 @@
 Provisioning Baremetal Before Overcloud Deploy
 ==============================================
 
-Baremetal provisioning is a feature which interacts directly with the 
+Baremetal provisioning is a feature which interacts directly with the
 Bare Metal service to provision baremetal before the overcloud is deployed.
 This adds a new provision step before the overcloud deploy, and the output of
 the provision is a valid :doc:`../features/deployed_server` configuration.
@@ -287,12 +287,8 @@ to increment the ``count`` in the roles to be scaled up (and add any desired
 Scaling Down
 ^^^^^^^^^^^^
 
-Scaling down an overcloud is different from scaling up for two reasons:
-
-* Specific nodes need to be selected to unprovision
-
-* After the overcloud deploy, an extra step is required to unprovision the
-  baremetal nodes
+Scaling down is done with the ``openstack overcloud node delete`` command but
+the nodes to delete are not passed as command arguments.
 
 To scale down an existing overcloud edit
 ``~/overcloud_baremetal_deploy.yaml`` to decrement the ``count`` in the roles
@@ -323,16 +319,14 @@ For example the following would remove ``overcloud-controller-1``
     - hostname: overcloud-controller-2
       name: node02
 
-When the :ref:`deploying-the-overcloud` steps are then followed, the result
-will be an overcloud which is configured to have those nodes removed, however
-the removed nodes will still be running in a provisioned state, so the final
-step is to unprovision those nodes::
+Then the delete command will be called with ``--baremetal-deployment``
+instead of passing node arguments::
 
-  openstack overcloud node unprovision \
-    --stack overcloud \
-    ~/overcloud_baremetal_deploy.yaml
+  openstack overcloud node delete \
+  --stack overcloud \
+  --baremetal-deployment ~/overcloud_baremetal_deploy.yaml
 
-Before any node is unprovisioned a list of nodes to unprovision is displayed
+Before any node is deleted, a list of nodes to delete is displayed
 with a confirmation prompt.
 
 What to do when scaling back up depends on the situation. If the scale-down
@@ -358,10 +352,6 @@ example
       name: node02
     - hostname: overcloud-controller-3
       name: node11
-
-.. note::
-   This scale-down approach should be used instead of using the ``openstack
-   overcloud node delete`` command.
 
 Unprovisioning All Nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^

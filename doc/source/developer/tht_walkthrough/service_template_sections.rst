@@ -8,6 +8,8 @@ service in TripleO.
 In this document we will attempt to enumerate all of them and explain the
 reasoning behind them.
 
+Note that you can also find useful information in the `tht deployment readme`_.
+
 What's the bare-minimum?
 ------------------------
 
@@ -505,6 +507,7 @@ run as part of the steps (you can specify several of these, divided by the
 
 .. References
 
+.. _tht deployment readme: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/deployment/README.rst
 .. _heat resource chain object: https://docs.openstack.org/heat/pike/template_guide/openstack.html#OS::Heat::ResourceChain
 .. _common/services.yaml: https://github.com/openstack/tripleo-heat-templates/blob/stable/queens/common/services.yaml#L44
 .. _container image prepare workflow: https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/overcloud.html#preparing-overcloud-images

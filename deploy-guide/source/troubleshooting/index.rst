@@ -12,4 +12,3 @@ This section contains troubleshooting related topics for |project|.
    troubleshooting-nodes
    troubleshooting-overcloud
    troubleshooting-tripleo-heat-templates
-   troubleshooting-virt-setup

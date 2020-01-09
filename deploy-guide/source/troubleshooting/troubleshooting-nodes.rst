@@ -5,13 +5,13 @@ Where Are the Logs?
 -------------------
 
 Some logs are stored in *journald*, but most are stored as text files in
-``/var/log``. They are only accessible by the root user.
+``/var/log/containers``. They are only accessible by the root user.
 
 ironic-inspector
 ~~~~~~~~~~~~~~~~
 
 The introspection logs (from ironic-inspector) are located in
-``/var/log/ironic-inspector``. If something fails during the introspection
+``/var/log/containers/ironic-inspector``. If something fails during the introspection
 ramdisk run, ironic-inspector stores the ramdisk logs in
 ``/var/log/ironic-inspector/ramdisk/`` as gz-compressed tar files.
 File names contain date, time and IPMI address of the node if it was detected
@@ -27,9 +27,9 @@ To collect introspection logs on success as well, set
 ironic
 ~~~~~~
 
-The deployment logs (from ironic) are located in ``/var/log/ironic``. If
+The deployment logs (from ironic) are located in ``/var/log/containers/ironic``. If
 something goes wrong during deployment or cleaning, the ramdisk logs are
-stored in ``/var/log/ironic/deploy``. See `ironic logs retrieving documentation
+stored in ``/var/log/containers/ironic/deploy``. See `ironic logs retrieving documentation
 <https://docs.openstack.org/ironic/latest/admin/troubleshooting.html#retrieving-logs-from-the-deploy-ramdisk>`_
 for more details.
 
@@ -60,16 +60,16 @@ For example, a wrong MAC can be fixed in two steps:
 * Find out the assigned port UUID by running
   ::
 
-    openstack baremetal port list --node <NODE UUID>
+    $ openstack baremetal port list --node <NODE UUID>
 
 * Update the MAC address by running
   ::
 
-    openstack baremetal port set --address <NEW MAC> <PORT UUID>
+    $ openstack baremetal port set --address <NEW MAC> <PORT UUID>
 
 A Wrong IPMI address can be fixed with the following command::
 
-    openstack baremetal node set <NODE UUID> --driver-info ipmi_address=<NEW IPMI ADDRESS>
+    $ openstack baremetal node set <NODE UUID> --driver-info ipmi_address=<NEW IPMI ADDRESS>
 
 Node power state is not enforced by Ironic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,7 +103,7 @@ power management, and it gets stuck in an abnormal state.
 Ironic requires that nodes that cannot be operated normally are put in the
 maintenance mode. It is done by the following command::
 
-    openstack baremetal node maintenance set <NODE UUID> --reason "<EXPLANATION>"
+    $ openstack baremetal node maintenance set <NODE UUID> --reason "<EXPLANATION>"
 
 Ironic will stop checking power and health state for such nodes, and Nova will
 not pick them for deployment. Power command will still work on them, though.
@@ -112,11 +112,11 @@ After a node is in the maintenance mode, you can attempt repairing it, e.g. by
 `Fixing invalid node information`_. If you manage to make the node operational
 again, move it out of the maintenance mode::
 
-    openstack baremetal node maintenance unset <NODE UUID>
+    $ openstack baremetal node maintenance unset <NODE UUID>
 
 If repairing is not possible, you can force deletion of such node::
 
-    openstack baremetal node delete <NODE UUID>
+    $ openstack baremetal node delete <NODE UUID>
 
 Forcing node removal will leave it powered on, accessing the network with
 the old IP address(es) and with all services running. Before proceeding, make
@@ -163,7 +163,7 @@ or DHCP logs from
 
 ::
 
-    sudo journalctl -u openstack-ironic-inspector-dnsmasq
+    $ sudo journalctl -u openstack-ironic-inspector-dnsmasq
 
 SSH as a root user with the temporary password or the SSH key.
 
@@ -189,5 +189,4 @@ How can introspection be stopped?
 
 Introspection for a node can be stopped with the following command::
 
-    openstack baremetal introspection abort <NODE UUID>
-
+    $ openstack baremetal introspection abort <NODE UUID>

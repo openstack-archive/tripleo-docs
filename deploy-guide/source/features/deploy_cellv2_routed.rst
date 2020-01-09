@@ -374,6 +374,10 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
     CellControllerCount: 3
     ComputeCount: 0
 
+    # Compute names need to be uniq, make sure to have a uniq
+    # hostname format for cell nodes
+    ComputeHostnameFormat: 'cell1-compute-%index%'
+
     # default gateway
     ControlPlaneStaticRoutes:
       - ip_netmask: 0.0.0.0/0
@@ -693,9 +697,10 @@ as explained in :ref:`cell_host_discovery`.
 Create and add the node to an Availability Zone
 _______________________________________________
 After a cell got provisioned, it is required to create an availability zone for the
-cell to make sure an instance created in the cell, stays in the cell when performing
-a migration. Check :ref:`cell_availability_zone` on more about how to create an
-availability zone and add the node.
+compute stack, it is not enough to just create an availability zone for the complete
+cell. In this used case we want to make sure an instance created in the compute group,
+stays in it when performing a migration. Check :ref:`cell_availability_zone` on more
+about how to create an availability zone and add the node.
 
 After that the cell is deployed and can be used.
 

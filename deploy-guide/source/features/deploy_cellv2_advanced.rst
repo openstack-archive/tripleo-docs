@@ -172,6 +172,11 @@ a parameter file for the cell compute stack, e.g. `cell1/cell1-cmp.yaml`:
 
 .. code-block:: yaml
 
+  resource_registry:
+    # Since the compute stack deploys only compute nodes ExternalVIPPorts
+    # are not required.
+    OS::TripleO::Network::Ports::ExternalVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+
   parameter_defaults:
     # number of controllers/computes in the cell
     CellControllerCount: 0
@@ -228,9 +233,10 @@ as explained in :ref:`cell_host_discovery`.
 Create and add the node to an Availability Zone
 _______________________________________________
 After a cell got provisioned, it is required to create an availability zone for the
-cell to make sure an instance created in the cell, stays in the cell when performing
-a migration. Check :ref:`cell_availability_zone` on more about how to create an
-availability zone and add the node.
+compute stack, it is not enough to just create an availability zone for the complete
+cell. In this used case we want to make sure an instance created in the compute group,
+stays in it when performing a migration. Check :ref:`cell_availability_zone` on more
+about how to create an availability zone and add the node.
 
 After that the cell is deployed and can be used.
 

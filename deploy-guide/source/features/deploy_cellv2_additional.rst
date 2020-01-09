@@ -19,20 +19,6 @@ gets created. The central cell must also be configured as a specific AZs
 
 Configuring AZs for Nova (compute)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Nova AZ configuration for compute nodes in the stack can be set with the
-`NovaComputeAvailabilityZone` parameter during the deployment.
-
-The value of the parameter is the name of the AZ where compute nodes in that
-stack will be added.
-
-For example, the following environment file would be used to add compute nodes
-in the `cell-1` stack to the `cell-1` AZ:
-
-.. code-block:: yaml
-
-  parameter_defaults:
-    NovaComputeAvailabilityZone: cell1
-
 It's also possible to configure the AZ for a compute node by adding it to a
 host aggregate after the deployment is completed. The following commands show
 creating a host aggregate, an associated AZ, and adding compute nodes to a
@@ -44,6 +30,15 @@ creating a host aggregate, an associated AZ, and adding compute nodes to a
   openstack aggregate create cell1 --zone cell1
   openstack aggregate add host cell1 hostA
   openstack aggregate add host cell1 hostB
+
+.. note::
+
+  Right now we can not use `OS::TripleO::Services::NovaAZConfig` to auto
+  create the AZ during the deployment as at this stage the initial cell
+  creation is not complete. Further work is needed to fully automate the
+  post cell creation steps before `OS::TripleO::Services::NovaAZConfig`
+  can be used.
+
 
 Routed networks
 ---------------

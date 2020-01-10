@@ -653,7 +653,7 @@ Validate the Overcloud
 
 Check the `Tempest`_ documentation on how to run tempest.
 
-.. _tempest: ../basic_deployment/tempest.html
+.. _tempest: ../post_deployment/tempest/tempest.html
 
 Redeploy the Overcloud
 ^^^^^^^^^^^^^^^^^^^^^^

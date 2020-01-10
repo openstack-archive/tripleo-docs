@@ -47,7 +47,7 @@ Tempest plugins contain the API and scenario tests for specific OpenStack
 services.
 Here is the detailed list of `tempest plugins consumed`_ in a TripleO deployment.
 
-.. _tempest plugins consumed: ../basic_deployment/tempest_plugins.html
+.. _tempest plugins consumed: ./tempest_plugins.html
 
 Packages provided by RDO
 ------------------------
@@ -381,7 +381,7 @@ tests::
 It will create **saved_state.json** file in tempest workspace containing all
 the tenants and resources information present on the system under test. More
 about the feature can be found in
-`Tempest documentation <https://docs.openstack.org/tempest/latest/cleanup.html>`
+`Tempest documentation <https://docs.openstack.org/tempest/latest/cleanup.html>`_.
 
 List tempest plugins installed on undercloud
 ++++++++++++++++++++++++++++++++++++++++++++

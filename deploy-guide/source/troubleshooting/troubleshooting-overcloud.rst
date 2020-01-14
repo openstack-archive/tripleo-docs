@@ -11,7 +11,7 @@ Identifying Failed Component
 In most cases, Heat will show the failed overcloud stack when a deployment
 has failed::
 
- $ heat stack-list
+ $ openstack stack list
 
  +--------------------------------------+------------+--------------------+----------------------+
  | id                                   | stack_name | stack_status       | creation_time        |
@@ -19,10 +19,10 @@ has failed::
  | 7e88af95-535c-4a55-b78d-2c3d9850d854 | overcloud  | CREATE_FAILED      | 2015-04-06T17:57:16Z |
  +--------------------------------------+------------+--------------------+----------------------+
 
-Occasionally, Heat is not even able to create the stack, so the ``heat
-stack-list`` output will be empty. If this is the case, observe the message
-that was printed to the terminal when ``openstack overcloud deploy`` or ``heat
-stack-create`` was run.
+Occasionally, Heat is not even able to create the stack, so the ``openstack
+stack list`` output will be empty. If this is the case, observe the message
+that was printed to the terminal when ``openstack overcloud deploy`` or ``openstack
+stack create`` was run.
 
 Next, there are a few layers on which the deployment can fail:
 
@@ -50,7 +50,7 @@ in the resulting table.
 
   You can check the actual cause using the following command::
 
-    openstack baremetal node show <UUID> -f value -c maintenance_reason
+    $ openstack baremetal node show <UUID> -f value -c maintenance_reason
 
   For example, **Maintenance** goes to ``True`` automatically, if wrong power
   credentials are provided.
@@ -58,7 +58,7 @@ in the resulting table.
   Fix the cause of the failure, then move the node out of the maintenance
   mode::
 
-    openstack baremetal node maintenance unset <NODE UUID>
+    $ openstack baremetal node maintenance unset <NODE UUID>
 
 * If **Provision State** is ``available`` then the problem occurred before
   bare metal deployment has even started. Proceed with `Debugging Using Heat`_.
@@ -75,7 +75,7 @@ in the resulting table.
 * If **Provision State** is ``error`` or ``deploy failed``, then bare metal
   deployment has failed for this node. Look at the **last_error** field::
 
-    openstack baremetal node show <UUID> -f value -c last_error
+    $ openstack baremetal node show <UUID> -f value -c last_error
 
   If the error message is vague, you can use logs to clarify it, see
   :ref:`ironic_logs` for details.
@@ -89,7 +89,7 @@ Showing deployment failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Deployment failures can be shown with the following command::
 
-    [stack@undercloud ]$ openstack overcloud failures --plan my-deployment
+    $ openstack overcloud failures --plan my-deployment
 
 The command will show any errors encountered when running ``ansible-playbook``
 to configure the overcloud during the ``config-download`` process. See
@@ -104,7 +104,7 @@ Debugging Using Heat
 
   ::
 
-    $ heat resource-list overcloud
+    $ openstack stack resource list overcloud
 
     +-----------------------------------+-----------------------------------------------+---------------------------------------------------+-----------------+----------------------+
     | resource_name                     | physical_resource_id                          | resource_type                                     | resource_status | updated_time         |
@@ -154,7 +154,7 @@ Debugging Using Heat
 
   ::
 
-    $ heat resource-show overcloud ControllerNodesPostDeployment
+    $ openstack stack resource show overcloud ControllerNodesPostDeployment
 
     +------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
     | Property               | Value                                                                                                                                                               |
@@ -175,7 +175,7 @@ Debugging Using Heat
     | updated_time           | 2015-04-06T21:15:20Z                                                                                                                                                |
     +------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-  The ``resource-show`` doesn't always show a clear reason why the resource
+  The ``resource show`` doesn't always show a clear reason why the resource
   failed. In these cases, logging into the Overcloud node is required to
   further troubleshoot the issue.
 
@@ -185,7 +185,7 @@ Debugging Using Heat
 
   ::
 
-    $ nova list
+    $ openstack server list
 
     +--------------------------------------+-------------------------------------------------------+--------+------------+-------------+---------------------+
     | ID                                   | Name                                                  | Status | Task State | Power State | Networks            |
@@ -219,17 +219,17 @@ Debugging Using Heat
 
   ::
 
-    $ nova list
-    $ nova show <server-id>
+    $ openstack server list
+    $ openstack server show <server-id>
 
   The most common error shown will reference the error message ``No valid host
   was found``. Refer to `No Valid Host Found Error`_ below.
 
   In other cases, look at the following log files for further troubleshooting::
 
-    /var/log/nova/*
-    /var/log/heat/*
-    /var/log/ironic/*
+    /var/log/containers/nova/*
+    /var/log/containers/heat/*
+    /var/log/containers/ironic/*
 
 * Using SOS
 
@@ -247,7 +247,7 @@ Debugging Using Heat
 No Valid Host Found Error
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes ``/var/log/nova/nova-conductor.log`` contains the following error::
+Sometimes ``/var/log/containers/nova/nova-conductor.log`` contains the following error::
 
     NoValidHost: No valid host was found. There are not enough hosts available.
 
@@ -266,7 +266,7 @@ you have enough nodes corresponding to each flavor/profile. Watch
 
 ::
 
-    openstack baremetal node show <UUID> --fields properties
+    $ openstack baremetal node show <UUID> --fields properties
 
 It should contain e.g. ``profile:compute`` for compute nodes.
 

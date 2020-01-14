@@ -19,7 +19,7 @@ Known Issues:
 
   The workaround is to do delete the libvirt capabilities cache and restart the service::
 
-      rm -Rf  /var/cache/libvirt/qemu/capabilities/
-      systemctl restart libvirtd
+      $ rm -Rf  /var/cache/libvirt/qemu/capabilities/
+      $ systemctl restart libvirtd
 
 .. _bug in libvirt: https://bugzilla.redhat.com/show_bug.cgi?id=1195882

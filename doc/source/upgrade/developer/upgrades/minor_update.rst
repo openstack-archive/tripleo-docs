@@ -130,19 +130,20 @@ Writing update logic for a service
 Simple config/image replacement
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the service is managed by Paunch_, it may be that there's no need to
-write any update tasks. Paunch can automatically handle simple
-updates: change in configuration or change of container image URL
-triggers automatic removal of the old container and creation of new
-one with latest config and latest image. If that's all the service
-needs for updates, you don't need to create any ``update_tasks``.
+If the service is managed by Paunch_ or tripleo-container-manage_ Ansible role,
+it may be that there's no need to write any update tasks. Paunch or
+tripleo-container-manage can automatically handle simple updates: change in
+configuration or change of container image URL triggers automatic removal of
+the old container and creation of new one with latest config and latest image.
+If that's all the service needs for updates, you don't need to create any
+``update_tasks``.
 
 Custom tasks during updates
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the service is not managed by Paunch_, or if the simple container
-replacement done by Paunch is not sufficient for the service update,
-you will need to include custom update logic. This is done via
+If the service is not managed by Paunch_ nor tripleo-container-manage, or if
+the simple container replacement done by Paunch is not sufficient for the
+service update, you will need to include custom update logic. This is done via
 providing these outputs in your composable service template:
 
 * ``update_tasks`` -- these are executed before deployment tasks on the
@@ -152,6 +153,7 @@ providing these outputs in your composable service template:
   the node being updated.
 
 .. _Paunch: https://opendev.org/openstack/paunch/src/branch/master/README.rst
+.. _tripleo-container-manage: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo-container-manage.html
 
 Update tasks are generally meant to bring the service into a stopped
 state (sometimes with pre-fetched new images, this is necessary for

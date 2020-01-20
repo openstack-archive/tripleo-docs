@@ -38,6 +38,13 @@ executed and what not. The puppet containers are created and removed
 automatically unless they fail. For all the other containers, it's enough to
 monitor the output of the command below::
 
+    $ watch -n 0.5 sudo podman ps -a --filter label=managed_by=tripleo_ansible
+
+.. admonition:: Stein and Train
+   :class: stable
+
+   ::
+
     $ watch -n 0.5 sudo podman ps -a --filter label=managed_by=paunch
 
 .. admonition:: Rocky
@@ -219,8 +226,20 @@ The following commands are useful for debugging containers.
 
         $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
 
+Debugging with tripleo-container-manage Ansible role
+----------------------------------------------------
+
+The debugging manual for tripleo-container-manage is documented in the role_
+directly.
+
+.. _role: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo-container-manage.html#debug
+
 Debugging with Paunch
 ---------------------
+
+.. note:: During Ussuri cycle, Paunch has been replaced by the
+   tripleo-container-manage Ansible role. Therefore, the following block
+   is deprecated in favor of the new role which contains a Debug manual.
 
 The ``paunch debug`` command allows you to perform specific actions on a given
 container.  This can be used to:

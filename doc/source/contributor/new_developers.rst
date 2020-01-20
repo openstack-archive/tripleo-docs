@@ -37,6 +37,10 @@ Repositories that are part of TripleO
   unrelated bits.  Work is ongoing to clean this up and split this into
   separate repositories.
 
+* `tripleo-ansible <https://opendev.org/openstack/tripleo-ansible/>`_:
+  Contains Ansible playbooks, roles, plugins, modules, filters for use with
+  TripleO deployments.
+
 * `tripleo-heat-templates <https://opendev.org/openstack/tripleo-heat-templates>`_:
   This contains all the Heat templates necessary to deploy the overcloud (and
   hopefully soon the undercloud as well).

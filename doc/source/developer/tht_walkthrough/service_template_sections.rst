@@ -432,9 +432,9 @@ This is the section where we tell TripleO what containers to start. Here, we
 explicitly write on which step to start which container. Steps are set as keys
 with the ``step_<step number>`` format. Inside these, we should set up keys
 with the specific container names. In our example, we're running only the etcd
-container, so we use a key called ``etcd`` to give it such a name. A tool
-called `paunch`_ will read these parameters, and start the containers
-with those settings.
+container, so we use a key called ``etcd`` to give it such a name.
+`Paunch`_ or tripleo-container-manage_ Ansible role will read these parameters,
+and start the containers with those settings.
 
 Here's an example of the container definition::
 
@@ -511,5 +511,6 @@ run as part of the steps (you can specify several of these, divided by the
 .. _heat resource chain object: https://docs.openstack.org/heat/pike/template_guide/openstack.html#OS::Heat::ResourceChain
 .. _common/services.yaml: https://github.com/openstack/tripleo-heat-templates/blob/stable/queens/common/services.yaml#L44
 .. _container image prepare workflow: https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/overcloud.html#preparing-overcloud-images
-.. _paunch: https://docs.openstack.org/paunch/readme.html
+.. _Paunch: https://docs.openstack.org/paunch/readme.html
+.. _tripleo-container-manage: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo-container-manage.html
 .. _privileged: https://www.linux.com/blog/learn/sysadmin/2017/5/lazy-privileged-docker-containers

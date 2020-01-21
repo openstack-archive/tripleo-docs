@@ -131,5 +131,6 @@ development using this framework instead of a complete overcloud.
 This is very useful if you are developing Heat templates or containerized
 services.
 
-Please see the following guide on how to set up a containerized undercloud:
-https://docs.openstack.org/tripleo-docs/latest/install/containers_deployment/undercloud.html
+Please see `Undercloud Deployment Guide <https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/undercloud.html>`_
+on how to set up a containerized undercloud.
+

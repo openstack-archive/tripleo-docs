@@ -340,7 +340,16 @@ from any CIDR::
     resource_registry:
       OS::TripleO::DeployedServer::ControlPlanePort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
       OS::TripleO::Network::Ports::ControlPlaneVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+
+      # Set VIP's for redis and OVN to noop to default to the ctlplane VIP
+      # The cltplane VIP is set with control_virtual_ip in
+      # DeployedServerPortMap below.
+      #
+      # Alternatively, these can be mapped to deployed-neutron-port.yaml as
+      # well and redis_virtual_ip and ovn_dbs_virtual_ip added to the
+      # DeployedServerPortMap value to set fixed IP's.
       OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
+      OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
 
     parameter_defaults:
       NeutronPublicInterface: eth1
@@ -373,15 +382,43 @@ from any CIDR::
             tags:
               - 192.168.100.0/24
 
-In the above example, notice how ``RedisVipPort`` is mapped to
-``network/ports/noop.yaml``. This mapping is due to the fact that the
-Redis VIP IP address comes from the ctlplane by default. The
-``EC2MetadataIp`` and ``ControlPlaneDefaultRoute`` parameters are set
-to the value of the control virtual IP address. These parameters are
-required to be set by the sample NIC configs, and must be set to a
-pingable IP address in order to pass the validations performed during
-deployment. Alternatively, the NIC configs could be further customized
-to not require these parameters.
+In the above example, notice how ``RedisVipPort`` and ``OVNDBsVipPort`` are mapped to
+``network/ports/noop.yaml``. This mapping is due to the fact that these
+VIP IP addresses comes from the ctlplane by default, and they will use the same
+VIP address that is used for ``ControlPlanePort``. Alternatively these VIP's
+can be mapped to their own fixed IP's, in which case a VIP will be created for
+each. In this case, the following mappings and values would be added to the
+above example::
+
+    resource_registry:
+      OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+      OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+
+    parameter_defaults:
+
+      DeployedServerPortMap:
+        redis_virtual_ip:
+          fixed_ips:
+            - ip_address: 192.168.100.10
+          subnets:
+            - cidr: 192.168.100.0/24
+          network:
+            tags:
+              - 192.168.100.0/24
+        ovn_dbs_virtual_ip:
+          fixed_ips:
+            - ip_address: 192.168.100.11
+          subnets:
+            - cidr: 192.168.100.0/24
+          network:
+            tags:
+              - 192.168.100.0/24
+
+The ``EC2MetadataIp`` and ``ControlPlaneDefaultRoute`` parameters are set to
+the value of the control virtual IP address. These parameters are required to
+be set by the sample NIC configs, and must be set to a pingable IP address in
+order to pass the validations performed during deployment. Alternatively, the
+NIC configs could be further customized to not require these parameters.
 
 When using network isolation, refer to the documentation on using fixed
 IP addresses for further information at :ref:`predictable_ips`.

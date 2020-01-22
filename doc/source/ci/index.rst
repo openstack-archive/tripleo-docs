@@ -15,3 +15,4 @@ TripleO CI Guide
   emit_releases_file
   ruck_rover_primer
   chasing_promotions
+  third_party_dependencies_ci

@@ -264,7 +264,17 @@ value::
       overcloud-novacompute-2: compute-02-rack01
 
 Write the contents to an environment file such as ``hostnamemap.yaml``, and
-pass it the environment as part of the deployment command.
+pass it the environment as part of the deployment command. It's imperative that
+the ``HostnameMap`` keys correspond to the ``HostnameFormatDefault`` for the
+appropriate role. For example, using ``overcloud-controller-0`` matches
+``HostnameFormatDefault: '%stackname%-controller-%index%'`` in the
+``Controller`` role. Similarly, ``overcloud-novacompute-0`` matches
+``HostnameFormatDefault: '%stackname%-novacompute-%index%'`` for the
+``Compute`` role. If you decide to change the ``HostnameFormatDefault`` to a
+different value, you'll need to account for this in your ``hostnamemap.yaml``
+file. Mismatched values between the ``HostnameMap`` keys and
+``HostnameFormatDefault`` causes failures during overcloud installation because
+TripleO can't find the appropriate hosts, as it's using the wrong names.
 
 
 

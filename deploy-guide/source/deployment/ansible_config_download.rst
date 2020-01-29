@@ -77,6 +77,8 @@ Mistral workflow(s).  The workflow steps are summarized as:
 #. Applying the downloaded software configuration to the overcloud nodes with
    ``ansible-playbook``.
 
+.. _`authorized on the overcloud nodes`:
+
 Creating the ``tripleo-admin`` user on each overcloud node is necessary since
 ansible uses ssh to connect to each node to perform configuration.
 
@@ -303,6 +305,21 @@ with a separate command and ``ansible-playbook`` run manually. This enables
 more manual interaction and debugging.
 
 This method is described in the following sections.
+
+Enable tripleo-admin via SSH
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The tripleo-admin user must be `authorized on the overcloud nodes`_ for use by
+``ansible-playbook``, if using the default user set by
+``tripleo-ansible-inventory``. Authorizing the tripleo-admin user is done by
+running the ``openstack overcloud admin authorize`` command::
+
+    openstack overcloud admin authorize \
+      --overcloud-ssh-user heat-admin \
+      --overcloud-ssh-key ~/.ssh/id_rsa
+
+Alternatively, a user and key that are already authorized on the overcloud
+nodes can be used if that user and key are specified when running
+``tripleo-ansible-inventory``. See `Generate an inventory`_.
 
 Run config-download
 ^^^^^^^^^^^^^^^^^^^

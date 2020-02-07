@@ -272,7 +272,7 @@ Deploying a Standalone OpenStack node
          sudo openstack tripleo deploy \
            --templates \
            --local-ip=$IP/$NETMASK \
-           -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
            -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
            -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
            -e $HOME/containers-prepare-parameters.yaml \
@@ -871,7 +871,7 @@ following content:
     GlanceCacheEnabled: true
 
 The above file disables additional resources which
-`/usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml`
+`/usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml`
 does not disable since it represents a compute node which will consume
 those resources from the earlier deployed controller node. It also
 sets the Glance blackened to Swift and enables Glance caching so that
@@ -888,7 +888,7 @@ Deploy the second node with the following:
         --templates \
         --local-ip=$IP/$NETMASK \
         -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
-        -e /usr/share/openstack-tripleo-heat-templates/environments/standalone.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
         -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
         -e $HOME/containers-prepare-parameters.yaml \
         -e $HOME/standalone_parameters.yaml \

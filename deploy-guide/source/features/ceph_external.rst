@@ -55,7 +55,27 @@ at least three required parameters related to the external Ceph cluster::
     # The list of Ceph monitors
     CephExternalMonHost: '172.16.1.7, 172.16.1.8, 172.16.1.9'
 
-As of the Newton release TripleO will install Ceph Jewel. If the
+If chosing to configure Manila with Ganesha as NFS gateway for CephFS,
+with an external Ceph cluster, then add `environments/manila-cephfsganesha-config.yaml`
+to the list of environment files used to deploy the overcloud and also
+configure the following parameters::
+
+  parameter_defaults:
+    ManilaCephFSDataPoolName: manila_data
+    ManilaCephFSMetadataPoolName: manila_metadata
+    ManilaCephFSCephFSAuthId: 'manila'
+    CephManilaClientKey: 'AQDLOh1VgEp6FRAAFzT7Zw+Y9V6JJExQAsRnRQ=='
+
+Which represent the data and metadata pools in use by the MDS for
+the CephFS filesystems, the CephX keyring to use and its secret.
+
+Like for the other services, the pools and keyring must be created on the
+external Ceph cluster before attempting the deployment of the overcloud.
+The keyring should look like the following::
+
+  ceph auth add client.manila mgr "allow *" mon "allow r, allow command 'auth del', allow command 'auth caps', allow command 'auth get', allow command 'auth get-or-create'" mds "allow *" osd "allow rw"
+
+As of the Train release TripleO will install Ceph Nautilus. If the
 external Ceph cluster uses the Hammer release instead, pass the
 following parameters to enable backward compatibility features::
 

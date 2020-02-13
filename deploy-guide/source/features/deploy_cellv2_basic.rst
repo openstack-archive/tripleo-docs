@@ -282,8 +282,9 @@ by this ansible way.
 
 .. code-block:: bash
 
+  export CONTAINERCLI=podman  #choose appropriate contaier cli here
   source stackrc
-  mkdir inventories-cell1
+  mkdir inventories
   for i in overcloud cell1; do \
     /usr/bin/tripleo-ansible-inventory \
     --static-yaml-inventory inventories/${i}.yaml --stack ${i}; \
@@ -292,7 +293,7 @@ by this ansible way.
   ANSIBLE_HOST_KEY_CHECKING=False ANSIBLE_SSH_RETRIES=3 ansible-playbook -i inventories \
     /usr/share/ansible/tripleo-playbooks/create-nova-cell-v2.yaml \
     -e tripleo_cellv2_cell_name=cell1 \
-    -e tripleo_cellv2_containercli=docker
+    -e tripleo_cellv2_containercli=${CONTAINERCLI}
 
 The playbook requires two parameters `tripleo_cellv2_cell_name` to provide
 the name of the new cell and until docker got dropped `tripleo_cellv2_containercli`

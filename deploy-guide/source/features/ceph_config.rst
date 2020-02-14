@@ -14,6 +14,14 @@ TripleO can deploy and configure Ceph as if it was a composable
 OpenStack service and configure OpenStack services like Nova, Glance,
 Cinder, Cinder Backup, and Gnocchi to use it as a storage backend.
 
+TripleO can only deploy one Ceph cluster in the overcloud per Heat
+stack. However, within that Heat stack it's possible to configure
+an overcloud to communicate with multiple Ceph clusters which are
+external to the overcloud. To do this, follow this document to
+configure the "internal" Ceph cluster which is part of the overcloud
+and also use the `CephExternalMultiConfig` parameter described in the
+:doc:`ceph_external` documentation.
+
 Prior to Pike, TripleO deployed Ceph with `puppet-ceph`_. With the
 Pike release it is possible to use TripleO to deploy Ceph with
 either `ceph-ansible`_ or puppet-ceph, though puppet-ceph is
@@ -195,6 +203,62 @@ rebalance a cluster, use an example like the following::
         osd_recovery_op_priority: 3
         osd_recovery_max_active: 3
         osd_max_backfills: 1
+
+Configuring CephX Keys
+----------------------
+
+TripleO will create a Ceph cluster with a CephX key file for OpenStack
+RBD client connections that is shared by the Nova, Cinder, Glance and
+Gnocchi services to read and write to their pools. Not only will the
+keyfile be created but the Ceph cluster will be configured to accept
+connections when the key file is used. The file will be named
+`/etc/ceph/ceph.client.openstack.keyring` and it will be created
+using the following defaults:
+
+* CephClusterName: 'ceph'
+* CephClientUserName: 'openstack'
+* CephClientKey: This value is randomly genereated per Heat stack. If
+  it is overridden the recomendation is to set it to the output of
+  `ceph-authtool --gen-print-key`.
+
+If the above values are overridden, the keyring file will have a
+different name and different content. E.g. if `CephClusterName` was
+set to 'foo' and `CephClientUserName` was set to 'bar', then the
+keyring file would be called `foo.client.bar.keyring` and it would
+contain the line `[client.bar]`.
+
+The `CephExtraKeys` parameter may be used to generate additional key
+files containing other key values and should contain a list of maps
+where each map describes an each additional key. The syntax of each
+map must conform to what the `ceph-ansible/library/ceph_key.py`
+Ansible module accepts. The `CephExtraKeys` parameter should be used
+like this::
+
+    CephExtraKeys:
+      - name: "client.glance"
+        caps:
+          mgr: "allow *"
+          mon: "profile rbd"
+          osd: "profile rbd pool=images"
+        key: "AQBRgQ9eAAAAABAAv84zEilJYZPNuJ0Iwn9Ndg=="
+        mode: "0600"
+
+If the above is used, in addition to the
+`ceph.client.openstack.keyring` file, an additional file called
+`ceph.client.glance.keyring` will be created which contains::
+
+  [client.glance]
+        key = AQBRgQ9eAAAAABAAv84zEilJYZPNuJ0Iwn9Ndg==
+        caps mgr = "allow *"
+        caps mon = "profile rbd"
+        caps osd = "profile rbd pool=images"
+
+The Ceph cluster will also allow the above key file to be used to
+connect to the images pool. Ceph RBD clients which are external to the
+overcloud could then use this CephX key to connect to the images
+pool used by Glance. The default Glance deployment defined in the Heat
+stack will continue to use the `ceph.client.openstack.keyring` file
+unless that Glance configuration itself is overridden.
 
 Tuning Ceph OSD CPU and Memory
 ------------------------------

@@ -90,9 +90,30 @@ the following steps must be executed.
 Database backups
 ~~~~~~~~~~~~~~~~
 
-The operator needs to backup all databases in the Undercloud node::
+The operator needs to backup all databases in the Undercloud node
 
-  mysqldump --opt --single-transaction --all-databases > /root/undercloud-all-databases.sql
+.. admonition:: Stein and Train
+   :class: stable
+
+   ::
+
+    /bin/hiera -c /etc/puppet/hiera.yaml mysql::server::root_password
+    podman exec mysql bash -c "mysqldump -uroot -pPASSWORD --opt --all-databases" > /root/undercloud-all-databases.sql
+
+.. admonition:: Rocky
+   :class: stable
+
+   ::
+
+    /bin/hiera -c /etc/puppet/hiera.yaml mysql::server::root_password
+    docker exec mysql bash -c "mysqldump -uroot -pPASSWORD --opt --all-databases" > /root/undercloud-all-databases.sql
+
+.. admonition:: Queens
+   :class: stable
+
+   ::
+
+    mysqldump --opt --single-transaction --all-databases > /root/undercloud-all-databases.sql
 
 Filesystem backups
 ~~~~~~~~~~~~~~~~~~

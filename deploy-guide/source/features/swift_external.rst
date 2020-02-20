@@ -1,11 +1,11 @@
 Use an external Swift Proxy with the Overcloud
 ===============================================
 
-|project| supports use of an external Swift proxy already available to the
-operator, that may need to configure at deploy time.
+|project| supports use of an external Swift (or Ceph RadosGW) proxy, already
+available to the operator.
 
-This happens by enabling a particular environment file when deploying the
-Overcloud, specifically `environments/swift-external.yaml`.
+Use of an external Swift proxy can be configured using a particular environment file
+when deploying the overcloud, specifically `environments/swift-external.yaml`.
 
 In the environment file above user must adjust the parameters to fit
 its setup by creating a custom environment file (i.e.
@@ -18,6 +18,14 @@ its setup by creating a custom environment file (i.e.
      ExternalSwiftUserTenant: 'service'
      SwiftPassword: 'choose_a_random_password'
 
+.. note::
+
+    When the external Swift is implemented by Ceph RadosGW, the endpoint will be
+    different; the /v1/ part needs to be replaced with /swift/v1, for example:
+    `http://<Public Swift endpoint or loadbalancer>:9024/v1/AUTH_%(tenant_id)s`
+    becomes
+    `http://<Public Swift endpoint or loadbalancer>:9024/swift/v1/AUTH_%(tenant_id)s`
+
 The user can create an environment file with the required settings
 and add the files above to the deploy commandline::
 
@@ -25,7 +33,7 @@ and add the files above to the deploy commandline::
 
 Once the deploy has succeeded, user has to complete the
 configuration on the external swift proxy, configuring it to use the
-keystone authentication provider. This environment files creates also
+keystone authentication provider. This environment file creates also
 a service user called *swift* that can be used for this purpose. The
 password for this user is defined by using the *SwiftPassword*
 parameter, as shown above.
@@ -59,3 +67,19 @@ how to configure the Swift proxy to use Keystone from the overcloud::
   cache = swift.cache
   include_service_catalog = False
   delay_auth_decision = True
+
+For Ceph RadosGW instead, the following settings can be used::
+
+  rgw_keystone_api_version: 3
+  rgw_keystone_url: http://<public Keystone endpoint>:5000/
+  rgw_keystone_accepted_roles: 'member, Member, admin'
+  rgw_keystone_accepted_admin_roles: ResellerAdmin, swiftoperator
+  rgw_keystone_admin_domain: default
+  rgw_keystone_admin_project: service
+  rgw_keystone_admin_user: swift
+  rgw_keystone_admin_password: <Password as defined in the environment parameters>
+  rgw_keystone_implicit_tenants: 'true'
+  rgw_keystone_revocation_interval: '0'
+  rgw_s3_auth_use_keystone: 'true'
+  rgw_swift_versioning_enabled: 'true'
+  rgw_swift_account_in_url: 'true'

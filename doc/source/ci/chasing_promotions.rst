@@ -173,6 +173,71 @@ you will use in testproject.
 An `example is there`_ and if you need to include a known fix you can simply
 have a Depends-On in the commit message.
 
+Specifying a particular hash
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Jobs in the periodic promotion pipelines are using the tripleo-ci-testing
+repo as described in the promotion-stages-overview_, since that is the candidate
+we are trying to promote to current-tripleo. The tripleo-ci-testing and all
+other named tags in tripleo, are associated with a particular *hash* that
+identifies the delorean repo. For example looking at `centos7 master tripleo-ci-testing`_
+at time of writing we see::
+
+    [delorean]
+    name=delorean-tripleo-ansible-544864ccc03b053317f5408b0c0349a42723ce73
+    baseurl=https://trunk.rdoproject.org/centos7/54/48/544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9
+    enabled=1
+    gpgcheck=0
+    priority=1
+
+So the centos7 master tripleo-ci-testing *hash* is
+*544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9a*. The corrresponding repo
+is given by the baseurl above and if you navigate to that URL with your
+browser you can see the list of packages used in the jobs. Thus, the job
+specified in the example above for testproject
+*periodic-tripleo-centos-7-train-containers-build-push* would use whatever
+the current tripleo-ci-testing points to.
+
+However it is possible to override the particular hash (and thus repo) used by
+a job you run with testproject, using the dlrn_hash_tag featureset_override::
+
+    - project:
+        check:
+          jobs:
+            - periodic-tripleo-ci-centos-7-ovb-1ctlr_1comp-featureset002-train-upload:
+                vars:
+                  force_periodic: true
+                  featureset_override:
+                    dlrn_hash_tag: 4b32d316befe0919fd98a147d84086bc0907677a_046903a2
+
+Thus, in the example above the periodic-tripleo-ci-centos-7-ovb-1ctlr_1comp-featureset002-train-upload
+job would run with the hash: *4b32d316befe0919fd98a147d84086bc0907677a_046903a2*
+regardless of the current value of tripleo-ci-testing.
+
+The most common reason for overriding the hash in this way is when we notice
+that a particular job failed during one of the recent periodic pipeline runs.
+Looking at one of the `indexed promoter service logs`_ you may notice something
+like the following text::
+
+    2020-02-21 03:57:07,458 31360 INFO promoter Skipping promotion of centos7-master
+    {'timestamp': 1582243926, 'distro_hash': 'ebb98bd9545e026f033683143ae39e9e236b3671',
+    'promote_name': 'tripleo-ci-testing', 'user': 'review_rdoproject_org',
+    'repo_url': 'https://trunk.rdoproject.org/centos7/54/48/544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9',
+    'full_hash': '544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9',
+    'repo_hash': '544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9',
+    'commit_hash': '544864ccc03b053317f5408b0c0349a42723ce73'}
+    from tripleo-ci-testing to current-tripleo,
+    missing successful jobs: [u'periodic-tripleo-ci-centos-7-ovb-3ctlr_1comp-featureset035-master',
+    u'periodic-tripleo-ci-centos-7-ovb-3ctlr_1comp-featureset001-master']
+
+In particular note the last line 'missing successful jobs'. This means that
+for the hash *544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9* a promotion
+could not happen, because in this particular run, those two identified jobs
+were failed. If the jobs were fixed in the meantime or you now know
+how to fix them and get a good result, you could re-run those with testproject
+specifying the particular hash. If they execute successfully then on the next
+run the promoter will promote that hash to become the new current-tripleo.
+
 
 .. _promotion-stages-overview: stages-overview.html
 .. _dlrn-api-promoter: dlrn-promoter-overview.html
@@ -191,3 +256,4 @@ have a Depends-On in the commit message.
 .. _testproject: https://review.rdoproject.org/r/#/q/project:testproject
 .. _`example is there`: https://review.rdoproject.org/r/#/c/23502/
 .. _`indexed promoter service logs`: http://promoter.rdoproject.org/
+.. _`centos7 master tripleo-ci-testing`: https://trunk.rdoproject.org/centos7-master/tripleo-ci-testing/delorean.repo

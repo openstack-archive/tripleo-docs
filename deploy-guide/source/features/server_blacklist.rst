@@ -76,7 +76,7 @@ reapply all manifests. This can be a time consuming operation and is not always
 required if not changing any configuration date such as in the case of only
 scaling out certain roles.
 
-The beavhior can be overridden by passing ``--skip-deploy-identifier`` to the
+The behavior can be overridden by passing ``--skip-deploy-identifier`` to the
 ``openstack overcloud deploy`` command.
 
 Similar to the server blacklist feature, this feature should be used only when

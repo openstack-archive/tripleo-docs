@@ -644,20 +644,22 @@ When the deployment has been completed the Ceph dashboard containers,
 including prometheus and grafana, will be running on the controller nodes
 and will be accessible using the port 3100 for grafana and 9092 for prometheus;
 since this service is only internal and doesn’t listen on the public vip, users
-can reach grafana using the controller provisioning network vip on the specified
-port.
+can reach grafana on the ceph storage network vip, and access the exposed ceph
+dashboard using the controller provisioning network vip on the specified port (
+8444 is the default for a generic overcloud deployment).
 The resulting deployment will be composed by an external stack made by grafana,
 prometheus, alertmanager, node-exporter containers and the ceph dashboard mgr
-module that acts as the backend for this external stack, pushing the grafana
-layouts and providing the ceph cluster specific metrics.
-The grafana frontend is fully integrated with the tls-everywhere framework, hence
-providing the tls environments files will trigger the certificate request for
-grafana: the generated crt and key files are then passed to ceph-ansible.
+module that acts as the backend for this external stack, embedding the grafana
+layouts and showing the ceph cluster specific metrics coming from prometheus.
+The Ceph Dashboard frontend is fully integrated with the tls-everywhere framework,
+hence providing the tls environments files will trigger the certificate request for
+both grafana and the ceph dashboard: the generated crt and key files are then passed
+to ceph-ansible.
 This feature will also work with composable networks.
 In order to isolate the monitoring access for security purposes, operators can
-take advantage of composable networks and access grafana through a separate network
-vip. By doing this, it's not necessary to access the provisioning network and separate
-authorization profiles may be implemented.
+take advantage of composable networks and access the dashboard through a separate
+network vip. By doing this, it's not necessary to access the provisioning network
+and separate authorization profiles may be implemented.
 To deploy the overcloud with the ceph dashboard composable network we need first
 to generate the controller specific role created for this scenario::
 

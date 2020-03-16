@@ -112,21 +112,13 @@ Be sure to make a local copy of ``/usr/share/openstack-tripleo-heat-templates``
 before making changes so the packaged files are not altered, as they will
 be overwritten if the package is updated.
 
-In ``ips-from-pool-all.yaml`` there are two major sections.  The first is
-a number of resource_registry overrides that tell TripleO you want to use
-a specific IP for a given port on a node type.  By default, this environment
-sets all the default networks on all node types to use a pre-assigned IP.
-To allow a particular network or node type to use default IP assignment instead,
-simply remove the resource_registry entries related to that node type/network
-from the environment file.
-
-The second section is parameter_defaults, where the actual IP addresses are
-assigned.  Each node type has an associated parameter - ControllerIPs for
-Controller nodes, ComputeIPs for Compute nodes, etc.  Each parameter is
-a map of network names to a list of addresses.  Each network type must have
-at least as many addresses as there will be nodes on that network.  The
-addresses will be assigned in order, so the first node of each type will get
-the first address in each of the lists, the second node will get the second
+The parameter_defaults section in ``ips-from-pool-all.yaml``, is where the IP
+addresses are assigned.  Each node type has an associated parameter -
+ControllerIPs for Controller nodes, ComputeIPs for Compute nodes, etc.  Each
+parameter is a map of network names to a list of addresses.  Each network type
+must have at least as many addresses as there will be nodes on that network.
+The addresses will be assigned in order, so the first node of each type will
+get the first address in each of the lists, the second node will get the second
 address in each of the lists, and so on.
 
 For example, if three Ceph storage nodes were being deployed, the CephStorageIPs

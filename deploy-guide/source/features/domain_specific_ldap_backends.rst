@@ -139,7 +139,7 @@ keys:
 * **tls_req_cert**: Valid options for tls_req_cert are demand, never, and allow.
 
 * **use_pool**: Enable LDAP connection pooling. (boolean value and defaults to
-  false)
+  true)
 
 * **pool_size**: Connection pool size. (integer value and defaults to '10')
 
@@ -157,7 +157,7 @@ keys:
 
 * **use_auth_pool**: Enable LDAP connection pooling for end user authentication.
   If use_pool is disabled, then this setting is meaningless and is not used at
-  all. (boolean value and defaults to false)
+  all. (boolean value and defaults to true)
 
 * **auth_pool_size**: End user auth connection pool size. (integer value and
   defaults to '100')

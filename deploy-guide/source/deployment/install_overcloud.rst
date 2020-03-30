@@ -92,6 +92,16 @@ created on the undercloud, one should use a non-root user.
       and the CentOS YAML at
       ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos7.yaml``.
 
+   .. admonition:: CentOS 8
+      :class: centos8
+
+      The default YAML for Centos 8 is
+       ``/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos8.yaml``
+
+      ::
+
+          export OS_YAML="/usr/share/openstack-tripleo-common/image-yaml/overcloud-images-centos8.yaml"
+
    .. admonition:: RHEL
       :class: rhel
 
@@ -124,6 +134,13 @@ created on the undercloud, one should use a non-root user.
       ::
 
          export DIB_YUM_REPO_CONF="$DIB_YUM_REPO_CONF /etc/yum.repos.d/tripleo-centos-ceph*.repo"
+
+   .. admonition:: CentOS 8
+      :class: centos8
+
+      ::
+
+           DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean* /etc/yum.repos.d/tripleo-centos-*"
 
    .. admonition:: Stable Branch
       :class: stable
@@ -226,6 +243,13 @@ created on the undercloud, one should use a non-root user.
       ::
 
         openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images.yaml --config-file $OS_YAML
+
+   .. admonition:: CentOS 8
+      :class: centos8
+
+      ::
+
+         openstack overcloud image build --config-file /usr/share/openstack-tripleo-common/image-yaml/overcloud-images-python3.yaml --config-file $OS_YAML
 
 
    See the help for ``openstack overcloud image build`` for further options.

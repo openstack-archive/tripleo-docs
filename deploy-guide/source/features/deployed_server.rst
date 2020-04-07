@@ -721,6 +721,17 @@ user are as follows:
 
 Scaling Down
 ^^^^^^^^^^^^
+
+.. admonition:: Train
+   :class: train
+
+   Starting in Train and onward, `openstack overcloud node delete` can take
+   a list of server hostnames instead of instance ids. However they can't be
+   mixed while running the command. Example: if you use hostnames, it would
+   have to be for all the nodes to delete.
+
+The following instructions are only useful when the cloud is deployed on Stein
+or backward.
 When scaling down the Overcloud, follow the scale down instructions as normal
 as shown in :doc:`../post_deployment/delete_nodes`, however use the following
 command to get the uuid values to pass to `openstack overcloud node delete`

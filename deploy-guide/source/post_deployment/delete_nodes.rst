@@ -5,7 +5,7 @@ Deleting Overcloud Nodes
 
 You can delete specific nodes from an overcloud with command::
 
-    openstack overcloud node delete --stack $STACK_NAME --templates [templates dir] <list of nova instance IDs>
+    openstack overcloud node delete --stack $STACK_NAME --templates [templates dir] <list of nova instance IDs or hostnames starting in Train>
 
 This command updates the heat stack with updated numbers and list of resource
 IDs (which represent nodes) to be deleted.
@@ -16,6 +16,14 @@ IDs (which represent nodes) to be deleted.
    In Train, we added a user confirmation to the scale down command to
    prevent accidental node removal.
    To skip it, please use "--yes".
+
+.. admonition:: Train
+   :class: train
+
+   Starting in Train and onward, `openstack overcloud node delete` can take
+   a list of server hostnames instead of instance ids. However they can't be
+   mixed while running the command. Example: if you use hostnames, it would
+   have to be for all the nodes to delete.
 
 .. note::
   If you are :ref:`baremetal_provision` then follow those

@@ -11,8 +11,31 @@ However in the event the service configuration required is not exposed
 as a top-level parameter, there are flexible interfaces which enable passing
 arbitrary additional configuration to the nodes on deployment.
 
-Making configuration changes
-----------------------------
+Making ansible variable changes
+-------------------------------
+
+Since the Train release, it is now possible to change any Ansible variable
+via group vars overriding.
+For example, to override the `chrony_role_action` variable used in
+ansible-role-chrony for all the Compute roles, we would do the following::
+
+    cat > compute_params.yaml << EOF
+    parameter_defaults:
+        ComputeExtraGroupVars:
+          chrony_role_action: config
+    EOF
+
+    openstack overcloud deploy -e compute_params.yaml
+
+Any variable can be set in that interface and it will take precedence if the
+variable was already set somewhere else (e.g. in the composable service).
+
+For any custom roles (defined via roles_data.yaml) the parameter name will
+be RoleNameExtraGroupVars where RoleName is the name specified in
+roles_data.yaml.
+
+Making puppet configuration changes
+-----------------------------------
 
 If you want to make a configuration change, either prior to initial deployment,
 or subsequently via an update, you can pass additional data to puppet via hiera

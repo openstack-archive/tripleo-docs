@@ -535,6 +535,118 @@ documentation to the volumes pool used by Cinder. A TripleO validation
 that the PG numbers satisfy Ceph's PG overdose protection check before
 the deployment starts.
 
+Customizing crushmap using device classes
+-----------------------------------------
+
+Since Luminous, Ceph introduces a new `device classes` feature with the
+purpose of automating one of the most common reasons crushmaps are
+directly edited.
+Device classes are a new property for OSDs visible by running `ceph osd
+tree` and observing the class column, which should default correctly to
+each device's hardware capability (hdd, ssd or nvme).
+This feature is useful because Ceph CRUSH rules can restrict placement
+to a specific device class. For example, they make it easy to create a
+"fast" pool that distributes data only over SSDs.
+To do this, one simply needs to specify in the pool definition which
+device class should be used.
+This is simpler than directly editing the CRUSH map itself.
+There is no need for the operator to specify the device class for each
+disk added into the cluster: with this new functionality, ceph is able
+to autodetect the disk type (exposed by Linux kernel), placing it in
+the right category.
+For this reason the old way of specifying which block devices will be
+used as Ceph OSDs is still valid::
+
+    CephAnsibleDisksConfig:
+        devices:
+          - /dev/sdb
+          - /dev/sdc
+          - /dev/sdd
+        osd_scenario: lvm
+        osd_objectstore: bluestore
+
+However, if the operator would like to force a specific device to
+belong to a specific class, the `crush_device_class` property is
+provided and the device list defined above can be changed into::
+
+    CephAnsibleDisksConfig:
+         lvm_volumes:
+            - data: '/dev/sdb'
+              crush_device_class: 'hdd'
+            - data: '/dev/sdc'
+              crush_device_class: 'sdd'
+            - data: '/dev/sdd'
+              crush_device_class: 'hdd'
+        osd_scenario: lvm
+        osd_objectstore: bluestore
+
+.. note::
+
+    crush_device_class property is optional and can be omitted. Ceph is
+    able to `autodect` the type of disk, so this option can be used for
+    advanced users or to fake/force the disk type.
+
+After the device list is defined, the next step is to set some additional
+parameters to properly generate the ceph-ansible variables; in TripleO
+there are no explicitly exposed parameters to integrate this feature,
+however, the ceph-ansible expected parameters can be generated through
+`CephAnsibleExtraConfig`::
+
+    CephAnsibleExtraConfig:
+        crush_rule_config: true
+        create_crush_tree: true
+        crush_rules:
+          - name: HDD
+            root: default
+            type: host
+            class: hdd
+            default: true
+          - name: SSD
+            root: default
+            type: host
+            class: ssd
+            default: false
+
+As seen in the example above, in order to properly generate the
+crushmap hierarchy used by device classes, the `crush_rule_config` and
+`create_crush_tree` booleans should be enabled. These booleans will
+trigger the ceph-ansible playbook related to the crushmap customization,
+and the rules associated to the device classes will be generated
+according to the `crush_rules` array.  This allows the ceph cluster to
+build a shadow hierarchy which reflects the specified rules.
+Finally, as described in the customize placement group section, TripleO
+supports the customization of pools; in order to tie a specific pool to
+a device class, the `rule_name` option should be added as follows::
+
+    CephPools:
+      - name: fastpool
+        pg_num: 8
+        rule_name: SSD
+        application: rbd
+
+By adding this rule, we can make sure `fastpool` will follow the SSD
+rule which is defined for the ssd device class and it can be configured
+and used as a second (fast) tier to manage cinder volumes.
+
+Customizing crushmap using node specific overrides
+--------------------------------------------------
+
+With device classes the ceph cluster can expose different storage
+tiers with no need to manually edit the crushmap.
+However, if device classes are not sufficient, the creation of a
+specific crush hierarchy (e.g., host, rack, row, etc.), adding or
+removing extra layers (e.g., racks) on the crushmap is still valid
+and can be done via :doc:`node_specific_hieradata`.
+NodeDataLookup playbook is able to generate node spec overrides using
+the following syntax::
+
+    NodeDataLookup: {"SYSTEM_UUID": {"osd_crush_location": {"root": "$MY_ROOT", "rack": "$MY_RACK", "host": "$OVERCLOUD_NODE_HOSTNAME"}}}
+
+Generate NodeDataLookup manually can be error-prone. For this reason
+TripleO provides the `make_ceph_disk`_ utility to build a JSON file
+to get started, then it can be modified adding the `osd_crush_location`
+properties dictionary with the syntax described above.
+
 Override Ansible run options
 ----------------------------
 
@@ -808,3 +920,4 @@ will fail if the placement group numbers are not correct.
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`ceph osd pool create`: http://docs.ceph.com/docs/jewel/rados/operations/pools/#create-a-pool
 .. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
+.. _`make_ceph_disk`: https://github.com/openstack/tripleo-heat-templates/blob/master/tools/make_ceph_disk_list.py

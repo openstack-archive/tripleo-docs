@@ -644,9 +644,9 @@ When the deployment has been completed the Ceph dashboard containers,
 including prometheus and grafana, will be running on the controller nodes
 and will be accessible using the port 3100 for grafana and 9092 for prometheus;
 since this service is only internal and doesn’t listen on the public vip, users
-can reach grafana on the ceph storage network vip, and access the exposed ceph
-dashboard using the controller provisioning network vip on the specified port (
-8444 is the default for a generic overcloud deployment).
+can reach both grafana and the exposed ceph dashboard using the controller
+provisioning network vip on the specified port (8444 is the default for a generic
+overcloud deployment).
 The resulting deployment will be composed by an external stack made by grafana,
 prometheus, alertmanager, node-exporter containers and the ceph dashboard mgr
 module that acts as the backend for this external stack, embedding the grafana
@@ -655,7 +655,25 @@ The Ceph Dashboard frontend is fully integrated with the tls-everywhere framewor
 hence providing the tls environments files will trigger the certificate request for
 both grafana and the ceph dashboard: the generated crt and key files are then passed
 to ceph-ansible.
-This feature will also work with composable networks.
+The Ceph Dashboard admin user role is set to `read-only` mode by default for safe
+monitoring of the Ceph cluster. To permit an admin user to have elevated privileges
+to alter elements of the Ceph cluster with the Dashboard, the operator can change the
+default.
+For this purpose, TripleO exposes a parameter that can be used to change the Ceph
+Dashboard admin default mode.
+Log in to the undercloud as `stack` user and create the `ceph_dashboard_admin.yaml`
+environment file with the following content::
+
+  parameter_defaults:
+     CephDashboardAdminRO: false
+
+Run the overcloud deploy command to update the existing stack and include the environment
+file created with all other environment files that are already part of the existing
+deployment::
+
+    openstack overcloud deploy  --templates -e <existing_overcloud_environment_files> -e ceph_dashboard_admin.yml
+
+The ceph dashboard will also work with composable networks.
 In order to isolate the monitoring access for security purposes, operators can
 take advantage of composable networks and access the dashboard through a separate
 network vip. By doing this, it's not necessary to access the provisioning network

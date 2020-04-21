@@ -12,9 +12,9 @@ its setup by creating a custom environment file (i.e.
 *~/my-swift-settings.yaml*)::
 
   parameter_defaults:
-     ExternalPublicUrl: 'http://<Public Swift endpoint or loadbalancer>:9024/v1/AUTH_%(tenant_id)s'
-     ExternalInternalUrl: 'http://<Internal Swift endpoint>:9024/v1/AUTH_%(tenant_id)s'
-     ExternalAdminUrl: 'http://<Admin Swift endpoint>:9024'
+     ExternalSwiftPublicUrl: 'http://<Public Swift endpoint or loadbalancer>:9024/v1/AUTH_%(tenant_id)s'
+     ExternalSwiftInternalUrl: 'http://<Internal Swift endpoint>:9024/v1/AUTH_%(tenant_id)s'
+     ExternalSwiftAdminUrl: 'http://<Admin Swift endpoint>:9024'
      ExternalSwiftUserTenant: 'service'
      SwiftPassword: 'choose_a_random_password'
 

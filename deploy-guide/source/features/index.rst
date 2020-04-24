@@ -17,6 +17,7 @@ Documentation on additional features for |project|.
    designate
    disable_telemetry
    distributed_compute_node
+   distributed_multibackend_storage
    extra_config
    high_availability
    instance_ha

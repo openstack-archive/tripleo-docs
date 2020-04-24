@@ -152,9 +152,16 @@ provisioning networks though. Key benefits IPv6 may provide for DCN are:
 Storage recommendations
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-DCN with only ephemeral storage is available for Nova Compute services.
-That is up to the edge cloud applications to be designed to provide enhanced
-data availability, locality awareness and/or replication mechanisms.
+Prior to Ussuri, DCN was only available with ephemeral storage for
+Nova Compute services. Enhanced data availability, locality awareness
+and/or replication mechanisms had to be addressed only on the edge
+cloud application layer.
+
+In Ussuri and newer, |project| is able to deploy
+:doc:`distributed_multibackend_storage` which may be combined with the
+example in this document to add distributed image management and
+persistent storage at the edge.
+
 
 Deploying DCN
 -------------
@@ -203,10 +210,12 @@ experience for distributed compute nodes.
 Configure the Swift temporary URL key
 _____________________________________
 
-Images are served by Swift and are made available to nodes using an HTTP URL,
-over the ``direct`` deploy interface. To allow Swift to create temporary URLs, it
-must be configured with a temporary URL key. The key value is used for
-cryptographic signing and verification of the temporary URLs created by Swift.
+Images used for overcloud deployment are served by Swift and are made
+available to nodes using an HTTP URL, over the ``direct`` deploy
+interface. To allow Swift to create temporary URLs, it must be
+configured with a temporary URL key. The key value is used for
+cryptographic signing and verification of the temporary URLs created
+by Swift.
 
 The following commands demonstrate how to configure the setting. In this
 example, ``uuidgen`` is used to randomly create a key value. You should choose a
@@ -281,14 +290,19 @@ purposes of this documentation, this stack is referred to as the
 No specific changes or deployment configuration is necessary to deploy just the
 control plane services.
 
-It's recommended that the ``control-plane`` stack contain only control plane
-services, and no compute or storage services. If compute and storage services
-are desired at the same geographical site as the ``control-plane`` stack then
-they should be deployed in a separate stack just like a edge site specific stack,
-but using nodes at the same geographical location. In such a scenario, the
-stack with compute and storage services could be called ``central`` and
-deploying it in a separate stack allows for separation of management and
-operations.
+It's possible to configure the ``control-plane`` stack to contain
+only control plane services, and no compute or storage services. If
+compute and storage services are desired at the same geographical site
+as the ``control-plane`` stack, then they may be deployed in a
+separate stack just like a edge site specific stack, but using nodes
+at the same geographical location. In such a scenario, the stack with
+compute and storage services could be called ``central`` and deploying
+it in a separate stack allows for separation of management and
+operations. This scenario may also be implemented with an "external"
+Ceph cluster for storage as described in :doc:`ceph_external`. If
+however, Glance needs to be configured with multiple stores so that
+images may be served to remote sites one ``control-plane`` stack may
+be used as described in :doc:`distributed_multibackend_storage`.
 
 It is suggested to give each stack an explicit name. For example, the control
 plane stack could be called ``control-plane`` and set by passing ``--stack
@@ -440,6 +454,11 @@ definition would look like:
       ``name_lower`` property such as ``InternalApiCompute0`` and
       ``internal_api_compute_0``.
 
+If separate storage and storage management networks are used with
+multiple Ceph clusters and Glance servers per site, then a routed
+storage network should be shared between sites for image transfer.
+The storage management network, which Ceph uses to keep OSDs balanced,
+does not need to be shared between sites.
 
 DCN related roles
 _________________
@@ -449,8 +468,8 @@ configuration and desired services to be deployed at each distributed site.
 The default compute role at ``roles/Compute.yaml`` can be used if that is
 sufficient for the use case.
 
-Two additional roles are also available for deploying compute nodes with
-co-located persistent storage at the distributed site.
+Three additional roles are also available for deploying compute nodes
+with co-located persistent storage at the distributed site.
 
 The first is ``roles/DistributedCompute.yaml``. This role includes the default
 compute services, but also includes the cinder volume service. The cinder
@@ -459,10 +478,29 @@ distributed site for persistent storage.
 
 The second is ``roles/DistributedComputeHCI.yaml``. This role includes the
 default computes services, the cinder volume service, and also includes the
-Ceph services for deploying a Ceph cluster at the distributed site. Using this
-role, both the compute services and ceph services are deployed on the same
-nodes, enabling a hyperconverged infrastructure for persistent storage at the
-distributed site.
+Ceph Mon, Mgr, and OSD services for deploying a Ceph cluster at the
+distributed site. Using this role, both the compute services and Ceph
+services are deployed on the same nodes, enabling a hyperconverged
+infrastructure for persistent storage at the distributed site. When
+Ceph is used, there must be a minimum of three `DistributedComputeHCI`
+nodes. This role also includes a Glance server, provided by the
+`GlanceApiEdge` service with in the `DistributedComputeHCI` role. The
+Nova compute service of each node in the `DistributedComputeHCI` role
+is configured by default to use its local Glance server.
+
+The third is ``roles/DistributedComputeHCIScaleUp.yaml``. This role is
+like the DistributedComputeHCI role but does not run the Ceph Mon and
+Mgr service. It offers the Ceph OSD service however, so it may be used
+to scale up storage and compute services at each DCN site after the
+minimum of three DistributedComputeHCI nodes have been deployed. There
+is no `GlanceApiEdge` service in the `DistributedComputeHCIScaleUp`
+role but in its place the Nova compute service of the role is
+configured by default to connect to a local `HaProxyEdge` service
+which in turn proxies image requests to the Glance servers running on
+the `DistributedComputeHCI` roles.
+
+For information on configuring the distributed Glance services see
+:doc:`distributed_multibackend_storage`.
 
 Configuring Availability Zones (AZ)
 ___________________________________
@@ -544,8 +582,9 @@ This example shows an environment file setting the AZ for the backend in the
 
 Deploying Ceph with HCI
 #######################
-When deploying Ceph while using the ``DistributedComputeHCI`` roles, the
-environment file to enable ceph should be used::
+When deploying Ceph while using the ``DistributedComputeHCI`` and
+``DistributedComputeHCIScaleUp`` roles, the following environment file
+should be used to enable Ceph::
 
       environments/ceph-ansible/ceph-ansible.yaml
 
@@ -638,6 +677,11 @@ templates directory at ``roles/Controller.yaml``.
     parameter_defaults:
       ControllerCount: 1
 
+.. warning::
+   Only one `Controller` node is deployed for example purposes but
+   three are recommended in order to have a highly available control
+   plane.
+
 ``network_data.yaml`` contains the default contents from the templates
 directory.
 
@@ -646,7 +690,6 @@ directory.
     parameter_defaults:
       CinderStorageAvailabilityZone: 'central'
       NovaComputeAvailabilityZone: 'central'
-      NovaAZAttach: false
 
 When the deployment completes, a single stack is deployed::
 
@@ -776,13 +819,19 @@ templates directory at ``roles/DistributedComputeHCI.yaml``.
   parameter_defaults:
     DistributedComputeHCICount: 1
 
+.. warning::
+   Only one `DistributedComputeHCI` is deployed for example
+   purposes but three are recommended in order to have a highly
+   available Ceph cluster. If more than three such nodes of that role
+   are necessary for additional compute and storage resources, then
+   use additional nodes from the `DistributedComputeHCIScaleOut` role.
+
 ``az.yaml`` contains the same content as was used in the ``control-plane``
 stack::
 
     parameter_defaults:
       CinderStorageAvailabilityZone: 'central'
       NovaComputeAvailabilityZone: 'central'
-      NovaAZAttach: false
 
 The ``control-plane-export.yaml`` file was generated from the command from
 example_export_dcn_.
@@ -911,12 +960,18 @@ same as was used in the ``central`` stack.
   parameter_defaults:
     DistributedComputeHCICount: 1
 
+.. warning::
+   Only one `DistributedComputeHCI` is deployed for example
+   purposes but three are recommended in order to have a highly
+   available Ceph cluster. If more than three such nodes of that role
+   are necessary for additional compute and storage resources, then
+   use additional nodes from the `DistributedComputeHCIScaleOut` role.
+
 ``az.yaml`` contains specific content for the ``edge-0`` stack::
 
     parameter_defaults:
       CinderStorageAvailabilityZone: 'edge-0'
       NovaComputeAvailabilityZone: 'edge-0'
-      NovaAZAttach: false
 
 The ``CinderStorageAvailabilityZone`` and ``NovaDefaultAvailabilityZone``
 parameters are set to ``edge-0`` to match the stack name.
@@ -931,7 +986,6 @@ different name with ``--stack edge-1`` and ``az.yaml`` contains::
     parameter_defaults:
       CinderStorageAvailabilityZone: 'edge-1'
       NovaComputeAvailabilityZone: 'edge-1'
-      NovaAZAttach: false
 
 When the deployment completes, there are now 4 stacks are deployed::
 
@@ -1013,6 +1067,9 @@ and ``edge-1`` are created and available::
     +------------------+-------------------------+---------+---------+-------+----------------------------+
     (control-plane) [centos@scale ~]$
 
+For information on extending this example with distributed image
+management for image sharing between DCN site Ceph clusters see
+:doc:`distributed_multibackend_storage`.
 
 Updating DCN
 ------------

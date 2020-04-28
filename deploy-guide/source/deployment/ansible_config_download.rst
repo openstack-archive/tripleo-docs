@@ -43,12 +43,11 @@ The difference with ``config-download`` is that although Heat creates all the
 deployment data necessary via SoftwareDeployment resources to perform the
 overcloud installation and configuration, it does not apply any of the software
 deployments. The data is only made available via the Heat API. Once the stack
-is created, an additional config-download Mistral workflow is triggered that
-downloads all of the deployment data from Heat.
+is created, deployment data is downloaded from Heat and ansible playbooks are
+generated.
 
-Using the downloaded deployment data, the workflow then generates Ansible
-playbooks and tasks that are used by the undercloud to complete the
-configuration of the overcloud using ``ansible-playbook``.
+Using the downloaded deployment data and ansible playbooks configuration of
+the overcloud using ``ansible-playbook`` are completed.
 
 This diagram details the overall sequence of how using config-download
 completes an overcloud deployment:
@@ -64,9 +63,9 @@ overcloud deploy`` (tripleoclient) is run. The command is backwards compatible
 in terms of functionality, meaning that running ``openstack overcloud deploy``
 will still result in a full overcloud deployment.
 
-The deployment is done through a series of automated workflows and steps in
-tripleoclient. All of the workflow steps are automated by tripleoclient and
-Mistral workflow(s).  The workflow steps are summarized as:
+The deployment is done through a series of steps in tripleoclient. All of the
+workflow steps are automated by tripleoclient. The workflow steps are summarized
+as:
 
 #. Create deployment plan
 #. Create Heat stack along with any OpenStack resources (Neutron networks,
@@ -84,29 +83,10 @@ ansible uses ssh to connect to each node to perform configuration.
 
 The following steps are done to create the ``tripleo-admin`` user:
 
-#. Create temporary ssh keys on the undercloud
-#. Use a deployer-specified private ssh key (defaults to ``~/.ssh/id_rsa``) to
-   connect to each overcloud node as a deployer specified user (defaults to
-   ``heat-admin``) and adds the temporary public ssh key to
-   ``~/.ssh/authorized_keys`` for that user.
-#. Executes a Mistral workflow to create ``tripleo-admin`` on each node,
-   passing as input the temporary private ssh key and ssh user to Mistral.
-#. The workflow creates the ``tripleo-admin`` user and gives sudo permissions
-   to the user, as well as creates and stores a new ssh keypair specific to
-   ``tripleo-admin``. This keypair (private and public) are stored in the
-   Mistral database.
-#. After the completion of the workflow, the temporary ssh public key is
-   deleted from ``~/.ssh/authorized_keys`` on each overcloud node, and the
-   temporary keypair is then deleted from the undercloud.
+#. Runs a playbook to create ``tripleo-admin`` on each node. Also, gives sudo
+   permissions to the user, as well as creates and stores a new ssh keypair
+   for ``tripleo-admin``.
 
-With these steps, the deployer-specified ssh key which is used for the initial
-connection is never sent or stored by any API service.
-
-To override the deployer specified ssh private key and user, there are cli args
-available with ``openstack overcloud deploy``::
-
-    --overcloud-ssh-user # defaults to heat-admin
-    --overcloud-ssh-key  # defaults to ~/.ssh/id_rsa
 
 The values for these cli arguments must be the same for all nodes in the
 overcloud deployment. ``overcloud-ssh-key`` should be the private key that
@@ -192,35 +172,17 @@ hostnames in the parameter value. The following example shows a sample value::
 Write the contents to an environment file such as ``hostnamemap.yaml``, and
 pass the environment as part of the deployment command with ``-e``.
 
-Mistral workflow
-----------------
-The Mistral workflow that will be called by tripleoclient and runs
-config-download and ``ansible-playbook`` is
-``tripleo.deployment.v1.config_download_deploy``.
-
 Ansible project directory
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The workflow will create an Ansible project directory with the plan name under
-``/var/lib/mistral``. For the default plan name of ``overcloud`` the working
+``$HOME/config-download``. For the default plan name of ``overcloud`` the working
 directory will be::
 
-    /var/lib/mistral/overcloud
+    $HOME/config-download/overcloud
 
 The project directory is where the downloaded software configuration from
 Heat will be saved. It also includes other ansible-related files necessary to
 run ``ansible-playbook`` to configure the overcloud.
-
-All of the files in the Ansible project directory at
-``/var/lib/mistral/<plan>`` are owned by the mistral user and readable by the
-mistral group from the mistral-executor container. The interactive user account
-on the undercloud can be granted read-only access to these files by using the
-following setacl command::
-
-    sudo setfacl -R -m u:$USER:rwx /var/lib/mistral
-
-Once a member of the ``mistral`` group, the contents of
-``/var/lib/mistral/<plan>`` can be browsed, examined, and
-``ansible-playbook`` rerun if desired.
 
 The contents of the project directory include the following files:
 
@@ -237,8 +199,8 @@ ssh_private_key
 
 Reproducing ansible-playbook
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Once in the project directory created by the Mistral workflow, simply run
-``ansible-playbook-command.sh`` to reproduce the deployment::
+Once in the project directory created, simply run ``ansible-playbook-command.sh``
+to reproduce the deployment::
 
     ./ansible-playbook-command.sh
 
@@ -296,9 +258,9 @@ applied.
 
 Manual config-download
 ----------------------
-The Mistral workflow that runs config-download can be skipped when running
-``openstack overcloud deploy`` by passing ``--stack-only``. This will cause
-tripleoclient to only deploy the Heat stack.
+The config-download steps can be skipped when running ``openstack overcloud deploy``
+by passing ``--stack-only``. This will cause tripleoclient to only deploy the Heat
+stack.
 
 When using ``--stack-only``, the deployment data needs to be pulled from Heat
 with a separate command and ``ansible-playbook`` run manually. This enables
@@ -367,8 +329,7 @@ All default ansible configuration values will be used when manually running
 `ansible configuration
 <https://docs.ansible.com/ansible/latest/installation_guide/intro_configuration.html>`_.
 
-The following minimum configuration is recommended and matches the default
-values used by the mistral workflow that runs ``config-download``::
+The following minimum configuration is recommended::
 
     [defaults]
     log_path = ansible.log
@@ -576,20 +537,10 @@ templates
 
 Other files
 ^^^^^^^^^^^
-Files in this section are only present in the project directory if the mistral
-workflow was used to generate the project directory under
-``/var/lib/mistral/<plan>``
+Other files in the project directory are:
 
-ansible.cfg
-  Ansible configuration file
-ansible-errors.json
-  JSON structured file containing any deployment errors
-ansible.log
-  Ansilbe log file
 ansible-playbook-command.sh
   Script to reproduce ansible-playbook command
-ssh_private_key
-  SSH private key used by ansible to access overcloud nodes
 tripleo-ansible-inventory.yaml
   Ansible inventory file
 overcloud-config.tar.gz
@@ -638,13 +589,12 @@ the ansible project directory.
 
 Complete the :ref:`manual-config-download` steps to create the ansible project
 directory, or use the existing project directory at
-``/var/lib/mistral/<plan>``.
+``$HOME/config-download/<plan>``.
 
 .. note::
 
-    The project directory under ``/var/lib/mistral/<plan>`` is only updated
-    by ``openstack overcloud deploy`` if the mistral workflow is used for
-    ``config-download`` (e.g., ``--stack-only`` is **not** used).
+    The project directory under ``$HOME/config-download/<plan>`` is only updated
+    by ``openstack overcloud deploy`` if ``--stack-only`` is **not** used.
 
 Tags
 ^^^^
@@ -751,7 +701,7 @@ following options to the ``ansible-playbook`` command::
         -e @global_vars.yaml
 
 The ``global_vars.yaml`` variable file exists in the config-download directory
-that was either generated manually or under ``/var/lib/mistral``.
+that was either generated manually or under ``$HOME/config-download``.
 
 Previewing changes
 ------------------

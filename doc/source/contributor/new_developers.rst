@@ -5,37 +5,29 @@ The intention of this document is to give new developers some information
 regarding how to get started with TripleO as well as some best practices that
 the TripleO community has settled on.
 
-In general TripleO is a very complex chunk of software.  It uses numerous
-technologies to implement an OpenStack installer.  The premise of TripleO was
+In general TripleO is a very complex chunk of software. It uses numerous
+technologies to implement an OpenStack installer. The premise of TripleO was
 to use the OpenStack platform itself as the installer and API for user
 interfaces.  As such the first step to installing TripleO is to create what is
-called an `undercloud`.  Today this is typically done using an undercloud image
-which contains all the software necessary to stand up an all-in-one style
-OpenStack installation.
+called an `undercloud`. We use almost similar architecture for both
+`undercloud` and `overcloud` that leverages same set of Heat templates found
+in `tripleo-heat-templates` repository, with a few minor differences. The
+`undercloud` services are deployed in containers and can be managed by the
+same tool chain used for `overcloud`.
 
-Once the `undercloud` is deployed, we use a combination of Mistral and a set of
-Heat templates, found in the `tripleo-heat-templates` repository, to drive the
-deployment of an overcloud.  Ironic is used to provision hardware and boot an
-operating system either on baremetal (for real deployments) or on VMs (for
-development).  As of the Pike release we now deploy almost all services in
-containers on the overcloud.  By the end of Queens all services should be
-containerized and the overcloud image should be reduced to a basic operating
-system image.
-
-We are also working on unifying the architecture of the overcloud and
-undercloud by moving to a containerized undercloud.  This allows you to do
-development on the undercloud using the same Heat templates as are used to
-deploy the overcloud.  This greatly accelerates development iteration cycle
-speed.
+Once the `undercloud` is deployed, we use a combination of Ansible playbooks
+and a set of Heat templates, to drive the deployment of an overcloud. Ironic
+is used to provision hardware and boot an operating system either on baremetal
+(for real deployments) or on VMs (for development).  All services are deployed
+in containers on the overcloud like undercloud.
 
 Repositories that are part of TripleO
 -------------------------------------
 
 * `tripleo-common <https://opendev.org/openstack/tripleo-common/>`_:
-  This is intended to be for TripleO libraries of common code including Mistral
-  workflows and actions.  Unfortunately it has become a bit overrun with
-  unrelated bits.  Work is ongoing to clean this up and split this into
-  separate repositories.
+  This is intended to be for TripleO libraries of common code.
+  Unfortunately it has become a bit overrun with unrelated bits. Work
+  is ongoing to clean this up and split this into separate repositories.
 
 * `tripleo-ansible <https://opendev.org/openstack/tripleo-ansible/>`_:
   Contains Ansible playbooks, roles, plugins, modules, filters for use with
@@ -76,10 +68,6 @@ Repositories that are part of TripleO
 * `tripleo-ui <https://opendev.org/openstack/tripleo-ui>`_:
   The web based graphical user interface for deploying TripleO.
 
-* `paunch <https://opendev.org/openstack/paunch>`_:
-  This is a library that is used to deploy containers.  It is called from the
-  Heat templates during installation to deploy our containerized services.
-
 * `kolla <https://opendev.org/openstack/kolla>`_:
   We use the containers built by the Kolla project for services in TripleO.
   Any new containers or additions to existing containers should be submitted
@@ -93,15 +81,8 @@ Definition of Done
 ------------------
 
 This is basically a check list of things that you want to think about when
-implementing a new feature.  Especially important is considering how the user
-interface functions along side the command line interface.
+implementing a new feature.
 
-- Ensure that any new feature is provided through Rest API in form of Mistral
-  actions, workflow or by directly accessing an OpenStack service API.
-- Ensure that GUI and CLI can both operate this feature through this API.
-- Start your feature work by creating Mistral action or Mistral workflow -
-  defining inputs and outputs. This is necessary so that the CI and UI have
-  feature parity and both use the same API calls to implement a given feature.
 - Ensure that the continuous integration (CI) is in place and passing, adding
   coverage to tests if required.  See
   http://specs.openstack.org/openstack/tripleo-specs/specs/policy/adding-ci-jobs.html
@@ -120,21 +101,17 @@ interface functions along side the command line interface.
 - If any new dependencies are used for your feature, be sure they are properly
   packaged and available in RDO. You can ask on #rdo (on freenode server) for
   help with this.
-- If a Mistral workflow changes between releases, make version notes so that
-  users know how they might have to update their workflow call. Make sure it's
-  backwards-compatible, or have at least one cycle deprecation period before
-  removing the old way of doing things.
 
 
-Using the Containerized Undercloud for Development.
----------------------------------------------------
+Using TripleO Standalone for Development
+----------------------------------------
 
-The containerized undercloud can be used for development purposes.
+The Standalone container based deployment can be used for development purposes.
 This reuses the existing TripleO Heat Templates, allowing you to do the
 development using this framework instead of a complete overcloud.
 This is very useful if you are developing Heat templates or containerized
 services.
 
-Please see `Undercloud Deployment Guide <https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/undercloud.html>`_
-on how to set up a containerized undercloud.
+Please see `Standalone Deployment Guide <https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/standalone.html>`_
+on how to set up a Standalone OpenStack node.
 

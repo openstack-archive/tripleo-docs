@@ -16,6 +16,21 @@ wiki/How_To_Contribute>`_.
 See :doc:`../install/introduction/components` to find out how to contribute into
 individual projects.
 
+Contacting the Core Team
+------------------------
+Please refer to the `TripleO Core Team
+<https://review.opendev.org/#/admin/groups/190,members>`_ contacts.
+
+For upgrade specific contacts, refer to `TripleO Upgrade Core
+<https://review.opendev.org/#/admin/groups/1853,members>`_ contacts
+
+For TripleO Ansible specific contacts, refer to `TripleO Ansible Core
+<https://review.opendev.org/#/admin/groups/448,members>`_ contacts
+
+For Shared TripleO CI role contacts, refer to `TripleO Shared CI Core
+<https://review.opendev.org/#/admin/groups/2090,members>`_ contacts
+
+
 Contributing to this Documentation
 -----------------------------------
 

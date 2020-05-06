@@ -482,12 +482,12 @@ service with in the `DistributedComputeHCI` role. The Nova compute
 service of each node in the `DistributedComputeHCI` role is configured
 by default to use its local Glance server.
 
-`DistributedComputeHCIScaleUp` role is like the `DistributedComputeHCI`
+`DistributedComputeHCIScaleOut` role is like the `DistributedComputeHCI`
 role but does not run the Ceph Mon and Mgr service. It offers the Ceph
 OSD service however, so it may be used to scale up storage and compute
 services at each DCN site after the minimum of three
 `DistributedComputeHCI` nodes have been deployed. There is no
-`GlanceApiEdge` service in the `DistributedComputeHCIScaleUp` role but
+`GlanceApiEdge` service in the `DistributedComputeHCIScaleOut` role but
 in its place the Nova compute service of the role is configured by
 default to connect to a local `HaProxyEdge` service which in turn
 proxies image requests to the Glance servers running on the

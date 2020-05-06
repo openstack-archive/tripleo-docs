@@ -488,12 +488,12 @@ nodes. This role also includes a Glance server, provided by the
 Nova compute service of each node in the `DistributedComputeHCI` role
 is configured by default to use its local Glance server.
 
-The third is ``roles/DistributedComputeHCIScaleUp.yaml``. This role is
+The third is ``roles/DistributedComputeHCIScaleOut.yaml``. This role is
 like the DistributedComputeHCI role but does not run the Ceph Mon and
 Mgr service. It offers the Ceph OSD service however, so it may be used
 to scale up storage and compute services at each DCN site after the
 minimum of three DistributedComputeHCI nodes have been deployed. There
-is no `GlanceApiEdge` service in the `DistributedComputeHCIScaleUp`
+is no `GlanceApiEdge` service in the `DistributedComputeHCIScaleOut`
 role but in its place the Nova compute service of the role is
 configured by default to connect to a local `HaProxyEdge` service
 which in turn proxies image requests to the Glance servers running on
@@ -583,7 +583,7 @@ This example shows an environment file setting the AZ for the backend in the
 Deploying Ceph with HCI
 #######################
 When deploying Ceph while using the ``DistributedComputeHCI`` and
-``DistributedComputeHCIScaleUp`` roles, the following environment file
+``DistributedComputeHCIScaleOut`` roles, the following environment file
 should be used to enable Ceph::
 
       environments/ceph-ansible/ceph-ansible.yaml

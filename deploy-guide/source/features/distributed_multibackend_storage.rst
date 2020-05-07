@@ -438,8 +438,7 @@ Override Glance defaults for dcn0
 Create ``~/dcn0/glance.yaml`` with content like the following::
 
   parameter_defaults:
-    DistributedComputeHCIExtraConfig:
-      glance::api::enabled_import_methods: 'glance-direct,web-download,copy-image'
+    GlanceEnabledImportMethods: web-download,copy-image
     GlanceBackend: rbd
     GlanceStoreDescription: 'dcn0 rbd glance store'
     GlanceMultistoreConfig:
@@ -449,9 +448,8 @@ Create ``~/dcn0/glance.yaml`` with content like the following::
         CephClientUserName: 'external'
         CephClusterName: central
 
-The `DistributedComputeHCIExtraConfig` parameter is used to override
-the Glance configuration's `enabled_import_methods` setting as
-described in :doc:`node_config`. These additional import methods are
+The `GlanceEnabledImportMethods` parameter is used to override the
+default of 'web-download' to also include 'copy-image', which is
 necessary to support the workflow described earlier.
 
 By default Glance on the dcn0 node will use the RBD store of the
@@ -635,8 +633,7 @@ Create ``~/control-plane/glance_update.yaml`` with content like the
 following::
 
   parameter_defaults:
-    ControllerExtraConfig:
-      glance::api::enabled_import_methods: 'glance-direct,web-download,copy-image'
+    GlanceEnabledImportMethods: web-download,copy-image
     GlanceBackend: rbd
     GlanceStoreDescription: 'central rbd glance store'
     CephClusterName: central
@@ -852,14 +849,13 @@ Confirm the expected stores are available:
   |          | store"}]                                                                         |
   +----------+----------------------------------------------------------------------------------+
 
-Assuming a qcow2 image like `cirros-0.4.0-x86_64-disk.img` is in the
-current directory, create an image and import it into the default
-backend at central as well as the dcn0 backend, by listing both
-stores in the `--stores` option, as seen in the following example:
+Create an image and import it into the default backend at central as
+well as the dcn0 backend, by listing both stores with the `--stores`
+option, as seen in the following example:
 
 .. code-block:: bash
 
-  glance image-create-via-import --disk-format qcow2 --container-format bare --name cirros --file cirros-0.4.0-x86_64-disk.img --import-method glance-direct --stores default_backend,dcn0
+  glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores default_backend,dcn0
 
 .. note:: The `--disk-format` is set to qcow2 as that is the format of
           the image file. However, Glance will convert and store the

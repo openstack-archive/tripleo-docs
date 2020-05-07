@@ -731,20 +731,15 @@ for more details.
 
 Generating overcloudrc
 ----------------------
-In some cases, it may be required to manually generate the ``overcloudrc.v3``
+In some cases, it may be required to manually generate the ``overcloudrc``
 file if ``ansible-playbook`` was used manually outside of the workflow.
 
-The following command can be used to generate the ``overcloudrc.v3`` file. Save
-the output of the command to the file where you want the contents saved::
+The following command can be used to generate the ``overcloudrc`` file::
 
-    openstack action execution run \
-      --save-result \
-      --run-sync \
-      tripleo.deployment.overcloudrc \
-      '{"container":"overcloud"}' \
-      | jq -r '.["result"]["overcloudrc.v3"]' \
-      > overcloudrc.v3
+    openstack overcloud credential overcloud
 
+It will generate the ``overcloudrc`` file in the current directory. The
+``--directory`` option can be used to generate it in a different location.
 If needed, substitute the name of the deployment for overcloud.
 
 config-download with Heat SoftwareDeployment outputs

@@ -355,3 +355,52 @@ After the overcloud is deployed, you can confirm each endpoint is using HTTPS
 by querying keystone's endpoints::
 
     $ openstack --os-cloud overcloud endpoint list
+
+Deleting Overclouds
+-------------------
+
+.. note::
+    This functionality is only invoked when you use the ``openstack overcloud
+    delete`` command using Train or newer releases. The overcloud is
+    technically a heat stack, but using ``openstack stack delete`` will not
+    clean up FreeIPA.
+
+.. note::
+    This section is only applicable to deployments using tripleo-ipa. Novajoin
+    cleans up FreeIPA after consuming notifications about instance deletion.
+
+The python-tripleoclient CLI cleans up hosts, services, and DNS records in
+FreeIPA when you delete an overcloud::
+
+    $ openstack overcloud delete overcloud
+
+You can verify the hosts, services, DNS records were removed by querying
+FreeIPA::
+
+    $ kinit
+    $ ipa host-find
+    $ ipa service-find
+    $ ipa dnsrecord-find example.com.
+
+The undercloud host, service, and DNS records are untouched when deleting
+overclouds. Overcloud hosts, services, and DNS records are re-added to FreeIPA
+during subsequent deployments.
+
+If you don't want to clean up FreeIPA when you delete your overcloud, you can
+use the ``openstack overcloud delete --skip-ipa-cleanup`` parameter. This
+option leaves all overcloud hosts, services, and DNS records in FreeIPA. You
+might find this useful if your FreeIPA server is unreachable or if you plan to
+clean up FreeIPA later.
+
+To clean up FreeIPA manually, you need the Ansible inventory file that
+describes your deployment. If you don't have it handy, you can generate one
+from the undercloud using::
+
+    $ source stackrc
+    $ tripleo-ansible-inventory --static-yaml-inventory generated-inventory.yaml
+
+The utility will generate an inventory file and store it as
+``generated-inventory.yaml``. You can invoke the playbook that cleans up
+FreeIPA using::
+
+    $ ansible-playbook -i generated-inventory.yaml /usr/share/ansible/tripleo-playbooks/cli-cleanup-ipa.yml

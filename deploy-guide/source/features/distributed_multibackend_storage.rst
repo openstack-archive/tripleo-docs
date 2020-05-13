@@ -247,6 +247,21 @@ but are not displayed in this document. For more information on
 configuring networks with distributed compute nodes see
 :doc:`distributed_compute_node`.
 
+The ``environments/ceph-ansible/ceph-ansible.yaml`` results in
+ceph-ansible deploying Ceph as part of the ``control-plane`` stack.
+This file also contains both `NovaEnableRbdBackend: true` and
+`GlanceBackend: rbd`. When both of these settings are used, the Glance
+`image_import_plugins` setting will contain `image_conversion`. With
+this setting enabled commands like `glance image-create-via-import`
+with `--disk-format qcow2` will result in the image being converted
+into a raw format, which is optimal for the Ceph RBD driver. If
+you need to disable image conversion you may override the
+`image_import_plugins` parameter. For example::
+
+   parameter_defaults:
+     ControllerExtraConfig:
+       glance::api::image_import_plugins: []
+
 The ``ceph.yaml`` file contains the following which sets the name of
 the Ceph cluster to "central"::
 
@@ -266,8 +281,8 @@ in its place to configure Ceph RGW.
 
 The ``environments/cinder-backup.yaml`` file is not used in this
 deployment. It's possible to enable the Cinder-backup service by using
-it but by default it writes to the backups pool of the central Ceph
-cluster.
+this file but it will only write to the backups pool of the central
+Ceph cluster.
 
 The ``~/control-plane/ceph_keys.yaml`` and
 ``~/control-plane/role-counts.yaml`` files were created in the
@@ -438,6 +453,7 @@ Override Glance defaults for dcn0
 Create ``~/dcn0/glance.yaml`` with content like the following::
 
   parameter_defaults:
+    GlanceShowMultipleLocations: true
     GlanceEnabledImportMethods: web-download,copy-image
     GlanceBackend: rbd
     GlanceStoreDescription: 'dcn0 rbd glance store'
@@ -633,6 +649,7 @@ Create ``~/control-plane/glance_update.yaml`` with content like the
 following::
 
   parameter_defaults:
+    GlanceShowMultipleLocations: true
     GlanceEnabledImportMethods: web-download,copy-image
     GlanceBackend: rbd
     GlanceStoreDescription: 'central rbd glance store'
@@ -857,13 +874,14 @@ option, as seen in the following example:
 
   glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores default_backend,dcn0
 
-.. note:: The `--disk-format` is set to qcow2 as that is the format of
-          the image file. However, Glance will convert and store the
-          image in the raw format after it's uploaded as that is the
-          optimal setting for Ceph RBD. TripleO configures Glance
-          Image conversion this way by default when Glance RBD is
-          used. This may be confirmed by `glance image-show <ID> |
-          grep disk_format` after the image is uploaded.
+.. note:: The example above assumes that Glance image format
+          conversion is enabled. Thus, even though `--disk-format` is
+          set to `qcow2`, which is the format of the image file, Glance
+          will convert and store the image in raw format after it's
+          uploaded because the raw format is the optimal setting for
+          Ceph RBD. The conversion may be confirmed by running
+          `glance image-show <ID> | grep disk_format` after the image
+          is uploaded.
 
 Set an environment variable to the ID of the newly created image:
 

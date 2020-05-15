@@ -84,6 +84,26 @@ Configure FreeIPA::
     --auto-reverse /
     --unattended
 
+By default, FreeIPA does not public it's Certificate Revocation List (CRL)
+on startup.  As the CRL is retrieved when the overcloud nodes retrieve
+certificates from FreeIPA, we should configure it to do so and restart
+FreeIPA.::
+
+    sed -i -e \
+    's/ca.crl.MasterCRL.publishOnStart=.*/ca.crl.MasterCRL.publishOnStart=true/' \
+    /etc/pki/pki-tomcat/ca/CS.cfg
+    systemctl restart ipa
+
+Finally, if your IPA server is not at 4.8.5 or higher, you will need to add an
+ACL to allow for the proper generation of certificates with a IP SAN.::
+
+    cat << EOF | ldapmodify -x -D "cn=Directory Manager" -w $DIRECTORY_MANAGER_PASSWORD
+    dn: cn=dns,dc=example,dc=com
+    changetype: modify
+    add: aci
+    aci: (targetattr = "aaaarecord || arecord || cnamerecord || idnsname || objectclass || ptrrecord")(targetfilter = "(&(objectclass=idnsrecord)(|(aaaarecord=*)(arecord=*)(cnamerecord=*)(ptrrecord=*)(idnsZoneActive=TRUE)))")(version 3.0; acl "Allow hosts to read DNS A/AAA/CNAME/PTR records"; allow (read,search,compare) userdn = "ldap:///fqdn=*,cn=computers,cn=accounts,dc=example,dc=com";)
+    EOF
+
 Please refer to ``ipa-server-install --help`` for specifics on each argument or
 reference the `FreeIPA documentation`_. The directions above are only a guide.
 You may need to adjust certain values and configuration options to use FreeIPA,

@@ -9,6 +9,7 @@
 
 .tox
 doc/build
+deploy-guide/source/_build
 build
 
 # pbr generates these

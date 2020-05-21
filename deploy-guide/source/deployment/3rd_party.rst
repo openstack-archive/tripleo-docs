@@ -3,18 +3,107 @@ Integrating 3rd Party Containers in TripleO
 
 .. _build_container_images:
 
-Building Containers
--------------------
-
 One of the following methods can be used to extend or build from scratch
 custom 3rd party containers.
 
-Adding layers to existing containers
-....................................
+Extend TripleO Containers
+-------------------------
 
 Any extra RPMs required by 3rd party drivers may need to be post-installed into
 our stock TripleO containers.  In this case the 3rd party vendor may opt to add
 a layer to an existing container in order to deploy their software.
+
+Adding layers to existing containers using TripleO tooling
+..........................................................
+
+.. note:: This method works with the Victoria release but work is happening
+          to backport it to Train. To add layers on an older release, refer
+          to the next section which uses Docker.
+
+The example below demonstrates how to extend a container image, where the goal
+is to create a layer on top of the cinder-volume image that will be named
+"cinder-cooldriver".
+
+* Make sure python-tripleoclient and the dependencies are installed:
+
+  .. code-block:: shell
+
+    sudo dnf install -y python-tripleoclient
+
+
+* Create a vendor directory (which later can be pushed into a git
+  repository):
+
+  .. code-block:: shell
+
+    mkdir ~/vendor
+
+* Create the `~/vendor/containers.yaml` which contains the list
+  of images that we want to build:
+
+  .. code-block:: yaml
+
+    container_images:
+      - image_source: tripleo
+        imagename: localhost/tripleomaster/openstack-cinder-cooldriver:latest
+
+* Create `~/vendor/cinder-cooldriver.yaml` file which contains
+  the container image configuration:
+
+  .. code-block:: yaml
+
+    ---
+    # that's the parent layer, here cinder-volume
+    tcib_from: localhost/tripleomaster/openstack-cinder-volume:latest
+    tcib_actions:
+      - run: mkdir /tmp/cooldriver/example.py
+      - run: dnf install -y cooldriver_package
+
+.. note:: the tcib parameters are documented in the `tcib`_ role.
+
+.. _tcib: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_container_image_build.html#r-o-l-e-d-e-f-a-u-l-t-s
+
+* Build the vendor container image:
+
+  .. code-block:: shell
+
+    openstack tripleo container image build \
+      --config-file ~/vendor/containers.yaml \
+      --config-path ~/vendor
+
+* Use `sudo buildah images` command to check if the image was built:
+
+  .. code-block:: shell
+
+      localhost/tripleomaster/openstack-cinder-cooldriver latest  257592a90133   1 minute ago    1.22 GB
+
+.. note:: If you want to push the image into a Docker Registry, you can use
+          `--push` with `--registry`. Use
+          `openstack tripleo container image build --help` for more details.
+
+* Push the image into the TripleO Container registry:
+
+  .. code-block:: shell
+
+    sudo openstack tripleo container image push \
+        --local --registry-url 192.168.24.1:8787 \
+        localhost/tripleomaster/openstack-cinder-cooldriver:latest
+
+* Use `openstack tripleo container image list` to check if the image was pushed:
+
+  .. code-block:: shell
+
+    +--------------------------------------------------------------------------------------------------+
+    | Image Name                                                                                       |
+    +--------------------------------------------------------------------------------------------------+
+    | docker://undercloud.ctlplane.localdomain:8787/tripleomaster/openstack-cinder-vendor:latest       |
+    +--------------------------------------------------------------------------------------------------+
+
+Adding layers to existing containers using Docker
+.................................................
+
+.. note:: Note that this method has been simplified in the Victoria cycle
+          with the new `openstack tripleo container image build` command.
 
 The example below demonstrates how to extend a container on the Undercloud host
 machine. It assumes you are running a local docker registry on the undercloud.
@@ -48,8 +137,45 @@ above to obtain the new container.
              are updated and include security fixes in these lower layers, this
              container will NOT be updated as a result and will require rebuilding.
 
+Building new containers with tripleo container image build
+----------------------------------------------------------
+
+.. note:: This method works with the Victoria release but work is happening
+          to backport it to Train. To add layers on an older release, refer
+          to the next section which uses Docker.
+
+Use the following command to build all of the container images used in TripleO:
+
+  .. code-block:: shell
+
+    openstack tripleo container image build
+
+Different options are provided for advanced usage. They can be discovered
+by using `--help` argument.
+Here are some of them:
+
+* `--config-file` to use a custom YAML config file specifying the images to build.
+* `--config-path` to use a custom base configuration path.
+  This is the base path for all container-image files. If this option is set,
+  the default path for <config-file> will be modified.
+* `--exclude` to skip some containers during the build.
+* `--registry` to specify a Container Registry where the images will be pushed.
+* `--authfile` to specify an authentification file if the Container Registry
+  requires authentification.
+* `--skip-build` if we don't want to build and push images. It will only
+  generate the configuration files.
+* `--push` to push the container images into the Container Registry.
+* `--volume` to overrides the default bind mounts needed when the container
+  images are built. If you use this argument, don't forget that you might need
+  to include the default ones.
+* `--work-dir` to specify the place where the configuration files will be generated.
+
 Building new containers with kolla-build
 ........................................
+
+.. note:: Note that this method will be deprecated during the Victoria cycle
+          and replaced by the new `openstack tripleo container image build`
+          command.
 
 To create new containers, or modify existing ones, you can use ``kolla-build``
 from the `Kolla`_ project to build and push the images yourself.  The command

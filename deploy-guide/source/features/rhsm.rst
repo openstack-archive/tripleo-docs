@@ -49,6 +49,7 @@ the extraconfig service::
         rhsm_baseurl: "https://mysatserver.com/pulp/repos"
         rhsm_method: satellite
         rhsm_insecure: yes
+        rhsm_release: 8.1
 
 In some advanced use cases, you might want to configure RHSM for a specific role::
 
@@ -61,6 +62,7 @@ In some advanced use cases, you might want to configure RHSM for a specific role
           rhsm_baseurl: "https://mysatserver.com/pulp/repos"
           rhsm_method: satellite
           rhsm_insecure: yes
+          rhsm_release: 8.1
 
 In that case, all nodes deployed with ComputeHCI will be configured with these RHSM parameters.
 

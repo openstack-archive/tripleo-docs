@@ -13,12 +13,11 @@ This Distributed Multibackend Storage design extends the architecture
 described in :doc:`distributed_compute_node` to support the following
 worklow.
 
-- Upload an image to the Central site, and any additional DCN sites
-  with storage, concurrently using one command like `glance
-  image-create-via-import --stores central,dcn1,dcn3`.
-- Move a copy of the same image to additional DCN sites when needed
-  using a command like `glance image-import <IMAGE-ID> --stores
-  dcn2,dcn4 --import-method copy-image`.
+- Upload an image to the Central site using `glance image-create`
+  command with `--file` and `--store default_backend` parameters.
+- Move a copy of the same image to DCN sites using a command like
+  `glance image-import <IMAGE-ID> --stores dcn1,dcn2 --import-method
+  copy-image`.
 - The image's unique ID will be shared consistently across sites
 - The image may be copy-on-write booted on any DCN site as the RBD
   pools for Glance and Nova will use the same local Ceph cluster.
@@ -865,13 +864,31 @@ Confirm the expected stores are available:
   |          | store"}]                                                                         |
   +----------+----------------------------------------------------------------------------------+
 
-Create an image and import it into the default backend at central as
-well as the dcn0 backend, by listing both stores with the `--stores`
-option, as seen in the following example:
+Assuming an image like `cirros-0.4.0-x86_64-disk.img` is in the
+current directory, convert the image from QCOW2 format to RAW format
+using a command like the following:
 
 .. code-block:: bash
 
-  glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores default_backend,dcn0
+  qemu-img convert -f qcow2 -O raw cirros-0.4.0-x86_64-disk.img cirros-0.4.0-x86_64-disk.raw
+
+Create an image in Glance default store at the central site as seen
+in the following example:
+
+.. code-block:: bash
+
+  glance image-create \
+  --disk-format raw --container-format bare \
+  --name cirros --file cirros-0.4.0-x86_64-disk.raw \
+  --store default_backend
+
+Alternatively, if the image is not in the current directory but in
+qcow2 format on a web server, then it may be imported and converted in
+one command by running the following:
+
+.. code-block:: bash
+
+  glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores default_backend
 
 .. note:: The example above assumes that Glance image format
           conversion is enabled. Thus, even though `--disk-format` is
@@ -888,11 +905,11 @@ Set an environment variable to the ID of the newly created image:
 
   ID=$(openstack image show cirros -c id -f value)
 
-Copy the image from the default store to the dcn1 store:
+Copy the image from the default store to the dcn0 and dcn1 stores:
 
 .. code-block:: bash
 
-  glance image-import $ID --stores dcn1 --import-method copy-image
+  glance image-import $ID --stores dcn0,dcn1 --import-method copy-image
 
 Confirm a copy of the image is in each store by looking at the image properties:
 

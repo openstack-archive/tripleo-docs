@@ -256,11 +256,10 @@ this setting enabled commands like `glance image-create-via-import`
 with `--disk-format qcow2` will result in the image being converted
 into a raw format, which is optimal for the Ceph RBD driver. If
 you need to disable image conversion you may override the
-`image_import_plugins` parameter. For example::
+`GlanceImageImportPlugin` parameter. For example::
 
    parameter_defaults:
-     ControllerExtraConfig:
-       glance::api::image_import_plugins: []
+     GlanceImageImportPlugin: []
 
 The ``ceph.yaml`` file contains the following which sets the name of
 the Ceph cluster to "central"::

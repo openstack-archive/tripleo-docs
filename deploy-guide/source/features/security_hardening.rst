@@ -136,79 +136,70 @@ Rules can be declared using an environment file and injected into
 Firewall Management
 -------------------
 
-iptables rules are automatically deployed on overcloud nodes to open only the
+Iptables rules are automatically deployed on overcloud nodes to open only the
 ports which are needed to get OpenStack working. Rules can be added during the
-deployement when is needed. For example, for Zabbix monitoring system::
+deployment when needed. For example, for Zabbix monitoring system.
+
+.. code-block:: yaml
 
     parameter_defaults:
-      ControllerExtraConfig:
-        tripleo::firewall::firewall_rules:
-          '301 allow zabbix':
-            dport: 10050
-            proto: tcp
-            source: 10.0.0.8
-            action: accept
+      ExtraFirewallRules:
+        '301 allow zabbix':
+          dport: 10050
+          proto: tcp
+          source: 10.0.0.8
+          action: accept
 
 Rules can also be used to restrict access. The number used at definition of a
 rule will determine where the iptables rule will be inserted. For example,
-rabbitmq rule number is 109 by default. If you want to restrain it, you can do::
+rabbitmq rule number is 109 by default. If you want to restrain it, you could
+do.
+
+.. code-block:: yaml
 
     parameter_defaults:
-      ControllerExtraConfig:
-        tripleo::firewall::firewall_rules:
-          '098 allow rabbit from internalapi network':
-            dport: [4369,5672,25672]
-            proto: tcp
-            source: 10.0.0.0/24
-            action: accept
-          '099 drop other rabbit access':
-            dport: [4369,5672,25672]
-            proto: tcp
-            action: drop
+      ExtraFirewallRules:
+        '098 allow rabbit from internalapi network':
+          dport:
+          - 4369
+          - 5672
+          - 25672
+          proto: tcp
+          source: 10.0.0.0/24
+          action: accept
+        '099 drop other rabbit access':
+          dport:
+          - 4369
+          - 5672
+          - 25672
+          proto: tcp
+          action: drop
 
-In this example, 098 and 099 are arbitrarily chosen numbers that are smaller than
-the rabbitmq rule number 109. To know the number of a rule, you can inspect
-the iptables rule on the appropriate node (controller, in case of rabbitmq)::
+In this example, 098 and 099 are arbitrarily numbers that are smaller than the
+default rabbitmq rule number. To know the number of a rule, inspect the active
+iptables rules on an appropriate node (controller, in case of rabbitmq)
+
+.. code-block:: shell
 
     iptables-save
     [...]
     -A INPUT -p tcp -m multiport --dports 4369,5672,25672 -m comment --comment "109 rabbitmq" -m state --state NEW -j ACCEPT
 
 Alternatively it's possible to get the information in tripleo service in the
-definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`::
+definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`.
 
-    tripleo.rabbitmq.firewall_rules:
+.. code-block:: yaml
+
+    firewall_rules:
       '109 rabbitmq':
         dport:
           - 4369
           - 5672
           - 25672
+          - 25673-25683
 
-The following parameters can be set for a rule:
-
-* **port**: The port associated to the rule. Deprecated by puppetlabs-firewall.
-
-* **dport**: The destination port associated to the rule.
-
-* **sport**: The source port associated to the rule.
-
-* **proto**: The protocol associated to the rule. Defaults to 'tcp'
-
-* **action**: The action policy associated to the rule. Defaults to 'accept'
-
-* **jump**: The chain to jump to.
-
-* **state**: Array of states associated to the rule. Default to ['NEW']
-
-* **source**: The source IP address associated to the rule.
-
-* **iniface**: The network interface associated to the rule.
-
-* **chain**: The chain associated to the rule. Default to 'INPUT'
-
-* **destination**: The destination cidr associated to the rule.
-
-* **extras**: Hash of any additional parameters supported by the puppetlabs-firewall module.
+Additional information regarding the the available interface options, the role,
+some of the implementation details can be reviewed `here <https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_firewall.html>`_.
 
 AIDE - Intrusion Detection
 --------------------------

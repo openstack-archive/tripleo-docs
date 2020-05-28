@@ -11,6 +11,7 @@ Documentation on additional features for |project|.
    composable_services
    custom_networks
    custom_roles
+   compute_nvdimm
    deploy_cellv2
    deploy_swift
    deployed_server

@@ -5,13 +5,26 @@
    and commands appearing below should not be taken as indication that this
    is fully supported by TripleO - we're still working on it!
 
-#. Download and install the python2-tripleo-repos RPM from
-   `the current RDO repository <https://trunk.rdoproject.org/centos7/current/>`_.
-   For example
+#. Download and install the python-tripleo-repos RPM from
+   the appropriate RDO repository
 
-   .. code-block:: bash
+   .. admonition:: CentOS 7
+      :class: centos7
 
-      sudo yum install -y https://trunk.rdoproject.org/centos7/current/python2-tripleo-repos-<version>.el7.centos.noarch.rpm
+      Current `Centos 7 RDO repository <https://trunk.rdoproject.org/centos7/current/>`_
+
+       .. code-block:: bash
+
+          sudo yum install -y https://trunk.rdoproject.org/centos7/current/python2-tripleo-repos-<version>.el7.centos.noarch.rpm
+
+   .. admonition:: CentOS 8
+      :class: centos8
+
+      Current `Centos 8 RDO repository <https://trunk.rdoproject.org/centos8/component/tripleo/current/>`_.
+
+       .. code-block:: bash
+
+          sudo dnf install -y https://trunk.rdoproject.org/centos8/component/tripleo/current/python3-tripleo-repos-<version>.el8.noarch.rpm
 
    .. note::
 

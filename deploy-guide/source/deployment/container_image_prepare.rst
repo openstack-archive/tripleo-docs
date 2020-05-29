@@ -434,3 +434,51 @@ OpenStack, you can use this example::
     ...
 
 It will produce a modified image with Python source code installed via pip.
+
+Building hotfixed containers
+............................
+
+The `tripleoclient` OpenStack plugin provides a command line interface which
+will allow operators to apply packages (hotfixes) to running containers. This
+capability leverages the **tripleo-modify-image** role, and automates its
+application to a set of containers for a given collection of packages.
+
+Using the provided command line interface is simple. The interface has very few
+required options. The noted options below inform the tooling which containers
+need to have the hotfix(es) applied, and where to find the hotfixed package(s).
+
+============ =================================================================
+   option       Description
+============ =================================================================
+--image       The `--image` argument requires the use fully qualified image
+              name, something like *localhost/image/name:tag-data*. The
+              `--image` option can be used more than once, which will inform
+              the tooling that multiple containers need to have the same
+              hotfix packages applied.
+--rpms-path   The `--rpms-path` argument requires the full path to a
+              directory where RPMs exist. The RPMs within this directory will
+              be installed into the container, producing a new layer for an
+              existing container.
+--tag         The `--tag` argument is optional, though it is recommended to
+              be used. The value of this option will append to the tag of the
+              running container. By using the tag argument, images that have
+              been modified can be easily identified.
+============ =================================================================
+
+With all of the required information, the command to modify existing container
+images can be executed like so.
+
+.. code-block:: shell
+
+    # The shell variables need to be replaced with data that pertains to the given environment.
+    tripleo container image hotfix --image ${FULLY_QUALIFIED_IMAGE_NAME} \
+                                   --rpms-path ${RPM_DIRECTORY} \
+                                   --tag ${TAG_VALUE}
+
+When this command completes, new container images will be available on the
+local system and are ready to be integrated into the environment.
+
+.. note::
+
+    Additional steps may be required before the images can be deployed into the
+    environment.

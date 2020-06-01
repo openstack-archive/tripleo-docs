@@ -76,13 +76,12 @@ Configuring nova-compute ephemeral backend per role
 ---------------------------------------------------
 
 NovaEnableRdbBackend can be configured on a per-role basis allowing compute
-hosts to be deployed with a subset using RBD ephemeral disk. The
-remaining hosts continue using the default local ephemeral disk.
+hosts to be deployed with a subset using RBD ephemeral disk and a subset using
+local ephemeral disk.
 
 .. note::
 
-    For best performacne images to be deployed to RBD ephemeral computes should be in RAW format while images to be deployed to local ephemeral computes should be QCOW2 format.
-
+    For best performance images to be deployed to RBD ephemeral computes should be in RAW format while images to be deployed to local ephemeral computes should be QCOW2 format.
 
 Generate roles_data including the provided ComputeLocalEphemeral and
 ComputeRBDEphemeral roles as described in the :ref:`custom_roles`
@@ -103,10 +102,20 @@ parameter on any Compute role, for example::
       MyCustomComputeParameters:
         NovaEnableRbdBackend: false
 
-Deploy using the per-role ceph-ansible environment file
-"environments/ceph-ansible/ceph-ansible-per-role.yaml"::
+If the top-level NovaEnableRbdBackend parameter is set to true, as it is in
+environments/ceph-ansible/ceph-ansible.yaml, then then this will be
+the default when not overridden via role parameters.
 
-    openstack overcloud deploy --templates -r my_roles_data.yaml -e nodes.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible-per-role.yaml
+Setting NovaEnableRbdBackend to true at the top level also enables the glance
+image_conversion import plugin and show_multiple_locations option.
+These parameters must be set explicitly when changing the top-level
+NovaEnableRbdBackend to false::
+
+    parameter_defaults:
+      NovaEnableRbdBackend: false
+      GlanceShowMultipleLocations: true
+      GlanceImageImportPlugins:
+        - image_conversion
 
 Customizing ceph.conf with puppet-ceph
 --------------------------------------

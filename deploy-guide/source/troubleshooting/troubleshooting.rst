@@ -7,7 +7,6 @@ help with troubleshooting when using |project|.
 .. toctree::
    :maxdepth: 2
 
-   troubleshooting-virt-setup
    troubleshooting-image-build
    troubleshooting-nodes
    troubleshooting-overcloud

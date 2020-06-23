@@ -315,8 +315,9 @@ Self-signed DNS-based certificate::
 
     -e ~/ssl-heat-templates/environments/ssl/enable-tls.yaml -e ~/ssl-heat-templates/environments/ssl/tls-endpoints-public-dns.yaml -e ~/cloudname.yaml -e ~/ssl-heat-templates/environments/ssl/inject-trust-anchor.yaml
 
-.. note:: It is also possible to get the public certificate from a CA. See
-          :doc:`tls_everywhere`
+It is also possible to get all your certificates from a CA. For this you need
+to include the **environments/services/haproxy-public-tls-certmonger.yaml**
+environment file.
 
 .. _ca-trust:
 
@@ -365,6 +366,3 @@ is in PEM format.
           copy the contents of
           ``/etc/pki/ca-trust/source/anchors/cm-local-ca.pem`` into the
           aforementioned ``CAMap`` parameter.
-
-
-.. include:: ./tls_everywhere.rst

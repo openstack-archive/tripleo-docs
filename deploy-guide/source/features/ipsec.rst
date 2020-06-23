@@ -17,7 +17,7 @@ not be possible to add another node to the network for various other reasons.
 For these cases, IPSec is a viable, alternative solution.
 
 .. note:: For more information on TLS Everywhere, please see
-          :doc:`tls_everywhere`.
+          :doc:`tls-everywhere`.
 
 IPSec thus, provides an alternative to TLS Everywhere. With IPSec the encryption
 happens on the IP layer, and not over TCP (as happens in TLS). As a result, the

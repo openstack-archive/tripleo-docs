@@ -32,7 +32,7 @@ In the case we have updated the packages correctly, and the user has an
 issue with updating the database schemas, we might need to restore the
 database cluster.
 
-With all the services stoped in the Overcloud controllers (except MySQL), go through
+With all the services stopped in the Overcloud controllers (except MySQL), go through
 the following procedure:
 
 On all the controller nodes, drop connections to the database port via the VIP by running::

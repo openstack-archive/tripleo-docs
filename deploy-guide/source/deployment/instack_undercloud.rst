@@ -32,7 +32,7 @@
 
    .. note::
       The undercloud is intended to work correctly with SELinux enforcing.
-      Installatoins with the permissive/disabled SELinux are not recommended.
+      Installations with the permissive/disabled SELinux are not recommended.
       The ``undercloud_enable_selinux`` config option controls that setting.
 
    .. note::
@@ -152,7 +152,7 @@
        actually deployed is completely changed and what is more, for the first
        time aligns with the overcloud deployment. See the command
        ``openstack tripleo deploy --standalone`` help for details.
-       That interface extention for standalone clouds is experimental for Rocky.
+       That interface extension for standalone clouds is experimental for Rocky.
        It is normally should not be used directly for undercloud installations.
 
 #. Run the command to install the undercloud:

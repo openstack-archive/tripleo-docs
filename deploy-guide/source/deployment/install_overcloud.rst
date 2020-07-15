@@ -281,7 +281,7 @@ Load the images into the containerized undercloud Glance::
 
 To upload a single image, see :doc:`upload_single_image`.
 
-If working with multiple architectures and/or plaforms with an architecure these
+If working with multiple architectures and/or platforms with an architecture these
 attributes can be specified at upload time as in::
 
     openstack overcloud image upload

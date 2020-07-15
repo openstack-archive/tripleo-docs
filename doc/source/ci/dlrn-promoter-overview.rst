@@ -121,7 +121,7 @@ https://github.com/rdo-infra/ci-config/blob/master/ci-scripts/dlrnapi_promoter/R
 Pushing RDO containers to ``docker.io``
 ```````````````````````````````````````
 
-The DLRN Promotor script calls the `container push playbook
+The DLRN Promoter script calls the `container push playbook
 <https://github.com/rdo-infra/ci-config/blob/master/ci-scripts/container-push/container-push.yml>`_
 to push the RDO containers at each stage to `docker.io
 <https://hub.docker.com/r/tripleopike/centos-binary-heat-api/tags/>`_.

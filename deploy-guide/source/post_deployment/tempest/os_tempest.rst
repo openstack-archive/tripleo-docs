@@ -76,10 +76,10 @@ What are these above vars:
 * `tempest_public_subnet_cidr`: Based on the standalone deployment IP, we need to pass a required cidr.
 * `tempest_public_subnet_gateway_ip and tempest_public_subnet_allocation_pools`:
    Subnet Gateway IP and allocation pool can be calculated based on the value of `tempest_public_subnet_cidr` nthhost value.
-* `tempest_use_tempestconf`: For generating tempest.conf, we use python-tempestconf tool. By default It is setted to false. Set to `true` for using it
-* `tempest_run_stackviz`: Stackviz is very useful in CI for analizing tempest results, for local use, we set it to false. By default it is setted to true.
+* `tempest_use_tempestconf`: For generating tempest.conf, we use python-tempestconf tool. By default It is set to false. Set it to `true` for using it
+* `tempest_run_stackviz`: Stackviz is very useful in CI for analyzing tempest results, for local use, we set it to false. By default it is set to true.
 * `tempest_tempest_conf_overrides`: In order to pass additional tempest configuration to python-tempestconf tool, we can pass a dictionary of values.
-* `tempest_test_whitelist`: We need to pass a list of tests which we wish to run on the targest host as a list.
+* `tempest_test_whitelist`: We need to pass a list of tests which we wish to run on the target host as a list.
 * `tempest_test_blacklist`: In order to skip tempest tests, we can pass the list here.
 * `gather_facts`: We need to set gather_facts to true as os_tempest rely on targetted environment facts for installing stuff.
 

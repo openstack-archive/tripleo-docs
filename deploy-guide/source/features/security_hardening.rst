@@ -113,7 +113,7 @@ Audit
 -----
 
 Having a system capable of recording all audit events is key for troubleshooting
-and peforming analysis of events that led to a certain outcome. The audit system
+and performing analysis of events that led to a certain outcome. The audit system
 is capable of logging many events such as someone changing the system time,
 changes to Mandatory / Discretionary Access Control, creating / destroying users
 or groups.
@@ -251,7 +251,7 @@ example structure::
 
 .. note::
    Operators should select their own required AIDE values, as the example list
-   above is not activley maintained or benchmarked. It only seeks to provide
+   above is not actively maintained or benchmarked. It only seeks to provide
    an document the YAML structure required.
 
 If above environment file were saved as `aide.yaml` it could then be passed to

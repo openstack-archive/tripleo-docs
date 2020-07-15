@@ -524,7 +524,7 @@ like this:
         external_resource_segment_id: 730769f8-e78f-42a3-9dd4-367a212e49ff
 
 Previously we already added the `external_resource_network_id` and `external_resource_subnet_id`
-for the network in the upper level hirarchy.
+for the network in the upper level hierarchy.
 
 In addition we add the `external_resource_vip_id` of the VIP of the stack which
 should be reused for this network (Storage).

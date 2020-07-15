@@ -16,7 +16,7 @@ The validations are assigned into various groups that indicate when in
 the deployment workflow they are expected to run:
 
 * **no-op** validations will run a no-op operation to verify that
-  the workflow is working as it supossed to, it will run in both
+  the workflow is working as it supposed to, it will run in both
   the Undercloud and Overcloud nodes.
 
 * **openshift-on-openstack** validations will check that the

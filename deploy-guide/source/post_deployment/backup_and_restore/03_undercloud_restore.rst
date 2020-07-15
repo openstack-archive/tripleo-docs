@@ -88,7 +88,7 @@ node, the user is able to log in as the stack user, and
 have the Backup restored in the folder
 `/var/tmp/test_bk_down`, follow the next steps.
 
-Syncronize the stack home directory, haproxy configuration,
+Synchronize the stack home directory, haproxy configuration,
 certificates and hieradata with the backup content:
 
 ::
@@ -171,7 +171,7 @@ the DB password to be able to reinstall the Undercloud:
   oldpassword=$(sudo cat /var/tmp/test_bk_down/root/.my.cnf | grep -m1 password | cut -d'=' -f2 | tr -d "'")
   mysqladmin -u root -p$oldpassword password ''
 
-Remove old user permisology if it exists, replace <node> with the host related to each user.
+Remove old user permissions if it exists, replace <node> with the host related to each user.
 
 ::
 

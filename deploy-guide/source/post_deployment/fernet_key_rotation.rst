@@ -4,7 +4,7 @@ Rotation Keystone Fernet Keys from the Overcloud
 ================================================
 
 Like most passwords in your overcloud deployment, keystone fernet keys are also
-stored as part of the deployment plan in mistral. The overcloud deplotment's
+stored as part of the deployment plan in mistral. The overcloud deployment's
 fernet keys can be rotated with the following command::
 
     openstack workflow execution create \

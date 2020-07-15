@@ -86,7 +86,7 @@ system, which is often the preferred way to operate.
 
 Restarting nova_scheduler for example::
 
-    $ sudo systemctl restart triplo_nova_scheduler
+    $ sudo systemctl restart tripleo_nova_scheduler
 
 Stopping a container with systemd::
 

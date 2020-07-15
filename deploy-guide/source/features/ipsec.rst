@@ -107,7 +107,7 @@ that looks as follows::
 The ``IpsecVars`` option is able to change any parameter in the tripleo-ipsec
 ansible role.
 
-.. note:: For more information on the algorithms that Libreswan suppports,
+.. note:: For more information on the algorithms that Libreswan supports,
           please check the `Libreswan documentation`_
 
 .. note:: For more information on the available parameters, check the README

@@ -1108,7 +1108,7 @@ switch with ironic/neutron controlling the vlan id for the switch::
       +---------------+        +-----------------+
 
 Switch config for xe-0/0/7 should be removed before deployment, and
-xe-0/0/1 shoud be a member of the vlan range 1200-1299::
+xe-0/0/1 should be a member of the vlan range 1200-1299::
 
   xe-0/0/1 {
       native-vlan-id XXX;

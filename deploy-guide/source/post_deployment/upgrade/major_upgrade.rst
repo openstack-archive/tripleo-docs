@@ -65,7 +65,7 @@ The upgrade workflow essentially consists of the following steps:
    Finally run a heat stack update, unsetting any upgrade specific variables
    and leaving the heat stack in a healthy state for future updates.
 
-Detailed infromation and pointers can be found in the relevant the
+Detailed information and pointers can be found in the relevant the
 queens-upgrade-dev-docs_.
 
 .. _queens-upgrade-dev-docs: https://docs.openstack.org/tripleo-docs/latest/install/developer/upgrades/major_upgrade.html # WIP @ https://review.opendev.org/#/c/569443/
@@ -266,7 +266,7 @@ don't want to start them all.
    :class: stable
 
    The --limit was introduced in the Stein release. In previous versions, use
-   --nodes or --roles parmeters.
+   --nodes or --roles parameters.
 
 openstack overcloud external-upgrade run (for services)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -612,7 +612,7 @@ major-upgrade-composable-steps that come first, as described above.
    are 'fully' upgraded after each step completes, rather than having to wait
    for the final converge step as has previously been the case. In the case of
    Ocata to Pike the full puppet/docker config is applied to bring up the
-   overclod services in containers.
+   overcloud services in containers.
 
    The tripleo_upgrade_node.sh_ script and puppet configuration are delivered to
    the nodes with ``disable_upgrade_deployment`` set ``True`` during the initial

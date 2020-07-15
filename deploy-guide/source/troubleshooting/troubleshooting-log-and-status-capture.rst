@@ -13,9 +13,9 @@ logs to the host that the command is executed from.
 Example: Download logs from all controllers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The required `server_name` option for the command can be a paritial name
+The required `server_name` option for the command can be a partial name
 match for the overcloud nodes. This means `openstack overcloud support report
-colect controller` will match all the overcloud nodes that contain the word
+collect controller` will match all the overcloud nodes that contain the word
 `controller`.  To download the run the command and download them to a local
 directory, run the following command::
 

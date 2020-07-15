@@ -324,7 +324,7 @@ from any CIDR::
       OS::TripleO::Network::Ports::ControlPlaneVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
 
       # Set VIP's for redis and OVN to noop to default to the ctlplane VIP
-      # The cltplane VIP is set with control_virtual_ip in
+      # The ctlplane VIP is set with control_virtual_ip in
       # DeployedServerPortMap below.
       #
       # Alternatively, these can be mapped to deployed-neutron-port.yaml as

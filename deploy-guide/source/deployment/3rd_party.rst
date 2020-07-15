@@ -153,8 +153,8 @@ Here are some of them:
   the default path for <config-file> will be modified.
 * `--exclude` to skip some containers during the build.
 * `--registry` to specify a Container Registry where the images will be pushed.
-* `--authfile` to specify an authentification file if the Container Registry
-  requires authentification.
+* `--authfile` to specify an authentication file if the Container Registry
+  requires authentication.
 * `--skip-build` if we don't want to build and push images. It will only
   generate the configuration files.
 * `--push` to push the container images into the Container Registry.
@@ -305,7 +305,7 @@ Either way, if you need to run a privileged container, make sure to set this par
 
     privileged: true
 
-If privilege mode isn't required, it is suggested to set it to false for security reaons.
+If privilege mode isn't required, it is suggested to set it to false for security reasons.
 
 Kernel modules will need to be loaded when the container will be started by Docker. To do so, it is
 suggested to configure the composable service which deploys the module in the container this way::

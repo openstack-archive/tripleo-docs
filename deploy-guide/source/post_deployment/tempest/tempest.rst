@@ -117,7 +117,7 @@ configuration, the following is the default::
 
 * Running tempest against overcloud::
 
-    $ cd <path to triplo-quickstart repo>
+    $ cd <path to tripleo-quickstart repo>
 
     $ bash quickstart.sh \
       --bootstrap \

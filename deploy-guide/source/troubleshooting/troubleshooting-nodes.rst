@@ -98,7 +98,7 @@ power management, and it gets stuck in an abnormal state.
 .. warning::
     Before proceeding with this section, always try to decommission a node
     normally, by scaling down your cloud. Forcing node deletion may cause
-    unpredicable results.
+    unpredictable results.
 
 Ironic requires that nodes that cannot be operated normally are put in the
 maintenance mode. It is done by the following command::

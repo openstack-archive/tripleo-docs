@@ -14,7 +14,7 @@ can be included in the TripleO promotion criteria.
 
 The goal is to give developers feedback on real deployments and allow us to
 have better coverage on issues seen in production environments. It also
-allows an aproximation of OVB jobs running in RDO cloud in order to get an
+allows an approximation of OVB jobs running in RDO cloud in order to get an
 "apples-to-apples" comparison to eliminate infra issues.
 
 .. _baremetal_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/provisioning/index.html
@@ -114,7 +114,7 @@ Now adding the dlrn reporting ::
       secrets:
          - dlrnapi
 
-Example of a specfic hardware job in Zuul:
+Example of a specific hardware job in Zuul:
 
 Note that multiple jobs cannot be run on the hardware concurrently.
 The base job is modified to include semaphore

@@ -11,7 +11,7 @@ Features
 
 This Distributed Multibackend Storage design extends the architecture
 described in :doc:`distributed_compute_node` to support the following
-worklow.
+workflow.
 
 - Upload an image to the Central site using `glance image-create`
   command with `--file` and `--store default_backend` parameters.

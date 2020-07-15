@@ -72,7 +72,7 @@ group Transfer the data to the freshly re-installed controller\n(only required i
 note over "undercloud", "controller-2" #AAFFAA
     Everything is composable, but diagram showcases MariaDB specifically
 end note
-User -> "undercloud" : openstack overcloud external-upgarde run
+User -> "undercloud" : openstack overcloud external-upgrade run
 "undercloud" -> "controller-1" : pcs resource disable\ngalera-bundle
 note right: Disable MariaDB
 "controller-1" -> "controller-2"

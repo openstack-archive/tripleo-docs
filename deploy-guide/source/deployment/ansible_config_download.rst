@@ -392,7 +392,7 @@ deploy_steps_playbook.yaml
 __________________________
 ``deploy_steps_playbook.yaml`` is the playbook used for deployment and template
 update. It applies all the software configuration necessary to deploy a full
-overcluod based on the templates provided as input to the deployment command.
+overcloud based on the templates provided as input to the deployment command.
 
 This section will summarize at high level the different ansible plays used
 within this playbook. The play names shown here are the same names used within
@@ -410,7 +410,7 @@ Gather facts from overcloud
 
   tags: facts
 Load global variables
-  Loads all varaibles from `l`global_vars.yaml``
+  Loads all variables from `l`global_vars.yaml``
 
   tags: always
 Common roles for TripleO servers
@@ -441,13 +441,13 @@ External deployment step [1,2,3,4,5]
 Overcloud deploy step tasks for [1,2,3,4,5]
   Applies tasks from the ``deploy_steps_tasks`` template interface
 
-  tags: overcloud, deploy_setps
+  tags: overcloud, deploy_steps
 Overcloud common deploy step tasks [1,2,3,4,5]
   Applies the common tasks done at each step to include puppet host
   configuration, ``container-puppet.py``, and ``paunch`` or
   ``tripleo_container_manage`` Ansible role (container configuration).
 
-  tags: overcloud, deploy_setps
+  tags: overcloud, deploy_steps
 Server Post Deployments
   Applies server specific Heat deployments for configuration done after the 5
   step deployment process.
@@ -722,7 +722,7 @@ previewed is dependent on many factors such as the underlying tools in use
 (puppet, docker, etc) and the support for ansible check mode in the given
 ansible module.
 
-The ``--diff`` option can aloso be used with ``--check`` to show the
+The ``--diff`` option can also be used with ``--check`` to show the
 differences that would result from changes.
 
 See `Ansible Check Mode ("Dry Run")

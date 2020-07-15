@@ -96,7 +96,7 @@ verify we can restore it from the Hypervisor.
 
 3. Prepare the hypervisor.
 
-We will run in the Hypervison some pre backup steps in
+We will run in the Hypervisor some pre backup steps in
 order to have the correct configuration to mount the
 backup bucket from the Undercloud node::
 

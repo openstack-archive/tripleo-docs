@@ -45,7 +45,7 @@ You can then pass the environment file on deployment as follows::
 The same approach can be used for any role.
 
 .. warning::
-  While considerable flexibilty is available regarding service placement with
+  While considerable flexibility is available regarding service placement with
   these interfaces, the flexible placement of pacemaker managed services is only
   available since the Ocata release.
 

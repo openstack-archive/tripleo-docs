@@ -128,7 +128,7 @@ network to the instance.
 .. note::
 
     Cloud-init by default configures only first network interface to use DHCP
-    which means that user intances will not have network interface for storage
+    which means that user instances will not have network interface for storage
     network autoconfigured. You can configure it manually or use
     `dhcp-all-interfaces <https://docs.openstack.org/diskimage-builder/elements/dhcp-all-interfaces/README.html>`_.
 
@@ -170,7 +170,7 @@ Deploying the Overcloud with an External Backend
 
    - Fill in or override the values of parameters for your back end.
 
-   - Since you have copied the file out of its original locaation,
+   - Since you have copied the file out of its original location,
      replace relative paths in the resource_registry with absolute paths
      based on ``/usr/share/openstack-tripleo-heat-templates``.
 

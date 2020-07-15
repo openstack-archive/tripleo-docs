@@ -5,7 +5,7 @@ Standalone Containers based Deployment
    This currently is only supported in Rocky or newer versions.
 
 This documentation explains how the underlying framework used by the
-Containterized Undercloud deployment mechanism can be reused to deploy a single
+Containerized Undercloud deployment mechanism can be reused to deploy a single
 node capable of running OpenStack services for development.
 
 
@@ -219,7 +219,7 @@ Deploying a Standalone OpenStack node
       :class: ceph
 
       Create an additional environment file which directs ceph-ansible
-      to use the block device with logical volumes and fecth directory
+      to use the block device with logical volumes and fetch directory
       backup created earlier. In the same file pass additional Ceph
       parameters for the OSD scenario and Ceph networks. Set the
       placement group and replica count to values which fit the number

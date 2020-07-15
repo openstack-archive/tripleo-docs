@@ -281,7 +281,7 @@ following template as a configuration::
   :doc:`ssl` document.
 
 * $SUFFIX will be the domain for your users. Given a domain, the suffix DN can
-  be created withwith the following snippet::
+  be created with the following snippet::
 
       suffix=`echo $DOMAIN | sed -e 's/^/dc=/' -e 's/\./,dc=/g'`
 

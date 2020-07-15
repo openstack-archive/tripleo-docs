@@ -226,8 +226,8 @@ using the following defaults:
 
 * CephClusterName: 'ceph'
 * CephClientUserName: 'openstack'
-* CephClientKey: This value is randomly genereated per Heat stack. If
-  it is overridden the recomendation is to set it to the output of
+* CephClientKey: This value is randomly generated per Heat stack. If
+  it is overridden the recommendation is to set it to the output of
   `ceph-authtool --gen-print-key`.
 
 If the above values are overridden, the keyring file will have a

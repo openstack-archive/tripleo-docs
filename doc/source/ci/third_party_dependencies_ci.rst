@@ -97,12 +97,12 @@ Click on the job link and it will open the build result page. Then click on
 `log_url`, click on the `job-output.txt`. It contains the results of
 ansible playbook runs.
 Look for *ERROR* or failed messages.
-If looks something ovious.
+If looks something obvious.
 Please go ahead and create the bug on launchpad_ against tripleo project with
 all the information.
 
 Once the bug is created, please add `depcheck` tag on the filed launchpad bug.
-This tag is explicitly used for listing bugs related to TripleO CI job failue
+This tag is explicitly used for listing bugs related to TripleO CI job failure
 against ceph-ansible and podman projects.
 
 .. _launchpad: https://bugs.launchpad.net/tripleo/+filebug

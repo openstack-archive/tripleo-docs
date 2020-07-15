@@ -382,7 +382,7 @@ At a minimum an operator should check the health of the pacemaker cluster
    :class: stable
 
    The ``--limit`` was introduced in the Stein release. In previous versions,
-   use ``--nodes`` or ``--roles`` paremeters.
+   use ``--nodes`` or ``--roles`` parameters.
 
 For control plane nodes, you are expected to upgrade all nodes within a role at
 the same time: pass a role name to ``--limit``. For non-control-plane nodes,

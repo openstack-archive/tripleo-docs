@@ -93,8 +93,8 @@ may not always point to the same device on reboot. Thus, `by_path` is
 recommended and is the default if `-k` is not specified.
 
 Ironic will have one of the available disks on the system reserved as
-the root disk. The utility will always exlude the root disk from the
-list of devices genereated.
+the root disk. The utility will always exclude the root disk from the
+list of devices generated.
 
 Use `./make_ceph_disk_list.py --help` to see other available options.
 

@@ -202,7 +202,7 @@ Updating your Overcloud - Pike
 For the Pike cycle the minor update workflow is significantly different to
 previous cycles. In particular, rather than using a static yum_update.sh_
 we now use service specific ansible update_tasks_ (similar to the upgrade_tasks
-used for the major upgrade worklow since Ocata). Furthermore, these are not
+used for the major upgrade workflow since Ocata). Furthermore, these are not
 executed directly via a Heat stack update, but rather, together with the
 docker/puppet config, collected and written to ansible playbooks. The operator
 then invokes these to deliver the minor update to particular nodes.
@@ -233,7 +233,7 @@ parameter::
    :class: stable
 
    The `--limit` was introduced in the Stein release. In previous versions,
-   use `--nodes` or `--roles` parmeters.
+   use `--nodes` or `--roles` parameters.
 
 You can specify a role name, e.g. 'Compute', to execute the minor update on
 all nodes of that role in a rolling fashion (serial:1 is used on the playbooks).

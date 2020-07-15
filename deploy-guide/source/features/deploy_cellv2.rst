@@ -2,7 +2,7 @@ Deploy an additional nova cell v2
 =================================
 
 .. warning::
-   Multi cell cupport is only supported in Stein and later versions.
+   Multi cell support is only supported in Stein and later versions.
 
 The different sections in this guide assume that you are ready to deploy a new
 overcloud, or already have installed an overcloud (min Stein release).

@@ -301,7 +301,7 @@ include:
 - As part of a development workflow where local changes need to be deployed for
   testing and development
 - When changes need to be deployed but are not available through an image
-  build pipeline (proprietry addons, emergency fixes)
+  build pipeline (proprietary addons, emergency fixes)
 
 The modification is done by invoking an ansible role on each image which needs
 to be modified. The role takes a source image, makes the requested changes,

@@ -16,7 +16,7 @@ management between the control plane stack and the stacks for additional compute
 nodes. The stacks can be managed, scaled, and updated separately.
 
 Using separate stacks also creates smaller failure domains as there are less
-baremetal nodes in each invidiual stack. A failure in one baremetal node only
+baremetal nodes in each individual stack. A failure in one baremetal node only
 requires that management operations to address that failure need only affect
 the single stack that contains the failed node.
 
@@ -339,7 +339,7 @@ Extract the needed data from the control plane stack:
   in the overcloud deployment. Some passwords in the file may be removed if
   they are not needed by DCN. For example, the passwords for RabbitMQ, MySQL,
   Keystone, Nova and Neutron should be sufficient to launch an instance.  When
-  the export comman is run, the Ceph passwords are excluded so that DCN
+  the export common is run, the Ceph passwords are excluded so that DCN
   deployments which include Ceph do not reuse the same Ceph password and
   instead new ones are generated per DCN deployment.
 
@@ -1114,7 +1114,7 @@ were to run the following::
 
   tripleo-ansible-inventory --static-yaml-inventory inventory.yaml --stack central,edge0
 
-then you could use the genereated inventory.yaml as follows::
+then you could use the generated inventory.yaml as follows::
 
   (undercloud) [stack@undercloud ~]$ ansible -i inventory.yaml -m ping central
   central-controller-0 | SUCCESS => {

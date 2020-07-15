@@ -108,7 +108,7 @@ Before deploying the Overcloud
 
 3. Configure the environment
 
-   The easiest way to configure our environment will be to create a parameter file, let's called paramters.yaml with all the paramteres defined.
+   The easiest way to configure our environment will be to create a parameter file, let's called parameters.yaml with all the parameters defined.
 
    - Availability Monitoring::
 

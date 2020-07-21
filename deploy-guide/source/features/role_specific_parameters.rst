@@ -55,10 +55,54 @@ which will be done by the service implementation::
                 NeutronDpdkMemoryChannels: {get_param: NeutronDpdkMemoryChannels}
                 NeutronDpdkSocketMemory: {get_param: NeutronDpdkSocketMemory}
 
+A service can have a unique variable name that is different than the role specific one.
+The example below shows how to define the service variable ``KeystoneWSGITimeout``, override
+it with the role specific variable ``WSGITimeout`` if it is found, and create a new alias variable
+named ``wsgi_timeout`` to store the value. Later on, that value can be retrieved by using
+``{get_attr: [RoleParametersValue, value, wsgi_timeout]}``.::
+
+    parameters:
+
+      KeystoneWSGITimeout:
+        description: The timeout for the Apache virtual host created for the API endpoint.
+        type: string
+        default: '60'
+        tags:
+          - role_specific
+
+    resources:
+
+      RoleParametersValue:
+        type: OS::Heat::Value
+        properties:
+          type: json
+          value:
+            map_replace:
+              - map_replace:
+                - wsgi_timeout: WSGITimeout
+                - values: {get_param: [RoleParameters]}
+              - values:
+                  WSGITimeout: {get_param: KeystoneWSGITimeout}
+
+    outputs:
+      role_data:
+        description: Role data for the Keystone API role.
+        value:
+          config_settings:
+            map_merge:
+              - keystone::wsgi::apache::vhost_custom_fragment:
+                  list_join: [' ', ['Timeout', {get_attr: [RoleParametersValue, value, wsgi_timeout]}]]
+
+Now the variable can optionally have a default set at the composable roles data level.::
+
+    - name: Undercloud
+      RoleParametersDefault:
+        WSGITimeout: '600'
+
 .. note::
     As of now, not all parameters can be set per role, it is based on the
     service or template implementation. Each service should have the
     implementation to merge the global parameters and role-specific
-    parameters, as explained in the above example. A warning will be shown
+    parameters, as explained in the above examples. A warning will be shown
     during the deployment, if an invalid parameter (which does not support
     role-specific implementation) is provided as role-specific input.

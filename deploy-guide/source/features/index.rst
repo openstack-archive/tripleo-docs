@@ -41,6 +41,6 @@ Documentation on additional features for |project|.
    security_hardening
    split_stack
    ssl
-   tls-everywhere
+   tls-introduction
    tuned
    undercloud_minion

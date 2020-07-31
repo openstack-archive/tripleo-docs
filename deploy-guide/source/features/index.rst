@@ -20,6 +20,7 @@ Documentation on additional features for |project|.
    distributed_compute_node
    distributed_multibackend_storage
    extra_config
+   tolerated_failure
    high_availability
    instance_ha
    ipsec

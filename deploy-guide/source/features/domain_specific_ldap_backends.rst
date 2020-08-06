@@ -275,7 +275,7 @@ following template as a configuration::
 
 * To use TLS, the FreeIPA server's certificate must also be trusted by the
   openldap client libraries. If you're using novajoin (and
-  :doc:`tls_everywhere`) this is easily achieved since all the nodes in your
+  :doc:`tls-everywhere`) this is easily achieved since all the nodes in your
   overcloud are enrolled in FreeIPA. If you're not using this setup, you should
   then follow the 'Getting the overcloud to trust CAs' section in the
   :doc:`ssl` document.

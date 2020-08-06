@@ -96,6 +96,28 @@ Installing the Undercloud
 
           sudo yum install -y ceph-ansible
 
+   .. admonition:: TLS
+      :class: tls
+
+      If you intend to deploy *TLS-everywhere* in the overcloud and are
+      deploying Train with python3 or Ussuri+, install the following packages::
+
+          sudo yum install -y python3-ipalib python3-ipaclient krb5-devel
+
+      If you're deploying Train with python2, install the corresponding python2
+      version of the above packages::
+
+          sudo yum install -y python-ipalib python-ipaclient krb5-devel
+
+      if you intend to use Novajoin to implement *TLS-everywhere* install the
+      following package::
+
+          sudo yum install -y python-novajoin
+
+      You can find more information about deploying with TLS in the
+      :doc:`../features/tls-introduction` documentation.
+
+
 #. Prepare the configuration file::
 
     cp /usr/share/python-tripleoclient/undercloud.conf.sample ~/undercloud.conf

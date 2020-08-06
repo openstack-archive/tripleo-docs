@@ -43,5 +43,6 @@ Documentation on additional features for |project|.
    split_stack
    ssl
    tls-introduction
+   tls-everywhere
    tuned
    undercloud_minion

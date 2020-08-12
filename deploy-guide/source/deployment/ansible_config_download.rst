@@ -415,8 +415,8 @@ Load global variables
   tags: always
 Common roles for TripleO servers
   Applies common ansible roles to all overcloud nodes. Includes
-  ``tripleo-bootstrap`` for installing bootstrap packages and
-  ``tripleo-ssh-known-hosts`` for configuring ssh known hosts.
+  ``tripleo_bootstrap`` for installing bootstrap packages and
+  ``tripleo_ssh_known_hosts`` for configuring ssh known hosts.
 
   tags: common_roles
 Overcloud deploy step tasks for step 0
@@ -445,7 +445,7 @@ Overcloud deploy step tasks for [1,2,3,4,5]
 Overcloud common deploy step tasks [1,2,3,4,5]
   Applies the common tasks done at each step to include puppet host
   configuration, ``container-puppet.py``, and ``paunch`` or
-  ``tripleo-container-manage`` Ansible role (container configuration).
+  ``tripleo_container_manage`` Ansible role (container configuration).
 
   tags: overcloud, deploy_setps
 Server Post Deployments

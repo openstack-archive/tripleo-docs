@@ -22,7 +22,7 @@ runtime and image components from the docker packages. The installed components
 include the docker daemon system service and `OCI`_ compliant `Moby`_ and
 `Containerd`_ - the building blocks for the container system.
 
-Containers control plane includes `Paunch`_ or tripleo-container-manage_ and
+Containers control plane includes `Paunch`_ or tripleo_container_manage_ and
 systemd for the stateless services, and Pacemaker `Bundle`_ for the
 containerized stateful services, like the messaging system or database.
 
@@ -96,7 +96,7 @@ Paunch
 ------
 
 .. note:: During Ussuri cycle, Paunch has been replaced by the
-   tripleo-container-manage_ Ansible role. Therefore, the following block
+   tripleo_container_manage_ Ansible role. Therefore, the following block
    is deprecated in favor of the new role. However, the JSON input remains
    backward compatible and the containers are configured the same way as it
    was with Paunch.
@@ -123,7 +123,7 @@ defined in the service's yaml file. Refer to the `Docker specific settings`_
 section for more info on this.
 
 .. _paunch: https://github.com/openstack/paunch
-.. _tripleo-container-manage: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo-container-manage.html
+.. _tripleo_container_manage: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_container_manage.html
 
 TripleO Heat Templates
 ----------------------

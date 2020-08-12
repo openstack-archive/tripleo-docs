@@ -226,19 +226,19 @@ The following commands are useful for debugging containers.
 
         $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
 
-Debugging with tripleo-container-manage Ansible role
+Debugging with tripleo_container_manage Ansible role
 ----------------------------------------------------
 
-The debugging manual for tripleo-container-manage is documented in the role_
+The debugging manual for tripleo_container_manage is documented in the role_
 directly.
 
-.. _role: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo-container-manage.html#debug
+.. _role: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_container_manage.html#debug
 
 Debugging with Paunch
 ---------------------
 
 .. note:: During Ussuri cycle, Paunch has been replaced by the
-   tripleo-container-manage Ansible role. Therefore, the following block
+   tripleo_container_manage Ansible role. Therefore, the following block
    is deprecated in favor of the new role which contains a Debug manual.
 
 The ``paunch debug`` command allows you to perform specific actions on a given

@@ -77,7 +77,7 @@ If the Heat templates will be customized for any of the deployed clouds
 modified. Then the location would be specified to the deploy command using
 the --templates flag.
 
-The templates could be managed using seperate directories for each deployed
+The templates could be managed using separate directories for each deployed
 cloud::
 
     ~stack/undercloud-templates

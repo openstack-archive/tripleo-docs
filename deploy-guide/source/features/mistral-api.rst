@@ -1,6 +1,12 @@
 Mistral API
 ===========
 
+.. warning::
+    Mistral on the Undercloud has been deprecated in the Ussuri cycle and is
+    soon being removed. You should consider Ansible playbooks instead of
+    Mistral workflows.
+    This page related to TripleO Train and backward.
+
 The public API for TripleO uses the OpenStack Workflow service, `Mistral`_ to
 provide its interface. This allows external systems to consume and use the same
 Workflows used by python-tripleoclient and tripleo-ui.

@@ -7,4 +7,5 @@ TripleO Contributor Guide
 
   new_developers
   contributions
+  core
 .. include:: ./squads.rst

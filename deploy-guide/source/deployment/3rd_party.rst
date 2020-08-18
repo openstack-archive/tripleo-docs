@@ -16,10 +16,6 @@ a layer to an existing container in order to deploy their software.
 Adding layers to existing containers using TripleO tooling
 ..........................................................
 
-.. note:: This method works with the Victoria release but work is happening
-          to backport it to Train. To add layers on an older release, refer
-          to the next section which uses Docker.
-
 The example below demonstrates how to extend a container image, where the goal
 is to create a layer on top of the cinder-volume image that will be named
 "cinder-cooldriver".
@@ -102,8 +98,9 @@ is to create a layer on top of the cinder-volume image that will be named
 Adding layers to existing containers using Docker
 .................................................
 
-.. note:: Note that this method has been simplified in the Victoria cycle
-          with the new `openstack tripleo container image build` command.
+.. note:: Note that this method has been simplified in Victoria and backported
+          down to train, with the new `openstack tripleo container image build`
+          command.
 
 The example below demonstrates how to extend a container on the Undercloud host
 machine. It assumes you are running a local docker registry on the undercloud.
@@ -139,10 +136,6 @@ above to obtain the new container.
 
 Building new containers with tripleo container image build
 ----------------------------------------------------------
-
-.. note:: This method works with the Victoria release but work is happening
-          to backport it to Train. To add layers on an older release, refer
-          to the next section which uses Docker.
 
 Use the following command to build all of the container images used in TripleO:
 

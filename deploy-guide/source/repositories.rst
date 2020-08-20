@@ -1,9 +1,9 @@
 .. This should be changed to something more user-friendly like http://tripleo.org/tripleo-repos.rpm
 
-.. warning::
-   Support for Python3 is still experimental. The Fedora 28 specific notes
-   and commands appearing below should not be taken as indication that this
-   is fully supported by TripleO - we're still working on it!
+.. note::
+   Python3 is required for Ussuri and newer releases of OpenStack which is supported on RHEL 8
+   and CentOS 8. Train is also recommended to be installed on RHEL 8 or CentOS 8. Earlier versions
+   should be installed on RHEL 7 or CentOS 7 which support Python2.7.
 
 #. Download and install the python-tripleo-repos RPM from
    the appropriate RDO repository
@@ -39,14 +39,14 @@
       Enable the appropriate repos for the desired release, as indicated below.
       Do not enable any other repos not explicitly marked for that release.
 
-   .. admonition:: Pike
-      :class: pike otop
+   .. admonition:: Ussuri
+      :class: ussuri ttou
 
-      Enable the current Pike repositories
+      Enable the current Ussuri repositories
 
       .. code-block:: bash
 
-         sudo -E tripleo-repos -b pike current
+         sudo -E tripleo-repos -b ussuri current
 
       .. admonition:: Ceph
          :class: ceph
@@ -55,16 +55,16 @@
 
          .. code-block:: bash
 
-            sudo -E tripleo-repos -b pike current ceph
+            sudo -E tripleo-repos -b ussuri current ceph
 
-   .. admonition:: Queens
-      :class: queens ptoq
+   .. admonition:: Train
+      :class: train stot
 
-      Enable the current Queens repositories
+      Enable the current Train repositories
 
       .. code-block:: bash
 
-         sudo -E tripleo-repos -b queens current
+         sudo -E tripleo-repos -b train current
 
       .. admonition:: Ceph
          :class: ceph
@@ -73,7 +73,25 @@
 
          .. code-block:: bash
 
-            sudo -E tripleo-repos -b queens current ceph
+            sudo -E tripleo-repos -b train current ceph
+
+   .. admonition:: Stein
+      :class: stein rtos
+
+      Enable the current Stein repositories
+
+      .. code-block:: bash
+
+         sudo -E tripleo-repos -b stein current
+
+      .. admonition:: Ceph
+         :class: ceph
+
+         Include the Ceph repo in the tripleo-repos call
+
+         .. code-block:: bash
+
+            sudo -E tripleo-repos -b stein current ceph
 
    .. admonition:: Rocky
       :class: rocky qtor
@@ -93,14 +111,14 @@
 
             sudo -E tripleo-repos -b rocky current ceph
 
-   .. admonition:: Stein
-      :class: stein rtos
+   .. admonition:: Queens
+      :class: queens ptoq
 
-      Enable the current Stein repositories
+      Enable the current Queens repositories
 
       .. code-block:: bash
 
-         sudo -E tripleo-repos -b stein current
+         sudo -E tripleo-repos -b queens current
 
       .. admonition:: Ceph
          :class: ceph
@@ -109,7 +127,25 @@
 
          .. code-block:: bash
 
-            sudo -E tripleo-repos -b stein current ceph
+            sudo -E tripleo-repos -b queens current ceph
+
+   .. admonition:: Pike
+      :class: pike otop
+
+      Enable the current Pike repositories
+
+      .. code-block:: bash
+
+         sudo -E tripleo-repos -b pike current
+
+      .. admonition:: Ceph
+         :class: ceph
+
+         Include the Ceph repo in the tripleo-repos call
+
+         .. code-block:: bash
+
+            sudo -E tripleo-repos -b pike current ceph
 
 .. warning::
 

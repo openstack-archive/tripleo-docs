@@ -20,7 +20,7 @@ independently managed registry. During deployment the environment parameter
 - How to discover the latest versioned tag for each image
 
 In the following examples, the parameter `ContainerImagePrepare` will be
-specified in its own file `containers-prepare-parameter.yaml`.
+specified in its own file `containers-prepare-parameters.yaml`.
 
 Default registry
 ................
@@ -34,11 +34,11 @@ During deployment with this default, any heat parameters which refer to
 required container images will be populated with a value pointing at the
 default registry, with a tag representing the latest image version.
 
-To generate the `containers-prepare-parameter.yaml` containing these defaults,
+To generate the `containers-prepare-parameters.yaml` containing these defaults,
 run this command::
 
   openstack tripleo container image prepare default \
-    --output-env-file containers-prepare-parameter.yaml
+    --output-env-file containers-prepare-parameters.yaml
 
 This will generate a file containing a `ContainerImagePrepare` similar to the
 following::
@@ -78,11 +78,11 @@ As part of the undercloud install, an image registry is configured on port
 `8787`.  This can be used to increase reliability of image pulls, and minimise
 overall network transfers.
 The undercloud registry can be used by generating the following
-`containers-prepare-parameter.yaml` file::
+`containers-prepare-parameters.yaml` file::
 
   openstack tripleo container image prepare default \
     --local-push-destination \
-    --output-env-file containers-prepare-parameter.yaml
+    --output-env-file containers-prepare-parameters.yaml
 
 This will generate a file containing a `ContainerImagePrepare` similar to the
 following::
@@ -129,11 +129,11 @@ Running container image prepare
 The prepare operations are run at the following times:
 
 #. During ``undercloud install`` when `undercloud.conf` has
-   `container_images_file=$HOME/containers-prepare-parameter.yaml` (see
+   `container_images_file=$HOME/containers-prepare-parameters.yaml` (see
    :ref:`install_undercloud`)
 #. During ``overcloud deploy`` when a `ContainerImagePrepare` parameter is
    provided by including the argument `-e
-   $HOME/containers-prepare-parameter.yaml`
+   $HOME/containers-prepare-parameters.yaml`
    (see :ref:`overcloud-prepare-container-images`)
 #. Any other time when ``sudo openstack tripleo container image prepare`` is run
 
@@ -333,7 +333,7 @@ images, it is recommended to run prepare on its own to confirm it is being
 modified as expected::
 
   sudo openstack tripleo container image prepare \
-    -e ~/containers-prepare-parameter.yaml
+    -e ~/containers-prepare-parameters.yaml
 
 Updating existing packages
 ..........................

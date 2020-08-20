@@ -99,7 +99,7 @@ Deploying a Standalone OpenStack node
 
       .. code-block:: bash
 
-         mkdir /root/ceph_ansible_fetch
+         sudo mkdir /root/ceph_ansible_fetch
 
 #. Configure basic standalone parameters which include network configuration
    and some deployment options.

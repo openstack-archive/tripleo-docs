@@ -811,6 +811,47 @@ The final overcloud command must look like the following::
 
     openstack overcloud deploy --templates -r /home/stack/roles_data.yaml -n /usr/share/openstack-tripleo-heat-templates/network_data_dashboard.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e ~/my-ceph-settings.yaml
 
+Using Ansible --limit with ceph-ansible
+---------------------------------------
+
+When using :doc:`config-download
+<../deployment/ansible_config_download>` to configure Ceph,
+if Ansible's `--limit` option is used, then it is passed to the
+execution of ceph-ansible too. This is the case for Train and newer.
+
+In the previous section an example was provided where Ceph was
+deployed with TripleO. The examples below show how to update the
+deployment and pass the `--limit` option.
+
+If oc0-cephstorage-0 had a disk failure and a factory clean disk was
+put in place of the failed disk, then the following could be run so
+that the new disk is used to bring up the missing OSD and so that
+ceph-ansible is only run on the nodes where it needs to be run. This
+is useful to reduce the time it takes to update the deployment::
+
+    openstack overcloud deploy --templates -r /home/stack/roles_data.yaml -n /usr/share/openstack-tripleo-heat-templates/network_data_dashboard.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml -e ~/my-ceph-settings.yaml --limit oc0-controller-0:oc0-controller-2:oc0-controller-1:oc0-cephstorage-0:undercloud
+
+If :doc:`config-download <../deployment/ansible_config_download>` has
+generated a `ansible-playbook-command.sh` script, then that script may
+also be run with the `--limit` option and it will be passed to
+ceph-ansible::
+
+    ./ansible-playbook-command.sh --limit oc0-controller-0:oc0-controller-2:oc0-controller-1:oc0-cephstorage-0:undercloud
+
+In the above example the controllers are included because the
+Ceph Mons need Ansible to change their OSD definitions. Both commands
+above would do the same thing. The former would only be needed if
+there were Heat environment file updates. After either of the above
+has run the
+`~/config-download/config-download-latest/ceph-ansible/ceph_ansible_command.sh`
+file should contain the `--limit` option.
+
+.. warning:: You must always include the undercloud in the limit list
+             or ceph-ansible will not be executed when using
+             `--limit`. This is necessary because the ceph-ansible
+             execution happens through the external_deploy_steps_tasks
+             playbook and that playbook only runs on the undercloud.
+
 Validating Ceph Configuration
 -----------------------------
 

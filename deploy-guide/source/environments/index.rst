@@ -7,6 +7,7 @@ section contains instructions on how to setup your environments properly.
 .. toctree::
    :maxdepth: 2
 
+   standalone
    virtual
    baremetal
    virtualbmc

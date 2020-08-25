@@ -2,18 +2,29 @@ Standalone Containers based Deployment
 ======================================
 
 .. warning::
-   This currently is only supported in Rocky or newer versions.
+   Standalone deployments are currently only supported in Rocky or newer
+   versions.
 
 This documentation explains how the underlying framework used by the
-Containerized Undercloud deployment mechanism can be reused to deploy a single
-node capable of running OpenStack services for development.
+Containerized Undercloud deployment mechanism can be reused to deploy a
+single node capable of running OpenStack services for development. Optional
+instructions for installing Ceph are included as well.
 
+System Requirements for a Standalone Deployment
+-----------------------------------------------
+
+   .. include:: ../environments/standalone.rst
+       :start-after: .. include_after_header
 
 Deploying a Standalone OpenStack node
 -------------------------------------
 
-#. Log into your machine (baremetal or VM) where you want to install the
-   standalone services on as a non-root user.::
+#. Copy your SSH key to a non-root user on your machine (baremetal or VM)
+   where you want to install the standalone services.::
+
+       ssh-copy-id -i ~/.ssh/<your ssh key> <non-root-user>@<machine>
+
+#. Connect to your machine as the non-root user.::
 
        ssh <non-root-user>@<machine>
 
@@ -25,19 +36,30 @@ Deploying a Standalone OpenStack node
 
 #. Enable needed repositories:
 
+   .. note::
+      The Ussuri version of TripleO utilizes Python3 and requires the OS
+      to be RHEL 8 or CentOS 8. It is also recommended that Train be installed
+      on RHEL 8 or CentOS 8.
+
    .. admonition:: RHEL
       :class: rhel
 
-      Enable optional repo::
+      Enable optional repo for RHEL 7::
 
           sudo yum install -y yum-utils
           sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
 
    .. include:: ../repositories.rst
 
-#. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
+#. Install the TripleO CLI, which will pull in all other necessary packages as dependencies.
 
-    sudo yum install -y python-tripleoclient
+    For Python3::
+
+       sudo yum install -y python3-tripleoclient
+
+    For Python2.7::
+
+       sudo yum install -y python-tripleoclient
 
    .. admonition:: Ceph
       :class: ceph
@@ -129,14 +151,21 @@ Deploying a Standalone OpenStack node
    assumes the second interface has a "public" /24 network which will be used
    for the cloud endpoints and public VM connectivity.
 
+   .. Note: The following example utilizes 2 interfaces. NIC1 which will serve as
+      the management inteface. It can have any address and will be left untouched.
+      NIC2 will serve as the OpenStack & Provider network NIC. The following
+      exports should be configured for your network and interface.
+
    .. code-block:: bash
 
-      # EXAMPLE: 2 interfaces
-      # NIC1 - management NIC (any address, left untouched)
-      # NIC2 - OpenStack & Provider network NIC ($INTERFACE configured with $IP, $NETMASK)
       export IP=192.168.24.2
       export NETMASK=24
       export INTERFACE=eth1
+
+   You will now create the standalone_parameters.yaml. The $IP, $NETMASK, and
+   $INTERFACE will be replaced with the values from the export commands.
+
+   .. code-block:: bash
 
       cat <<EOF > $HOME/standalone_parameters.yaml
       parameter_defaults:
@@ -172,15 +201,21 @@ Deploying a Standalone OpenStack node
    cloud endpoints, 1 is used for an internal router and 1 is used as a
    floating IP.
 
+   .. Note: NIC1 will serve as the management, OpenStack and Provider network
+      inteface. The exports should be configured for your network and interface.
+
    .. code-block:: bash
 
-      # EXAMPLE: 1 interface
-      # NIC1 - management, OpenStack, & Provider network ($INTERFACE reconfigured using $IP, $NETMASK, $GATEWAY)
       export IP=192.168.24.2
       export NETMASK=24
-      # We need the gateway as we'll be reconfiguring the eth0 interface
       export GATEWAY=192.168.24.1
       export INTERFACE=eth0
+
+   You will now create the standalone_parameters.yaml. The $IP, $NETMASK,
+   $GATEWAY, and $INTERFACE will be replaced with the values from the export
+   commands.
+
+   .. code-block:: bash
 
       cat <<EOF > $HOME/standalone_parameters.yaml
       parameter_defaults:
@@ -248,7 +283,7 @@ Deploying a Standalone OpenStack node
            CephPoolDefaultSize: 1
          EOF
 
-#. Run deploy command:
+#. Run the deploy command:
 
    .. code-block:: bash
 
@@ -294,8 +329,8 @@ Deploying a Standalone OpenStack node
 
 #. Cleanup a deployment
 
-   If you want to remove the services and files installed by Standalone, after
-   a deployment failure or just to re-deploy from scratch, you can run the
+   If you want to remove the services and files installed by Standalone after
+   a deployment failure, or just to re-deploy from scratch, you can run the
    following script:
 
    .. code-block:: bash
@@ -1012,3 +1047,4 @@ example::
                      +----+-------------+----------+
                      |standalone|controller|central|
                      +-----------------------------+
+

@@ -23,10 +23,6 @@ Below is the detailed list of openstack services wise tempest plugins.
     * RPM package name: python2-horizon-tests-tempest
     * Source Code: https://opendev.org/openstack/tempest-horizon
 
-* Networking-l2gw
-    * RPM package: python2-networking-l2gw-tests-tempest
-    * Source Code: https://opendev.org/openstack/networking-l2gw-tempest-plugin
-
 * Kuryr
     * RPM package: python2-kuryr-tests-tempest
     * Source Code: https://opendev.org/openstack/kuryr-tempest-plugin

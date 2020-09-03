@@ -471,9 +471,9 @@ images can be executed like so.
 .. code-block:: shell
 
     # The shell variables need to be replaced with data that pertains to the given environment.
-    tripleo container image hotfix --image ${FULLY_QUALIFIED_IMAGE_NAME} \
-                                   --rpms-path ${RPM_DIRECTORY} \
-                                   --tag ${TAG_VALUE}
+    openstack tripleo container image hotfix --image ${FULLY_QUALIFIED_IMAGE_NAME} \
+                                             --rpms-path ${RPM_DIRECTORY} \
+                                             --tag ${TAG_VALUE}
 
 When this command completes, new container images will be available on the
 local system and are ready to be integrated into the environment.

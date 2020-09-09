@@ -516,3 +516,18 @@ where it's needed. Two ways are supported:
 * (Short but not persistent after a minor update): Run Paunch or Ansible
   to update the container on a host. The procedure is already documented
   in the :doc:`./tips_tricks` manual.
+
+
+Once the hotfixed container image has been deployed, it's very important to
+check that the container is running with the right rpm version.
+For example, if the nova-compute container was updated with a new hotfix image,
+we want to check that the right nova-compute rpm is installed:
+
+.. code-block:: shell
+
+    sudo podman exec -ti -u root nova_compute rpm -qa | grep nova-compute
+
+It will return the version of the openstack-nova-compute rpm and we can compare
+it with the one that was delivered via rpm. If the version is not correct (e.g.
+older), it means that the hotfix image is wrong and doesn't contain the rpm
+provided to build the new image. The image has to be rebuilt and redeployed.

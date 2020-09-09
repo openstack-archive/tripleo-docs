@@ -478,7 +478,41 @@ images can be executed like so.
 When this command completes, new container images will be available on the
 local system and are ready to be integrated into the environment.
 
+You should see the image built on your local system via buildah CLI:
+
+.. code-block:: shell
+
+   # The shell variables need to be replaced with data that pertains to the given environment.
+   sudo buildah images | grep ${TAG_VALUE}
+
+Here is an example on how to push it into the TripleO Container registry:
+
+.. code-block:: shell
+
+   # ${IMAGE} is in this format: <registry>/<namespace>/<name>:<tag>
+   sudo openstack tripleo container image push --local \
+        --registry-url 192.168.24.1:8787 ${IMAGE}
+
 .. note::
 
-    Additional steps may be required before the images can be deployed into the
-    environment.
+    Container images can be pushed to the TripleO Container registry or
+    a Docker Registry (using basic auth or the bearer token auth).
+
+Now that your container image is pushed into a registry, you can deploy it
+where it's needed. Two ways are supported:
+
+* (Long but persistent): Update Container$NameImage where $Name is the name of
+  the service we update (e.g. ContainerNovaComputeImage). The parameters
+  can be found in TripleO Heat Templates. Once you update it into your
+  environment, you need to re-run the "openstack overcloud deploy" command
+  again and the necessary hosts will get the new container.
+
+  Example::
+
+    parameter_defaults:
+        # Replace the values by where the image is stored
+        ContainerNovaComputeImage: <registry>/<namespace>/<name>:<tag>
+
+* (Short but not persistent after a minor update): Run Paunch or Ansible
+  to update the container on a host. The procedure is already documented
+  in the :doc:`./tips_tricks` manual.

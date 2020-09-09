@@ -137,6 +137,9 @@ above to obtain the new container.
 Building new containers with tripleo container image build
 ----------------------------------------------------------
 
+Usage
+.....
+
 Use the following command to build all of the container images used in TripleO:
 
   .. code-block:: shell
@@ -151,6 +154,8 @@ Here are some of them:
 * `--config-path` to use a custom base configuration path.
   This is the base path for all container-image files. If this option is set,
   the default path for <config-file> will be modified.
+* `--extra-config` to apply additional options from a given configuration YAML
+  file. This will apply to all containers built.
 * `--exclude` to skip some containers during the build.
 * `--registry` to specify a Container Registry where the images will be pushed.
 * `--authfile` to specify an authentication file if the Container Registry
@@ -162,6 +167,65 @@ Here are some of them:
   images are built. If you use this argument, don't forget that you might need
   to include the default ones.
 * `--work-dir` to specify the place where the configuration files will be generated.
+
+Tips and Tricks with tripleo_container_image_build
+..................................................
+
+Here's a non-exaustive list of tips and tricks that might make things faster,
+especially on a dev env where you need to build multiple times the containers.
+
+Inject a caching proxy
+______________________
+
+Using a caching proxy can make things faster when it comes to package fetching.
+
+One of the way is to either expose the dnf.conf/yum.conf using `--volume`.
+Since `dnf.conf is edited during the container build`_, you want to expose a
+copy of your host config::
+
+  sudo cp -r /etc/dnf /srv/container-dnf
+  openstack tripleo container image build --volume /srv/container-dnf:/etc/dnf:z
+
+Another way is to expose the `http_proxy` and `https_proxy` environment
+variable.
+
+In order to do so, create a simple yaml file, for instance ~/proxy.yaml::
+
+  ---
+  tcib_envs:
+    LANG: en_US.UTF-8
+    container: oci
+    http_proxy: http://PROXY_HOST:PORT
+    https_proxy: http://PROXY_HOST:PORT
+
+Then, pass that file using the `--extra-config` parameter::
+
+  openstack tripleo container image build --extra-config proxy.yaml
+
+And you're set.
+
+.. note:: Please ensure you also pass the `default values`_, since ansible
+          isn't configured to `merge dicts/lists`_ by default.
+
+.. _dnf.conf is edited during the container build: https://opendev.org/openstack/tripleo-common/src/commit/156b565bdf74c19d3513f9586fa5fcf1181db3a7/container-images/tcib/base/base.yaml#L3-L14
+.. _default values: https://opendev.org/openstack/tripleo-common/src/commit/156b565bdf74c19d3513f9586fa5fcf1181db3a7/container-images/tcib/base/base.yaml#L35-L37
+.. _merge dicts/lists: https://docs.ansible.com/ansible/latest/reference_appendices/config.html#default-hash-behaviour
+
+
+Get a minimal environment to build containers
+_____________________________________________
+
+As a dev, you might want to get a daily build of your container images. While
+you can, of course, run this on an Undercloud, you actually don't need an
+undercloud: you can use `this playbook`_ from `tripleo-operator-ansible`_
+project
+
+With this, you can set a nightly cron that will ensure you're always getting
+latest build on your registry.
+
+.. _this playbook: https://opendev.org/openstack/tripleo-operator-ansible/src/branch/master/playbooks/container-build.yaml
+.. _tripleo-operator-ansible: https://docs.openstack.org/tripleo-operator-ansible/latest/
+
 
 Building new containers with kolla-build
 ........................................

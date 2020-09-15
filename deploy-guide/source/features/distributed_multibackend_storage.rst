@@ -135,11 +135,11 @@ different stack. In this sense, the example in this document uses both
 types of deployments as described in the following sequence:
 
 - The central site deploys an internal Ceph cluster called central
-  with an additional cephx keyring which may be used to access the
-  central ceph pools.
-- The dcn0 site deploys an internal Ceph cluster called dcn0 with an
-  additional cephx keyring which may be used to access the dcn0 Ceph
-  pools. During the same deployment the dcn0 site is also configured
+  with a cephx keyring which may be used to access the central ceph
+  pools.
+- The dcn0 site deploys an internal Ceph cluster called dcn0 with a
+  cephx keyring which may be used to access the dcn0 Ceph pools.
+  During the same deployment the dcn0 site is also configured
   with the cephx keyring from the previous step so that it is also a
   client of the external Ceph cluster, relative to dcn0, called
   central from the previous step. The `GlanceMultistoreConfig`
@@ -164,6 +164,34 @@ The above sequence is possible by using the `CephExtraKeys` parameter
 as described in :doc:`ceph_config` and the `CephExternalMultiConfig`
 parameter described in :doc:`ceph_external`.
 
+Decide which cephx key will be used to access remote Ceph clusters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When |project| deploys Ceph it creates a cephx key called openstack and
+configures Cinder, Glance, and Nova to use this key. When |project| creates
+multiple Ceph clusters, as described in this document, a unique version of
+this key is automatically created for each site,
+e.g. central.client.openstack.keyring, dcn0.client.openstack.keyring,
+and dcn1.client.openstack.keyring. Each site also needs a cephx key to
+access the Ceph cluster at another site, and there are two options.
+
+1. Each site shares a copy of its openstack cephx key with the other site.
+2. Each site shares a separately created external cephx key with the other
+   site, and does not share its own openstack key.
+
+Option 1 allows certain Cinder volume operations to function correctly across
+sites. For example, Cinder can back up volumes at DCN sites to the central
+site, and restore volume backups to other sites. Offline volume migration can
+be used to move volumes from DCN sites to the central site, and from the
+central site to DCN sites. Note that online volume migration between sites,
+and migrating volumes directly from one DCN site to another DCN site are not
+supported.
+
+Option 2 does not support backing up or restoring cinder volumes between the
+central and DCN sites, nor does it support offline volume migration between
+the sites. However, if a shared external key is ever compromised, it can be
+rescinded without affecting the site's own openstack key.
+
 Deployment Steps
 ----------------
 
@@ -172,8 +200,15 @@ files of an example DCN deployment with distributed image
 management. It is based on the :doc:`distributed_compute_node`
 example and does not cover redundant aspects of it such as networking.
 
-Create extra Ceph key
-^^^^^^^^^^^^^^^^^^^^^
+Create a separate external Cephx key (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you do not wish to distribute the default cephx key called
+openstack, and instead create a cephx key used at external sites, then
+follow this section. Otherwise proceed to the next section.
+Some cinder volume operations only work when sites are using a common
+'openstack' cephx key name. Cross-AZ backups and offline volume
+migration are not supported when using a separate external cephx key.
 
 Create ``/home/stack/control-plane/ceph_keys.yaml`` with contents like
 the following::
@@ -237,9 +272,20 @@ Deploy the control-plane stack::
          -e /usr/share/openstack-tripleo-heat-templates/environments/podman.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/disable-swift.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+         -e /usr/share/openstack-tripleo-heat-templates/environments/cinder-backup.yaml \
          -e ~/control-plane/role-counts.yaml \
          -e ~/control-plane/ceph.yaml \
          -e ~/control-plane/ceph_keys.yaml
+
+Passing ``-e ~/control-plane/ceph_keys.yaml`` is only required if you
+followed the optional section called "Create a separate external Cephx
+key (optional)". If you are using the openstack keyring, then you may
+pass the ``environments/cinder-backup.yaml`` to deploy the
+cinder-backup service at the central site. The cinder-backup service
+running in the central site will be able to back up volumes located at
+DCN sites as long as all sites use the default 'openstack' cephx key
+name. DCN volumes cannot be backed up to the central site if the
+deployment uses a separate 'external' cephx key.
 
 The network related files are included to make the example complete
 but are not displayed in this document. For more information on
@@ -294,15 +340,46 @@ Use the `openstack overcloud export` command to create
 :doc:`distributed_compute_node`::
 
   openstack overcloud export \
-          --config-download-dir /var/lib/mistral/control-plane/ \
           --stack control-plane \
           --output-file ~/control-plane-export.yaml
 
-In the above example `--config-download-dir` may be at a different
-location if you deployed with a manual config-download as described in
+You may need to pass the `--config-download-dir` option if you
+deployed with a manual config-download as described in
 :doc:`../deployment/ansible_config_download`.
 
-Create ``~/central_ceph_external.yaml`` with content like the following::
+Use the `openstack overcloud export ceph` command to create
+``~/central_ceph_external.yaml``::
+
+  openstack overcloud export ceph \
+          --stack control-plane \
+          --output-file ~/central_ceph_external.yaml
+
+By default the ``~/central_ceph_external.yaml`` file created from the
+command above will contain the contents of cephx file
+central.client.openstack.keyring. This document uses the convention of
+calling the file "external" because it's for connecting to a Ceph
+cluster (central) which is external and deployed before dcn0 which
+contains is only internal and deployed during the dcn0 deployment.
+If you do not wish to distribute central.client.openstack.keyring
+and chose to create an external cephx keyring called "external" as
+described in the optional cephx section above, then use the following
+following command instead to create ``~/central_ceph_external.yaml``::
+
+  openstack overcloud export ceph \
+          --stack control-plane \
+          --cephx-key-client-name external \
+          --output-file ~/central_ceph_external.yaml
+
+The ``--cephx-key-client-name external`` option passed to the
+``openstack overcloud export ceph`` command results in the external
+key, created during deployment and defined in
+`/home/stack/control-plane/ceph_keys.yaml`, being extracted from
+config-download. If the ``--cephx-key-client-name`` is not passed,
+then the default cephx client key called `openstack` will be
+extracted.
+
+The genereated ``~/central_ceph_external.yaml`` should look something
+like the following::
 
   parameter_defaults:
     CephExternalMultiConfig:
@@ -324,76 +401,25 @@ Create ``~/central_ceph_external.yaml`` with content like the following::
 
 The `CephExternalMultiConfig` section of the above is used to
 configure any DCN node as a Ceph client of the central Ceph
-cluster. All of the values, except `external_cluster_mon_ips`, for
-this section may be obtained from the directory specified by
-`--config-download-dir` when the `openstack overcloud export` command
-was run. Based on the example provided in this document, the relevant
-file with the desired values is
-``/var/lib/mistral/control-plane/ceph-ansible/group_vars/all.yml``.
+cluster.
 
-For example, the `fsid` and `cluster` (name) may be found like this::
+The ``openstack overcloud export ceph`` command will obtain all of the
+values from the config-download directory of the stack specified by
+`--stack` option. All values, except `external_cluster_mon_ips`,
+are extracted from the `ceph-ansible/group_vars/all.yml` file. The
+value for `external_cluster_mon_ips` is populated with a concatenation
+of each storage_ip of all nodes running the CephMon service. These
+values are in the ceph-ansible inventory. Both the inventory and
+group_vars for the ceph-ansible subdirectory within the
+config-download directory are genereated when config-download executes
+the tripleo-ansible role `tripleo_ceph_work_dir`. It should not be
+necessary to extract these values manually as the ``openstack
+overcloud export ceph`` command will genereate a valid YAML file with
+`CephExternalMultiConfig` populated for all stacks passed with the
+`--stack` option.
 
-  cd /var/lib/mistral/control-plane/ceph-ansible/group_vars/
-  grep fsid: all.yml
-  grep name: all.yml
-
-The `keys` section should contain the same list item that was passed
-to the `CephExtraKeys` parameter in the first step of this procedure.
-The key value may also be obtained by looking at the key used by the
-`client.external` name in the `openstack_keys` list found in
-``all.yml``. For example, ``all.yml`` should contain something which
-looks like the following and the second item in the list should be
-used to get the value because it has `name` set to `client.external`::
-
-  openstack_keys:
-  -   caps:
-        mgr: allow *
-        mon: profile rbd
-        osd: profile rbd pool=vms, profile rbd pool=volumes, profile rbd pool=images
-      key: AQDIl2teAAAAABAAtFuRHdcS8v3+kk9Y6RzehA==
-      mode: '0600'
-      name: client.openstack
-  -   caps:
-        mgr: allow *
-        mon: profile rbd
-        osd: profile rbd pool=vms, profile rbd pool=volumes, profile rbd pool=images
-      key: AQD29WteAAAAABAAphgOjFD7nyjdYe8Lz0mQ5Q==
-      mode: '0600'
-      name: client.external
-
-To determine the value for `external_cluster_mon_ips` to provide
-within the `CephExternalMultiConfig` parameter, use the inventory
-generated by config-download and select the storage IP or storage
-hostname of every node which runs the `CephMons` service. Based on the
-example provided in this document, the relevant inventory file is
-``/var/lib/mistral/control-plane/inventory.yaml``. For example the
-nodes in the `Controller` role run the `CephMon` service by default
-on IPs in the storage network so the IPs will be in a section which
-looks like this::
-
-  Controller:
-    hosts:
-      control-plane-controller-0:
-        ansible_host: 192.168.24.16
-        ...
-        storage_hostname: control-plane-controller-0.storage.localdomain
-        storage_ip: 172.16.11.84
-        ...
-      control-plane-controller-1:
-        ansible_host: 192.168.24.22
-        ...
-        storage_hostname: control-plane-controller-1.storage.localdomain
-        storage_ip: 172.16.11.87
-        ...
-
-The `storage_ip` from each host should be combined in a comma delimited
-list. In this example the parameter is set to
-`external_cluster_mon_ips: "172.16.11.84, 172.16.11.87,
-172.16.11.92"`. If necessary, the inventory may be regenerated by
-running the `tripleo-ansible-inventory` command as described in
-:doc:`../deployment/ansible_config_download`.
-
-The `ceph_conf_overrides` section should look like the following::
+The `ceph_conf_overrides` section of the file genereated by ``openstack
+overcloud export ceph`` should look like the following::
 
         ceph_conf_overrides:
           client:
@@ -408,25 +434,25 @@ the central Ceph cluster::
 
 The name of the external Ceph cluster, relative to the DCN nodes,
 is `central` so the relevant Ceph configuration file is called
-``/etc/ceph/central.conf``. Optionally, the path to the key may be
-confirmed by looking directly on any node running the `CephMon`
-service on the control-plane stack if desired. If the conventions in
-this document are followed, then it should remain consistent. This
-directive is necessary so that the Glance service on all DCN nodes,
-which will be deployed in the next section, knows which keyring to use
-when connecting to the central Ceph cluster.
+``/etc/ceph/central.conf``. This directive is necessary so that the
+Glance client called by Nova on all DCN nodes, which will be deployed
+in the next section, know which keyring to use so they may connect to
+the central Ceph cluster.
 
 It is necessary to always pass `dashboard_enabled: false` when using
 `CephExternalMultiConfig` as the Ceph dashboard cannot be deployed
 when configuring an overcloud as a client of an external Ceph cluster.
+Thus the ``openstack overcloud export ceph`` command adds this option.
 
 For more information on the `CephExternalMultiConfig` parameter see
 :doc:`ceph_external`.
 
-Create extra Ceph key for dcn0
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Create extra Ceph key for dcn0 (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create ``~/dcn0/ceph_keys.yaml`` with content like the following::
+If you do not wish for the central site to use the openstack keyring
+generated for the dcn0 site, then create ``~/dcn0/ceph_keys.yaml``
+with content like the following::
 
   parameter_defaults:
     CephExtraKeys:
@@ -443,7 +469,7 @@ pattern as the first step of this procedure. It should use a
 new key, which should be considered sensitive and can be randomly
 generated with the same Python command from the first step. This same
 key will be used later when Glance on the central site needs to
-connect to dcn0 "images".
+connect to the dcn0 images pool.
 
 Override Glance defaults for dcn0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -459,8 +485,29 @@ Create ``~/dcn0/glance.yaml`` with content like the following::
       central:
         GlanceBackend: rbd
         GlanceStoreDescription: 'central rbd glance store'
-        CephClientUserName: 'external'
         CephClusterName: central
+
+In the above example the `CephClientUserName` is not set because it
+uses the default of 'openstack' and thus the openstack cephx key is
+used. If you choose to create and distribute separate cephx keys as
+described in the optional cephx section, then add this line to this
+file so that it looks like the following::
+
+  parameter_defaults:
+    GlanceShowMultipleLocations: true
+    GlanceEnabledImportMethods: web-download,copy-image
+    GlanceBackend: rbd
+    GlanceStoreDescription: 'dcn0 rbd glance store'
+    GlanceMultistoreConfig:
+      central:
+        GlanceBackend: rbd
+        GlanceStoreDescription: 'central rbd glance store'
+        CephClusterName: central
+        CephClientUserName: 'external'
+
+The `CephClientUserName` should only be set to "external" if an
+additional key which was passed with `CephExtraKeys` to the
+control-plane stack had a name of "client.external".
 
 The `GlanceEnabledImportMethods` parameter is used to override the
 default of 'web-download' to also include 'copy-image', which is
@@ -470,10 +517,7 @@ By default Glance on the dcn0 node will use the RBD store of the
 dcn0 Ceph cluster. The `GlanceMultistoreConfig` parameter is then used
 to add an additional store of type RBD called `central` which uses
 the Ceph cluster deployed by the control-plane stack so the
-`CephClusterName` is set to "central". The `CephClientUserName` is set
-to "external" because the additional key which was passed with
-`CephExtraKeys` to the control-plane stack had a name of
-"client.external".
+`CephClusterName` is set to "central".
 
 Create DCN roles for dcn0
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -553,6 +597,10 @@ Deploy the dcn0 stack::
          -e ~/dcn0/ceph.yaml \
          -e ~/dcn0/az.yaml \
          -e ~/dcn0/glance.yaml
+
+Passing ``-e ~/dcn0/dcn_ceph_keys.yaml`` is only required if you
+followed the optional section called "Create extra Ceph key for dcn0
+(optional)".
 
 The network related files are included to make the example complete
 but are not displayed in this document. For more information on
@@ -656,6 +704,28 @@ following::
       dcn0:
         GlanceBackend: rbd
         GlanceStoreDescription: 'dcn0 rbd glance store'
+        CephClusterName: dcn0
+      dcn1:
+        GlanceBackend: rbd
+        GlanceStoreDescription: 'dcn1 rbd glance store'
+        CephClusterName: dcn1
+
+In the above example the `CephClientUserName` is not set because it
+uses the default of 'openstack' and thus the openstack cephx key is
+used. If you choose to create and distribute separate cephx keys as
+described in the optional cephx section, then add this line to this
+file per DCN site so that it looks like the following::
+
+  parameter_defaults:
+    GlanceShowMultipleLocations: true
+    GlanceEnabledImportMethods: web-download,copy-image
+    GlanceBackend: rbd
+    GlanceStoreDescription: 'central rbd glance store'
+    CephClusterName: central
+    GlanceMultistoreConfig:
+      dcn0:
+        GlanceBackend: rbd
+        GlanceStoreDescription: 'dcn0 rbd glance store'
         CephClientUserName: 'external'
         CephClusterName: dcn0
       dcn1:
@@ -664,11 +734,36 @@ following::
         CephClientUserName: 'external'
         CephClusterName: dcn1
 
-The above will configure the Glance service running on the Controllers
-to use two additional stores called "dcn0" and "dcn1".
+The `CephClientUserName` should only be set to "external" if an
+additional key which was passed with `CephExtraKeys` to the
+DCN stacks had a name of "client.external". The above will configure
+the Glance service running on the Controllers to use two additional
+stores called "dcn0" and "dcn1".
 
-Create ``~/control-plane/dcn_ceph_external.yaml`` with content like the
-following::
+Use the `openstack overcloud export ceph` command to create
+``~/control-plane/dcn_ceph_external.yaml``::
+
+  openstack overcloud export ceph \
+          --stack dcn0,dcn1 \
+          --output-file ~/control-plane/dcn_ceph_external.yaml
+
+In the above example a coma-delimited list of Heat stack names is
+provided to the ``--stack`` option. Pass as many stacks as necessary
+for all deployed DCN sites so that the configuration data to connect
+to every DCN Ceph cluster is extracted into the single genereated
+``dcn_ceph_external.yaml`` file.
+
+If you created a separate cephx key called external on each DCN ceph
+cluster with ``CephExtraKeys``, then use the following variation of
+the above command instead::
+
+  openstack overcloud export ceph \
+          --stack dcn0,dcn1 \
+          --cephx-key-client-name external \
+          --output-file ~/control-plane/dcn_ceph_external.yaml
+
+Create ``~/control-plane/dcn_ceph_external.yaml`` should have content
+like the following::
 
   parameter_defaults:
     CephExternalMultiConfig:
@@ -713,112 +808,6 @@ have the following files created:
 - /etc/ceph/dcn0.client.external.keyring
 - /etc/ceph/dcn1.conf
 - /etc/ceph/dcn1.client.external.keyring
-
-All of the values under `CephExternalMultiConfig`, except
-`external_cluster_mon_ips`, for this section may be obtained from the
-config-download directory as described in
-:doc:`../deployment/ansible_config_download`. Based on the examples in
-this document the relevant files with the desired values are
-``/var/lib/mistral/dcn0/ceph-ansible/group_vars/all.yml`` and
-``/var/lib/mistral/dcn1/ceph-ansible/group_vars/all.yml``.
-
-For example, the `fsid` and `cluster` (name) for dcn0 may be found
-like this::
-
-  cd /var/lib/mistral/dcn0/ceph-ansible/group_vars/
-  grep fsid: all.yml
-  grep name: all.yml
-
-The `keys` section for dcn0 should contain the same list item that was
-passed to the `CephExtraKeys` parameter in an earlier step of this
-procedure. The key value may also be obtained by looking at the key
-used by the `client.external` name in the `openstack_keys` list found in
-``all.yml``. For example, ``all.yml`` should contain something which
-looks like the following and the second item in the list should be
-used to get the value because it has `name` set to `client.external`::
-
-  openstack_keys:
-  -   caps:
-          mgr: allow *
-          mon: profile rbd
-          osd: profile rbd pool=vms, profile rbd pool=volumes, profile rbd pool=images
-      key: AQB7/mteAAAAABAAZzufVwFpSN4Hg2TCsR5AfA==
-      mode: '0600'
-      name: client.openstack
-  -   caps:
-          mgr: allow *
-          mon: profile rbd
-          osd: profile rbd pool=vms, profile rbd pool=volumes, profile rbd pool=images
-      key: AQBO/mteAAAAABAAc4mVMTpq7OFtrPlRFqN+FQ==
-      mode: '0600'
-      name: client.external
-
-To determine the value for `external_cluster_mon_ips` to provide
-within the `CephExternalMultiConfig` parameter for dcn0, use the
-inventory generated by config-download and select the storage IP or
-storage hostname of every node which runs the `CephMons` service.
-Based on the example provided in this document, the relevant inventory
-file is ``/var/lib/mistral/dcn0/inventory.yaml``. For example
-the nodes in the `DistributedComputeHCI` role run the `CephMon`
-service by default on IPs in the storage network so the IPs will be in
-a section which looks like this::
-
-  DistributedComputeHCI:
-    hosts:
-      dcn0-distributedcomputehci-0:
-        ansible_host: 192.168.24.20
-        ...
-        storage_hostname: dcn0-distributedcomputehci-0.storage.localdomain
-        storage_ip: 172.16.11.61
-        ...
-      dcn0-distributedcomputehci-1:
-        ansible_host: 192.168.24.25
-        ...
-        storage_hostname: dcn0-distributedcomputehci-1.storage.localdomain
-        storage_ip: 172.16.11.64
-        ...
-
-The `storage_ip` from each host should be combined in a comma delimited
-list. In this example the parameter is set to
-`external_cluster_mon_ips: "172.16.11.61, 172.16.11.64, 172.16.11.66"`.
-If necessary, the inventory may be regenerated by running the
-`tripleo-ansible-inventory` command as described in
-:doc:`../deployment/ansible_config_download`.
-
-The `ceph_conf_overrides` section should look like the following::
-
-        ceph_conf_overrides:
-          client:
-            keyring: /etc/ceph/dcn0.client.external.keyring
-
-The above will result in the following lines in
-``/etc/ceph/dcn0.conf`` on the central nodes which interact with
-the dcn0 Ceph cluster::
-
-  [client]
-  keyring = /etc/ceph/dcn0.client.external.keyring
-
-The name of the external Ceph cluster, relative to the central node,
-is `dcn0` so the relevant Ceph configuration file is called
-``/etc/ceph/dcn0.conf``. Optionally, the path to the key may be
-confirmed by looking directly on any node running the `CephMon`
-service on the dcn0 stack if desired. If the conventions in this
-document are followed, then it should remain consistent. This
-directive is necessary so that the Glance service on central site
-knows which keyring to use when connecting to the central Ceph
-cluster.
-
-It is necessary to always pass `dashboard_enabled: false` when using
-`CephExternalMultiConfig` as the Ceph dashboard cannot be deployed
-when configuring an overcloud as a client of an external Ceph cluster.
-
-The second item in the `CephExternalMultiConfig` list which starts
-with `cluster: "dcn1"` may have its values determined exactly as they
-were determined for `cluster: "dcn0"`, except the relevant data should
-come from ``/var/lib/mistral/dcn1/ceph-ansible/group_vars/all.yml``
-and ``/var/lib/mistral/dcn1/inventory.yaml``. The same pattern may be
-continued for additional DCN sites which the central site wishes to
-use as an additional Glance store.
 
 For more information on the `CephExternalMultiConfig` parameter see
 :doc:`ceph_external`.

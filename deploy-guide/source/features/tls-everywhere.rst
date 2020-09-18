@@ -162,7 +162,8 @@ TLS-everywhere with Novajoin
 
 .. warning:: This deployment strategy is only supported up to the Train release. We
     recommend using tripleo-ipa to accomplish *TLS-everywhere* in newer
-    releases. Steps for using tripleo-ipa are documented above.
+    releases. Steps for using tripleo-ipa are documented above.  This deployment
+    strategy has been removed in Victoria.
 
 Do the following steps before deploying your undercloud.
 
@@ -313,25 +314,23 @@ are described below.
 Novajoin Composable Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the default option but we will update TripleO in the future to use
-tripleo-ipa by default. At that point, you may need to add the following
-composable service to the ``resource_registry`` in ``tls-parameters.yaml``::
+This was the default option until Ussuri.  As of Victoria, this option has
+been removed, and deployers upgrading to Victoria will be migrated to tripleo-ipa.
 
-    resource_registry:
-      OS::TripleO::Services::IpaClient: /usr/share/openstack-tripleo-heat-templates/deployment/ipa/ipaclient-baremetal-ansible.yaml
+For reference, the Novajoin based composable service is located at
+/usr/share/openstack-tripleo-heat-templates/deployment/ipa/ipaclient-baremetal-ansible.yaml
 
 tripleo-ipa Composable Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're deploying *TLS-everwhere* with tripleo-ipa, you need to override the
-default Novajoin composable service. Add the following composable service to
+If you're deploying *TLS-everwhere* with tripleo-ipa prior to Victoria, you need to
+override the default Novajoin composable service. Add the following composable service to
 the ``resource_registry`` in ``tls-parameters.yaml``::
 
     resource_registry:
       OS::TripleO::Services::IpaClient: /usr/share/openstack-tripleo-heat-templates/deployment/ipa/ipaservices-baremetal-ansible.yaml
 
-Remember, this is going to be the default method of deploying *TLS-everywhere*
-as of the Victoria release.
+As of Victoria, this is the only method for deploying *TLS-everywhere*.
 
 Specify Templates
 ~~~~~~~~~~~~~~~~~

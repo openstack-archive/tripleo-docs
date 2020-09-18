@@ -94,7 +94,7 @@ FreeIPA.::
     /etc/pki/pki-tomcat/ca/CS.cfg
     systemctl restart ipa
 
-Finally, if your IPA server is not at 4.8.5 or higher, you will need to add an
+If your IPA server is not at 4.8.5 or higher, you will need to add an
 ACL to allow for the proper generation of certificates with a IP SAN.::
 
     cat << EOF | ldapmodify -x -D "cn=Directory Manager" -w $DIRECTORY_MANAGER_PASSWORD
@@ -103,6 +103,13 @@ ACL to allow for the proper generation of certificates with a IP SAN.::
     add: aci
     aci: (targetattr = "aaaarecord || arecord || cnamerecord || idnsname || objectclass || ptrrecord")(targetfilter = "(&(objectclass=idnsrecord)(|(aaaarecord=*)(arecord=*)(cnamerecord=*)(ptrrecord=*)(idnsZoneActive=TRUE)))")(version 3.0; acl "Allow hosts to read DNS A/AAA/CNAME/PTR records"; allow (read,search,compare) userdn = "ldap:///fqdn=*,cn=computers,cn=accounts,dc=example,dc=com";)
     EOF
+
+If you are upgrading to Victoria and you have been using novajoin, an additional permission
+must be added to the Nova Host Manager role to allow the creation of DNS zone entries.
+As an admin user::
+
+    ipa privilege-add-permission 'Nova Host Management' --permission \
+      'System: Modify Realm Domains'
 
 Please refer to ``ipa-server-install --help`` for specifics on each argument or
 reference the `FreeIPA documentation`_. The directions above are only a guide.
@@ -126,6 +133,14 @@ Novajoin was introduced in the Queens release and is supported through Train.
 The `tripleo-ipa`_ project, described below, effectively replaced novajoin in
 the Train release.
 
+As of Victoria, novajoin is not longer supported.  If you are updating
+from Ussuri, tripleo will automatically migrate your deployment from novajoin
+to tripleo-ipa.  Tripleo will stop and remove the novajoin containers from
+the undercloud.  If in-flight validations are enabled, tripleo will run a
+pre-upgrade validation to verify that the needed ACI and permissions have been
+added to the FreeIPA server.  See the previous section on "Installing FreeIPA"
+for more details.
+
 .. _Novajoin: https://opendev.org/x/novajoin
 
 tripleo-ipa
@@ -138,8 +153,7 @@ well as :doc:`deployed_server`. This project was introduced in Train and
 effectively replaces the novajoin metadata service.
 
 We recommend using tripleo-ipa for all *TLS-everywhere* deployments as of the
-Train release. In a future release, we will update TripleO to only support
-tripleo-ipa as the default method for configuring and deploying
-*TLS-everywhere*.
+Train release. As of Victoria, tripleo-ipa is the only supported method to
+configure and deploy *TLS-everywhere*.
 
 .. _tripleo-ipa: https://opendev.org/x/tripleo-ipa

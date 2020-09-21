@@ -747,6 +747,11 @@ overcloud nodes that Ansible uses to configure Ceph.
     Deployment with `ceph-ansible` requires that OSDs run on dedicated
     block devices.
 
+.. note::
+
+    If the overcloud is named differently than the default ("overcloud"),
+    then you'll have to set the OVERCLOUD_PLAN variable as well
+
 
 Adding Ceph Dashboard to a Overcloud deployment
 ------------------------------------------------

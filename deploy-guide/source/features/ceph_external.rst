@@ -258,6 +258,11 @@ script configures a user on the overcloud nodes that Ansible uses to
 configure Ceph. The `for` loop creates the Ceph user on the relevant
 overcloud hosts.
 
+.. note::
+
+    If the overcloud is named differently than the default ("overcloud"),
+    then you'll have to set the OVERCLOUD_PLAN variable as well
+
 Deployment of an Overcloud with External Ceph
 ---------------------------------------------
 

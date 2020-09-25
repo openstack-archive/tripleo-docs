@@ -186,7 +186,7 @@ ________________
   image. URL schemes supported are ``file://``, ``http://``, and ``https://``.
   If the value is not a valid URL, it is assumed to be a Glance image reference
 
-* ``checksum``: When the ``href`` is a URL, the ``SHA512`` checksum of the root
+* ``checksum``: When the ``href`` is a URL, the ``MD5`` checksum of the root
   partition or whole disk image
 
 * ``kernel``: Glance image reference or URL of the kernel image (partition images only)

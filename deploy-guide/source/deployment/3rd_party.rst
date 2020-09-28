@@ -34,6 +34,13 @@ is to create a layer on top of the cinder-volume image that will be named
 
     mkdir ~/vendor
 
+* Create a tcib directory under the vendor folder. All container build
+  yaml needs to live in a tcib folder as a root directory.
+
+  .. code-block:: shell
+
+    mkdir ~/vendor/tcib
+
 * Create the `~/vendor/containers.yaml` which contains the list
   of images that we want to build:
 
@@ -43,8 +50,15 @@ is to create a layer on top of the cinder-volume image that will be named
       - image_source: tripleo
         imagename: localhost/tripleomaster/openstack-cinder-cooldriver:latest
 
-* Create `~/vendor/cinder-cooldriver.yaml` file which contains
-  the container image configuration:
+* Create `~/vendor/tcib/cinder-cooldriver` to hold our container image
+  configuration.
+
+  .. code-block:: yaml
+
+    mkdir ~/vendor/tcib/cinder-cooldriver
+
+* Create `~/vendor/tcib/cinder-cooldriver/cinder-cooldriver.yaml` file which
+  contains the container image configuration:
 
   .. code-block:: yaml
 
@@ -58,6 +72,18 @@ is to create a layer on top of the cinder-volume image that will be named
 .. note:: the tcib parameters are documented in the `tcib`_ role.
 
 .. _tcib: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_container_image_build.html#r-o-l-e-d-e-f-a-u-l-t-s
+
+
+* The result file structure should look something like:
+
+  .. code-block:: shell
+
+    $ tree vendor
+    vendor
+    ├── containers.yaml
+    └── tcib
+        └── cinder-cooldriver
+                └── cinder-cooldriver.yaml
 
 * Build the vendor container image:
 

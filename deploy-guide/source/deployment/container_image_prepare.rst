@@ -208,7 +208,7 @@ often come from a different registry, and have a different versioned tag
 policy.
 
 The values in the `set` map are used when evaluating the file
-`/usr/share/openstack-tripleo-common/container-images/overcloud_containers.yaml.j2`
+`/usr/share/openstack-tripleo-common/container-images/tripleo_containers.yaml.j2`
 as a Jinja2 template. This file contains the list of every container image and
 how it relates to TripleO services and heat parameters.
 

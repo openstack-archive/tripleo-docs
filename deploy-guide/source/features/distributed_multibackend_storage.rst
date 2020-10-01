@@ -14,7 +14,7 @@ described in :doc:`distributed_compute_node` to support the following
 workflow.
 
 - Upload an image to the Central site using `glance image-create`
-  command with `--file` and `--store default_backend` parameters.
+  command with `--file` and `--store central` parameters.
 - Move a copy of the same image to DCN sites using a command like
   `glance image-import <IMAGE-ID> --stores dcn1,dcn2 --import-method
   copy-image`.
@@ -275,7 +275,8 @@ Deploy the control-plane stack::
          -e /usr/share/openstack-tripleo-heat-templates/environments/cinder-backup.yaml \
          -e ~/control-plane/role-counts.yaml \
          -e ~/control-plane/ceph.yaml \
-         -e ~/control-plane/ceph_keys.yaml
+         -e ~/control-plane/ceph_keys.yaml \
+         -e ~/control-plane/glance.yaml
 
 Passing ``-e ~/control-plane/ceph_keys.yaml`` is only required if you
 followed the optional section called "Create a separate external Cephx
@@ -316,6 +317,15 @@ The ``ceph.yaml`` file should also contain additional parameters like
 `CephAnsibleDisksConfig`, `CephPoolDefaultSize`,
 `CephPoolDefaultPgNum` to configure the Ceph cluster relative to the
 available hardware as described in :doc:`ceph_config`.
+
+The ``glance.yaml`` file sets the following to configue the local Glance backend::
+
+  parameter_defaults:
+    GlanceShowMultipleLocations: true
+    GlanceEnabledImportMethods: web-download,copy-image
+    GlanceBackend: rbd
+    GlanceBackendID: central
+    GlanceStoreDescription: 'central rbd glance store'
 
 The ``environments/disable-swift.yaml`` file was passed to disable
 Swift simply because an object storage system is not needed for this
@@ -480,6 +490,7 @@ Create ``~/dcn0/glance.yaml`` with content like the following::
     GlanceShowMultipleLocations: true
     GlanceEnabledImportMethods: web-download,copy-image
     GlanceBackend: rbd
+    GlangeBackendID: dcn0
     GlanceStoreDescription: 'dcn0 rbd glance store'
     GlanceMultistoreConfig:
       central:
@@ -691,15 +702,10 @@ as indicated by the list of undercloud Heat stacks::
   +---------------+-----------------+
   $
 
-Create ``~/control-plane/glance_update.yaml`` with content like the
+Create ``~/control-plane/glance-dcn-stores.yaml`` with content like the
 following::
 
   parameter_defaults:
-    GlanceShowMultipleLocations: true
-    GlanceEnabledImportMethods: web-download,copy-image
-    GlanceBackend: rbd
-    GlanceStoreDescription: 'central rbd glance store'
-    CephClusterName: central
     GlanceMultistoreConfig:
       dcn0:
         GlanceBackend: rbd
@@ -812,13 +818,13 @@ have the following files created:
 For more information on the `CephExternalMultiConfig` parameter see
 :doc:`ceph_external`.
 
-The number of lines in the ``~/control-plane/glance_update.yaml`` and
-``~/control-plane/glance_update.yaml`` files will be proportional to
+The number of lines in the ``~/control-plane/glance-dcn-stores.yaml`` and
+``~/control-plane/dcn_ceph_external.yaml`` files will be proportional to
 the number of DCN sites deployed.
 
 Run the same `openstack overcloud deploy --stack control-plane ...`
 command which was run in the previous section but also include the
-the ``~/control-plane/glance_update.yaml`` and
+the ``~/control-plane/glance-dcn-stores.yaml`` and
 ``~/control-plane/dcn_ceph_external.yaml`` files with a `-e`. When the
 stack update is complete, proceed to the next section.
 
@@ -847,7 +853,7 @@ Confirm the expected stores are available:
   +----------+----------------------------------------------------------------------------------+
   | Property | Value                                                                            |
   +----------+----------------------------------------------------------------------------------+
-  | stores   | [{"default": "true", "id": "default_backend", "description": "central rbd glance |
+  | stores   | [{"default": "true", "id": "central", "description": "central rbd glance         |
   |          | store"}, {"id": "http", "read-only": "true"}, {"id": "dcn0", "description":      |
   |          | "dcn0 rbd glance store"}, {"id": "dcn1", "description": "dcn1 rbd glance         |
   |          | store"}]                                                                         |
@@ -869,7 +875,7 @@ in the following example:
   glance image-create \
   --disk-format raw --container-format bare \
   --name cirros --file cirros-0.4.0-x86_64-disk.raw \
-  --store default_backend
+  --store central
 
 Alternatively, if the image is not in the current directory but in
 qcow2 format on a web server, then it may be imported and converted in
@@ -877,7 +883,7 @@ one command by running the following:
 
 .. code-block:: bash
 
-  glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores default_backend
+  glance --verbose image-create-via-import --disk-format qcow2 --container-format bare --name cirros --uri http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img --import-method web-download --stores central
 
 .. note:: The example above assumes that Glance image format
           conversion is enabled. Thus, even though `--disk-format` is
@@ -905,10 +911,10 @@ Confirm a copy of the image is in each store by looking at the image properties:
 .. code-block:: bash
 
   $ openstack image show $ID | grep properties
-  | properties       | direct_url='rbd://d25504ce-459f-432d-b6fa-79854d786f2b/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', locations='[{u'url': u'rbd://d25504ce-459f-432d-b6fa-79854d786f2b/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'default_backend'}}, {u'url': u'rbd://0c10d6b5-a455-4c4d-bd53-8f2b9357c3c7/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'dcn0'}}, {u'url': u'rbd://8649d6c3-dcb3-4aae-8c19-8c2fe5a853ac/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'dcn1'}}]', os_glance_failed_import='', os_glance_importing_to_stores='', os_hash_algo='sha512', os_hash_value='b795f047a1b10ba0b7c95b43b2a481a59289dc4cf2e49845e60b194a911819d3ada03767bbba4143b44c93fd7f66c96c5a621e28dff51d1196dae64974ce240e', os_hidden='False', stores='default_backend,dcn0,dcn1' |
+  | properties       | direct_url='rbd://d25504ce-459f-432d-b6fa-79854d786f2b/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', locations='[{u'url': u'rbd://d25504ce-459f-432d-b6fa-79854d786f2b/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'central'}}, {u'url': u'rbd://0c10d6b5-a455-4c4d-bd53-8f2b9357c3c7/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'dcn0'}}, {u'url': u'rbd://8649d6c3-dcb3-4aae-8c19-8c2fe5a853ac/images/8083c7e7-32d8-4f7a-b1da-0ed7884f1076/snap', u'metadata': {u'store': u'dcn1'}}]', os_glance_failed_import='', os_glance_importing_to_stores='', os_hash_algo='sha512', os_hash_value='b795f047a1b10ba0b7c95b43b2a481a59289dc4cf2e49845e60b194a911819d3ada03767bbba4143b44c93fd7f66c96c5a621e28dff51d1196dae64974ce240e', os_hidden='False', stores='central,dcn0,dcn1' |
 
 The `stores` key, which is the last item in the properties map is set
-to 'default_backend,dcn0,dcn1'.
+to 'central,dcn0,dcn1'.
 
 On further inspection the `direct_url` key is set to::
 
@@ -1074,12 +1080,12 @@ site, which is the default backend for Glance.
 .. code-block:: bash
 
   IMAGE_ID=$(openstack image show cirros-snapshot -f value -c id)
-  glance image-import $IMAGE_ID --stores default_backend --import-method copy-image
+  glance image-import $IMAGE_ID --stores central --import-method copy-image
 
 After the above is run the output of `openstack image show
 $IMAGE_ID -f value -c properties` should contain a JSON data structure
-whose key called `stores` should looke like "dcn0,default_backend" as
-the image will also exist in the "default_backend" which stores its
+whose key called `stores` should looke like "dcn0,central" as
+the image will also exist in the "central" backend which stores its
 data on the central Ceph cluster. The same image at the Central site
 may then be copied to other DCN sites, booted in the vms or volumes
 pool, and snapshotted so that the same process may repeat.

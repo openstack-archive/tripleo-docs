@@ -151,6 +151,10 @@ Deploying a Standalone OpenStack node
    assumes the second interface has a "public" /24 network which will be used
    for the cloud endpoints and public VM connectivity.
 
+   In addition to the IPs used on eth1, a virtual IP will be added and managed
+   by pacemaker. This must be a different address to the other IP as one will
+   be bound to by haproxy while the other by backend services on the same.
+
    .. Note: The following example utilizes 2 interfaces. NIC1 which will serve as
       the management inteface. It can have any address and will be left untouched.
       NIC2 will serve as the OpenStack & Provider network NIC. The following
@@ -159,11 +163,12 @@ Deploying a Standalone OpenStack node
    .. code-block:: bash
 
       export IP=192.168.24.2
+      export VIP=192.168.25.2
       export NETMASK=24
       export INTERFACE=eth1
 
-   You will now create the standalone_parameters.yaml. The $IP, $NETMASK, and
-   $INTERFACE will be replaced with the values from the export commands.
+   You will now create the standalone_parameters.yaml. The $IP, $VIP, $NETMASK,
+   and $INTERFACE will be replaced with the values from the export commands.
 
    .. code-block:: bash
 
@@ -207,6 +212,7 @@ Deploying a Standalone OpenStack node
    .. code-block:: bash
 
       export IP=192.168.24.2
+      export VIP=192.168.25.2
       export NETMASK=24
       export GATEWAY=192.168.24.1
       export INTERFACE=eth0
@@ -290,6 +296,7 @@ Deploying a Standalone OpenStack node
     sudo openstack tripleo deploy \
       --templates \
       --local-ip=$IP/$NETMASK \
+      --control-virtual-ip $VIP \
       -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
       -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
       -e $HOME/containers-prepare-parameters.yaml \
@@ -307,6 +314,7 @@ Deploying a Standalone OpenStack node
          sudo openstack tripleo deploy \
            --templates \
            --local-ip=$IP/$NETMASK \
+           --control-virtual-ip $VIP \
            -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
            -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
            -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \

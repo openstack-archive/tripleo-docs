@@ -32,6 +32,7 @@ Documentation on additional features for |project|.
    network_isolation_virt
    node_config
    node_specific_hieradata
+   octavia
    ops_tools
    oslo_messaging_config
    ovs_dpdk_config

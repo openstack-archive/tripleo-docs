@@ -16,3 +16,4 @@ TripleO CI Guide
   ruck_rover_primer
   chasing_promotions
   third_party_dependencies_ci
+  content_provider_jobs

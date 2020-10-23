@@ -870,7 +870,7 @@ Create an inventory on the undercloud which refers to itself::
 
 Set Ansible environment variables::
 
-  BASE="/usr/share/openstack-tripleo-validations"
+  BASE="/usr/share/ansible"
   export ANSIBLE_RETRY_FILES_ENABLED=false
   export ANSIBLE_KEEP_REMOTE_FILES=1
   export ANSIBLE_CALLBACK_PLUGINS="${BASE}/callback_plugins"
@@ -880,11 +880,11 @@ Set Ansible environment variables::
 
 See what Ceph validations are available::
 
-  ls $BASE/playbooks | grep ceph
+  ls $BASE/validation-playbooks | grep ceph
 
 Run a Ceph validation with command like the following::
 
-  ansible-playbook -i inventory $BASE/playbooks/ceph-ansible-installed.yaml
+  ansible-playbook -i inventory $BASE/validation-playbooks/ceph-ansible-installed.yaml
 
 For Stein and newer it is possible to run validations using the
 `openstack tripleo validator run` command with a syntax like the
@@ -895,6 +895,19 @@ following::
 The `ceph-ansible-installed` validation warns if the `ceph-ansible`
 RPM is not installed on the undercloud. This validation is also run
 automatically during deployment unless validations are disabled.
+
+.. admonition:: Ussuri and older
+   :class: ceph
+
+   For Ussuri and older the base path should be set like this::
+
+     BASE="/usr/share/openstack-tripleo-validations"
+
+   Also, the validation playbooks will be in $BASE/playbooks/ and not
+   $BASE/validation-playbooks. E.g. the ceph-pg.yaml playbook covered
+   in the next section would be run like this::
+
+     ansible-playbook -i inventory $BASE/playbooks/ceph-pg.yaml -e @ceph.yaml -e num_osds=36
 
 Ceph Placement Group Validation
 -------------------------------
@@ -927,7 +940,7 @@ environment files are passed with the `-e @file.yaml` syntax::
 
 Then use a command like the following::
 
-  ansible-playbook -i inventory $BASE/playbooks/ceph-pg.yaml -e @ceph.yaml -e num_osds=36
+  ansible-playbook -i inventory $BASE/validation-playbooks/ceph-pg.yaml -e @ceph.yaml -e num_osds=36
 
 The `num_osds` parameter is required. This value should be the number
 of expected OSDs that will be in the Ceph deployment. It should be
@@ -957,7 +970,7 @@ pass the same environment files for enabling these services you would
 as if you were running `openstack overcloud deploy`. For example::
 
   export THT=/usr/share/openstack-tripleo-heat-templates/
-  ansible-playbook -i inventory $BASE/playbooks/ceph-pg.yaml \
+  ansible-playbook -i inventory $BASE/validation-playbooks/ceph-pg.yaml \
     -e @$THT/environments/ceph-ansible/ceph-rgw.yaml \
     -e @$THT/environments/ceph-ansible/ceph-mds.yaml \
     -e @$THT/environments/manila-cephfsganesha-config.yaml \

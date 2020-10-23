@@ -247,6 +247,14 @@ The overcloud can then be deployed using the output from the provision command::
     --disable-validations \
     # other CLI arguments
 
+.. note::
+    The validation which is part of `openstack overcloud node
+    provision` may fail with the default overcloud image unless the
+    Ironic node has more than 4 GB of RAM. For example, a VBMC node
+    provisioned with 4096 MB of memory failed because the image size
+    plus the reserved RAM size were not large enough (Image size: 4340
+    MiB, Memory size: 3907 MiB).
+
 Viewing Provisioned Node Details
 --------------------------------
 

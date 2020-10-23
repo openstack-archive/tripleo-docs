@@ -18,6 +18,7 @@ post cloud deployment.
    validations/index
 
 
+
 Post Cloud Deployment Advanced Topics
 =====================================
 
@@ -32,3 +33,4 @@ or configured post cloud deployment.
    quiesce_compute
    updating_network_configuration_post_deployment
    vm_snapshot
+   pre_cache_images

@@ -150,6 +150,9 @@ Each ``instances`` entry and the ``defaults`` dict support the following propert
 
 * ``capabilities``: Selection criteria to match the node's capabilities
 
+* ``config_drive``: Add data and first-boot commands to the config-drive passed
+  to the node. See :ref:`config-drive`
+
 * ``hostname``: If this complies with the ``hostname_format`` pattern then
   other properties will apply to the node allocated to this hostname.
   Otherwise, this allows a custom hostname to be specified for this node.
@@ -221,6 +224,70 @@ Other valid NIC entries would be
   - subnet: ctlplane-subnet
     fixed_ip: 192.168.24.8
   - port: overcloud-controller-0-ctlplane
+
+.. _config-drive:
+
+Config Drive
+____________
+
+The ``instances`` ``config_drive`` property supports two sub-properties:
+
+* ``cloud_config``: Dict of cloud-init `cloud-config`_ data for tasks to run on
+  node boot. A task specified in an ``instances`` ``cloud_config`` will
+  overwrite a task with the same name in in ``defaults`` ``cloud_config``.
+
+* ``meta_data``: Extra metadata to include with the config-drive cloud-init
+  metadata. This will be added to the generated metadata ``public_keys``,
+  ``uuid``, ``name``, ``hostname``, and ``instance-type`` which is set to
+  the role name. Cloud-init makes this metadata available as `instance-data`_.
+  A key specified in an ``instances`` ``meta_data`` entry will overwrite the
+  same key in ``defaults`` ``meta_data``.
+
+Below are some examples of what can be done with ``config_drive``.
+
+Run arbitrary scripts on first boot:
+
+.. code-block:: yaml
+
+  config_drive:
+    cloud_config:
+      bootcmd:
+        # temporary workaround to allow steering in ConnectX-3 devices
+        - echo "options mlx4_core log_num_mgm_entry_size=-1" >> /etc/modprobe.d/mlx4.conf
+        - /sbin/dracut --force
+
+Enable and configure ntp:
+
+.. code-block:: yaml
+
+  config_drive:
+    cloud_config:
+      enabled: true
+      ntp_client: chrony  # Uses cloud-init default chrony configuration
+
+Allow root ssh login (for development environments only):
+
+.. code-block:: yaml
+
+  config_drive:
+    cloud_config:
+      ssh_pwauth: true
+      disable_root: false
+      chpasswd:
+        list: |
+          root:sekrit password
+        expire: False
+
+Use values from custom metadata:
+
+.. code-block:: yaml
+
+  config_drive:
+    meta_data:
+      foo: bar
+    cloud_config:
+      runcmd:
+        - echo The value of foo is `jq .foo < /run/cloud-init/instance-data.json`
 
 .. _deploying-the-overcloud:
 
@@ -374,3 +441,7 @@ the ``--all`` argument::
     ~/overcloud_baremetal_deploy.yaml
 
 .. _metalsmith: https://docs.openstack.org/metalsmith/
+
+.. _cloud-config: https://cloudinit.readthedocs.io/en/latest/topics/examples.html
+
+.. _instance-data: https://cloudinit.readthedocs.io/en/latest/topics/instancedata.html

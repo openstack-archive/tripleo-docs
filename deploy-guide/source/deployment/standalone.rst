@@ -185,6 +185,7 @@ Deploying a Standalone OpenStack node
           - $IP:8787
         NeutronPublicInterface: $INTERFACE
         # domain name used by the host
+        CloudDomain: localdomain
         NeutronDnsDomain: localdomain
         # re-use ctlplane bridge for public net, defined in the standalone
         # net config (do not change unless you know what you're doing)
@@ -242,6 +243,7 @@ Deploying a Standalone OpenStack node
           - $IP:8787
         NeutronPublicInterface: $INTERFACE
         # domain name used by the host
+        CloudDomain: localdomain
         NeutronDnsDomain: localdomain
         # re-use ctlplane bridge for public net, defined in the standalone
         # net config (do not change unless you know what you're doing)

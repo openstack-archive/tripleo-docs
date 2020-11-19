@@ -350,7 +350,7 @@ Example::
     ---
     {% set mtu_list = [ctlplane_mtu] %}
     {% for network in role_networks %}
-    {{ mtu_list.append(lookup('vars', role_networks_lower[network] ~ '_mtu')) }}
+    {{ mtu_list.append(lookup('vars', networks_lower[network] ~ '_mtu')) }}
     {%- endfor %}
     {% set min_viable_mtu = mtu_list | max %}
     network_config:
@@ -380,11 +380,11 @@ Example::
           mtu: {{ min_viable_mtu }}
     {% for network in role_networks %}
       - type: vlan
-        mtu: {{ lookup('vars', role_networks_lower[network] ~ '_mtu') }}
-        vlan_id: {{ lookup('vars', role_networks_lower[network] ~ '_vlan_id') }}
+        mtu: {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
+        vlan_id: {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
         addresses:
-        - ip_netmask: {{ lookup('vars', role_networks_lower[network] ~ '_ip') }}/{{ lookup('vars', role_networks_lower[network] ~ '_cidr') }}
-        routes: {{ lookup('vars', role_networks_lower[network] ~ '_host_routes') }}
+        - ip_netmask: {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
+        routes: {{ lookup('vars', networks_lower[network] ~ '_host_routes') }}
     {%- endfor %}
 
 .. note::

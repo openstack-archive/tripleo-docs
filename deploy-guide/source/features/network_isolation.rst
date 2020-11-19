@@ -186,8 +186,12 @@ Create Network Environment Overrides File
 The environment file will describe the network environment and will point to
 the network interface configuration files to use for the overcloud nodes.
 
-In order to configure the ``resource registry`` section of the network
-environment of the cluster, copy the generated
+Earlier method of generating network interface configurations with heat has
+been deprecated since victoria. To use a custom network configuration copy
+an appropriate sample network interface configuration file from
+`tripleo-ansible <tripleo_ansible_>`_  and make necessary changes.
+
+Then copy the generated
 ``net-single-nic-with-vlans.yaml`` file to apply the required cluster specific
 changes, which overrides the defaults::
 
@@ -201,28 +205,33 @@ allow the OpenStack Public APIs and the Horizon Dashboard to be reachable.
 Without a valid default route, the post-deployment steps cannot be performed.
 
 .. note::
-  The ``resource_registry`` section of the
-  ``network-environment-overrides.yaml`` contains pointers to the network
-  interface configurations for the deployed roles. These files must exist at
-  the path referenced here, and will be copied later in this guide.
+
+   The ``parameter_defaults`` section of the ``network-environment-overrides.yaml``
+   contains pointers to the network interface configuration files for the deployed
+   roles. These files must exist at the path referenced here.
 
 Example::
 
-  resource_registry:
-    OS::TripleO::BlockStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/cinder-storage.yaml
-    OS::TripleO::Compute::Net::SoftwareConfig: /home/stack/templates/nic-configs/compute.yaml
-    OS::TripleO::Controller::Net::SoftwareConfig: /home/stack/templates/nic-configs/controller.yaml
-    OS::TripleO::ObjectStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/swift-storage.yaml
-    OS::TripleO::CephStorage::Net::SoftwareConfig: /home/stack/templates/nic-configs/ceph-storage.yaml
-
   parameter_defaults:
+    ControllerNetworkConfigTemplate: 'templates/single_nic_vlans/single_nic_vlans.j2'
+    ComputeNetworkConfigTemplate: 'templates/single_nic_vlans/single_nic_vlans.j2'
+    BlockStorageNetworkConfigTemplate: 'templates/single_nic_vlans/single_nic_vlans_storage.j2'
+
     # May set to br-ex if using floating IPs only on native VLAN on bridge br-ex
     NeutronExternalNetworkBridge: "''"
     NeutronNetworkType: 'vxlan,vlan'
     NeutronTunnelTypes: 'vxlan'
     # Customize bonding options if required (ignored if bonds are not used)
-    BondInterfaceOvsOptions:
-        "lacp=active other-config:lacp-fallback-ab=true"
+    BondInterfaceOvsOptions: "lacp=active other-config:lacp-fallback-ab=true"
+
+
+Users can still use the old network interface configuration heat templates
+for custom network configuration. Set ``NetworkConfigWithAnsible`` parameter
+to ``false`` to use them::
+
+  parameter_defaults:
+    NetworkConfigWithAnsible: false
+
 
 Configure IP Subnets
 --------------------
@@ -302,27 +311,26 @@ Creating Custom Interface Templates
 In order to configure the network interfaces on each node, the network
 interface templates may need to be customized.
 
-Start by copying the generated configurations from one of the example
-directories. The first example copies the templates which include network
-bonding. The second example copies the templates which use a single network
-interface with multiple VLANs (this configuration is mostly intended for
-testing).
+Start by copying the existing templates in `tripleo-ansible <tripleo_ansible_>`_.
+The first example copies the templates which include network bonding. The second
+example copies the templates which use a single network interface with multiple
+VLANs (this configuration is mostly intended for testing).
+
+.. _tripleo_ansible: https://opendev.org/openstack/tripleo-ansible/src/branch/master/tripleo_ansible/roles/tripleo_network_config/templates
 
 To copy the bonded example interface configurations, run::
 
-    $ cp ~/generated-openstack-tripleo-heat-templates/network/config/bond-with-vlans/* \
+    $ cp /usr/share/ansible/roles/tripleo_network_config/templates/bonds_vlans/* \
           ~/templates/nic-configs
 
 To copy the single NIC with VLANs example interface configurations, run::
 
-    $ cp ~/generated-openstack-tripleo-heat-templates/network/config/single-nic-vlans/* \
+    $ cp /usr/share/ansible/roles/tripleo_network_config/templates/single_nic_vlans/* \
           ~/templates/nic-configs
 
 Or, if you have custom NIC templates from another source, copy them to the
-location referenced in the ``resource_registry`` section of the environment
-file. And ensure that the whole ``parameters`` section of all the custom NIC
-templates are replaced with the ``parameters`` section of the generated
-NIC templates.
+location referenced in the ``parameter_defaults`` section of the environment
+file.
 
 Customizing the Interface Templates
 -----------------------------------
@@ -339,185 +347,102 @@ but will have only a subset of the networks attached.
 
 Example::
 
-  heat_template_version: 2015-04-30
+    ---
+    {% set mtu_list = [ctlplane_mtu] %}
+    {% for network in role_networks %}
+    {{ mtu_list.append(lookup('vars', role_networks_lower[network] ~ '_mtu')) }}
+    {%- endfor %}
+    {% set min_viable_mtu = mtu_list | max %}
+    network_config:
+    - type: interface
+      name: nic1
+      mtu: {{ ctlplane_mtu }}
+      use_dhcp: false
+      addresses:
+      - ip_netmask: {{ ctlplane_ip }}/{{ ctlplane_subnet_cidr }}
+      routes: {{ ctlplane_host_routes }}
+    - type: ovs_bridge
+      name: {{ neutron_physical_bridge_name }}
+      dns_servers: {{ ctlplane_dns_nameservers }}
+      domain: {{ dns_search_domains }}
+      members:
+      - type: ovs_bond
+        name: bond1
+        mtu: {{ min_viable_mtu }}
+        ovs_options: {{ bond_interface_ovs_options }}
+        members:
+        - type: interface
+          name: nic3
+          mtu: {{ min_viable_mtu }}
+          primary: true
+        - type: interface
+          name: nic4
+          mtu: {{ min_viable_mtu }}
+    {% for network in role_networks %}
+      - type: vlan
+        mtu: {{ lookup('vars', role_networks_lower[network] ~ '_mtu') }}
+        vlan_id: {{ lookup('vars', role_networks_lower[network] ~ '_vlan_id') }}
+        addresses:
+        - ip_netmask: {{ lookup('vars', role_networks_lower[network] ~ '_ip') }}/{{ lookup('vars', role_networks_lower[network] ~ '_cidr') }}
+        routes: {{ lookup('vars', role_networks_lower[network] ~ '_host_routes') }}
+    {%- endfor %}
 
-  description: >
-    Software Config to drive os-net-config with 2 bonded nics on a bridge
-    with a VLANs attached for the controller role.
+.. note::
+  If you are using old heat network interface configuration templates from versions
+  prior to Victoria, you may need to make updates to the templates. See below.
 
-  parameters:
-    ControlPlaneIp:
-      default: ''
-      description: IP address/subnet on the ctlplane network
-      type: string
-    ExternalIpSubnet:
-      default: ''
-      description: IP address/subnet on the external network
-      type: string
-    InternalApiIpSubnet:
-      default: ''
-      description: IP address/subnet on the internal API network
-      type: string
-    StorageIpSubnet:
-      default: ''
-      description: IP address/subnet on the storage network
-      type: string
-    StorageMgmtIpSubnet:
-      default: ''
-      description: IP address/subnet on the storage mgmt network
-      type: string
-    TenantIpSubnet:
-      default: ''
-      description: IP address/subnet on the tenant network
-      type: string
-    BondInterfaceOvsOptions:
-      default: ''
-      description: The ovs_options string for the bond interface. Set things like
-                   lacp=active and/or bond_mode=balance-slb using this option.
-      type: string
-    ExternalNetworkVlanID:
-      default: 10
-      description: Vlan ID for the external network traffic.
-      type: number
-    InternalApiNetworkVlanID:
-      default: 20
-      description: Vlan ID for the internal_api network traffic.
-      type: number
-    StorageNetworkVlanID:
-      default: 30
-      description: Vlan ID for the storage network traffic.
-      type: number
-    StorageMgmtNetworkVlanID:
-      default: 40
-      description: Vlan ID for the storage mgmt network traffic.
-      type: number
-    TenantNetworkVlanID:
-      default: 50
-      description: Vlan ID for the tenant network traffic.
-      type: number
-    ExternalInterfaceDefaultRoute:
-      default: '10.0.0.1'
-      description: Default route for the external network.
-      type: string
-    ControlPlaneSubnetCidr: # Override this via parameter_defaults
-      default: '24'
-      description: The subnet CIDR of the control plane network.
-      type: string
-    DnsServers: # Override this via parameter_defaults
-      default: []
-      description: A list of DNS servers (2 max) to add to resolv.conf.
-      type: json
-    EC2MetadataIp: # Override this via parameter_defaults
-      description: The IP address of the EC2 metadata server.
-      type: string
+Updating Existing Network Interface Configuration Templates
+-----------------------------------------------------------
+
+Prior to Victoria relase the network interface configuration file
+used a ``OS::Heat::SoftwareConfig`` resource to configure interfaces::
 
   resources:
     OsNetConfigImpl:
-      type: OS::Heat::StructuredConfig
+      type: OS::Heat::SoftwareConfig
       properties:
         group: script
         config:
           str_replace:
             template:
-              get_file: ../../scripts/run-os-net-config.sh
+              get_file: /usr/share/openstack-tripleo-heat-templates/network/scripts/run-os-net-config.sh
             params:
               $network_config:
                 network_config:
-                  -
-                    type: interface
-                    name: nic1
-                    use_dhcp: false
-                    addresses:
-                      -
-                        ip_netmask:
-                          list_join:
-                            - '/'
-                            - - {get_param: ControlPlaneIp}
-                              - {get_param: ControlPlaneSubnetCidr}
-                    routes:
-                      -
-                        ip_netmask: 169.254.169.254/32
-                        next_hop: {get_param: EC2MetadataIp}
-                  -
-                    type: ovs_bridge
-                    name: bridge_name
-                    dns_servers: {get_param: DnsServers}
-                    members:
-                      -
-                        type: ovs_bond
-                        name: bond1
-                        ovs_options: {get_param: BondInterfaceOvsOptions}
-                        members:
-                          -
-                            type: interface
-                            name: nic3
-                            primary: true
-                          -
-                            type: interface
-                            name: nic4
-                      -
-                        type: vlan
-                        device: bond1
-                        vlan_id: {get_param: ExternalNetworkVlanID}
-                        addresses:
-                          -
-                            ip_netmask: {get_param: ExternalIpSubnet}
-                        routes:
-                          -
-                            ip_netmask: 0.0.0.0/0
-                            next_hop: {get_param: ExternalInterfaceDefaultRoute}
-                      -
-                        type: vlan
-                        device: bond1
-                        vlan_id: {get_param: InternalApiNetworkVlanID}
-                        addresses:
-                        -
-                          ip_netmask: {get_param: InternalApiIpSubnet}
-                      -
-                        type: vlan
-                        device: bond1
-                        vlan_id: {get_param: StorageNetworkVlanID}
-                        addresses:
-                        -
-                          ip_netmask: {get_param: StorageIpSubnet}
-                      -
-                        type: vlan
-                        device: bond1
-                        vlan_id: {get_param: StorageMgmtNetworkVlanID}
-                        addresses:
-                        -
-                          ip_netmask: {get_param: StorageMgmtIpSubnet}
-                      -
-                        type: vlan
-                        device: bond1
-                        vlan_id: {get_param: TenantNetworkVlanID}
-                        addresses:
-                        -
-                          ip_netmask: {get_param: TenantIpSubnet}
+                  [NETWORK INTERFACE CONFIGURATION HERE]
 
-      outputs:
-        OS::stack_id:
-          description: The OsNetConfigImpl resource.
-          value: {get_resource: OsNetConfigImpl}
+These templates are now expected to use ``OS::Heat::Value`` resource::
 
-.. note::
-  If you are using network interface configuration templates from versions
-  prior to Ocata, you may need to make updates to the templates. See below.
+  resources:
+    OsNetConfigImpl:
+      type: OS::Heat::Value
+      properties:
+        value:
+          network_config:
+            [NETWORK INTERFACE CONFIGURATION HERE]
+  outputs:
+    config:
+      value: get_attr[OsNetConfigImpl, value]
 
-Updating Existing Network Interface Configuration Templates
------------------------------------------------------------
 
-  Prior to the Ocata release, the network interface configuration files used
-  a different mechanism for running os-net-config. Ocata introduced the
-  run-os-net-config.sh script, and the old mechanism was deprecated. The
-  deprecated mechanism was removed in Queens, so older templates must be
-  updated. The resource definition must be changed, and {get_input: bridge_name} is
-  replaced with the special token "bridge_name", which will be replaced with
-  the value of the NeutronPhysicalBridge.
+
+Old network inteface configuration heat templates can be converted using
+the provided conversion `convert-nic-config.py <convert_nic_config_>`_ script.
+
+.. _convert_nic_config: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/tools/convert_nic_config.py
+
+
+Prior to the Ocata release, the network interface configuration files used
+a different mechanism for running os-net-config. Ocata introduced the
+run-os-net-config.sh script, and the old mechanism was deprecated. The
+deprecated mechanism was removed in Queens, so older templates must be
+updated. The resource definition must be changed, and {get_input: bridge_name} is
+replaced with the special token "bridge_name", which will be replaced with
+the value of the NeutronPhysicalBridge.
 
 Old Header::
 
-    resources:
+  resources:
     OsNetConfigImpl:
       type: OS::Heat::StructuredConfig
       properties:
@@ -525,22 +450,17 @@ Old Header::
         config:
           os_net_config:
             network_config:
+              [NETWORK INTERFACE CONFIGURATION HERE]
 
 New Header::
 
   resources:
-  OsNetConfigImpl:
-    type: OS::Heat::SoftwareConfig
+    OsNetConfigImpl:
+      type: OS::Heat::Value
       properties:
-      group: script
-      config:
-        str_replace:
-          template:
-            # This filename can be relative to template root or absolute
-            get_file: ../../scripts/run-os-net-config.sh
-          params:
-            $network_config:
-              network_config:
+        value:
+          network_config:
+            [NETWORK INTERFACE CONFIGURATION HERE]
 
 Old Bridge Definition::
 
@@ -561,30 +481,27 @@ NICs for the bond:
 
 Example::
 
-          network_config:
-            # Add a DHCP infrastructure network to nic2
-            -
-              type: interface
-              name: nic2
-              use_dhcp: true
-              defroute: false
-            -
-              type: ovs_bridge
-              name: bridge_name
-              members:
-                -
-                  type: ovs_bond
-                  name: bond1
-                  ovs_options: {get_param: BondInterfaceOvsOptions}
-                  members:
-                    # Modify bond NICs to use nic3 and nic4
-                    -
-                      type: interface
-                      name: nic3
-                      primary: true
-                    -
-                      type: interface
-                      name: nic4
+    network_config:
+    - type: interface
+      name: nic2
+      mtu: {{ ctlplane_mtu }}
+      use_dhcp: true
+      defroute: no
+    - type: ovs_bridge
+      name: {{ neutron_physical_bridge_name }}
+      members:
+      - type: ovs_bond
+        name: bond1
+        mtu: {{ min_viable_mtu }}
+        ovs_options: {{ bound_interface_ovs_options }}
+        members:
+        - type: interface
+          name: nic3
+          mtu: {{ min_viable_mtu }}
+          primary: true
+        - type: interface
+          name: nic4
+          mtu: {{ min_viable_mtu }}
 
 When using numbered interfaces ("nic1", "nic2", etc.) instead of named
 interfaces ("eth0", "eno2", etc.), the network interfaces of hosts within
@@ -615,17 +532,14 @@ to routes learned via DHCP):
 
 Example::
 
-            # No default route on the Provisioning network
-            -
-              type: interface
-              name: nic1
-              use_dhcp: true
-              defroute: no
-            # Instead use this DHCP infrastructure VLAN as the default route
-            -
-              type: interface
-              name: nic2
-              use_dhcp: true
+    network_config:
+    - type: interface
+      name: nic1
+      use_dhcp: true
+      defroute: no
+    - type: interface
+      name: nic2
+      use_dhcp: true
 
 To set a static route on an interface with a static IP, specify a route to the
 subnet. For instance, here is a hypothetical route to the 10.1.2.0/24 subnet
@@ -633,17 +547,15 @@ via the gateway at 172.17.0.1 on the Internal API network:
 
 Example::
 
-            -
-              type: vlan
-              device: bond1
-              vlan_id: {get_param: InternalApiNetworkVlanID}
-              addresses:
-              -
-                ip_netmask: {get_param: InternalApiIpSubnet}
-              routes:
-                -
-                  ip_netmask: 10.1.2.0/24
-                  next_hop: 172.17.0.1
+    - type: vlan
+      device: bond1
+      vlan_id: {{ internal_api_vlan_id }}
+      addresses:
+      - ip_netmask: {{ internal_api_ip ~ '/' ~ internal_api_cidr }}
+      routes:
+      - ip_netmask: 10.1.2.0/24
+        next_hop: 172.17.0.1
+
 
 Using a Dedicated Interface For Tenant VLANs
 --------------------------------------------
@@ -654,14 +566,12 @@ VLANs, you would add the following to the Controller and Compute templates:
 
 Example::
 
-            -
-              type: ovs_bridge
-              name: br-vlan
-              members:
-                -
-                  type: interface
-                  name: nic4
-                  primary: true
+    - type: ovs_bridge
+      name: br-vlan
+      members:
+      - type: interface
+        name: nic4
+        primary: true
 
 A similar configuration may be used to define an interface or a bridge that
 will be used for Provider VLANs. Provider VLANs are external networks which
@@ -704,30 +614,22 @@ configuration would look like this:
 
 Example::
 
-              -
-                type: ovs_bridge
-                name: bridge_name
-                dns_servers: {get_param: DnsServers}
-                addresses:
-                  -
-                    ip_netmask: {get_param: ExternalIpSubnet}
-                routes:
-                  -
-                    ip_netmask: 0.0.0.0/0
-                    next_hop: {get_param: ExternalInterfaceDefaultRoute}
-                members:
-                  -
-                    type: ovs_bond
-                    name: bond1
-                    ovs_options: {get_param: BondInterfaceOvsOptions}
-                    members:
-                      -
-                        type: interface
-                        name: nic3
-                        primary: true
-                      -
-                        type: interface
-                        name: nic4
+      - type: ovs_bridge
+        name: bridge_name
+        dns_servers: {{ ctlplane_dns_nameservers }}
+        addresses:
+        - ip_netmask: {{ external_ip ~ '/' ~ external_cidr }}
+        routes: {{ external_host_routes }}
+        members:
+        - type: ovs_bond
+          name: bond1
+          ovs_options: {{ bond_interface_ovs_options }}
+          members:
+          - type: interface
+            name: nic3
+            primary: true
+          - type: interface
+            name: nic4
 
 .. note::
   When moving the address (and possibly route) statements onto the bridge, be
@@ -761,42 +663,30 @@ over 300% greater when using jumbo frames in conjunction with VXLAN tunnels.
 
 Example::
 
-                  -
-                    type: ovs_bond
+                  - type: ovs_bond
                     name: bond1
                     mtu: 9000
-                    ovs_options: {get_param: BondInterfaceOvsOptions}
+                    ovs_options: {{ bond_interface_ovs_options }}
                     members:
-                      -
-                        type: interface
-                        name: nic3
-                        mtu: 9000
-                        primary: true
-                      -
-                        type: interface
-                        name: nic4
-                        mtu: 9000
-                  -
-                    # The external interface should stay at default
-                    type: vlan
+                    - type: interface
+                      name: nic3
+                      mtu: 9000
+                      primary: true
+                    - type: interface
+                      name: nic4
+                      mtu: 9000
+                  - type: vlan
                     device: bond1
-                    vlan_id: {get_param: ExternalNetworkVlanID}
+                    vlan_id: {{ external_vlan_id }}
                     addresses:
-                      -
-                        ip_netmask: {get_param: ExternalIpSubnet}
-                    routes:
-                      -
-                        ip_netmask: 0.0.0.0/0
-                        next_hop: {get_param: ExternalInterfaceDefaultRoute}
-                  -
-                    # MTU 9000 for Internal API, Storage, and Storage Management
-                    type: vlan
+                    - ip_netmask: {{ external_ip ~ '/' ~ external_cidr }}
+                    routes: {{ external_host_routes }}
+                  - type: vlan
                     device: bond1
                     mtu: 9000
-                    vlan_id: {get_param: InternalApiNetworkVlanID}
+                    vlan_id: {{ internal_api_vlan_id }}
                     addresses:
-                    -
-                      ip_netmask: {get_param: InternalApiIpSubnet}
+                    - ip_netmask: {{ internal_api_ip ~ '/' ~ internal_api_cidr }}
 
 Assigning OpenStack Services to Isolated Networks
 -------------------------------------------------

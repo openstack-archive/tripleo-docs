@@ -10,7 +10,7 @@ possible we will use the ``single-nic-with-vlans`` network isolation
 templates to create isolated VLANs on top of the single NIC already
 used for the provisioning/``ctlplane``.
 
-The ``single-nic-vlans`` templates work well for many virtualized environments
+The ``single_nic_vlans.j2`` template work well for many virtualized environments
 because they do not require adding any extra NICs. Additionally, Open vSwitch
 automatically trunks VLANs for us, so there is no extra switch configuration
 required.

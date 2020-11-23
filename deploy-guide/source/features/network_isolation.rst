@@ -334,6 +334,7 @@ file.
 
 Customizing the Interface Templates
 -----------------------------------
+
 The following example configures a bond on interfaces 3 and 4 of a system
 with 4 interfaces. This example is based on the controller template from the
 bond-with-vlans sample templates, but the bond has been placed on nic3 and nic4
@@ -388,14 +389,72 @@ Example::
     {%- endfor %}
 
 .. note::
-  If you are using old heat network interface configuration templates from versions
-  prior to Victoria, you may need to make updates to the templates. See below.
+  If you are using old heat network interface configuration templates from
+  versions prior to Victoria, either migrate them to new format and update
+  the environments accordingly, for them to be used with ansible interface
+  or update them to use ``OS::Heat::Value`` resource.
+
+Migrating existing Network Interface Configuration Templates
+------------------------------------------------------------
+
+Below outlines some guidelines on how to migrate the old heat net configs
+to the new format consumed by ansible.
+
+#. Create a Jinja2 template using `os-net-config <os_net_config_schema_>`_
+   schema. You can also use one of the in-tree `examples <config_ex_>`_
+   or a copy of `/etc/os-net-config/config.json` (converted to yaml) from
+   an existing node (per role) as a start.
+#. Use `role_networks` and `networks_lower` ansible vars to loop through
+   available networks for a role and their lowercase names.
+#. Use Jinja2 filters to replace heat intrinsic functions. For example
+   `min_viable_mtu` can be calculated with::
+
+      {% set mtu_list = [ctlplane_mtu] %}
+      {% for network in role_networks %}
+      {{ mtu_list.append(lookup('vars', networks_lower[network] ~ '_mtu')) }}
+      {%- endfor %}
+      {% set min_viable_mtu = mtu_list | max %}
+
+#. Heat parameters used with `get_param` can be mapped to ansible vars as per
+   below mapping. Host routes are pre-merged and are available as
+   `ctlplane_host_routes` and `networks_lower[network] ~ '_host_routes'`
+   ansible vars and can be used directly.
+
+#. Any custom heat parameter used, already not available as ansible var has to
+   be passed using `{{role.name}}ExtraGroupVars` THT interface and can then be
+   used in the templates. For example, `StorageSupernet` parameter has to be
+   passed as below::
+
+     parameter_defaults:
+       ControllerExtraGroupVars:
+          storage_supernet: 172.16.0.0/16
+
+.. table:: **Heat parameters to Ansible vars Mapping**
+
+ ===============================  ================================================================================================================
+  Heat Parameters                  Ansible Vars
+ ===============================  ================================================================================================================
+  BondInterfaceOvsOptions          {{ bond_interface_ovs_options }}
+  ControlPlaneIp                   {{ ctlplane_ip }}
+  ControlPlaneSubnetCidr           {{ ctlplane_subnet_cidr }}
+  ControlPlaneMtui                 {{ ctlplane_mtu }}
+  DnsServers                       {{ ctlplane_dns_nameservers }}
+  DnsSearchDomains                 {{ dns_search_domains }}
+  NumDpdkInterfaceRxQueues         {{ num_dpdk_interface_rx_queues }}
+  {{network.name}}IpSubnet         {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
+  {{network.name}}NetworkVlanID    {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
+  {{network.name}}Mtu              {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
+ ===============================  ================================================================================================================
+
+
+.. _os_net_config_schema: https://opendev.org/openstack/os-net-config/src/branch/master/os_net_config/schema.yaml
+.. _config_ex: https://opendev.org/openstack/tripleo-ansible/src/branch/master/tripleo_ansible/roles/tripleo_network_config/templates
 
 Updating Existing Network Interface Configuration Templates
 -----------------------------------------------------------
 
-Prior to Victoria relase the network interface configuration file
-used a ``OS::Heat::SoftwareConfig`` resource to configure interfaces::
+Prior to Victoria release the network interface configuration files
+used  ``OS::Heat::SoftwareConfig`` resource to configure interfaces::
 
   resources:
     OsNetConfigImpl:
@@ -426,7 +485,7 @@ These templates are now expected to use ``OS::Heat::Value`` resource::
 
 
 
-Old network inteface configuration heat templates can be converted using
+Old network interface configuration heat templates can be converted using
 the provided conversion `convert-nic-config.py <convert_nic_config_>`_ script.
 
 .. _convert_nic_config: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/tools/convert_nic_config.py

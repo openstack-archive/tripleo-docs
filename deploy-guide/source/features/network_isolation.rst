@@ -124,26 +124,68 @@ Workflow
 
 The procedure for enabling network isolation is this:
 
-#. Create and edit network_data.yaml file for the cluster
+#. Create and edit network data YAML definition file for the cluster
+#. Use the network data YAML definition file as input to create network
+   resources and generate the networks-deployed-environment.yaml
+   environment file
 #. Generate templates from Jinja2
 #. Create network environment overrides file (e.g. ~/network-environment-overrides.yaml)
 #. Make a copy of the appropriate sample network interface configurations
 #. Edit the network interface configurations to match local environment
 #. Deploy overcloud with the proper parameters to include network isolation
 
+.. admonition:: Victoria and prior releases
+
+  For Victoria and earlier releases the procedure is:
+
+  #. Create and edit network data YAML definition file for the cluster
+  #. Generate templates from Jinja2
+  #. Create network environment overrides file (e.g. ~/network-environment-overrides.yaml)
+  #. Make a copy of the appropriate sample network interface configurations
+  #. Edit the network interface configurations to match local environment
+  #. Deploy overcloud with the proper parameters to include network isolation
+
 The next section will walk through the elements that need to be added to
 the network-environment.yaml to enable network isolation. The sections
 after that deal with configuring the network interface templates. The final step
 will deploy the overcloud with network isolation and a custom environment.
 
-Create and Edit network_data.yaml file for the Cluster
-------------------------------------------------------
+Create and Edit network data YAML definition file
+-------------------------------------------------
 
-Copy the default ``network_data.yaml`` file and customize the networks, IP
-subnets, VLANs, etc., as per the cluster requirements::
+Use the network-data-samples_ in tripleo-heat-templates_ as a reference and
+customize the networks, IP addressing, VLANs, etc., as per the cluster
+requirements.
 
-  $ cp /usr/share/openstack-tripleo-heat-templates/network_data.yaml ~/templates/network_data.yaml
+Please refer to the :ref:`network_definition_opts` reference section on the
+:ref:`custom_networks` document page for a reference on available options in
+the network data YAML schema.
 
+.. admonition:: Victoria and prior releases
+
+  Copy the default ``network_data.yaml`` file and customize the networks, IP
+  subnets, VLANs, etc., as per the cluster requirements::
+
+    $ cp /usr/share/openstack-tripleo-heat-templates/network_data.yaml ~/templates/network_data.yaml
+
+Create the networks, segments and subnet resources on the Undercloud
+--------------------------------------------------------------------
+
+.. admonition:: Victoria and prior releases
+
+  For Victoria and prior releases the network resources are created as part of
+  the overcloud heat stack. This step is not valid for these releases.
+
+Run the "openstack overcloud network provision" command to create/update the
+networks on the Undercloud. This command will also generate the
+``networks-deployed-environment.yaml`` environment file which must be be used
+when deploying the overcloud.
+
+   ::
+
+     openstack overcloud network provision \
+       --output ~/templates/networks-deployed-environment.yaml \
+       ~/templates/custom_network_data.yaml
 
 Generate Templates from Jinja2
 ------------------------------
@@ -304,6 +346,8 @@ the bond::
 
   # Milliseconds between rebalancing flows between bond members, zero to disable
   "other_config:bond-rebalance-interval=10000"
+
+.. _creating_custom_interface_templates:
 
 Creating Custom Interface Templates
 -----------------------------------
@@ -818,8 +862,20 @@ be specified, along with the tunneling or VLAN parameters. Specify the libvirt
 type if on bare metal, so that hardware virtualization will be used.
 
 To deploy with network isolation and include the network environment file, use
-the ``-e`` parameters with the ``openstack overcloud deploy`` command. The
-following deploy command should work for all of the subsequent examples::
+the ``-e`` and ``--networks-file`` parameters with the
+``openstack overcloud deploy`` command. The following deploy command should
+work for all of the subsequent examples::
+
+    openstack overcloud deploy --templates \
+    --networks-file ~/templates/custom_network_data.yaml \
+    -e ~/templates/networks-deployed-environment.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
+    -e ~/templates/network-environment-overrides.yaml \
+    --ntp-server pool.ntp.org
+
+
+.. admonition:: Victoria and prior releases
 
     openstack overcloud deploy --templates \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
@@ -934,3 +990,8 @@ to a provider network if Neutron is to provide DHCP services to tenant VMs::
     --allocation-pool start=10.0.3.50,end=10.0.3.100 \
     --gateway 10.0.3.254 \
     provider_network 10.0.3.0/24
+
+
+.. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
+.. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples/default-network-isolation.yaml
+.. _network-data-samples: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples

@@ -39,6 +39,24 @@
       Enable the appropriate repos for the desired release, as indicated below.
       Do not enable any other repos not explicitly marked for that release.
 
+   .. admonition:: Victoria
+      :class: victoria utov
+
+      Enable the current Victoria repositories
+
+      .. code-block:: bash
+
+         sudo -E tripleo-repos -b victoria current
+
+      .. admonition:: Ceph
+         :class: ceph
+
+         Include the Ceph repo in the tripleo-repos call
+
+         .. code-block:: bash
+
+            sudo -E tripleo-repos -b victoria current ceph
+
    .. admonition:: Ussuri
       :class: ussuri ttou
 

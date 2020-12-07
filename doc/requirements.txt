@@ -7,3 +7,6 @@ sphinxcontrib-svg2pdfconverter>=0.1.0 # BSD
 sphinxcontrib-mermaid>=0.3.1 # BSD
 requests
 pyquery
+
+# needed because sphinxcontrib-mermaid calls it but doesn't require it
+six

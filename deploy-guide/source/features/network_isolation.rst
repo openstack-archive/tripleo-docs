@@ -431,20 +431,24 @@ to the new format consumed by ansible.
 
 .. table:: **Heat parameters to Ansible vars Mapping**
 
- ===============================  ================================================================================================================
-  Heat Parameters                  Ansible Vars
- ===============================  ================================================================================================================
-  BondInterfaceOvsOptions          {{ bond_interface_ovs_options }}
-  ControlPlaneIp                   {{ ctlplane_ip }}
-  ControlPlaneSubnetCidr           {{ ctlplane_subnet_cidr }}
-  ControlPlaneMtui                 {{ ctlplane_mtu }}
-  DnsServers                       {{ ctlplane_dns_nameservers }}
-  DnsSearchDomains                 {{ dns_search_domains }}
-  NumDpdkInterfaceRxQueues         {{ num_dpdk_interface_rx_queues }}
-  {{network.name}}IpSubnet         {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
-  {{network.name}}NetworkVlanID    {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
-  {{network.name}}Mtu              {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
- ===============================  ================================================================================================================
+ ======================================= ================================================================================================================
+  Heat Parameters                         Ansible Vars
+ ======================================= ================================================================================================================
+  BondInterfaceOvsOptions                 {{ bond_interface_ovs_options }}
+  ControlPlaneIp                          {{ ctlplane_ip }}
+  ControlPlaneSubnetCidr                  {{ ctlplane_subnet_cidr }}
+  ControlPlaneDefaultRoute                {{ ctlplane_gateway_ip }}
+  ControlPlaneStaticRoutes                {{ ctlplane_host_routes }}
+  ControlPlaneMtu                         {{ ctlplane_mtu }}
+  DnsServers                              {{ ctlplane_dns_nameservers }}
+  DnsSearchDomains                        {{ dns_search_domains }}
+  NumDpdkInterfaceRxQueues                {{ num_dpdk_interface_rx_queues }}
+  {{network.name}}IpSubnet                {{ lookup('vars', networks_lower[network] ~ '_ip') }}/{{ lookup('vars', networks_lower[network] ~ '_cidr') }}
+  {{network.name}}NetworkVlanID           {{ lookup('vars', networks_lower[network] ~ '_vlan_id') }}
+  {{network.name}}Mtu                     {{ lookup('vars', networks_lower[network] ~ '_mtu') }}
+  {{network.name}}InterfaceDefaultRoute   {{ lookup('vars', networks_lower[network] ~ '_gateway_ip') }}
+  {{network.name}}InterfaceRoutes         {{ lookup('vars', networks_lower[network] ~ '_host_routes') }}
+ ======================================= ================================================================================================================
 
 
 .. _os_net_config_schema: https://opendev.org/openstack/os-net-config/src/branch/master/os_net_config/schema.yaml

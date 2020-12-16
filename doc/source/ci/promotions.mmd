@@ -1,5 +1,6 @@
 graph TD
-    master --> |build-packages|current-consistent
-    current-consistent --> |<a href='http://cistatus.tripleo.org/promotion/'>tripleo-ci promotion</a>|current-tripleo
-    current-tripleo --> |<a href='http://cistatus.tripleo.org/phase1/'>rdo phase1 promotion</a>|current-tripleo-rdo
-    current-tripleo-rdo --> |<a href='http://cistatus.tripleo.org/phase2/'>rdo phase2 promotion</a>|current-tripleo-rdo-internal
+    A[promoted-components] --> |periodically promote to| B[tripleo-ci-testing]
+    B --> |Build images & containers| C[images in RDO cloud]
+    C --> |Run periodic promotion jobs| D{criteria jobs passing?}
+    D-->|no| F[reject content]
+    D-->|yes| E[current-tripleo]

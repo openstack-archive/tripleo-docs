@@ -1,0 +1,6 @@
+graph TD
+   A[consistent] -->|periodically promote to| B[component-ci-testing]
+   B -->|Run periodic promotion jobs| C{criteria jobs passing?}
+   C -->|no| E[reject content]
+   C -->|yes| D[promoted-components]
+   D --> F[start of integration pipeline]

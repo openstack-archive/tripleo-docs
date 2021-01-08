@@ -57,7 +57,7 @@ Get Images
        delete the older images and restart the process from this step.
 
        Alternatively, images are available via RDO at
-       https://images.rdoproject.org/master which offers images from both the
+       https://images.rdoproject.org/centos8/master/rdo_trunk/ which offers images from both the
        CentOS Build System (cbs) and RDO Trunk (called rdo_trunk or delorean).
        However this mirror is slow so if you experience slow download speeds
        you should skip to building the images instead.
@@ -140,17 +140,38 @@ created on the undercloud, one should use a non-root user.
 
       ::
 
-           DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean* /etc/yum.repos.d/tripleo-centos-*"
+         export DIB_YUM_REPO_CONF="/etc/yum.repos.d/delorean* /etc/yum.repos.d/tripleo-centos-*"
 
    .. admonition:: Stable Branch
       :class: stable
 
-      .. admonition:: Queens
-         :class: queens
+      .. admonition:: Victoria
+         :class: victoria
 
          ::
 
-            export STABLE_RELEASE="queens"
+            export STABLE_RELEASE="victoria"
+
+      .. admonition:: Ussuri
+         :class: ussuri
+
+         ::
+
+            export STABLE_RELEASE="ussuri"
+
+      .. admonition:: Train
+         :class: train
+
+         ::
+
+            export STABLE_RELEASE="train"
+
+      .. admonition:: Stein
+         :class: stein
+
+         ::
+
+            export STABLE_RELEASE="stein"
 
       .. admonition:: Rocky
          :class: rocky
@@ -159,12 +180,12 @@ created on the undercloud, one should use a non-root user.
 
             export STABLE_RELEASE="rocky"
 
-      .. admonition:: Stein
-         :class: stein
+      .. admonition:: Queens
+         :class: queens
 
          ::
 
-            export STABLE_RELEASE="stein"
+            export STABLE_RELEASE="queens"
 
 
 #. Build the required images:

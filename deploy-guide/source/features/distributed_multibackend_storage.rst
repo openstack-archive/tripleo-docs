@@ -571,18 +571,27 @@ with the following::
 
 If you do not wish to hyper-converge the compute nodes with Ceph OSD
 services, then substitute `DistributedCompute` for
-`DistributedComputeHCI`, `DistributedComputeScaleOut` for
-`DistributedComputeHCIScaleOut`, and add `CephStorage` nodes. The
-`DistributedCompute` role contains the `GlanceApiEdge` service so that
-the Compute service uses its the local Glance and local Ceph server at
-the dcn0 site. The `DistributedComputeScaleOut` contains the
+`DistributedComputeHCI` and `DistributedComputeScaleOut` for
+`DistributedComputeHCIScaleOut`, and add `CephAll` nodes (which host
+both the Mon, Mgr and OSD services).
+
+Both the `DistributedCompute` and `DistributedComputeHCI` roles
+contain `CinderVolumeEdge` and `Etcd` service for running Cinder
+in active/active mode but this service will not be enabled unless
+the `environments/dcn-hci.yaml` environment file is included in the
+deploy command. If the `environments/dcn.yaml` is used in its place,
+then the CinderVolumeEdge service will remain disabled.
+
+The `DistributedCompute` role contains the `GlanceApiEdge` service so
+that the Compute service uses its the local Glance and local Ceph
+server at the dcn0 site. The `DistributedComputeScaleOut` contains the
 `HAproxyEdge` service so that any compute instances booting on the
 `DistributedComputeScaleOut` node proxy their request for images to the
 Glance services running on the `DistributedCompute` nodes. It is only
 necessary to deploy the `ScaleOut` roles if more than three
 `DistributedComputeHCI` or `DistributedCompute` nodes are necessary.
-Unlike the `DistributedComputeHCI` role, there is no minimum number of
-`DistributedCompute` required.
+Three are needed for the Cinder active/active service and if
+applicable the Ceph Monitor and Manager services.
 
 Deploy the dcn0 stack
 ^^^^^^^^^^^^^^^^^^^^^

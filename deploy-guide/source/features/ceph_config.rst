@@ -221,8 +221,25 @@ RBD client connections that is shared by the Nova, Cinder, Glance and
 Gnocchi services to read and write to their pools. Not only will the
 keyfile be created but the Ceph cluster will be configured to accept
 connections when the key file is used. The file will be named
-`/etc/ceph/ceph.client.openstack.keyring` and it will be created
-using the following defaults:
+`ceph.client.openstack.keyring` and it will be stored in `/etc/ceph`
+within the containers, but on the container host it will be stored in
+a location defined by a TripleO exposed parameter which defaults to
+`/var/lib/tripleo-config/ceph`.
+
+.. admonition:: Wallaby and newer versions
+
+   Prior to Wallaby the `CephConfigPath` option didn't exist and the
+   configuration files (keyfiles and ceph.conf) were always stored
+   in /etc/ceph.
+   Wallaby introduces a new tripleo-ansible role which is responsible
+   to create the keyrings and the ceph configuration file and, later
+   in the process, configure the clients by copying the rendered files.
+   The containers will find the Ceph related files inside /etc/ceph,
+   however, TripleO exposes the new parameter that can be used to
+   specify the location where the tripleo-ansible Ceph client role is
+   supposed to render the keyfiles and the ceph.conf file.
+
+The keyring file is created using the following defaults:
 
 * CephClusterName: 'ceph'
 * CephClientUserName: 'openstack'

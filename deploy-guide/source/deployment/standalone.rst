@@ -163,7 +163,7 @@ Deploying a Standalone OpenStack node
    .. code-block:: bash
 
       export IP=192.168.24.2
-      export VIP=192.168.25.2
+      export VIP=192.168.24.3
       export NETMASK=24
       export INTERFACE=eth1
 
@@ -213,7 +213,7 @@ Deploying a Standalone OpenStack node
    .. code-block:: bash
 
       export IP=192.168.24.2
-      export VIP=192.168.25.2
+      export VIP=192.168.24.3
       export NETMASK=24
       export GATEWAY=192.168.24.1
       export INTERFACE=eth0

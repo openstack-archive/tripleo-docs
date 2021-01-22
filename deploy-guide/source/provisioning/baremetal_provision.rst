@@ -244,7 +244,7 @@ The overcloud can then be deployed using the output from the provision command::
     -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
     -e ~/overcloud-baremetal-deployed.yaml \
     --deployed-server \
-    --disable-validations \
+    --disable-validations \ # optional, see note below
     # other CLI arguments
 
 .. note::

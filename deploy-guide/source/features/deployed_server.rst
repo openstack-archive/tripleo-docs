@@ -185,13 +185,15 @@ command.::
 
     openstack overcloud deploy \
       <other cli arguments> \
-      --disable-validations \
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml
 
-The ``--disable-validations`` option disables the basic Nova, Ironic, and
-Glance related validations executed by python-tripleoclient. These validations
-are not necessary since those services will not be used to deploy the
-Overcloud.
+.. admonition:: Until Victoria
+   :class: stable
+
+   Note that, until Victoria, you have to pass ``--disable-validations`` in
+   order to disable the basics Nova, Ironic and Glance validations executed
+   by python-tripleoclient. These validations are not necessary since those
+   services will not be used to deploy the Overcloud.
 
 The ``deployed-server.yaml`` environment takes advantage of the template
 composition nature of Heat and tripleo-heat-templates to substitute

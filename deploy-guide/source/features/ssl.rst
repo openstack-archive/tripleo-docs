@@ -188,23 +188,45 @@ Certificate Details
        sudo update-ca-trust extract
 
    Generate the leaf certificate request and key that will be used for the
-   public VIP. Again, Most of the fields don't matter, but this is where the
-   Common Name must be set to the fixed IP in the external network allocation
-   pool::
+   public VIP. To do this, we will create two files for the certificate 
+   request. First, we create the server.csr.cnf::
 
-       openssl req -newkey rsa:2048 -days 365 \
-            -nodes -keyout server-key.pem -out server-req.pem
+       [req]
+       default_bits = 2048
+       prompt = no
+       default_md = sha256
+       distinguished_name = dn
+       [dn]
+       C=AU
+       ST=Queensland
+       L=Brisbane
+       O=your-org
+       OU=admin
+       emailAddress=me@example.com
+       CN=openstack.example.com
 
-   Process the server RSA key::
+   Create v3.ext::
 
-       openssl rsa -in server-key.pem -out server-key.pem
+       authorityKeyIdentifier=keyid,issuer
+       basicConstraints=CA:FALSE
+       keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+       subjectAltName = @alt_names
+       [alt_names]
+       DNS.1=openstack.example.com
 
-   Sign the leaf certificate with the CA certificate and generate the
-   certificate::
+   Create the Key::
 
-       openssl x509 -req -in server-req.pem -days 365 \
-             -CA overcloud-cacert.pem -CAkey overcloud-ca-privkey.pem \
-             -set_serial 01 -out server-cert.pem
+       openssl req -new -sha256 -nodes -out server.csr \
+       -newkey rsa:2048 -keyout server-key.pem \
+       -config <( cat server.csr.cnf )
+
+   Create the certificate::
+
+       openssl x509 -req -in server.csr \
+       -CA overcloud-cacert.pem \
+       -CAkey overcloud-ca-privkey.pem \
+       -CAcreateserial -out server-cert.pem \
+       -days 500 -sha256 -extfile v3.ext
 
    The following is a list of which files generated in the previous steps
    map to which parameters in the SSL environment files::

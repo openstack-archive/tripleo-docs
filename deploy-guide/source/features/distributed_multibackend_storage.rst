@@ -578,7 +578,7 @@ both the Mon, Mgr and OSD services).
 Both the `DistributedCompute` and `DistributedComputeHCI` roles
 contain `CinderVolumeEdge` and `Etcd` service for running Cinder
 in active/active mode but this service will not be enabled unless
-the `environments/dcn-hci.yaml` environment file is included in the
+the `environments/dcn-storage.yaml` environment file is included in the
 deploy command. If the `environments/dcn.yaml` is used in its place,
 then the CinderVolumeEdge service will remain disabled.
 
@@ -609,7 +609,7 @@ Deploy the dcn0 stack::
          -e /usr/share/openstack-tripleo-heat-templates/environments/disable-telemetry.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/podman.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/dcn-hci.yaml \
+         -e /usr/share/openstack-tripleo-heat-templates/environments/dcn-storage.yaml \
          -e ~/control-plane-export.yaml \
          -e ~/central_ceph_external.yaml \
          -e ~/dcn0/dcn_ceph_keys.yaml \
@@ -629,11 +629,11 @@ configuring networks with distributed compute nodes see
 
 The ``environments/cinder-volume-active-active.yaml`` file is NOT used
 to configure Cinder active/active on the DCN site because
-``environments/dcn-hci.yaml`` contains the same parameters. The
-``environments/dcn-hci.yaml`` file is also used to configure the
+``environments/dcn-storage.yaml`` contains the same parameters. The
+``environments/dcn-storage.yaml`` file is also used to configure the
 `GlanceApiEdge` and `HAproxyEdge` edge services. If you are not using
 hyper-converged Ceph, then use ``environments/dcn.yaml`` instead.
-Both ``environments/dcn-hci.yaml`` and ``environments/dcn.yaml`` use
+Both ``environments/dcn-storage.yaml`` and ``environments/dcn.yaml`` use
 `NovaCrossAZAttach: False` to override the Nova configuration `[cinder]`
 `cross_az_attach` setting from its default of `true`. This setting
 should be `false` for all nodes in the dcn0 stack so that volumes
@@ -664,7 +664,7 @@ The ``~/dcn0/az.yaml`` file contains the following::
 
 `CinderVolumeCluster` is the name of the Cinder active/active cluster
 which is deployed per DCN site. The above setting overrides the
-default of "dcn" to "dcn0" found in `environments/dcn-hci.yaml`. See
+default of "dcn" to "dcn0" found in `environments/dcn-storage.yaml`. See
 :doc:`distributed_compute_node` for details on the other parameters
 above.
 
@@ -1016,7 +1016,7 @@ example below:
 
 The above will only work if the Nova `cross_az_attach` setting
 of the relevant compute node is set to `false`. This is automatically
-configured by deploying with `environments/dcn-hci.yaml`. If the
+configured by deploying with `environments/dcn-storage.yaml`. If the
 `cross_az_attach` setting is `true` (the default), then the volume
 will be created from the image not in the dcn0 site, but on the
 default central site (as verified with the `rbd` command on the

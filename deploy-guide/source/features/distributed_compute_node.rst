@@ -596,7 +596,7 @@ for setting many of the parameter values and ``resource_registry`` mappings. The
 environments are located within the ``tripleo-heat-templates`` directory at::
 
       environments/dcn.yaml
-      environments/dcn-hci.yaml
+      environments/dcn-storage.yaml
 
 The environments are not all-inclusive and do not set all needed values and
 mappings, but can be used as a guide when deploying DCN.

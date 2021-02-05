@@ -2,8 +2,8 @@ Updating Undercloud Components
 ------------------------------
 
 .. note::
-   Instack-undercloud is deprecated in Rocky cycle. Instack undercloud can
-   only be upgraded to containerized undercloud. See
+   Instack-undercloud is deprecated as of the Rocky cycle. Instack undercloud
+   can only be upgraded to a containerized undercloud. See
    :doc:`../../deployment/undercloud`
    for backward compatibility related information.
 

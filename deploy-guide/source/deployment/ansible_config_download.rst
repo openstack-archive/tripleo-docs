@@ -13,7 +13,7 @@ configuration with Ansible in TripleO.
 Summary
 -------
 Starting with the Queens release, it is possible to use Ansible to apply the
-overcloud configuration. In the Rocky release, this method is the new default
+overcloud configuration. Since the Rocky release, this method is the new default
 behavior.
 
 Ansible is used to replace the communication and transport of the software

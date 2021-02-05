@@ -160,20 +160,6 @@ in an environment file:
     Alternatively, you can skip adding ``cpus`` and ``memory_mb`` to your bare
     metal nodes. This will make the virtual flavors skip bare metal nodes.
 
-  * Before the Pike release, this list had to also contain ``RamFilter`` and
-    ``DiskFilter``::
-
-        parameter_defaults:
-            NovaSchedulerDefaultFilters:
-                - RetryFilter
-                - AggregateInstanceExtraSpecsFilter
-                - AvailabilityZoneFilter
-                - RamFilter
-                - DiskFilter
-                - ComputeFilter
-                - ComputeCapabilitiesFilter
-                - ImagePropertiesFilter
-
 Additional configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -490,7 +476,7 @@ Ironic has to be configured to use three networks for its internal purposes:
 * *Rescuing* network is used when starting the *rescue* process - repairing
   broken instances through a special ramdisk.
 
-  This network is supported by TripleO starting with the Rocky release and
+  This network is supported by TripleO starting wince the Rocky release and
   can be configured to a name or UUID during deployment via
   the ``IronicRescuingNetwork`` parameter.
 

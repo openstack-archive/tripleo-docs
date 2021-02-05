@@ -8,6 +8,10 @@
 #. Download and install the python-tripleo-repos RPM from
    the appropriate RDO repository
 
+.. note::
+   At this time, the Queens release is still active. However, Pike and Rocky are EOL and have
+   been removed.
+
    .. admonition:: CentOS 7
       :class: centos7
 
@@ -111,24 +115,6 @@
 
             sudo -E tripleo-repos -b stein current ceph
 
-   .. admonition:: Rocky
-      :class: rocky qtor
-
-      Enable the current Rocky repositories
-
-      .. code-block:: bash
-
-         sudo -E tripleo-repos -b rocky current
-
-      .. admonition:: Ceph
-         :class: ceph
-
-         Include the Ceph repo in the tripleo-repos call
-
-         .. code-block:: bash
-
-            sudo -E tripleo-repos -b rocky current ceph
-
    .. admonition:: Queens
       :class: queens ptoq
 
@@ -146,24 +132,6 @@
          .. code-block:: bash
 
             sudo -E tripleo-repos -b queens current ceph
-
-   .. admonition:: Pike
-      :class: pike otop
-
-      Enable the current Pike repositories
-
-      .. code-block:: bash
-
-         sudo -E tripleo-repos -b pike current
-
-      .. admonition:: Ceph
-         :class: ceph
-
-         Include the Ceph repo in the tripleo-repos call
-
-         .. code-block:: bash
-
-            sudo -E tripleo-repos -b pike current ceph
 
 .. warning::
 

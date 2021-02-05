@@ -13,8 +13,7 @@ Podman
 Prior to Stein, containerized OpenStack deployments used Docker.
 
 Starting with the Stein release, Docker is no longer part of OpenStack,
-and Podman has taken its place.  The notes here are regarding Stein and later,
-with Rocky and earlier docker commands clearly marked.
+and Podman has taken its place.  The notes here are regarding Stein and later.
 
 sudo
 ----
@@ -47,13 +46,6 @@ monitor the output of the command below::
 
     $ watch -n 0.5 sudo podman ps -a --filter label=managed_by=paunch
 
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ watch -n 0.5 docker ps -a --filter label=managed_by=docker-cmd
-
 .. _debug-containers:
 
 Viewing container logs
@@ -62,13 +54,6 @@ Viewing container logs
 You can view the output of the main process running in a container by running::
 
     $ sudo podman logs $CONTAINER_ID_OR_NAME
-
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ docker logs $CONTAINER_ID_OR_NAME
 
 From Stein release, standard out and standard error from containers are
 captured in `/var/log/containers/stdouts`.
@@ -103,26 +88,11 @@ For services that support `reloading their configuration at runtime`_::
     $ sudo podman exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
     $ sudo podman kill -s SIGHUP nova_scheduler
 
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ sudo docker exec -u root nova_scheduler crudini --set /etc/nova/nova.conf DEFAULT debug true
-     $ sudo docker kill -s SIGHUP nova_scheduler
-
 .. _reloading their configuration at runtime: https://storyboard.openstack.org/#!/story/2001545
 
 Restart the container to turn back the configuration to normal::
 
     $ sudo podman restart nova_scheduler
-
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ sudo docker restart nova_scheduler
 
 Otherwise, if the service does not yet support reloading its configuration, it
 is necessary to change the configuration on the host filesystem and restart the
@@ -131,26 +101,10 @@ container::
     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug true
     $ sudo podman restart nova_scheduler
 
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug true
-     $ sudo docker restart nova_scheduler
-
 Apply the inverse change to restore the default log verbosity::
 
     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug false
     $ sudo podman restart nova_scheduler
-
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-     $ sudo crudini --set /var/lib/config-data/puppet-generated/nova/etc/nova/nova.conf DEFAULT debug false
-     $ sudo docker restart nova_scheduler
 
 Debugging container failures
 ----------------------------
@@ -163,13 +117,6 @@ The following commands are useful for debugging containers.
 
     $ sudo podman inspect $CONTAINER_ID_OR_NAME
 
-  .. admonition:: Rocky
-     :class: stable
-
-     ::
-
-       $ docker inspect $CONTAINER_ID_OR_NAME
-
 * **top**: Viewing processes running within a container is trivial with Podman::
 
     $ sudo podman top $CONTAINER_ID_OR_NAME
@@ -180,24 +127,10 @@ The following commands are useful for debugging containers.
 
     $ sudo podman exec -ti $CONTAINER_ID_OR_NAME /bin/bash
 
-  .. admonition:: Rocky
-     :class: stable
-
-     ::
-
-       $ docker exec -ti $CONTAINER_ID_OR_NAME /bin/bash
-
   Replace the `/bin/bash` above with other commands to run oneshot commands. For
   example::
 
     $ sudo podman exec -ti mysql mysql -u root -p $PASSWORD
-
-  .. admonition:: Rocky
-     :class: stable
-
-     ::
-
-       $ docker exec -ti mysql mysql -u root -p $PASSWORD
 
   The above will start a mysql shell on the mysql container.
 
@@ -208,23 +141,6 @@ The following commands are useful for debugging containers.
   files that may not be in the mounted volumes::
 
     $ sudo podman export $CONTAINER_ID_OR_NAME -o $CONTAINER_ID_OR_NAME.tar
-
-  .. admonition:: Rocky
-     :class: stable
-
-     ::
-
-        There's no shortcut for *rebuilding* the command that was used to run the
-        container but, it's possible to do so by using the `docker inspect` command
-        and the format parameter
-
-        $ docker inspect --format='{{range .Config.Env}} -e "{{.}}" {{end}} {{range .Mounts}} -v {{.Source}}:{{.Destination}}{{if .Mode}}:{{.Mode}}{{end}}{{end}} -ti {{.Config.Image}}' $CONTAINER_ID_OR_NAME
-
-        Copy the output from the command above and append it to the one below, which
-        will run the same container with a random name and remove it as soon as the
-        execution exits::
-
-        $ docker run --rm $OUTPUT_FROM_PREVIOUS_COMMAND /bin/bash
 
 Debugging with tripleo_container_manage Ansible role
 ----------------------------------------------------

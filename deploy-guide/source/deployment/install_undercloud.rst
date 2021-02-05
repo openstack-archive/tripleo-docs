@@ -13,7 +13,7 @@ Installing the Undercloud
 --------------------------
 
 .. note::
-   Instack-undercloud is deprecated in Rocky cycle. Containerized undercloud
+   Instack-undercloud was deprecated in Rocky cycle. Containerized undercloud
    should be installed instead. See :doc:`undercloud`
    for backward compatibility related information.
 
@@ -185,8 +185,7 @@ Installing the Undercloud
        actually deployed is completely changed and what is more, for the first
        time aligns with the overcloud deployment. See the command
        ``openstack tripleo deploy --standalone`` help for details.
-       That interface extension for standalone clouds is experimental for Rocky.
-       It is normally should not be used directly for undercloud installations.
+       It normally should not be used directly for undercloud installations.
 
 #. Run the command to install the undercloud:
 
@@ -215,11 +214,9 @@ Installing the Undercloud
 
 .. note::
     To install a deprecated instack undercloud, you'll need to deploy
-    with ``--use-heat=False`` option. It only works in Rocky
-    as instack-undercloud was retired in Stein.
+    with ``--use-heat=False`` option. 
 
-
-In Rocky, we will run all the OpenStack services in a moby container runtime
+Since Rocky, we will run all the OpenStack services in a moby container runtime
 unless the default settings are overwritten.
 This command requires 2 services to be running at all times. The first one is a
 basic keystone service, which is currently executed by `tripleoclient` itself, the

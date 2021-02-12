@@ -107,7 +107,7 @@ The `CephExternalMultiConfig` parameter is used like this::
           caps:
             mgr: "allow *"
             mon: "profile rbd"
-            osd: "osd: profile rbd pool=volumes, profile rbd pool=backups, profile rbd pool=vms, profile rbd pool=images"
+            osd: "profile rbd pool=volumes, profile rbd pool=backups, profile rbd pool=vms, profile rbd pool=images"
           key: "AQCwmeRcAAAAABAA6SQU/bGqFjlfLro5KxrB1Q=="
           mode: "0600"
       dashboard_enabled: false
@@ -119,7 +119,7 @@ The `CephExternalMultiConfig` parameter is used like this::
           caps:
             mgr: "allow *"
             mon: "profile rbd"
-            osd: "osd: profile rbd pool=volumes, profile rbd pool=backups, profile rbd pool=vms, profile rbd pool=images"
+            osd: "profile rbd pool=volumes, profile rbd pool=backups, profile rbd pool=vms, profile rbd pool=images"
           key: "AQCwmeRcAAAAABAA6SQU/bGqFjlfLro5KxrB2Q=="
           mode: "0600"
       dashboard_enabled: false

@@ -837,6 +837,122 @@ the ``~/control-plane/glance-dcn-stores.yaml`` and
 ``~/control-plane/dcn_ceph_external.yaml`` files with a `-e`. When the
 stack update is complete, proceed to the next section.
 
+DCN using only External Ceph Clusters (optional)
+------------------------------------------------
+
+A possible variation of the deployment described above is one in which
+Ceph is not deployed by director but is external to director as
+described in :doc:`ceph_external`. Each site must still use a Ceph
+cluster which is in the same physical location in order to address
+latency requirements but that Ceph cluster does not need to be
+deployed by director as in the examples above. In this configuration
+Ceph services may not be hyperconverged with the Compute and
+Controller nodes. The example in this section makes the following
+assumptions:
+
+- A separate Ceph cluster at the central site called central
+- A separate Ceph cluster at the dcn0 site called dcn0
+- A separate Ceph cluster at each dcnN site called dcnN for any other
+  DCN sites
+
+For each Ceph cluster listed above the following command has been
+run::
+
+  ceph auth add client.openstack mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=volumes, allow rwx pool=vms, allow rwx pool=images'
+
+For the central site you may optionally append `, allow rwx
+pool=backups, allow rwx pool=metrics` to the above command if you will
+be using the Cinder backup or Telemetry services. Either way, the
+above command will return a Ceph client key which should be saved in
+an environment file to set the value of `CephClientKey`. The
+environment file should be named something like
+external-ceph-<SITE>.yaml (e.g. external-ceph-central.yaml,
+external-ceph-dcn0.yaml, external-ceph-dcn1.yaml, etc.) and should
+contain values like the following::
+
+  parameter_defaults:
+    # The cluster FSID
+    CephClusterFSID: '4b5c8c0a-ff60-454b-a1b4-9747aa737d19'
+    # The CephX user auth key
+    CephClientKey: 'AQDLOh1VgEp6FRAAFzT7Zw+Y9V6JJExQAsRnRQ=='
+    # The list of IPs or hostnames of the Ceph monitors
+    CephExternalMonHost: '172.16.1.7, 172.16.1.8, 172.16.1.9'
+    # The desired name of the generated key and conf files
+    CephClusterName: central
+
+The above will not result in creating a new Ceph cluster but in
+configuring a client to connect to an existing one, though the
+`CephClusterName` variable should still be set so that the
+configuration files are named based on the variable's value,
+e.g. /etc/ceph/central.conf. The above example might be used for
+the central site but for the dcn1 site, `CephClusterName` should be
+set to "dcn1". Naming the cluster after its planned availability zone
+is a strategy to keep the names consistent. Whatever name is supplied
+will result in the Ceph configuration file in /etc/ceph/ having that
+name, e.g. /etc/ceph/central.conf, /etc/ceph/dcn0.conf,
+/etc/ceph/dcn1.conf, etc. and central.client.openstack.keyring,
+dcn0.client.openstack.keyring, etc. The name should be unique so as to
+avoid file overwrites. If the name is not set it will default to
+"ceph".
+
+In each `openstack overcloud deploy` command in the previous sections
+replace ``environments/ceph-ansible/ceph-ansible.yaml`` with
+``environments/ceph-ansible/ceph-ansible-external.yaml`` and replace
+``ceph.yaml`` with ``external-ceph-<SITE>.yaml`` as described above.
+Thus, for a three stack deployment the following will be the case.
+
+- The initial deployment of the cental stack is configured with one
+  external Ceph cluster called central, which is the default store for
+  Cinder, Glance, and Nova. We will refer to this as the central
+  site's "primary external Ceph cluster".
+
+- The initial deployment of the dcn0 stack is configured
+  with its own primary external Ceph cluster called dcn0  which is the
+  default store for the Cinder, Glance, and Nova services at the dcn0
+  site. It is also configured with the secondary external Ceph cluster
+  central.
+
+- Each subsequent dcnN stack has its own primary external Ceph cluster
+  and a secondary Ceph cluster which is central.
+
+- After every DCN site is deployed, the central stack is updated so
+  that in addition to its primary external Ceph cluster, "central", it
+  has multiple secondary external Ceph clusters. This stack update
+  will also configure Glance to use the additional secondary external
+  Ceph clusters as additional stores.
+
+In the example above, each site must have a primary external Ceph
+cluster and each secondary external Ceph cluster is configured by
+using the `CephExternalMultiConfig` parameter described in
+:doc:`ceph_external`.
+
+The `CephExternalMultiConfig` parameter must be manually configured
+because the `openstack overcloud export ceph` command can only export
+Ceph configuration information from clusters which it has deployed.
+However, the `ceph auth add` command and `external-ceph-<SITE>.yaml`
+site file described above contain all of the information necessary
+to populate the `CephExternalMultiConfig` parameter.
+
+If the external Ceph cluster at each DCN site had the ceph-ansible
+`cluster` parameter set to its default value of "ceph", then you
+should still define a unique cluster name within the
+`CephExternalMultiConfig` parameter like the following::
+
+  parameter_defaults:
+    CephExternalMultiConfig:
+      - cluster: dcn1
+        ...
+      - cluster: dcn2
+        ...
+
+The above will result in dcn1.conf, dcn2.conf, etc, being created in
+/etc/ceph on the control-plane nodes so that Glance is able to use
+the correct Ceph configuration file per image store. If each
+`cluster:` parameter above were set to "ceph", then the configuration
+for each cluster would overwrite the file defined in the previous
+configuration, so be sure to use a unique cluster name matching the
+planned name of the availability zone.
+
 Confirm images may be copied between sites
 ------------------------------------------
 

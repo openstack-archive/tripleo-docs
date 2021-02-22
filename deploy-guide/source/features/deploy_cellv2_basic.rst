@@ -312,7 +312,7 @@ Get control plane and cell controller IPs:
 .. code-block:: bash
 
   CTRL_IP=$(openstack server list -f value -c Networks --name overcloud-controller-0 | sed 's/ctlplane=//')
-  CELL_CTRL_IP=$(openstack server list -f value -c Networks --name cellcontrol-0 | sed 's/ctlplane=//')
+  CELL_CTRL_IP=$(openstack server list -f value -c Networks --name cell1-cellcontrol-0 | sed 's/ctlplane=//')
 
 Add cell information to overcloud controllers
 _____________________________________________
@@ -322,7 +322,7 @@ endpoint (usually internalapi) to `/etc/hosts`, from the undercloud:
 .. code-block:: bash
 
   CELL_INTERNALAPI_INFO=$(ssh heat-admin@${CELL_CTRL_IP} egrep \
-  cellcontrol.*\.internalapi /etc/hosts)
+  cell1.*\.internalapi /etc/hosts)
   ansible -i /usr/bin/tripleo-ansible-inventory Controller -b \
   -m lineinfile -a "dest=/etc/hosts line=\"$CELL_INTERNALAPI_INFO\""
 
@@ -345,7 +345,7 @@ next step:
   crudini --get /var/lib/config-data/nova/etc/nova/nova.conf DEFAULT transport_url)
   CELL_MYSQL_VIP=$(ssh heat-admin@${CELL_CTRL_IP} sudo \
   crudini --get /var/lib/config-data/nova/etc/nova/nova.conf database connection \
-  | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1')
+  | awk -F[@/] '{print $4}'
 
 Create the cell
 _______________

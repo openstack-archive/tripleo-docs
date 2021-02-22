@@ -17,3 +17,4 @@ TripleO CI Guide
   chasing_promotions
   third_party_dependencies_ci
   content_provider_jobs
+  tripleo_dependencies_pipelines

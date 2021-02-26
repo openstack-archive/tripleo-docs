@@ -34,9 +34,6 @@ is. So lets look at a very minimal service template::
                    via parameter_defaults in the resource registry.  This
                    mapping overrides those in ServiceNetMapDefaults.
       type: json
-    DefaultPasswords:
-      default: {}
-      type: json
     RoleName:
       default: ''
       description: Role name on which the service is applied
@@ -121,7 +118,6 @@ this is called::
         ServiceData: {get_param: ServiceData}
         ServiceNetMap: {get_param: ServiceNetMap}
         EndpointMap: {get_param: EndpointMap}
-        DefaultPasswords: {get_param: DefaultPasswords}
         RoleName: {get_param: RoleName}
         RoleParameters: {get_param: RoleParameters}
 
@@ -138,13 +134,6 @@ following:
 * **EndpointMap**: Contains the keystone endpoints for each service. With this
   you'll be able to get what port, what protocol, and even different entries
   for the public, internal and admin endpoints.
-
-* **DefaultPasswords**: Defines the default passwords for only some of the
-  services... Namely, the following parameters are available through here:
-  DefaultMysqlRootPassword, DefaultRabbitCookie, DefaultHeatAuthEncryptionKey,
-  DefaultPcsdPassword, DefaultHorizonSecret. Note that TripleO usually will
-  autogenerate the passwords with secure, randomly generated defaults, so this
-  is barely used.
 
 * **RoleName**: This is the name of the role on which the service is applied.
   It could be one of the default roles (e.g. "Controller" or "Compute"), or a

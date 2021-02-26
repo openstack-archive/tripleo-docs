@@ -363,7 +363,6 @@ to look in the ``resources`` section of your template for something like this::
       type: ./apache.yaml
       properties:
         ServiceNetMap: {get_param: ServiceNetMap}
-        DefaultPasswords: {get_param: DefaultPasswords}
         EndpointMap: {get_param: EndpointMap}
 
 Note that this is of type ./apache.yaml which is the template that contains the
@@ -769,7 +768,6 @@ the following::
         type: OS::TripleO::Services::TLSProxyBase
         properties:
           ServiceNetMap: {get_param: ServiceNetMap}
-          DefaultPasswords: {get_param: DefaultPasswords}
           EndpointMap: {get_param: EndpointMap}
           EnableInternalTLS: {get_param: EnableInternalTLS}
 

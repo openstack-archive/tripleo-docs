@@ -131,7 +131,6 @@ follows::
             get_param: {{role.name}}Services
           ServiceNetMap: {get_attr: [ServiceNetMap, service_net_map]}
           EndpointMap: {get_attr: [EndpointMap, endpoint_map]}
-          DefaultPasswords: {get_attr: [DefaultPasswords, passwords]}
 
     ...
     {% endfor %}

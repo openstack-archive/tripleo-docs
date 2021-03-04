@@ -1,135 +1,127 @@
 Reproduce CI jobs for debugging and development
 ===============================================
 
-Reproducing any given CI job that is executed upstream is critical for
-development.  You will find a script called "reproducer-zuul-quickstart.sh"
-under the logs directory of any TripleO CI job that will assist you in
-recreating a TripleO Quickstart upstream job.
+Knowing that at times ( perhaps always ) manipulating zuul jobs to do
+your bidding can be frustrating. Perhaps you are trying to reproduce a
+bug, test a patch, or just bored on a Sunday afternoon. I wanted to
+briefly remind folks of their options.
 
-Each script contains the same parameters used in the job and includes any
-deployment or CI related settings.  Any patches that were marked as
-dependencies will also be included in the script and execution.
+`RDO's zuul: <https://review.rdoproject.org/sf/welcome.html>`__
+---------------------------------------------------------------
 
-This script will provision a heat stack in an OpenStack host cloud that matches
-the environment created by nodepool or `OVB <http://openstack-virtual-baremetal.
-readthedocs.io/en/latest/introduction.html>`_ upstream.  Once the environment
-is ready, the script prompts the user with some additional instructions that
-executes the same scripts and tools used upstream to bootstrap and execute the
-CI.
+RDO's zuul is setup to directly inherit from upstream zuul. Any TripleO
+job that executes upstream should be rerunable in RDO's zuul. A distinct
+advantage here is that you can ask RDO admins to hold the job for you,
+get your ssh keys on the box and debug the live environment. It's good
+stuff. To hold a node, ask your friends in #rhos-ops
 
-Install system dependencies
----------------------------
-Before execute the reproduce-quickstart it's necessary to install few
-dependencies on the system::
+Use testproject: Some documentation can be found
+`here <https://docs.openstack.org/tripleo-docs/latest/ci/chasing_promotions.html#hack-the-promotion-with-testproject>`__:
 
-* python3-openstackclient
-* python3-heatclient
+upstream job example:
+^^^^^^^^^^^^^^^^^^^^^
 
-If you use Python 2 change python3 by python2 in the package name.
+.. code-block:: yaml
 
-How to execute the reproducer-quickstart script
------------------------------------------------
+    - project:
+        name: testproject
+        check:
+          jobs:
+            - tripleo-ci-centos-8-content-provider
+            - tripleo-ci-centos-8-containers-multinode:
+                dependencies:
+                  - tripleo-ci-centos-8-content-provider
 
-Go to the "logs" directory of the job::
+        gate:
+          jobs: []
 
-    wget http://logs.openstack.org/34/653934/1/<snip>/05075b2/logs/reproducer-quickstart/reproducer-zuul-based-quickstart.tar
-    tar -xvf reproducer-zuul-based-quickstart.tar
+periodic job, perhaps recreating a CIX issue example:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+   - project:
+      name: testproject
+      check:
+         jobs:
+            - tripleo-ci-centos-8-scenario002-standalone:
+               vars:
+                  timeout: 22000
+            - periodic-tripleo-ci-centos-8-standalone-full-tempest-scenario-master:
+               vars:
+                  timeout: 22000
+                  force_periodic: true
+            - periodic-tripleo-ci-centos-8-standalone-full-tempest-scenario-victoria:
+               vars:
+                  timeout: 22000
+                  force_periodic: true
+            - periodic-tripleo-ci-centos-8-standalone-full-tempest-scenario-ussuri:
+               vars:
+                  timeout: 22000
+                  force_periodic: true
+
+      gate:
+         jobs: []
 
 
-Be sure you have download the OpenStack RC file. To have more information you
-can check the documentation `here <https://docs.openstack.org/newton/user-guide
-/common/cli-set-environment-variables-using-openstack-rc.html>`_.
-
-Source your OpenStack RC file::
-
-    source openstack_rc.sh
-
-Execute the reproducer-quickstart.sh::
-
-    bash -x reproducer-zuul-based-quickstart.sh
-
-Please check the script's help command however the available options are::
 
 
-  Options:
-  -w, --workspace <dir>
-                      directory where the virtualenv, inventory files, etc.
-                      are created. Defaults to creating a directory in /tmp
-  -l, --libvirt
-                      Runs a 2-node multinode job or singlenode job on a
-                      single virthost using libvirt to create the nodes.
-                      If a singlenode reproducer is run, two VMs will still be created.
-  -c, --cloud-name
-                      Host cloud, specified in the clouds.yaml, to target
-                      Defaults to rdo-cloud
-  -cp, --clouds-yaml-path
-                      Full path to the clouds.yaml file
-                      Defaults to /home/$USER/.config/openstack/clouds.yaml
-  -ok, --ovb-key-name
-                      Name of the key to use in the host tenant for OVB deployments
-                      Defaults to tripleo-ci-team
-  -f, --force-post-failure
-                      Force job to fail so that the nodes will be held.
-                      Temporary solution
-  -ug, --upstream-gerrit-user
-                      Set the upstream gerrit user required to clone repos.
-                      Defaults to the current $USER
-  -rg, --rdo-gerrit-user
-                      Set the upstream RDO user required to clone RDO-related repos.
-                      Defaults to the current $USER
-  -k, --ssh-key
-                     private ssh key used to set up an access nodes.
-                     Defaults to id_rsa.
-  -kp, --ssh-key-public
-                     public ssh key used to set up an access nodes.
-                     Defaults to $USER_SSH_KEY.pub
-  -skp, --ssh-key-path
-                     Path to directory where user ssh keys are stored.
-                     Defaults to /home/$USER/.ssh
-  -ugk, --upstream-gerrit-key
-                     Set the upstream gerrit private key.
-                     Defaults to the $USER_SSH_KEY.
-  -rgk, --rdo-gerrit-key
-                     Set the upstream RDO user key.
-                     Defaults to the $USER_SSH_KEY.
-  -e, --extra-params
-                     File or/and parameters used to override default
-                     parameters for playbooks. Multiple files
-                     can be passed [-e @file1.yml -e @file2.yml ...]
-                     and arguments [-e var=value -e var2=value2 ...]
-  -h, --help         print this help and exit
+Remember that depends-on can bring in any upstream changes.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-How does this script work
--------------------------
+- Here is an example commit message:
 
-The script is generated by a `jinja2 template <https://github.com/openstack/
-tripleo-quickstart-extras/blob/master/roles/create-zuul-based-reproducer/
-templates/reproducer-zuul-based-quickstart.sh.j2>`_ that reads all the
-variables passed to the CI job and builds a custom script for each job. There
-are two major steps to be familiar with in this script.  The first part of the
-script will provision the servers, networks and other infrastructure for the
-TripleO deployment. The second part invokes the CI tools and scripts in
-the `same way the original CI job was executed
-<https://github.com/openstack-infra/tripleo-ci/blob/master/
-toci_gate_test-oooq.sh>`_.
+Test jobs with new ovn package
 
-Notes
------
+.. code-block:: yaml
 
-If the environment was provisioned successfully you will be presented with
-further instructions that will prompt you to ssh to the environment and execute
-the upstream CI scripts.  You may elect to run this automatically with the
-"autorun" option found in the help.
+   Test jobs with new ovn package
 
-Support
--------
+   Depends-On: https://review.opendev.org/c/openstack/openstack-tempest-skiplist/+/775493
 
-The TripleO CI team will provide community support for the
-reproducer-quickstart.sh script.  The tool is only supported in use with an
-OpenStack host cloud.  Your results with various OpenStack providers may vary.
-Please open any issues or problems in
-`launchpad <https://bugs.launchpad.net/tripleo>`_ with the "quickstart" tag.
+   Change-Id: I7b392acc4690199caa78cac90956e717105f4c6e
 
-The `devmode.sh <https://github.com/openstack/tripleo-quickstart/blob/master/
-devmode.sh>`_ script is deprecated.  The reproducer-zuul-based-quickstart.sh should be
-used for upstream development and debugging of TripleO CI.
+`Local zuul: <https://github.com/rdo-infra/ansible-role-tripleo-ci-reproducer>`__
+---------------------------------------------------------------------------------
+
+Setting up zuul and friends locally is a much heavier lift than your
+first option.  Instructions and scripts to help you are available in any upstream
+TripleO job, and
+`here <https://github.com/rdo-infra/ansible-role-tripleo-ci-reproducer>`__
+
+A basic readme for the logs can be found directly in the logs directory
+of any tripleo job.
+
+-  `Basic
+   Readme <https://opendev.org/openstack/tripleo-ci/src/branch/master/docs/tripleo-quickstart-logs.html>`__
+-  `Job
+   reproduce <https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/roles/create-zuul-based-reproducer/templates/README-reproducer-zuul-based-quickstart.html.j2>`__
+
+If you are familiar w/ zuul and friends, containers, etc.. this could be
+a good option for you and your team. There are a lot of moving parts and
+it's complicated, well because it's complicated. A good way to become
+more familiar with zuul would be to try out zuul's tutorial
+
+`zuul-runner: <https://zuul-ci.org/docs/zuul/reference/developer/specs/zuul-runner.html>`__
+-------------------------------------------------------------------------------------------
+
+A long hard fought battle of persuasion and influence has been fought
+with the maintainers of the zuul project. The blueprints and specs have
+merged. The project's status is not complete as there are many
+unmerged patches to date.
+
+Other Options:
+--------------
+
+Finally, if you are not attempting to recreate, test, play with an
+upstream tripleo job and just want to develop code there is another
+option. A lot of developers find `tripleo-lab <https://github.com/cjeanner/tripleo-lab>`__ to be quite useful. Many
+devels have their own patterns as well, what works for you is fine.
+
+Summary:
+--------
+
+For what it's worth imho using testproject jobs is an efficient, low
+barrier to getting things done with upstream TripleO jobs. I'll be
+updating the documentation and references to try and help over the next
+few days, patches are welcome :)

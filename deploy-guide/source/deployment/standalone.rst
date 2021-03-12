@@ -68,7 +68,13 @@ Deploying a Standalone OpenStack node
 
       .. code-block:: bash
 
-         sudo yum install -y ceph-ansible util-linux lvm2
+         sudo yum install -y util-linux lvm2 cephadm
+
+      .. admonition:: Victoria or earlier
+
+        .. code-block:: bash
+
+           sudo yum install -y util-linux lvm2 ceph-ansible
 
 #. Generate a file with the default ContainerImagePrepare value::
 
@@ -91,8 +97,7 @@ Deploying a Standalone OpenStack node
          sudo pvcreate /dev/loop3
          sudo vgcreate vg2 /dev/loop3
          sudo lvcreate -n data-lv2 -l 597 vg2
-         sudo lvcreate -n db-lv2 -l 597 vg2
-         sudo lvcreate -n wal-lv2 -l 597 vg2
+         sudo lvcreate -n db-lv2 -l 1194 vg2
 
       Create a systemd service that restores the device on startup.
 
@@ -116,12 +121,6 @@ Deploying a Standalone OpenStack node
 
          sudo mv /tmp/ceph-osd-losetup.service /etc/systemd/system/
          sudo systemctl enable ceph-osd-losetup.service
-
-      Create a directory to back up the ceph-ansible fetch directory.
-
-      .. code-block:: bash
-
-         sudo mkdir /root/ceph_ansible_fetch
 
 #. Configure basic standalone parameters which include network configuration
    and some deployment options.
@@ -261,35 +260,48 @@ Deploying a Standalone OpenStack node
    .. admonition:: Ceph
       :class: ceph
 
-      Create an additional environment file which directs ceph-ansible
-      to use the block device with logical volumes and fetch directory
-      backup created earlier. In the same file pass additional Ceph
-      parameters for the OSD scenario and Ceph networks. Set the
-      placement group and replica count to values which fit the number
-      of OSDs being used, e.g. 32 and 1 are used for testing with only
-      one OSD.
+      Create an additional environment file which directs the ceph
+      deployment tool to use the block device with logical volumes
+      created earlier. Set the placement group and replica count to
+      values which fit the number of OSDs being used, e.g. 8
+      and 1 are used for testing with only one OSD.
 
       .. code-block:: bash
 
          cat <<EOF > $HOME/ceph_parameters.yaml
          parameter_defaults:
-           CephAnsibleDisksConfig:
-             osd_scenario: lvm
-             osd_objectstore: bluestore
-             lvm_volumes:
-               - data: data-lv2
-                 data_vg: vg2
-                 db: db-lv2
-                 db_vg: vg2
-                 wal: wal-lv2
-                 wal_vg: vg2
-           LocalCephAnsibleFetchDirectoryBackup: /root/ceph_ansible_fetch
-           CephAnsibleExtraConfig:
-             cluster_network: 192.168.24.0/24
-             public_network: 192.168.24.0/24
-           CephPoolDefaultPgNum: 32
+           CephSpecFqdn: true
+           CephOsdSpec:
+            data_devices:
+              paths:
+                - /dev/vg2/data-lv2
+           CephConfigOverrides:
+             mon:
+               mon_warn_on_pool_no_redundancy: false
+           CephPoolDefaultPgNum: 8
            CephPoolDefaultSize: 1
          EOF
+
+      .. admonition:: Victoria or earlier
+
+        .. code-block:: bash
+
+           cat <<EOF > $HOME/ceph_parameters.yaml
+           parameter_defaults:
+             CephAnsibleDisksConfig:
+               osd_scenario: lvm
+               osd_objectstore: bluestore
+               lvm_volumes:
+                 - data: data-lv2
+                   data_vg: vg2
+                   db: db-lv2
+                   db_vg: vg2
+             CephAnsibleExtraConfig:
+               cluster_network: 192.168.24.0/24
+               public_network: 192.168.24.0/24
+             CephPoolDefaultPgNum: 8
+             CephPoolDefaultSize: 1
+           EOF
 
 #. Run the deploy command:
 
@@ -318,13 +330,30 @@ Deploying a Standalone OpenStack node
            --local-ip=$IP/$NETMASK \
            --control-virtual-ip $VIP \
            -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
-           -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+           -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml \
            -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
            -e $HOME/containers-prepare-parameters.yaml \
            -e $HOME/standalone_parameters.yaml \
            -e $HOME/ceph_parameters.yaml \
            --output-dir $HOME \
            --standalone
+
+      .. admonition:: Victoria or earlier
+
+        .. code-block:: bash
+
+           sudo openstack tripleo deploy \
+             --templates \
+             --local-ip=$IP/$NETMASK \
+             --control-virtual-ip $VIP \
+               -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
+             -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+             -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
+             -e $HOME/containers-prepare-parameters.yaml \
+             -e $HOME/standalone_parameters.yaml \
+             -e $HOME/ceph_parameters.yaml \
+             --output-dir $HOME \
+             --standalone
 
 #. Check the deployed OpenStack Services
 

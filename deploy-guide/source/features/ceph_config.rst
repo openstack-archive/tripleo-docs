@@ -1,5 +1,5 @@
-Configuring Ceph with Custom Config Settings
-============================================
+Configuring Ceph with Custom Config Settings (via ceph-ansible or puppet-ceph)
+==============================================================================
 
 This guide assumes that the undercloud is already installed and ready
 to deploy an overcloud and that the appropriate repositories
@@ -12,7 +12,7 @@ Deploying an Overcloud with Ceph
 
 TripleO can deploy and configure Ceph as if it was a composable
 OpenStack service and configure OpenStack services like Nova, Glance,
-Cinder, Cinder Backup, and Gnocchi to use it as a storage backend.
+Cinder and Cinder Backup to use it as a storage backend.
 
 TripleO can only deploy one Ceph cluster in the overcloud per Heat
 stack. However, within that Heat stack it's possible to configure
@@ -28,6 +28,13 @@ either `ceph-ansible`_ or puppet-ceph, though puppet-ceph is
 deprecated. To deploy Ceph in containers use `ceph-ansible`, for which
 only a containerized Ceph deployment is possible. It is not possible
 to deploy a containerized Ceph with `puppet-ceph`.
+
+TripleO Wallaby can deploy Ceph Pacific with ceph-ansible though
+Wallaby is the last planned release with ceph-ansible integration.
+Wallaby is also able to deploy a full Ceph RBD cluster using cephadm
+in place of ceph-ansible as described in :doc:`cephadm`. TripleO's
+cephadm integration does not yet support deploying Ceph services like
+RGW, MDS, and Dashboard.
 
 To deploy with Ceph include either of the appropriate environment
 files. For puppet-ceph use "environments/puppet-ceph.yaml"
@@ -217,8 +224,8 @@ Configuring CephX Keys
 ----------------------
 
 TripleO will create a Ceph cluster with a CephX key file for OpenStack
-RBD client connections that is shared by the Nova, Cinder, Glance and
-Gnocchi services to read and write to their pools. Not only will the
+RBD client connections that is shared by the Nova, Cinder, and Glance
+services to read and write to their pools. Not only will the
 keyfile be created but the Ceph cluster will be configured to accept
 connections when the key file is used. The file will be named
 `ceph.client.openstack.keyring` and it will be stored in `/etc/ceph`
@@ -255,7 +262,7 @@ contain the line `[client.bar]`.
 
 The `CephExtraKeys` parameter may be used to generate additional key
 files containing other key values and should contain a list of maps
-where each map describes an each additional key. The syntax of each
+where each map describes an additional key. The syntax of each
 map must conform to what the `ceph-ansible/library/ceph_key.py`
 Ansible module accepts. The `CephExtraKeys` parameter should be used
 like this::
@@ -740,9 +747,9 @@ deployment::
 
 In the example above, the OVERCLOUD_HOSTS variable should be set to
 the IPs of the overcloud hosts which will be Ceph servers or which
-will host Ceph clients (e.g. Nova, Cinder, Glance, Gnocchi, Manila,
-etc.). The `enable-ssh-admin.sh` script configures a user on the
-overcloud nodes that Ansible uses to configure Ceph.
+will host Ceph clients (e.g. Nova, Cinder, Glance Manila, etc.). The
+`enable-ssh-admin.sh` script configures a user on the overcloud nodes
+that Ansible uses to configure Ceph.
 
 .. note::
 
@@ -752,7 +759,7 @@ overcloud nodes that Ansible uses to configure Ceph.
    disks before every new attempt. One option is to enable the automated
    cleanup functionality in Ironic, which will zap the disks every time that a
    node is released. The same process can be executed manually or only for some
-   target nodes, see `cleaning instructions in the Ironic doc`.
+   target nodes, see `cleaning instructions in the Ironic documentation`_.
 
 .. note::
 
@@ -1004,5 +1011,5 @@ will fail if the placement group numbers are not correct.
 .. _`the "batch" subcommand`: http://docs.ceph.com/docs/master/ceph-volume/lvm/batch
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`ceph osd pool create`: http://docs.ceph.com/docs/jewel/rados/operations/pools/#create-a-pool
-.. _`cleaning instructions in the Ironic doc`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
+.. _`cleaning instructions in the Ironic documentation`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
 .. _`make_ceph_disk`: https://github.com/openstack/tripleo-heat-templates/blob/master/tools/make_ceph_disk_list.py

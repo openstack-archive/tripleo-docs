@@ -214,6 +214,9 @@ Below is an example of a post-deployment configuration template::
     parameters:
       servers:
         type: json
+      EndpointMap:
+        default: {}
+        type: json
 
       # Optional implementation specific parameters
       some_extraparam:

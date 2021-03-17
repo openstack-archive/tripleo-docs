@@ -190,7 +190,7 @@ openstack overcloud external-upgrade run (for container images)
 .. admonition:: Rocky
    :class: qtor
 
-   In Rocky and beyond, we'll need to upload the container images to
+   In Rocky and beyond, container images will need to be uploaded  to
    the local registry after we've run `upgrade prepare`. Run:
 
    .. code-block:: bash

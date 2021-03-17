@@ -38,13 +38,6 @@ the OpenStack release that you currently operate, perform these steps:
       images. This is done via workflow described in
       :doc:`containerized deployment documentation<../../deployment/overcloud>`.
 
-   .. admonition:: Rocky
-      :class: rocky
-
-      Prepare an environment file with new ``ContainerImagePrepare``
-      parameter. This is done via a command described in
-      :doc:`container image preparation documentation<../../deployment/container_image_prepare>`.
-
 #. **Update preparation**
 
    To prepare the overcloud for the update, run:
@@ -86,10 +79,7 @@ the OpenStack release that you currently operate, perform these steps:
 
 #. **Container image upload**
 
-   .. admonition:: Rocky
-      :class: rocky
-
-      In Rocky and beyond, we'll need to upload the container images
+      Since Rocky, we will need to upload the container images
       to the local registry at this point. Run:
 
       .. code-block:: bash
@@ -119,7 +109,7 @@ the OpenStack release that you currently operate, perform these steps:
 
    If your environment includes Ceph managed by TripleO (i.e. *not*
    what TripleO calls "external Ceph"), you'll want to update Ceph at
-   this point too. The procedure differs between Queens and Rocky
+   this point too. The procedure differs between Queens and newer
    releases:
 
    .. admonition:: Queens

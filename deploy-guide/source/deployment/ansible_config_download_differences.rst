@@ -3,7 +3,7 @@
 Ansible config-download differences
 ===================================
 Starting with the Queens release, it is possible to use Ansible to apply the
-overcloud configuration. In the Rocky release, this method is the new default
+overcloud configuration. Since the Rocky release, this method is the new default
 behavior.
 
 The feature is fully documented at

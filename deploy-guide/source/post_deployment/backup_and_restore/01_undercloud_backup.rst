@@ -100,14 +100,6 @@ The operator needs to backup all databases in the Undercloud node
     /bin/hiera -c /etc/puppet/hiera.yaml mysql::server::root_password
     podman exec mysql bash -c "mysqldump -uroot -pPASSWORD --opt --all-databases" > /root/undercloud-all-databases.sql
 
-.. admonition:: Rocky
-   :class: stable
-
-   ::
-
-    /bin/hiera -c /etc/puppet/hiera.yaml mysql::server::root_password
-    docker exec mysql bash -c "mysqldump -uroot -pPASSWORD --opt --all-databases" > /root/undercloud-all-databases.sql
-
 .. admonition:: Queens
    :class: stable
 

@@ -8,11 +8,10 @@ the project defaults.
 
 .. note::
 
-      Beginning in the Rocky release, Ansible is used to deploy the software
-      configuration of the overcloud nodes using a feature called
-      **config-download**. While there are no necessary changes to the default
-      deployment commands, there are several differences to the deployer
-      experience.
+      Since Rocky, Ansible is used to deploy the software configuration of
+      the overcloud nodes using a feature called **config-download**. While
+      there are no necessary changes to the default deployment commands,
+      there are several differences to the deployer experience.
 
       It's recommended to review these differences as documented at
       :doc:`ansible_config_download_differences`
@@ -172,13 +171,6 @@ created on the undercloud, one should use a non-root user.
          ::
 
             export STABLE_RELEASE="stein"
-
-      .. admonition:: Rocky
-         :class: rocky
-
-         ::
-
-            export STABLE_RELEASE="rocky"
 
       .. admonition:: Queens
          :class: queens

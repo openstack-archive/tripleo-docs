@@ -318,8 +318,12 @@ to the ``<short hostname>-ctlplane`` of the deployed servers. Specify the ip
 addresses and subnet CIDR to be assigned under ``fixed_ips``.
 
 In the case where the ctlplane is not routable from the deployed
-servers, you can use ``DeployedServerPortMap`` to assign an IP address
-from any CIDR::
+servers, the virtual IPs on the ControlPlane, as well as the virtual IPs
+for services (Redis and OVNDBs) must be statically assigned.
+
+.. admonition:: Victoria and prior releases
+
+  Use ``DeployedServerPortMap`` to assign an IP address from any CIDR::
 
     resource_registry:
       OS::TripleO::DeployedServer::ControlPlanePort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
@@ -366,37 +370,85 @@ from any CIDR::
             tags:
               - 192.168.100.0/24
 
-In the above example, notice how ``RedisVipPort`` and ``OVNDBsVipPort`` are mapped to
-``network/ports/noop.yaml``. This mapping is due to the fact that these
-VIP IP addresses comes from the ctlplane by default, and they will use the same
-VIP address that is used for ``ControlPlanePort``. Alternatively these VIP's
-can be mapped to their own fixed IP's, in which case a VIP will be created for
-each. In this case, the following mappings and values would be added to the
-above example::
+  In the above example, notice how ``RedisVipPort`` and ``OVNDBsVipPort`` are
+  mapped to ``network/ports/noop.yaml``. This mapping is due to the fact that
+  these VIP IP addresses comes from the ctlplane by default, and they will use
+  the same VIP address that is used for ``ControlPlanePort``. Alternatively
+  these VIP's can be mapped to their own fixed IP's, in which case a VIP will
+  be created for each. In this case, the following mappings and values would be
+  added to the above example::
 
-    resource_registry:
-      OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
-      OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+      resource_registry:
+        OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+        OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
 
-    parameter_defaults:
+      parameter_defaults:
 
-      DeployedServerPortMap:
-        redis_virtual_ip:
-          fixed_ips:
-            - ip_address: 192.168.100.10
-          subnets:
-            - cidr: 192.168.100.0/24
-          network:
-            tags:
-              - 192.168.100.0/24
-        ovn_dbs_virtual_ip:
-          fixed_ips:
-            - ip_address: 192.168.100.11
-          subnets:
-            - cidr: 192.168.100.0/24
-          network:
-            tags:
-              - 192.168.100.0/24
+        DeployedServerPortMap:
+          redis_virtual_ip:
+            fixed_ips:
+              - ip_address: 192.168.100.10
+            subnets:
+              - cidr: 192.168.100.0/24
+            network:
+              tags:
+                - 192.168.100.0/24
+          ovn_dbs_virtual_ip:
+            fixed_ips:
+              - ip_address: 192.168.100.11
+            subnets:
+              - cidr: 192.168.100.0/24
+            network:
+              tags:
+                - 192.168.100.0/24
+
+
+Use ``DeployedServerPortMap`` to assign an ControlPlane Virtual IP address from
+any CIDR, and the ``RedisVirtualFixedIPs`` and ``OVNDBsVirtualFixedIPs``
+parameters to assing the ``RedisVip`` and ``OVNDBsVip``::
+
+  resource_registry:
+    OS::TripleO::DeployedServer::ControlPlanePort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+    OS::TripleO::Network::Ports::ControlPlaneVipPort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml
+
+  parameter_defaults:
+    NeutronPublicInterface: eth1
+    EC2MetadataIp: 192.168.100.1
+    ControlPlaneDefaultRoute: 192.168.100.1
+
+    # Set VIP's for redis and OVN
+    RedisVirtualFixedIPs:
+      - ip_address: 192.168.100.10
+        use_neutron: false
+    OVNDBsVirtualFixedIPs:
+      - ip_address: 192.168.100.11
+        use_neutron: false
+
+    DeployedServerPortMap:
+      control_virtual_ip:
+        fixed_ips:
+          - ip_address: 192.168.100.1
+        subnets:
+          - cidr: 192.168.100.0/24
+        network:
+          tags:
+            - 192.168.100.0/24
+      controller0-ctlplane:
+        fixed_ips:
+          - ip_address: 192.168.100.2
+        subnets:
+          - cidr: 192.168.100.0/24
+        network:
+          tags:
+            - 192.168.100.0/24
+      compute0-ctlplane:
+        fixed_ips:
+          - ip_address: 192.168.100.3
+        subnets:
+          - cidr: 192.168.100.0/24
+        network:
+          tags:
+            - 192.168.100.0/24
 
 The ``EC2MetadataIp`` and ``ControlPlaneDefaultRoute`` parameters are set to
 the value of the control virtual IP address. These parameters are required to

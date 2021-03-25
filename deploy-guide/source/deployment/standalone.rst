@@ -1,3 +1,5 @@
+.. _standalone:
+
 Standalone Containers based Deployment
 ======================================
 

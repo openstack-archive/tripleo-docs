@@ -26,6 +26,7 @@ This section has additional documentation around advanced deployment related top
    architecture
    build_single_image
    container_image_prepare
+   ephemeral_heat
    instack_undercloud
    standalone
    template_deploy

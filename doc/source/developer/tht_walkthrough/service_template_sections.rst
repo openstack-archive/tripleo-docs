@@ -223,6 +223,14 @@ subscription for the node where this is running. We would definitely want this
 to happen in the very beginning of the deployment, so ``host_prep_tasks`` is an
 appropriate place to put it.
 
+Pre Deploy Step tasks (or ``pre_deploy_step_tasks``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These are Ansible tasks that take place in the overcloud nodes. They are run
+after the network is completely setup, after the bits to prepare for containers
+running are completed (TCIB/Kolla files, container engine installation and configuration).
+They are also run before any External deploy tasks.
+
 External deploy tasks
 ^^^^^^^^^^^^^^^^^^^^^
 

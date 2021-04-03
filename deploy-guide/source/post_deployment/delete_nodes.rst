@@ -3,9 +3,35 @@
 Deleting Overcloud Nodes
 ========================
 
-You can delete specific nodes from an overcloud with command::
+There may be situations where it's necessary to remove specific Compute nodes
+from the overcloud. In those situations, it is possible to remove specific nodes
+by following the process outlined in on this page.
 
-    openstack overcloud node delete --stack $STACK_NAME --templates [templates dir] <list of nova instance IDs or hostnames starting in Train>
+.. note::
+   If you're just scaling down nodes and plan to re-use them. Use :ref:`scale_roles`
+   instead. For temporary issues with nodes, they can be blacklisted temporarily
+   using ``DeploymentServerBlacklist``.
+   This guide is specifcally for removing nodes from the environment.
+
+.. note::
+   If your Compute node is still hosting VM's, ensure they are migrated to
+   another Compute node before continuing.
+
+.. note::
+  If you are using :ref:`baremetal_provision` then follow those
+  scale-down instructions to call ``openstack overcloud node delete`` with a
+  ``--baremetal-deployment`` argument instead of passing a list of nodes to
+  delete as arguments.
+
+To delete a specific node from the Overcloud. We use the following command::
+
+    openstack overcloud node delete --stack $STACK_NAME <hostname-of-compute-node>
+
+.. note::
+   This command uses the hostnames as it's referring to nodes from the Ansible
+   inventory. While there is currently a process to translate Nova UUID's to
+   the hostname. This may be removed in future releases. As such, it is 
+   recommended to use the hostname instead of Nova UUIDs.
 
 This command updates the heat stack with updated numbers and list of resource
 IDs (which represent nodes) to be deleted.
@@ -26,24 +52,20 @@ IDs (which represent nodes) to be deleted.
    have to be for all the nodes to delete.
 
 .. note::
-  If you are :ref:`baremetal_provision` then follow those
-  scale-down instructions to call ``openstack overcloud node delete`` with a
-  ``--baremetal-deployment`` argument instead of passing a list of nodes to
-  delete as arguments.
-
-.. note::
-   If you passed any extra environment files when you created the overcloud (for
-   instance, in order to configure :doc:`network isolation
-   <../features/network_isolation>`), you must pass them again here
-   using the ``-e`` or ``--environment-file`` option to avoid making undesired
-   changes to the overcloud.
-
-.. note::
    Before deleting a compute node or a cephstorage node, please make sure that
    the node is quiesced, see :ref:`quiesce_compute` or
    :ref:`quiesce_cephstorage`.
 
 .. note::
-   A list of nova instance IDs can be listed with command::
+   You can generate the list of hostname in the Ansible inventory using::
 
-       openstack server list
+      . stackrc
+      tripleo-ansible-inventory --stack <STACK_NAME> --static-yaml-inventory overcloud-inv.yaml
+
+   This file will contain the Ansible inventory in use and help to identify the
+   hostname that needs to be passed to the `node delete` command.
+
+.. note::
+   Once the node deletion has completed. Be sure to decrement the node count in your templates.
+   For example, if removing a compute node, then the ``ComputeCount:`` value needs to be updated
+   to reflect the new correct number of nodes in the environment.

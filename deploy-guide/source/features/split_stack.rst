@@ -1,6 +1,10 @@
 Splitting the Overcloud stack into multiple independent Heat stacks
 ===================================================================
 
+.. note:: Since victoria TripleO provisions baremetal using a separate
+   workflow :doc:`../provisioning/baremetal_provision` that does not
+   involve Heat stack, making this feature irrelevant.
+
 split-stack is a feature in TripleO that splits the overcloud stack into
 multiple independent stacks in Heat.
 
@@ -90,12 +94,6 @@ Heat.
   ``overcloud-baremetal`` stack deployment command. These will only be passed
   to the ``overcloud-services`` stack deployment command.
 
-An output on the ``overcloud-baremetal`` stack produces the contents of an
-environment file that needs to be passed to the ``overcloud-services`` command.
-Use the following command to save the output value::
-
-  openstack stack output show overcloud-baremetal DeployedServerEnvironment -f json -c output_value | jq .output_value > deployed-server-environment-output.json
-
 Services Deployment Command
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -110,9 +108,7 @@ deployment command::
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-deployed-neutron-ports.yaml \
       -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-bootstrap-environment-centos.yaml \
-      -e /usr/share/openstack-tripleo-heat-templates/environments/overcloud-services.yaml \
       -e /usr/share/openstack-tripleo-heat-templates/environments/split-stack-consistent-hostname-format.yaml
-      -e deployed-server-environment-output.json
 
 The ``overcloud-services`` stack makes use of the "deployed-server" feature.
 The additional environments needed are shown in the above command. See
@@ -122,16 +118,9 @@ feature.
 The roles file, ``roles-data.yaml`` is again passed to the services stack as
 the same roles file should be used for both stacks.
 
-Also, instead of passing the ``overcloud-baremetal.yaml`` environment,
-``overcloud-services.yaml`` is now passed.
-
 The ``split-stack-consistent-hostname-format.yaml`` environment is again
 passed, so that the hostnames used for the server resources created by Heat are
 the same as were created in the previous baremetal stack.
-
-Pass the ``deployed-server-environment-output.json`` environment file that was
-generated from the value of the ``DeployedServerEnvironment`` output
-of the ``overcloud-baremetal`` stack.
 
 During this deployment, any network isolation environments and/or NIC config
 templates should be passed for the desired network configuration.

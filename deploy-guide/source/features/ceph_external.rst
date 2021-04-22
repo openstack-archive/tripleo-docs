@@ -9,18 +9,28 @@ Deploying Cinder, Glance, Nova, Gnocchi with an external Ceph RBD service
 
 The overcloud may be configured to use an external Ceph RBD service by
 enabling a particular environment file when deploying the
-Overcloud. For Ocata and earlier use
-`environments/puppet-ceph-external.yaml`. For Pike and newer, use
-`environments/ceph-ansible/ceph-ansible-external.yaml` and install
+Overcloud. For Wallaby and newer include
+`environments/external-ceph.yaml`.
+
+For Ocata and earlier use
+`environments/puppet-ceph-external.yaml`. For Pike through Victoria
+use `environments/ceph-ansible/ceph-ansible-external.yaml` and install
 ceph-ansible on the Undercloud as described in
-:doc:`../deployment/index`. For Pike and newer a Ceph container is
-downloaded and executed on Overcloud nodes to use Ceph binaries only
-available within the container. These binaries are used to create
-the CephX client keyrings on the overcloud. Thus it is necessary when
-preparing to deploy a containerized overcloud, as described in
+:doc:`../deployment/index`. For Pike through Victoria a Ceph container
+is downloaded and executed on Overcloud nodes to use Ceph binaries
+only available within the container. These binaries are used to create
+the CephX client keyrings on the overcloud. Thus, between Pike and
+Victoria it was necessary when preparing to deploy a containerized
+overcloud, as described in
 :doc:`../deployment/container_image_prepare`, to include the Ceph
 container even if that overcloud will only connect to an external Ceph
-cluster.
+cluster. Starting in Wallaby neither ceph-ansible or cephadm configure
+Ceph clients and instead the tripleo-ansible role tripleo_ceph_client
+is used. Thus, it is not necessary to install ceph-ansible nor prepare
+a Ceph container when configuring external Ceph in Wallaby and
+newer. Simply include `environments/external-ceph.yaml` in the
+deployment. All parameters described below remain consistent
+regardless of external Ceph configuration method.
 
 Some of the parameters in the above environment files can be overridden::
 

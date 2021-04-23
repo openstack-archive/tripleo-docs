@@ -53,7 +53,7 @@ The `cephadm` package is pre-built into the overcloud-full image.
 The `tripleo_cephadm` role will also use Ansible's package module
 to ensure it is present. If `tripleo-repos` is passed the `ceph`
 argument for Wallaby or newer, then the CentOS SIG Ceph repository
-will be enabled with the appropriate version containg the `cephadm`
+will be enabled with the appropriate version containing the `cephadm`
 package, e.g. for Wallaby the ceph-pacific repository is enabled.
 
 Prerequisite: Ensure Disks are Clean
@@ -74,14 +74,17 @@ Deploying Ceph During Overcloud Deployment
 To deploy an overcloud with a Ceph RBD and RGW server include the
 appropriate environment file as in the example below::
 
-    openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml
+  openstack overcloud deploy --templates \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml
 
 Do not directly edit the `environments/cephadm/cephadm.yaml` file.
 If you wish to override the defaults, as described below in the
 sections starting with "Overriding", then place those overrides
 in a separate `cephadm-overrides.yaml` file and deploy like this::
 
-    openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml -e cephadm-overrides.yaml
+  openstack overcloud deploy --templates \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml \
+    -e cephadm-overrides.yaml
 
 Deploying with the commands above will result in the process described
 in the next section.
@@ -189,7 +192,7 @@ All TripleO cephadm deployments rely on a valid `Ceph Service
 Specification`_. It is not necessary to provide a service
 specification directly as TripleO will generate one dynamically.
 However, one may provide their own service specification by disabling
-the dynmaic spec generation and providing a path to their service
+the dynamic spec generation and providing a path to their service
 specification as shown in the following::
 
   parameter_defaults:
@@ -220,7 +223,7 @@ In the above example, the `data_devices` key is valid for any `Ceph
 Service Specification`_ whose `service_type` is "osd". Other OSD
 service types, as found in the `Advanced OSD Service
 Specifications`_, may be set by overriding the `CephOsdSpec`
-paramter. In the example below all rotating devices will be data
+parameter. In the example below all rotating devices will be data
 devices and all non-rotating devices will be used as shared devices
 (wal, db) following::
 
@@ -284,7 +287,7 @@ To deploy Ceph pools with custom `CRUSH Map Rules`_ use the
 then associate the `rule_name` per pool with the `CephPools`
 parameter::
 
-  paramter_defaults:
+  parameter_defaults:
     CephCrushRules:
       - name: HDD
         root: default
@@ -396,6 +399,164 @@ what you might see is below::
 If you need to make updates to your Ceph deployment use the `Ceph
 Orchestrator`_.
 
+Scenario: Deploy Ceph with TripleO and Metalsmith
+-------------------------------------------------
+
+Deploy the hardware as described in :doc:`../provisioning/baremetal_provision`
+and include nodes with in the `CephStorage` role. For example, the
+following could be the content of ~/overcloud_baremetal_deploy.yaml::
+
+  - name: Controller
+    count: 3
+    instances:
+      - hostname: controller-0
+        name: controller-0
+      - hostname: controller-1
+        name: controller-1
+      - hostname: controller-2
+        name: controller-2
+  - name: CephStorage
+    count: 3
+    instances:
+      - hostname: ceph-0
+        name: ceph-0
+      - hostname: ceph-1
+        name: ceph-2
+      - hostname: ceph-2
+        name: ceph-2
+  - name: Compute
+    count: 1
+    instances:
+      - hostname: compute-0
+        name: compute-0
+
+which is passed to the following command::
+
+  openstack overcloud node provision \
+    --stack overcloud \
+    --output ~/overcloud-baremetal-deployed.yaml \
+    ~/overcloud_baremetal_deploy.yaml
+
+As described in :doc:`../provisioning/baremetal_provision`, pass
+~/overcloud_baremetal_deploy.yaml as input, along with
+/usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml
+and cephadm-overrides.yaml described above, to the `openstack overcloud
+deploy` command.
+
+Scenario: Scale Up Ceph with TripleO and Metalsmith
+---------------------------------------------------
+
+Modify the ~/overcloud_baremetal_deploy.yaml file described above to
+add more CephStorage nodes. In the example below the number of storage
+nodes is doubled::
+
+  - name: CephStorage
+    count: 6
+    instances:
+      - hostname: ceph-0
+        name: ceph-0
+      - hostname: ceph-1
+        name: ceph-2
+      - hostname: ceph-2
+        name: ceph-2
+      - hostname: ceph-3
+        name: ceph-3
+      - hostname: ceph-4
+        name: ceph-4
+      - hostname: ceph-5
+        name: ceph-5
+
+As described in :doc:`../provisioning/baremetal_provision`, re-run the
+same `openstack overcloud node provision` command with the updated
+~/overcloud_baremetal_deploy.yaml file. This will result in the three
+new storage nodes being provisioned and output an updated copy of
+~/overcloud-baremetal-deployed.yaml. The updated copy will have the
+`CephStorageCount` changed from 3 to 6 and the `DeployedServerPortMap`
+and `HostnameMap` will contain the new storage nodes.
+
+After the three new storage nodes are deployed run the same
+`openstack overcloud deploy` command as described in the previous
+section with updated copy of ~/overcloud-baremetal-deployed.yaml.
+The additional Ceph Storage nodes will be added to the Ceph and
+the increased capacity will available.
+
+In particular, the following will happen as a result of running
+`openstack overcloud deploy`:
+
+- The storage networks and firewall rules will be appropriately
+  configured on the new CephStorage nodes
+- The ceph-admin user will be created on the new CephStorage nodes
+- The ceph-admin user's SSH keys will be distributed to the new
+  CephStorage nodes so that cephadm can use SSH to add extra nodes
+- An updated Ceph spec will be generated and installed on the
+  bootstrap node, i.e. /home/ceph-admin/specs/ceph_spec.yaml on the
+  bootstrap node will contain new entries for the new CephStorage
+  nodes.
+- The cephadm bootstrap process will be skipped because `cephadm ls`
+  will indicate that Ceph containers are already running.
+- The updated spec will be applied and cephadm will schedule the new
+  nodes to join the cluster.
+
+Scenario: Scale Down Ceph with TripleO and Metalsmith
+-----------------------------------------------------
+
+.. warning:: This procedure is only possible if the Ceph cluster has
+             the capacity to lose OSDs.
+
+Before using TripleO to remove hardware which is part of a Ceph
+cluster, use Ceph orchestrator to deprovision the hardware gracefully.
+This example uses commands from the `OSD Service Documentation for
+cephadm`_ to remove the OSDs, and their host, before using TripleO
+to scale down the Ceph storage nodes.
+
+Start a Ceph shell as described in "Accessing the Ceph Command Line"
+above and identify the OSDs to be removed by server. In the following
+example we will identify the OSDs of the host ceph-2::
+
+  [ceph: root@oc0-controller-0 /]# ceph osd tree
+  ID  CLASS  WEIGHT   TYPE NAME            STATUS  REWEIGHT  PRI-AFF
+  -1         0.58557  root default
+  ... <redacted>
+  -7         0.19519      host ceph-2
+   5    hdd  0.04880          osd.5            up   1.00000  1.00000
+   7    hdd  0.04880          osd.7            up   1.00000  1.00000
+   9    hdd  0.04880          osd.9            up   1.00000  1.00000
+  11    hdd  0.04880          osd.11           up   1.00000  1.00000
+  ... <redacted>
+  [ceph: root@oc0-controller-0 /]#
+
+As per the example above the ceph-2 host has OSDs 5,7,9,11 which can
+be removed by running `ceph orch osd rm 5 7 9 11`. For example::
+
+  [ceph: root@oc0-controller-0 /]# ceph orch osd rm 5 7 9 11
+  Scheduled OSD(s) for removal
+  [ceph: root@oc0-controller-0 /]# ceph orch osd rm status
+  OSD_ID  HOST        STATE     PG_COUNT  REPLACE  FORCE  DRAIN_STARTED_AT
+  7       ceph-2      draining  27        False    False  2021-04-23 21:35:51.215361
+  9       ceph-2      draining  8         False    False  2021-04-23 21:35:49.111500
+  11      ceph-2      draining  14        False    False  2021-04-23 21:35:50.243762
+  [ceph: root@oc0-controller-0 /]#
+
+Use `ceph orch osd rm status` to check the status::
+
+  [ceph: root@oc0-controller-0 /]# ceph orch osd rm status
+  OSD_ID  HOST        STATE                    PG_COUNT  REPLACE  FORCE  DRAIN_STARTED_AT
+  7       ceph-2      draining                 34        False    False  2021-04-23 21:35:51.215361
+  11      ceph-2      done, waiting for purge  0         False    False  2021-04-23 21:35:50.243762
+  [ceph: root@oc0-controller-0 /]#
+
+Only proceed if `ceph orch osd rm status` returns no output.
+
+Remove the host with `ceph orch host rm <HOST>`. For example::
+
+  [ceph: root@oc0-controller-0 /]# ceph orch host rm ceph-2
+  Removed host 'ceph-2'
+  [ceph: root@oc0-controller-0 /]#
+
+Now that the host and OSDs have been logically removed from the Ceph
+cluster proceed to remove the host from the overcloud as described in
+the "Scaling Down" section of :doc:`../provisioning/baremetal_provision`.
+
 
 .. _`cephadm`: https://docs.ceph.com/en/latest/cephadm/index.html
 .. _`cleaning instructions in the Ironic documentation`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
@@ -405,3 +566,4 @@ Orchestrator`_.
 .. _`Autoscaling Placement Groups`: https://docs.ceph.com/en/latest/rados/operations/placement-groups/
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`CRUSH Map Rules`: https://docs.ceph.com/en/latest/rados/operations/crush-map-edits/?highlight=ceph%20crush%20rules#crush-map-rules
+.. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/latest/cephadm/osd/

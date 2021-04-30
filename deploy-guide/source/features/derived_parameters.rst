@@ -118,7 +118,7 @@ deployer to quickly see the values of the derived parameters.
    SRIOV are enabled.
 
 On the undercloud within ``/usr/share/ansible/tripleo-playbooks/`` a
-simple playbook ``cli-derive-local-hci-parameters.yml`` is available
+simple playbook ``derive-local-hci-parameters.yml`` is available
 which calls the ``tripleo_derive_hci_parameters`` Ansible module. To
 use the playbook before deployment determine the Ironic node UUID
 which will correspond to the role being deployed. In the example below
@@ -134,7 +134,7 @@ introspection data::
 Make a copy of the playbook in the stack users home directory and then
 modify it to set the four playbook variables as below::
 
-  [stack@undercloud ~]$ head cli-derive-local-hci-parameters.yml
+  [stack@undercloud ~]$ head derive-local-hci-parameters.yml
   ---
   - name: Derive HCI parameters before deployment
     hosts: localhost
@@ -175,7 +175,7 @@ is rotational).
 
 After these values are set run the playbook::
 
-  [stack@undercloud ~]$ ansible-playbook cli-derive-local-hci-parameters.yml
+  [stack@undercloud ~]$ ansible-playbook derive-local-hci-parameters.yml
   [WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit
   localhost does not match 'all'
 

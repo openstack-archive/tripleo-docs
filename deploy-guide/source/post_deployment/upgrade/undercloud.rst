@@ -57,7 +57,7 @@ Updating Undercloud Components
 
       .. code-block:: bash
 
-         mistral execution-get-output $(openstack workflow execution create -f value -c ID tripleo.validations.v1.run_groups '{"group_names": ["pre-upgrade"]}')
+         openstack tripleo validator run --group pre-upgrade
 
    .. admonition:: Newton to Ocata
       :class: ntoo

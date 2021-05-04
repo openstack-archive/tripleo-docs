@@ -380,7 +380,7 @@ Introspect Nodes
    Once the undercloud is installed, you can run the
    ``pre-introspection`` validations::
 
-     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-introspection"]}'
+     openstack tripleo validator run --group pre-introspection
 
    Then verify the results as described in :ref:`running_validation_group`.
 
@@ -470,7 +470,7 @@ Deploy the Overcloud
    Before you start the deployment, you may want to run the
    ``pre-deployment`` validations::
 
-     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["pre-deployment"]}'
+     openstack tripleo validator run --group pre-deployment
 
    Then verify the results as described in :ref:`running_validation_group`.
 
@@ -615,7 +615,7 @@ Post-Deployment
    After the deployment finishes, you can run the ``post-deployment``
    validations::
 
-     openstack workflow execution create tripleo.validations.v1.run_groups '{"group_names": ["post-deployment"]}'
+     openstack tripleo validator run --group post-deployment
 
    Then verify the results as described in :ref:`running_validation_group`.
 

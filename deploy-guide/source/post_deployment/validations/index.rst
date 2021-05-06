@@ -5,12 +5,19 @@ Since the Newton release, TripleO ships with extensible checks for
 verifying the Undercloud configuration, hardware setup, and the
 Overcloud deployment to find common issues early.
 
-The TripleO UI runs the validations automatically. Since
-Stein, it is possible to run the validations using the TripleO
-CLI.
+Since Stein, it is possible to run the validations using the TripleO CLI.
 
-.. note:: The TripleO UI is marked for deprecation beginning with
-  OpenStack Stein.
+Validations are used to efficiently and reliably verify various facts about
+the cloud on the level of individual nodes and hosts.
+
+Validations are non-intrusive by design, and recommended when performing large
+scale changes to the cloud, for example upgrades, or to aid in the diagnosis
+of various issues. Detailed docs for both the CLI and the API are provided
+by the Validations Framework project.
+
+* tripleo-validations: https://docs.openstack.org/tripleo-validations/latest/
+* validations-common: https://docs.openstack.org/validations-common/latest/
+* validations-libs: https://docs.openstack.org/validations-libs/latest/
 
 The validations are assigned into various groups that indicate when in
 the deployment workflow they are expected to run:
@@ -41,14 +48,18 @@ the deployment workflow they are expected to run:
 
 * **post-upgrade** try to validate your OpenStack deployment after you upgrade it.
 
-Note that for most of these validations, a failure does not mean that
-you'll be unable to deploy or run OpenStack. But it can indicate
-potential issues with long-term or production setups. If you're
-running an environment for developing or testing TripleO, it's okay
-that some validations fail. In a production setup, they should not.
+.. note::
+  In case of the most validations, a failure does not mean that
+  you'll be unable to deploy or run OpenStack. But it can indicate
+  potential issues with long-term or production setups. If you're
+  running an environment for developing or testing TripleO, it's okay
+  that some validations fail. In a production setup, they should not.
 
 The list of all existing validations and the specific documentation
-for the project is described on the `tripleo-validations documentation page`_.
+for the project can be found on the `tripleo-validations documentation page`_.
+
+With implementation specifics described in docs for the `validations-libs`_,
+and `validations-common`_.
 
 The following sections describe the different ways of running and listing the
 currently installed validations.
@@ -58,8 +69,9 @@ currently installed validations.
   :includehidden:
 
   cli
-  mistral
   ansible
   in-flight
 
-.. _tripleo-validations documentation page: https://docs.openstack.org/tripleo-validations/latest/readme.html
+.. _tripleo-validations documentation page: https://docs.openstack.org/tripleo-validations/latest/
+.. _validations-libs: https://docs.openstack.org/validations-libs/latest/
+.. _validations-common: https://docs.openstack.org/validations-common/latest/

@@ -56,7 +56,3 @@ to wipe the node's metadata starting with the Rocky release:
    or provide all manageable nodes::
 
     openstack overcloud node provide --all-manageable
-
-See :ref:`cleaning_workflow` for an explanation how to use Mistral workflows
-directly to initiate cleaning. This is particularly useful if you want to run
-some non-standard clean steps.

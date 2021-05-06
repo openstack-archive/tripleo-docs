@@ -27,7 +27,6 @@ Documentation on additional features for |project|.
    ipsec
    keystone_security_compliance
    lvmfilter
-   mistral-api
    multiple_overclouds
    network_isolation
    network_isolation_virt

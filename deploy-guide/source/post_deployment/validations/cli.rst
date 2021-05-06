@@ -32,6 +32,11 @@ For example you can run this as:
 
   $ openstack tripleo validator run --validation check-ftype,512e
 
+.. _running_validation_group:
+
+Running validation groups
+-------------------------
+
 ``--group``: This option allows to run specific group validations, if more than
 one group is required, then separate the group names with commas. The default
 value for this option is ['pre-deployment'].

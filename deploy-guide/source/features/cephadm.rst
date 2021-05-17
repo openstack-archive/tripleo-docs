@@ -116,10 +116,16 @@ After the hardware is provisioned, the user `ceph-admin` is created
 on the overcloud nodes. The `ceph-admin` user has one set of public
 and private SSH keys created on the undercloud (in
 /home/stack/.ssh/ceph-admin-id_rsa.pub and .ssh/ceph-admin-id_rsa)
-which is distributed to all overcloud nodes. Unlike the
-`tripleo-admin` user, this allows the `ceph-admin` user to SSH from
-any overcloud node to any other overcloud node. `cephadm`_ requires
-this type of access in order to scale from more than one Ceph node.
+which is distributed to all overcloud nodes which host the Ceph
+Mgr and Mon service; only the public key is distributed to nodes
+in the Ceph cluster which do not run the Mgr or Mon service. Unlike
+the `tripleo-admin` user, this allows the `ceph-admin` user to SSH
+from any overcloud node hosting the Mon or Mgr service to any other
+overcloud node hosting the Mon or Mgr service. By default these
+services run on the controller nodes so this means by default that
+Controllers can SSH to each other but other nodes, e.g. CephStorage
+nodes, cannot SSH to Controller nodes. `cephadm`_ requires this type
+of access in order to scale from more than one Ceph node.
 
 The deployment definition as described TripleO Heat Templates,
 e.g. which servers run which services according to composable
@@ -536,8 +542,10 @@ In particular, the following will happen as a result of running
 - The storage networks and firewall rules will be appropriately
   configured on the new CephStorage nodes
 - The ceph-admin user will be created on the new CephStorage nodes
-- The ceph-admin user's SSH keys will be distributed to the new
+- The ceph-admin user's public SSH key will be distributed to the new
   CephStorage nodes so that cephadm can use SSH to add extra nodes
+- If a new host with the Ceph Mon or Ceph Mgr service is being added,
+  then the private SSH key will also be added to that node.
 - An updated Ceph spec will be generated and installed on the
   bootstrap node, i.e. /home/ceph-admin/specs/ceph_spec.yaml on the
   bootstrap node will contain new entries for the new CephStorage

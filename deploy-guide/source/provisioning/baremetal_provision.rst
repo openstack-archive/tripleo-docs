@@ -8,6 +8,11 @@ Bare Metal service to provision baremetal before the overcloud is deployed.
 This adds a new provision step before the overcloud deploy, and the output of
 the provision is a valid :doc:`../features/deployed_server` configuration.
 
+In the Wallaby release the baremetal provisining was extended to also manage
+the neutron API resources for :doc:`../features/network_isolation` and
+:doc:`../features/custom_networks`, and apply network configuration on the
+provisioned nodes using os-net-config.
+
 Undercloud Components For Baremetal Provisioning
 ------------------------------------------------
 
@@ -112,6 +117,53 @@ For example, the following are equivalent
     - hostname: overcloud-controller-2
       name: node02
 
+When using :doc:`../features/network_isolation`,
+:doc:`../features/custom_networks` or a combination of the two the **networks**
+and **network_configuration** must either be set in the ``defaults`` for the
+role or for each specific node (instance). The following example extends the
+first simple configuration example adding typical TripleO network isolation by
+setting defaults for each role
+
+.. code-block:: yaml
+
+  - name: Controller
+    count: 3
+    defaults:
+      networks:
+      - network: ctlplane
+        subnet: ctlplane-subnet
+        vif: true
+      - network: external
+        subnet: external_subnet
+      - network: internalapi
+        subnet: internal_api_subnet01
+      - network: storage
+        subnet: storage_subnet01
+      - network: storagemgmt
+        subnet: storage_mgmt_subnet01
+      - network: tenant
+        subnet: tenant_subnet01
+      network_config:
+        template: /home/stack/nic-config/controller.j2
+        default_route_network:
+        - external
+  - name: Compute
+    count: 100
+    defaults:
+      networks:
+      - network: ctlplane
+        subnet: ctlplane-subnet
+        vif: true
+      - network: internalapi
+        subnet: internal_api_subnet02
+      - network: tenant
+        subnet: tenant_subnet02
+      - network: storage
+        subnet: storage_subnet02
+      network_config:
+        template: /home/stack/nic-config/compute.j2
+
+
 Role Properties
 ^^^^^^^^^^^^^^^
 
@@ -140,11 +192,13 @@ Each role entry supports the following properties:
 Instance and Defaults Properties
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-These properties serve two purposes:
+These properties serve three purposes:
 
 * Setting selection criteria when allocating nodes from the pool of available nodes
 
 * Setting attributes on the baremetal node being deployed
+
+* Setting network configuration properties for the deployed nodes
 
 Each ``instances`` entry and the ``defaults`` dict support the following properties:
 
@@ -163,7 +217,14 @@ Each ``instances`` entry and the ``defaults`` dict support the following propert
 * ``name``: The name of a node to deploy this instance on (Cannot be specified
   in ``defaults``)
 
-* ``nics``: List of dicts representing requested NICs. See :ref:`nics-properties`
+* ``nics``: (**DEPRECATED:** Replaced by ``networks`` in Wallaby) List of
+  dicts representing requested NICs. See :ref:`nics-properties`
+
+* ``networks``: List of dicts representing instance networks. See
+  :ref:`networks-properties`
+
+* ``network_config``: Network configuration details. See
+  :ref:`network-config-properties`
 
 * ``profile``: Selection criteria to use :doc:`./profile_matching`
 
@@ -195,6 +256,85 @@ ________________
 * ``kernel``: Glance image reference or URL of the kernel image (partition images only)
 
 * ``ramdisk``: Glance image reference or URL of the ramdisk image (partition images only)
+
+
+.. _networks-properties:
+
+Networks Properties
+___________________
+
+The ``instances`` ``networks`` property supports a list of dicts, one dict per
+network.
+
+* ``network``: Neutron network to create the port for this network:
+
+* ``fixed_ip``: Specific IP address to use for this network
+
+* ``network``: Neutron network to create the port for this network
+
+* ``subnet``: Neutron subnet to create the port for this network
+
+* ``port``: Existing Neutron port to use instead of creating one
+
+* ``vif``: When ``true`` the network is attached as VIF (virtual-interface) by
+  metalsmith/ironic. When ``false`` the baremetal provisioning workflow creates
+  the Neutron API resource, but no VIF attachment happens in metalsmith/ironic.
+  (Typically only the provisioning network (``ctlplane``) has this set to
+  ``true``.)
+
+By default there is one network representing
+
+.. code-block:: yaml
+
+  - network: ctlplane
+    vif: true
+
+Other valid network entries would be
+
+.. code-block:: yaml
+
+  - network: ctlplane
+    fixed_ip: 192.168.24.8
+    vif: true
+  - port: overcloud-controller-0-ctlplane
+  - network: internal_api
+    subnet: internal_api_subnet01
+
+.. _network-config-properties:
+
+Network Config Properties
+_________________________
+
+The ``network_config`` property contains os-net-config related properties.
+
+* ``template``: The ansible j2 nic config template to use when
+  applying node network configuration. (default:
+  ``templates/net_config_bridge.j2``)
+
+* ``physical_bridge_name``:  Name of the OVS bridge to create for accessing
+  external networks. (default: ``br-ex``)
+
+* ``public_interface_name``: Which interface to add to the public bridge
+  (default: ``nic1``)
+
+* ``network_deployment_actions``: When to apply network configuration changes,
+  allowed values are CREATE and UPDATE. (default: ``CREATE``)
+
+* ``net_config_data_lookup``: Per node and/or per node group os-net-config nic
+  mapping config.
+
+* ``default_route_network``: The network to use for the default route (default:
+  ``ctlplane``)
+
+* ``networks_skip_config``: List of networks that should be skipped when
+  configuring node networking
+
+* ``dns_search_domains``: A list of DNS search domains to be added (in order)
+  to resolv.conf.
+
+* ``bond_interface_ovs_options``: The ovs_options or bonding_options string for
+  the bond interface. Set things like lacp=active and/or bond_mode=balance-slb
+  for OVS bonds or like mode=4 for Linux bonds using this option.
 
 .. _nics-properties:
 
@@ -296,19 +436,28 @@ Deploying the Overcloud
 
 This example assumes that the baremetal provision configuration file has the
 filename ``~/overcloud_baremetal_deploy.yaml`` and the resulting deployed
-server environment file is ``~/overcloud-baremetal-deployed.yaml``
+server environment file is ``~/overcloud-baremetal-deployed.yaml``. It also
+assumes overcloud networks are pre-deployed using the ``openstack overcloud
+network provision`` command and the deployed networks environment file is
+``~/overcloud-networks-deployed.yaml``.
 
 The baremetal nodes are provisioned with the following command::
 
   openstack overcloud node provision \
     --stack overcloud \
+    --network-config \
     --output ~/overcloud-baremetal-deployed.yaml \
     ~/overcloud_baremetal_deploy.yaml
+
+.. note:: Removing the ``--network-config`` argument will disable the management
+          of non-VIF networks and post node provisioning network configuration
+          with os-net-config via ansible.
 
 The overcloud can then be deployed using the output from the provision command::
 
   openstack overcloud deploy \
     -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
+    -e ~/overcloud-networks-deployed.yaml \
     -e ~/overcloud-baremetal-deployed.yaml \
     --deployed-server \
     --disable-validations \ # optional, see note below
@@ -438,7 +587,12 @@ the ``--all`` argument::
 
   openstack overcloud node unprovision --all \
     --stack overcloud \
+    --network-ports \
     ~/overcloud_baremetal_deploy.yaml
+
+.. note:: Removing the ``--network-ports`` argument will disable the management
+          of non-VIF networks, non-VIF ports will _not_ be deleted in that
+          case.
 
 .. _metalsmith: https://docs.openstack.org/metalsmith/
 

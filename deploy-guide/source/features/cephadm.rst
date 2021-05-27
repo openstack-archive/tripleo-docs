@@ -78,7 +78,7 @@ appropriate environment file as in the example below::
     -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml
 
 If you only wish to deploy Ceph RBD without RGW then use the following
-variation of the above.
+variation of the above::
 
   openstack overcloud deploy --templates \
     -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm-rbd-only.yaml
@@ -615,6 +615,144 @@ Now that the host and OSDs have been logically removed from the Ceph
 cluster proceed to remove the host from the overcloud as described in
 the "Scaling Down" section of :doc:`../provisioning/baremetal_provision`.
 
+Scenario: Deploy Hyperconverged Ceph
+------------------------------------
+
+Use a command like the following to create a `roles.yaml` file
+containing a standard Controller role and a ComputeHCI role::
+
+  openstack overcloud roles generate Controller ComputeHCI -o ~/roles.yaml
+
+The ComputeHCI role is a Compute node which also runs co-located Ceph
+OSD daemons. This kind of service co-location is referred to as HCI,
+or hyperconverged infrastructure. See the :doc:`composable_services`
+documentation for details on roles and services.
+
+When collocating Nova Compute and Ceph OSD services boundaries can be
+set to reduce contention for CPU and Memory between the two services.
+This is possible by adding parameters to `cephadm-overrides.yaml` like
+the following::
+
+  parameter_defaults:
+    CephHciOsdType: hdd
+    CephHciOsdCount: 4
+    CephConfigOverrides:
+      osd:
+        osd_memory_target_autotune: true
+        osd_numa_auto_affinity: true
+      mgr:
+        mgr/cephadm/autotune_memory_target_ratio: 0.2
+
+The `CephHciOsdType` and `CephHciOsdCount` parameters are used by the
+Derived Parameters workflow to tune the Nova scheduler to not allocate
+a certain amount of memory and CPU from the hypervisor to virtual
+machines so that Ceph can use them instead. See the
+:doc:`derived_parameters` documentation for details. If you do not use
+Derived Parameters workflow, then at least set the
+`NovaReservedHostMemory` to the number of OSDs multipled by 5 GB per
+OSD per host.
+
+The `CephConfigOverrides` map passes Ceph OSD parameters to limit the
+CPU and memory used by the OSDs.
+
+The `osd_memory_target_autotune`_ is set to true so that the OSD
+daemons will adjust their memory consumption based on the
+`osd_memory_target` config option. The `autotune_memory_target_ratio`
+defaults to 0.7. So 70% of the total RAM in the system is the starting
+point, from which any memory consumed by non-autotuned Ceph daemons
+are subtracted, and then the remaining memory is divided by the OSDs
+(assuming all OSDs have `osd_memory_target_autotune` true). For HCI
+deployments the `mgr/cephadm/autotune_memory_target_ratio` can be set
+to 0.2 so that more memory is available for the Nova Compute
+service. This has the same effect as setting the ceph-ansible `is_hci`
+parameter to true.
+
+A two NUMA node system can host a latency sensitive Nova workload on
+one NUMA node and a Ceph OSD workload on the other NUMA node. To
+configure Ceph OSDs to use a specific NUMA node (and not the one being
+used by the Nova Compute workload) use either of the following Ceph
+OSD configurations:
+
+- `osd_numa_node` sets affinity to a numa node (-1 for none)
+- `osd_numa_auto_affinity` automatically sets affinity to the NUMA
+  node where storage and network match
+
+If there are network interfaces on both NUMA nodes and the disk
+controllers are NUMA node 0, then use a network interface on NUMA node
+0 for the storage network and host the Ceph OSD workload on NUMA
+node 0. Then host the Nova workload on NUMA node 1 and have it use the
+network interfaces on NUMA node 1. Setting `osd_numa_auto_affinity`,
+to true, as in the example `cephadm-overrides.yaml` file above, should
+result in this configuration. Alternatively, the `osd_numa_node` could
+be set directly to 0 and `osd_numa_auto_affinity` could be unset so
+that it will default to false.
+
+When a hyperconverged cluster backfills as a result of an OSD going
+offline, the backfill process can be slowed down. In exchange for a
+slower recovery, the backfill activity has less of an impact on
+the collocated Compute workload. Ceph Pacific has the following
+defaults to control the rate of backfill activity::
+
+  parameter_defaults:
+    CephConfigOverrides:
+      osd:
+        osd_recovery_op_priority: 3
+        osd_max_backfills: 1
+        osd_recovery_max_active_hdd: 3
+        osd_recovery_max_active_ssd: 10
+
+It is not necessary to pass the above as they are the default values,
+but if these values need to be deployed with different values modify
+an example like the above before deployment. If the values need to be
+adjusted after the deployment use `ceph config set osd <key> <value>`.
+
+Deploy the overcloud as described in "Scenario: Deploy Ceph with
+TripleO and Metalsmith" but use the `-r` option to include generated
+`roles.yaml` file and the `-e` option with the
+`cephadm-overrides.yaml` file containing the HCI tunings described
+above.
+
+The examples above may be used to tune a hyperconverged system during
+deployment. If the values need to be changed after deployment, then
+use the `ceph orchestrator` command to set them directly.
+
+After deployment start a Ceph shell as described in "Accessing the
+Ceph Command Line" and confirm the above values were applied. For
+example, to check that the NUMA and memory target auto tuning run
+commands lke this::
+
+  [ceph: root@oc0-controller-0 /]# ceph config dump | grep numa
+    osd                                             advanced  osd_numa_auto_affinity                 true
+  [ceph: root@oc0-controller-0 /]# ceph config dump | grep autotune
+    osd                                             advanced  osd_memory_target_autotune             true
+  [ceph: root@oc0-controller-0 /]# ceph config get mgr mgr/cephadm/autotune_memory_target_ratio
+  0.200000
+  [ceph: root@oc0-controller-0 /]#
+
+We can then confirm that a specific OSD, e.g. osd.11, inherited those
+values with commands like this::
+
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_memory_target
+  4294967296
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_memory_target_autotune
+  true
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_numa_auto_affinity
+  true
+  [ceph: root@oc0-controller-0 /]#
+
+To confirm that the default backfill values are set for the same
+example OSD, use commands like this::
+
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_recovery_op_priority
+  3
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_max_backfills
+  1
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_recovery_max_active_hdd
+  3
+  [ceph: root@oc0-controller-0 /]# ceph config get osd.11 osd_recovery_max_active_ssd
+  10
+  [ceph: root@oc0-controller-0 /]#
+
 
 .. _`cephadm`: https://docs.ceph.com/en/latest/cephadm/index.html
 .. _`cleaning instructions in the Ironic documentation`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
@@ -628,3 +766,4 @@ the "Scaling Down" section of :doc:`../provisioning/baremetal_provision`.
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`CRUSH Map Rules`: https://docs.ceph.com/en/latest/rados/operations/crush-map-edits/?highlight=ceph%20crush%20rules#crush-map-rules
 .. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/latest/cephadm/osd/
+.. _`osd_memory_target_autotune`: https://docs.ceph.com/en/latest/cephadm/osd/#automatically-tuning-osd-memory

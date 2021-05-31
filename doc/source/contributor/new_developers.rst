@@ -99,7 +99,7 @@ implementing a new feature.
 - Documentation should be updated if necessary. New features need a
   tripleo-docs patch.
 - If any new dependencies are used for your feature, be sure they are properly
-  packaged and available in RDO. You can ask on #rdo (on freenode server) for
+  packaged and available in RDO. You can ask on #rdo (on OFTC server) for
   help with this.
 
 

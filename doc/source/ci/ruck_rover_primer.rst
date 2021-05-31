@@ -3,7 +3,7 @@ TripleO CI ruck|rover primer
 
 The tripleo-squad divides their work across 3 week sprints. During sprint
 planning 2 members of the team are nominated as the 'ruck' and 'rover'.
-You can easily identify these unfortunate souls in freenode #oooq with "ruck" or
+You can easily identify these unfortunate souls in OFTC #oooq with "ruck" or
 "rover" in their irc nick.
 
 In short the "ruck" and "rover" are tasked with keeping the lights on for a
@@ -45,7 +45,7 @@ appropriate tag(s):
 * ci: a general tag for all ci related bugs - any bug about a failing CI job
   should have this.
 * alert: critical bugs e.g. something that affects a great number of jobs. This
-  tag causes the bug to be advertised in irc freenode #tripleo.
+  tag causes the bug to be advertised in irc OFTC #tripleo.
 * tempest: bug is tempest related - failing tests or other tempest related error.
 * ci-reproducer: related to the `zuul based job reproducer`_
 * promotion-blocker: this is used when the failing job(s)  is in the promotion
@@ -90,7 +90,7 @@ through to simply harrassing the 'right folks' ;) in the relevant `TripleO Squad
 In other cases bugs may be deprioritized - for example if the job is non voting
 or is not in the promotion criteria then any related bugs are less likely to
 be getting the rover's attention. If you are interested in such jobs or bugs
-then you should go to #freenode oooq channel and find the folks with "ruck" or
+then you should go to #OFTC oooq channel and find the folks with "ruck" or
 "rover" in their nick and harrass them about it!
 
 Of course for other cases there are bona fide bugs with the `TripleO CI code`_
@@ -120,7 +120,7 @@ any ongoing issues actively being worked on. Besides allowing coordination
 between ruck and rover themselves (the TripleO CI team is distributed across
 a number of time zones) one other use case is to allow  tripleo-devs to check
 if the reason a particular job is failing on their code review is 'known' or if
-they need to go harrass the ruck|rover about it in freenode #oooq. The location
+they need to go harrass the ruck|rover about it in OFTC #oooq. The location
 of the current ruck|rover etherpad is given in grafana (see below).
 
 Sova

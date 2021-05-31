@@ -153,7 +153,7 @@ Contacting CI team
 ------------------
 
 When in need you can contact the TripleO CI team members on one of the two
-irc channels on freenode #tripleo by mentioning ``@oooq`` keyword in your
+irc channels on OFTC #tripleo by mentioning ``@oooq`` keyword in your
 message as team members get notified about such messages. It is good to
 remember that those nicknames with ``|ruck`` and ``|rover`` suffix are on duty
 to look for CI status.

@@ -101,7 +101,6 @@ The steps to define your custom networks are:
 
    :name: Name of the network (mandatory)
    :vip: Enable creation of a virtual IP on this network
-   :vlan: Vlan ID for this network. (supported in Queens and later)
    :subnets: Dictionary's, one or more subnet definition items keyed by the
      subnet name.
 
@@ -112,6 +111,8 @@ The steps to define your custom networks are:
        :allocation_pools: IP range list, e.g. ``[{'start':'10.0.0.4', 'end':'10.0.0.250'}]``
 
        :gateway_ip: Gateway for the network
+
+       :vlan: Vlan ID for this network. (supported in Queens and later)
 
    See `Network data YAML options`_ for a list of all documented options for
    the ``network_data`` YAML network definition.

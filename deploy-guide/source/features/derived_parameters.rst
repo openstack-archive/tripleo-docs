@@ -9,8 +9,8 @@ supports this feature for both NFV (Network Function Virtualization)
 and HCI (Hyper-converged Infrastructure; nodes with collocated Ceph
 OSD and Nova Compute services) deployments.
 
-Using derived paramters during a deployment
--------------------------------------------
+Using derived parameters during a deployment
+--------------------------------------------
 
 To have TripleO derive parameters during deployment, specify an
 alternative *deployment plan* containing directives which trigger
@@ -18,7 +18,7 @@ either a Mistral workflow (prior to Victoria) or an Ansible playbook
 (in Victoria and newer) which derives the parameters.
 
 A default *deployment plan* is created during deployment. This
-deployment plan my be overridden by passing the ``-p`` or
+deployment plan may be overridden by passing the ``-p`` or
 ``--plan-environment-file`` option to the ``openstack overcloud
 deploy`` command. If the ``plan-environment-derived-params.yaml``
 file, located in
@@ -42,12 +42,12 @@ for use by a Ceph OSD.
 Parameters which are derived for HCI deployments
 ------------------------------------------------
 
-The derived paramters for HCI sets the NovaReservedHostMemory and
+The derived parameters for HCI sets the NovaReservedHostMemory and
 NovaCPUAllocationRatio per role based on the amount and type of Ceph
 OSDs requested during deployment, the available hardware in Ironic,
 and the average Nova guest workload.
 
-Deriving the paramters is useful because in an HCI deployment the Nova
+Deriving the parameters is useful because in an HCI deployment the Nova
 scheduler does not, by default, take into account the requirements of
 the Ceph OSD services which are collocated with the Nova Compute
 services. Thus, it's possible for Compute resources needed by an OSD
@@ -61,7 +61,7 @@ medium the more vCPUs an OSD should use in order for the CPU resources
 to not become a performance bottle-neck. All of this is taken into
 account by the derived parameters for HCI.
 
-The workload of the Nova guests should also to be taken into account.
+The workload of the Nova guests may also be taken into account.
 The ``plan-environment-derived-params.yaml`` file contains the
 following::
 
@@ -98,18 +98,18 @@ to take into account the memory overhead per guest for the hypervisor.
 It also does not set the NovaCPUAllocationRatio. Thus, passing an
 expected average workload will produce a more accurate set of derived
 HCI parameters. However, this default does allow for a simpler
-deployment where derived paramters may be used without having to
+deployment where derived parameters may be used without having to
 specify a workload but the OSDs are protected from having their memory
 allocated to Nova guests.
 
-Deriving HCI paramters before a deployment
-------------------------------------------
+Deriving HCI parameters before a deployment
+-------------------------------------------
 
 The ``tripleo_derive_hci_parameters`` Ansible module may be run
 independently on the undercloud before deployment to generate a YAML
-file to pass to the ``opentack overcloud deploy`` command with the
+file to pass to the ``openstack overcloud deploy`` command with the
 ``-e`` option. If this option is used it's not necessary to derive HCI
-paramters during deployment. Using this option also allows the
+parameters during deployment. Using this option also allows the
 deployer to quickly see the values of the derived parameters.
 
 .. warning::
@@ -143,35 +143,81 @@ modify it to set the four playbook variables as below::
       # Set the following variables for your environment
       ironic_node_id: ef4cbd49-3773-4db2-80da-4210a7c24047
       role: ComputeHCI
-      average_guest_cpu_utilization_percentage: 10
-      average_guest_memory_size_in_mb: 2048
+      average_guest_cpu_utilization_percentage: 50
+      average_guest_memory_size_in_mb: 8192
       heat_environment_input_file: /home/stack/ceph_overrides.yaml
   [stack@undercloud ~]$
 
 In the above example it is assumed the ``role`` `ComputeHCI` will use
-nodes with the same type of hardwqare which is set to the
+nodes with the same type of hardware which is set to the
 ``ironic_node_id`` and that the average guest will use 50% of its CPU
-and will use 8 GB of RAM. The ``heat_environment_input_file`` must
-be set to the path of the Heat environment file where the
-``CephAnsibleDisksConfig`` parameter is set. This parameter is used
-to define which disks are used as Ceph OSDs and might look like the
-following if bluestore was being deployed on 4 SSDs::
+and will use 8 GB of RAM. If the workload is unknown, remove these
+variables. The system tuning will not be as accurate but the Ansible
+module will at least set the NovaReservedHostMemory as a function of
+the number of OSDs.
 
-  CephAnsibleDisksConfig:
-    osd_scenario: lvm
-    osd_objectstore: bluestore
-    osds_per_device: 4
-    devices:
-      - /dev/sda
-      - /dev/sdb
-      - /dev/sdc
-      - /dev/sdd
+The ``heat_environment_input_file`` must be set to the path of the
+Heat environment file which defines the OSDs.
 
-The derived parameters workflow would use the values above to
-determine the number of OSDs requested (e.g. 4 devices * 4 OSDs per
-device = 16) and the type of device based on the Ironic data
-(e.g. during introspection, ironic can determine if a storage device
-is rotational).
+.. admonition:: Victoria or earlier
+
+  When ceph-ansible is used, in place of cephadm, this should be the
+  file where the ``CephAnsibleDisksConfig`` parameter is set. This
+  parameter is used to define which disks are used as Ceph OSDs and
+  might look like the following if bluestore was being deployed on 4
+  NVMe SSDs::
+
+    parameter_defaults:
+      CephAnsibleDisksConfig:
+        osd_scenario: lvm
+        osd_objectstore: bluestore
+        osds_per_device: 4
+        devices:
+          - /dev/nvme0n1
+          - /dev/nvme0n2
+          - /dev/nvme0n3
+          - /dev/nvme0n4
+
+  The derived parameters workflow would use the values above to
+  determine the number of OSDs requested (e.g. 4 devices * 4 OSDs per
+  device = 16) and the type of device based on the Ironic data
+  (e.g. during introspection, ironic can determine if a storage device
+  is rotational).
+
+If cephadm is used, in place of ceph-ansible (for Wallaby and newer),
+then the ``heat_environment_input_file`` must be set to the path of
+the file where the ``CephHciOsdCount`` and ``CephHciOsdType``
+parameters are set.
+
+The ``CephHciOsdCount`` and ``CephHciOsdType`` exist because
+``CephOsdSpec``, as used by cephadm, might only specify a description
+of devices to be used as OSDs (e.g. "all devices"), and not a list of
+devices like ``CephAnsibleDisksConfig``, setting the count directly is
+necessary in order to know how much CPU/RAM to reserve. Similarly,
+because a device path is not hard coded, we cannot look up that device
+in Ironic to determine its type. For information on the
+``CephOsdSpec`` parameter see the :doc:`cephadm` documentation.
+
+``CephHciOsdType`` is the type of data_device (not db_device) used for
+each OSD and must be one of hdd, ssd, or nvme. These are used by
+the Ansible module tripleo_derive_hci_parameters.
+
+``CephHciOsdCount`` is the number of expected Ceph OSDs per HCI
+node. If a server has eight HDD drives, then the parameters should be
+set like this::
+
+  parameter_defaults:
+    CephHciOsdType: hdd
+    CephHciOsdCount: 8
+
+To fully utilize nvme devices for data (not metadata), multiple
+OSDs are required. If the ``CephOsdSpec`` parameter is used to set
+`osds_per_device` to 4, and there are four NVMe drives on a host (and
+no HDD drives), then the parameters should be set like this::
+
+  parameter_defaults:
+    CephHciOsdType: nvme
+    CephHciOsdCount: 16
 
 After these values are set run the playbook::
 
@@ -184,7 +230,7 @@ After these values are set run the playbook::
   TASK [Get baremetal inspection data] *********************************************************
   ok: [localhost]
 
-  TASK [Get tripleo CephDisks environment paramters] *******************************************
+  TASK [Get tripleo CephDisks environment parameters] *******************************************
   ok: [localhost]
 
   TASK [Derive HCI parameters] *****************************************************************

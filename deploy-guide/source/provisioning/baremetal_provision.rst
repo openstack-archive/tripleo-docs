@@ -414,7 +414,7 @@ Allow root ssh login (for development environments only):
       ssh_pwauth: true
       disable_root: false
       chpasswd:
-        list: |
+        list: |-
           root:sekrit password
         expire: False
 

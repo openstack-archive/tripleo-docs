@@ -619,6 +619,14 @@ Post-Deployment
 
    Then verify the results as described in :ref:`running_validation_group`.
 
+Deployment artifacts
+^^^^^^^^^^^^^^^^^^^^
+
+Artifacts from the deployment, including log files, rendered
+templates, and generated environment files are saved under the working
+directory which can be specified with the ``--work-dir`` argument to
+``openstack overcloud deploy``. By default, the location is
+``~/overcloud-deploy/<stack>``.
 
 Access the Overcloud
 ^^^^^^^^^^^^^^^^^^^^

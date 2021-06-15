@@ -126,18 +126,14 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
 .. code-block::
 
   resource_registry:
-    # since the same networks are used in this example, the
-    # creation of the different networks is omitted
-    OS::TripleO::Network::External: OS::Heat::None
-    OS::TripleO::Network::InternalApi: OS::Heat::None
-    OS::TripleO::Network::Storage: OS::Heat::None
-    OS::TripleO::Network::StorageMgmt: OS::Heat::None
-    OS::TripleO::Network::Tenant: OS::Heat::None
-    OS::TripleO::Network::Management: OS::Heat::None
     OS::TripleO::Network::Ports::OVNDBsVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
     OS::TripleO::Network::Ports::RedisVipPort: /usr/share/openstack-tripleo-heat-templates/network/ports/noop.yaml
 
   parameter_defaults:
+    # since the same networks are used in this example, the
+    # creation of the different networks is omitted
+    ManageNetworks: false
+
     # CELL Parameter to reflect that this is an additional CELL
     NovaAdditionalCell: True
 
@@ -168,8 +164,13 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
     DnsServers:
       - x.x.x.x
 
-The above file disables creating networks as the networks from the overcloud stack
-are reused. It also specifies that this will be an additional cell using parameter
+The above file disables creating networks by setting ``ManageNetworks`` parameter
+to ``false`` so that the same ``network_data.yaml`` file from the overcloud stack
+can be used. When ``ManageNetworks`` is set to false, ports will be created for
+the nodes in the separate stacks on the existing networks that were already created
+in the ``overcloud`` stack.
+
+It also specifies that this will be an additional cell using parameter
 `NovaAdditionalCell`.
 
 .. note::

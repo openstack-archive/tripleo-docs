@@ -143,6 +143,14 @@ been added to the network definitions in the network_data.yaml file format:
   external_resource_segment_id: Existing Segment UUID
   external_resource_vip_id: Existing VIP UUID
 
+.. note:
+
+  The cell controllers use virtual IPs, therefore the existing VIPs from the
+  central overcloud stack should not be referenced. In case cell controllers
+  and cell computes get split into sepearate stacks, the cell compute stack
+  network_data file need an external_resource_vip_id reference to the cell
+  controllers VIP resource.
+
 These parameters can be set on each network definition in the `network_data-ctrl.yaml`
 file used for the deployment of the separate stack.
 

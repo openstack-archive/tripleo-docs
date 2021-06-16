@@ -187,6 +187,13 @@ Each role entry supports the following properties:
   See :ref:`instance-defaults-properties` for supported properties. The length
   of this list must not be greater than ``count``
 
+* ``ansible_playbooks``: A list of dict for Ansible playbooks and Ansible vars,
+  the playbooks are run against the role instances after node provisioning,
+  prior to the node network configuration. See
+  :ref:`ansible-playbook-properties` for more details and examples.
+
+  .. note:: Playbooks only run if '--network-config' is enabled.
+
 .. _instance-defaults-properties:
 
 Instance and Defaults Properties
@@ -428,6 +435,41 @@ Use values from custom metadata:
     cloud_config:
       runcmd:
         - echo The value of foo is `jq .foo < /run/cloud-init/instance-data.json`
+
+
+.. _ansible-playbook-properties:
+
+Ansible Playbooks
+-----------------
+
+The role ``ansible_playbooks`` takes a list of playbook definitions, supporting
+the ``playbook`` and ``extra_vars`` sub-properties.
+
+* ``playbook``: The path (relative to the roles definition YAML file) to the
+  ansible playbook.
+
+* ``extra_vars``: Extra Ansible variables to set when running the playbook.
+
+.. note:: Playbooks only run if '--network-config' is enabled.
+
+Run arbitrary playbooks:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: a_playbook.yaml
+    - playbook: b_playbook.yaml
+
+Run arbitrary playbooks with extra variables defined for one of the playbooks:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: a_playbook.yaml
+      extra_vars:
+        param1: value1
+        param2: value2
+    - playbook: b_playbook.yaml
 
 .. _deploying-the-overcloud:
 

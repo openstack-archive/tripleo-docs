@@ -754,6 +754,73 @@ example OSD, use commands like this::
   [ceph: root@oc0-controller-0 /]#
 
 
+Add the Ceph Dashboard to a Overcloud deployment
+------------------------------------------------
+
+During the overcloud deployment most of the Ceph daemons can be added and
+configured.
+To deploy the ceph dashboard include the ceph-dashboard.yaml environment
+file as in the following example::
+
+    openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/ceph-dashboard.yaml
+
+The command above will include the ceph dashboard related services and
+generates all the `cephadm` required variables to render the monitoring
+stack related spec that can be applied against the deployed Ceph cluster.
+When the deployment has been completed the Ceph dashboard containers,
+including prometheus and grafana, will be running on the controller nodes
+and will be accessible using the port 3100 for grafana and 9092 for prometheus;
+since this service is only internal and doesn’t listen on the public vip, users
+can reach both grafana and the exposed ceph dashboard using the controller
+provisioning network vip on the specified port (8444 is the default for a generic
+overcloud deployment).
+The resulting deployment will be composed by an external stack made by grafana,
+prometheus, alertmanager, node-exporter containers and the ceph dashboard mgr
+module that acts as the backend for this external stack, embedding the grafana
+layouts and showing the ceph cluster specific metrics coming from prometheus.
+The Ceph Dashboard backend services run on the specified `CephDashboardNetwork`
+and `CephGrafanaNetwork`, while the high availability is realized by haproxy and
+Pacemaker.
+The Ceph Dashboard frontend is fully integrated with the tls-everywhere framework,
+hence providing the tls environments files will trigger the certificate request for
+both grafana and the ceph dashboard: the generated crt and key files are then
+configured by cephadm, resulting in a key-value pair within the Ceph orchestrator,
+which is able to mount the required files to the dashboard related containers.
+The Ceph Dashboard admin user role is set to `read-only` mode by default for safe
+monitoring of the Ceph cluster. To permit an admin user to have elevated privileges
+to alter elements of the Ceph cluster with the Dashboard, the operator can change the
+default.
+For this purpose, TripleO exposes a parameter that can be used to change the Ceph
+Dashboard admin default mode.
+Log in to the undercloud as `stack` user and create the `ceph_dashboard_admin.yaml`
+environment file with the following content::
+
+  parameter_defaults:
+     CephDashboardAdminRO: false
+
+Run the overcloud deploy command to update the existing stack and include the environment
+file created with all other environment files that are already part of the existing
+deployment::
+
+    openstack overcloud deploy  --templates -e <existing_overcloud_environment_files> -e ceph_dashboard_admin.yml
+
+The ceph dashboard will also work with composable networks.
+In order to isolate the monitoring access for security purposes, operators can
+take advantage of composable networks and access the dashboard through a separate
+network vip. By doing this, it's not necessary to access the provisioning network
+and separate authorization profiles may be implemented.
+To deploy the overcloud with the ceph dashboard composable network we need first
+to generate the controller specific role created for this scenario::
+
+    openstack overcloud roles generate -o /home/stack/roles_data.yaml ControllerStorageDashboard Compute BlockStorage ObjectStorage CephStorage
+
+Finally, run the overcloud deploy command including the new generated `roles_data.yaml`
+and the `network_data_dashboard.yaml` file that will trigger the generation of this
+new network.
+The final overcloud command must look like the following::
+
+    openstack overcloud deploy --templates -r /home/stack/roles_data.yaml -n /usr/share/openstack-tripleo-heat-templates/network_data_dashboard.yaml -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml -e ~/my-ceph-settings.yaml
+
 .. _`cephadm`: https://docs.ceph.com/en/latest/cephadm/index.html
 .. _`cleaning instructions in the Ironic documentation`: https://docs.openstack.org/ironic/latest/admin/cleaning.html
 .. _`Ceph Orchestrator`: https://docs.ceph.com/en/latest/mgr/orchestrator/

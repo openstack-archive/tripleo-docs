@@ -48,3 +48,4 @@ Documentation on additional features for |project|.
    tls-everywhere
    tuned
    undercloud_minion
+   vdpa_deployment

@@ -192,8 +192,6 @@ Each role entry supports the following properties:
   prior to the node network configuration. See
   :ref:`ansible-playbook-properties` for more details and examples.
 
-  .. note:: Playbooks only run if '--network-config' is enabled.
-
 .. _instance-defaults-properties:
 
 Instance and Defaults Properties

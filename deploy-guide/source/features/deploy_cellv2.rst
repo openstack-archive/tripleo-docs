@@ -9,7 +9,7 @@ overcloud, or already have installed an overcloud (min Stein release).
 
 .. note::
 
-   Starting with CentOS 8 and TripleO Stein release, podman is the CONTAINERCLI
+   Starting with CentOS 8 and the TripleO Stein release, podman is the CONTAINERCLI
    to be used in the following steps.
 
 The minimum requirement for having multiple cells is to have a central OpenStack
@@ -23,7 +23,6 @@ For more details on the cells v2 layout check `Cells Layout (v2)
 
 .. toctree::
 
-   deploy_cellv2_stein.rst
    deploy_cellv2_basic.rst
    deploy_cellv2_advanced.rst
    deploy_cellv2_routed.rst

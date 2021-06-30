@@ -14,7 +14,7 @@ already installed an overcloud (min Train release).
 
 .. note::
 
-  Starting with CentOS 8 and TripleO Stein release, podman is the CONTAINERCLI
+  Starting with CentOS 8 and the TripleO Stein release, podman is the CONTAINERCLI
   to be used in the following steps.
 
 .. _basic_cell_arch:

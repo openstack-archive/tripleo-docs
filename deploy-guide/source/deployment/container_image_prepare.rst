@@ -115,7 +115,7 @@ refer to the images in `push_destination` instead of `namespace`.
 
    Prior to Stein, Docker Registry v2 (provided by "Docker
    Distribution" package), was the service running on tcp 8787.
-   In Stein it has been replaced with an Apache vhost called
+   Since Stein it has been replaced with an Apache vhost called
    "image-serve", which serves the containers on tcp 8787 and
    supports podman or buildah pull commands. Though podman or buildah
    tag, push, and commit commands are not supported, they are not

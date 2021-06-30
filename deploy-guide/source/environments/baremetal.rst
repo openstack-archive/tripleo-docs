@@ -292,8 +292,8 @@ explanation of similarities and differences between the two types.
 
 Hardware types are enabled in the ``undercloud.conf`` using the
 ``enabled_hardware_types`` configuration option. Classic drivers are enabled
-using the ``enabled_drivers`` option. It is deprecated in the Queens release
-cycle and should no longer be used. See the `hardware types migration guide`_
+using the ``enabled_drivers`` option. It has been  deprecated since the Queens
+release and should no longer be used. See the `hardware types migration guide`_
 for information on how to migrate existing nodes.
 
 Both hardware types and classic drivers can be equally used in the

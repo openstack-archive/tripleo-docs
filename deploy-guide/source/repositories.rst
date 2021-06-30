@@ -2,26 +2,12 @@
 
 .. note::
    Python3 is required for Ussuri and newer releases of OpenStack which is supported on RHEL 8
-   and CentOS 8. Train is also recommended to be installed on RHEL 8 or CentOS 8. Earlier versions
-   should be installed on RHEL 7 or CentOS 7 which support Python2.7.
+   and CentOS 8. Train is also recommended to be installed on RHEL 8 or CentOS 8.
 
 #. Download and install the python-tripleo-repos RPM from
    the appropriate RDO repository
 
-.. note::
-   At this time, the Queens release is still active. However, Pike and Rocky are EOL and have
-   been removed.
-
-   .. admonition:: CentOS 7
-      :class: centos7
-
-      Current `Centos 7 RDO repository <https://trunk.rdoproject.org/centos7/current/>`_
-
-       .. code-block:: bash
-
-          sudo yum install -y https://trunk.rdoproject.org/centos7/current/python2-tripleo-repos-<version>.el7.centos.noarch.rpm
-
-   .. admonition:: CentOS 8
+   .. admonition:: CentOS 8 and CentOS Strem 8
       :class: centos8
 
       Current `Centos 8 RDO repository <https://trunk.rdoproject.org/centos8/component/tripleo/current/>`_.
@@ -42,6 +28,24 @@
 
       Enable the appropriate repos for the desired release, as indicated below.
       Do not enable any other repos not explicitly marked for that release.
+
+   .. admonition:: Wallaby
+      :class: wallaby vtow
+
+      Enable the current Wallaby repositories
+
+      .. code-block:: bash
+
+         sudo -E tripleo-repos -b wallaby current
+
+      .. admonition:: Ceph
+         :class: ceph
+
+         Include the Ceph repo in the tripleo-repos call
+
+         .. code-block:: bash
+
+            sudo -E tripleo-repos -b wallaby current ceph
 
    .. admonition:: Victoria
       :class: victoria utov
@@ -96,42 +100,6 @@
          .. code-block:: bash
 
             sudo -E tripleo-repos -b train current ceph
-
-   .. admonition:: Stein
-      :class: stein rtos
-
-      Enable the current Stein repositories
-
-      .. code-block:: bash
-
-         sudo -E tripleo-repos -b stein current
-
-      .. admonition:: Ceph
-         :class: ceph
-
-         Include the Ceph repo in the tripleo-repos call
-
-         .. code-block:: bash
-
-            sudo -E tripleo-repos -b stein current ceph
-
-   .. admonition:: Queens
-      :class: queens ptoq
-
-      Enable the current Queens repositories
-
-      .. code-block:: bash
-
-         sudo -E tripleo-repos -b queens current
-
-      .. admonition:: Ceph
-         :class: ceph
-
-         Include the Ceph repo in the tripleo-repos call
-
-         .. code-block:: bash
-
-            sudo -E tripleo-repos -b queens current ceph
 
 .. warning::
 

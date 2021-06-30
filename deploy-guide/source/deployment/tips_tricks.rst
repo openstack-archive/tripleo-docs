@@ -39,7 +39,7 @@ monitor the output of the command below::
 
     $ watch -n 0.5 sudo podman ps -a --filter label=managed_by=tripleo_ansible
 
-.. admonition:: Stein and Train
+.. admonition:: Train
    :class: stable
 
    ::
@@ -55,7 +55,7 @@ You can view the output of the main process running in a container by running::
 
     $ sudo podman logs $CONTAINER_ID_OR_NAME
 
-From Stein release, standard out and standard error from containers are
+Since the Stein release, standard out and standard error from containers are
 captured in `/var/log/containers/stdouts`.
 
 We export traditional logs from containers into the `/var/log/containers`

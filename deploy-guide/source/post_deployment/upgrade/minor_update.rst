@@ -6,13 +6,13 @@ Updating Content on Overcloud Nodes
 The update of overcloud packages and containers to the latest version
 of the current release is referred to as the 'minor update' in TripleO
 (distinguishing it from the 'major upgrade' to the next release). In
-the Queens cycle the minor update workflow has changed compared to
+the Queens cycle the minor update workflow was changed compared to
 previous cycles. There are thus version specific sections below.
 
 Updating your Overcloud - Queens and beyond
 -------------------------------------------
 
-The Queens release brings common CLI and workflow conventions to the
+The Queens release brought common CLI and workflow conventions to the
 main deployment lifecycle operations (minor updates, major upgrades,
 and fast forward upgrades). This means that the minor update workflow
 has changed compared to previous releases, and it should now be easier
@@ -28,16 +28,6 @@ the OpenStack release that you currently operate, perform these steps:
    RPMs. If you use stable RDO repositories, you don't need to change
    anything.
 
-   Update container image parameter files:
-
-   .. admonition:: Queens
-      :class: queens
-
-      Fetch latest container images to your undercloud registry and
-      generate a Heat environment file pointing to new container
-      images. This is done via workflow described in
-      :doc:`containerized deployment documentation<../../deployment/overcloud>`.
-
 #. **Update preparation**
 
    To prepare the overcloud for the update, run:
@@ -52,7 +42,7 @@ the OpenStack release that you currently operate, perform these steps:
    used with previous `openstack overcloud deploy` command.
 
    The last argument `containers-prepare-parameter.yaml` differs in
-   content depending on release. In Queens and before, it has a list
+   content depending on release. In Queens and before, it was a list
    of individual container image parameters, pointing to images you've
    already uploaded to local registry in previous step. In Rocky and
    beyond, this file contains the ``ContainerImagePrepare`` parameter.
@@ -109,45 +99,7 @@ the OpenStack release that you currently operate, perform these steps:
 
    If your environment includes Ceph managed by TripleO (i.e. *not*
    what TripleO calls "external Ceph"), you'll want to update Ceph at
-   this point too. The procedure differs between Queens and newer
-   releases:
-
-   .. admonition:: Queens
-      :class: queens
-
-      Run:
-
-      .. code-block:: bash
-
-         openstack overcloud ceph-upgrade run <OPTIONS>
-
-      In place of the `<OPTIONS>` token should go all parameters that you
-      used with previous `openstack overcloud update prepare` command
-      (including the new `-e container-params.yaml`).
-
-      .. note::
-
-         The `ceph-upgrade run` command performs a Heat stack update, and
-         as such it should be passed all parameters currently used by the
-         Heat stack (most notably environment files, role counts, roles
-         data, and network data). This is crucial in order to keep
-         correct state of the stack.
-
-      The `ceph-upgrade run` command re-enables config management
-      operations previously disabled by `update prepare`, and triggers
-      the rolling update playbook of the Ceph installer (`ceph-ansible`).
-
-   .. admonition:: Rocky
-      :class: rocky
-
-      Run:
-
-      .. code-block:: bash
-
-         openstack overcloud external-update run --tags ceph
-
-      This will update Ceph by running ceph-ansible installer with
-      update playbook.
+   this point too. 
 
 #. **Update convergence**
 
@@ -222,8 +174,8 @@ parameter::
 .. admonition:: Stable Branch
    :class: stable
 
-   The `--limit` was introduced in the Stein release. In previous versions,
-   use `--nodes` or `--roles` parameters.
+   The `--limit` was introduced in the Stein release, previous versions used
+   `--nodes` or `--roles` parameters.
 
 You can specify a role name, e.g. 'Compute', to execute the minor update on
 all nodes of that role in a rolling fashion (serial:1 is used on the playbooks).

@@ -569,21 +569,19 @@ node being unprovisioned which contains the following:
 
 * A YAML comment explaining the reason for making the node unprovisioned (optional)
 
-For example the following would remove ``overcloud-controller-1``
+For example the following would remove ``overcloud-compute-1``
 
 .. code-block:: yaml
 
-  - name: Controller
-    count: 2
+  - name: Compute
+    count: 1
     instances:
-    - hostname: overcloud-controller-0
-      name: node00
-    - hostname: overcloud-controller-1
-      name: node01
-      # Removed from cluster due to disk failure
+    - hostname: overcloud-compute-0
+      name: node10
+      # Removed from deployment due to disk failure
       provisioned: false
-    - hostname: overcloud-controller-2
-      name: node02
+    - hostname: overcloud-compute-1
+      name: node11
 
 Then the delete command will be called with ``--baremetal-deployment``
 instead of passing node arguments::
@@ -605,19 +603,18 @@ example
 
 .. code-block:: yaml
 
-  - name: Controller
-    count: 3
+  - name: Compute
+    count: 2
     instances:
-    - hostname: overcloud-controller-0
-      name: node00
-    - hostname: overcloud-controller-1
-      name: node01
-      # Removed from cluster due to disk failure
+    - hostname: overcloud-compute-0
+      name: node10
+      # Removed from deployment due to disk failure
       provisioned: false
-    - hostname: overcloud-controller-2
-      name: node02
-    - hostname: overcloud-controller-3
+    - hostname: overcloud-compute-1
       name: node11
+    - hostname: overcloud-compute-2
+      name: node12
+
 
 Unprovisioning All Nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^

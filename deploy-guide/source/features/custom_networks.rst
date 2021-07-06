@@ -138,6 +138,31 @@ The steps to define your custom networks are:
       and do not conflict with any existing networks, otherwise your deployment
       may fail or result in unexpected results.
 
+#. Copy one of the sample ``vip_data`` YAML definitions provided by
+   tripleo-heat-templates_, for example::
+
+     cp /usr/share/openstack-tripleo-heat-templates/network-data-samples/vip-data-default-network-isolation.yaml  \
+       custom_vip_data.yaml
+
+   .. admonition:: Victoria and prior releases
+
+     For Victoria and prior releases the Virtual IP resources are created as
+     part of the overcloud heat stack. This step is not valid for these
+     releases.
+
+#. Modify the ``custom_vip_data.yaml`` file as required. The Virtual IP data
+   is a list of Virtual IP address definitions, each containing at a minimum
+   the name of the network where the IP address should be allocated.
+
+   See `Network Virtual IPs data YAML options`_ for a list of all documented
+   options for the ``vip_data`` YAML network Virtual IPs definition.
+
+   .. admonition:: Victoria and prior releases
+
+     For Victoria and prior releases the Virtual IP resources are created as
+     part of the overcloud heat stack. This step is not valid for these
+     releases.
+
 #. Copy network configuration templates, add new networks.
 
    Prior to Victoria, Heat templates were used to define nic configuration
@@ -208,13 +233,53 @@ The steps to define your custom networks are:
      releases. Network resources was created as part of the overcloud heat
      stack.
 
+   .. note:: This step is optional when using the ``--baremetal-deployment``
+             and ``--vip-data`` options with the ``overcloud deploy`` command.
+             The deploy command will detect the new format of the network data
+             YAML definition, run the workflow to create the networks and
+             include the ``networks-deployed-environment.yaml`` automatically.
+
+#. Create the overcloud network Virtual IPs and generate the
+   ``vip-deployed-environment.yaml`` which will be used as an environment file
+   when deploying the overcloud.
+
+   .. code-block:: bash
+
+     $ openstack overcloud network vip provision  \
+         --output ~/templates/vip-deployed-environment.yaml \
+         ~/templates/custom_vip_data.yaml
+
+   .. note:: This step is optional if using the ``--vip-data`` options with the
+             ``overcloud deploy`` command. In that case workflow to create the
+             Virtual IPs and including the environment is automated.
+
 #. To deploy you pass the ``custom_network_data.yaml`` file via the ``-n``
-   option to the overcloud deploy, for example::
+   option to the overcloud deploy, for example:
+
+   .. code-block:: bash
 
       openstack overcloud deploy --templates \
         -n custom_network_data.yaml \
         -e networks-deployed-environment.yaml \
+        -e vip-deployed-environment.yaml \
         -e custom-net-single-nic-with-vlans.yaml
+
+   Alternatively include the network, Virtual  IPs and baremetal provisioning
+   in the ``overcloud deploy`` command to do it all in one:
+
+   .. code-block:: bash
+
+      openstack overcloud deploy --templates \
+        --networks-file custom_network_data.yaml \
+        --vip-file custom_vip_data.yaml \
+        --baremetal-deployment baremetal_deployment.yaml \
+        --network-config \
+        -e custom-net-single-nic-with-vlans.yaml
+
+   .. note:: Please refer to :doc:`../provisioning/baremetal_provision`
+             document page for a reference on the ``baremetal_deployment.yaml``
+             used in the above example.
+
 
    .. admonition:: Victoria and prior releases
 
@@ -462,6 +527,44 @@ Options for network data YAML subnet definitions
 
   type: *number*
 
+
+.. _virtual_ips_definition_opts:
+
+Network Virtual IPs data YAML options
+-------------------------------------
+
+:network:
+  Neutron Network name
+
+  type: *string*
+
+:ip_address:
+  *(optional)* IP address, a pre-defined fixed IP address.
+
+  type: *string*
+
+:subnet:
+  *(optional)* Neutron Subnet name, used to specify the subnet to use when
+  creating the Virtual IP neutron port.
+
+  This is required for deployments using routed networks, to ensure the Virtual
+  IP is allocated on the subnet where controller nodes are attached.
+
+  type: *string*
+
+:dns_name:
+  *(optional)* Dns Name, the hostname part of the FQDN (Fully Qualified Domain
+  Name)
+
+  type: *string*
+
+  default: overcloud
+
+:name:
+  *(optional)* Virtual IP name
+
+  type: *string*
+  default: $network_name_virtual_ip
 
 .. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
 .. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples/default-network-isolation.yaml

@@ -164,7 +164,9 @@ the network data YAML schema.
 .. admonition:: Victoria and prior releases
 
   Copy the default ``network_data.yaml`` file and customize the networks, IP
-  subnets, VLANs, etc., as per the cluster requirements::
+  subnets, VLANs, etc., as per the cluster requirements:
+
+.. code-block:: bash
 
     $ cp /usr/share/openstack-tripleo-heat-templates/network_data.yaml ~/templates/network_data.yaml
 
@@ -181,11 +183,72 @@ networks on the Undercloud. This command will also generate the
 ``networks-deployed-environment.yaml`` environment file which must be be used
 when deploying the overcloud.
 
-   ::
+.. code-block:: bash
 
-     openstack overcloud network provision \
-       --output ~/templates/networks-deployed-environment.yaml \
-       ~/templates/custom_network_data.yaml
+     $ openstack overcloud network provision \
+         --output ~/templates/networks-deployed-environment.yaml \
+         ~/templates/custom_network_data.yaml
+
+.. note:: This step is optional when using the ``--baremetal-deployment`` and
+          ``--vip-data`` options with the ``overcloud deploy`` command. The
+          deploy command will detect the new format of the network data YAML
+          definition, run the workflow to create the networks and include the
+          ``networks-deployed-environment.yaml`` automatically.
+
+Create and Edit network Virtual IPs YAML definition file
+--------------------------------------------------------
+
+.. admonition:: Victoria and prior releases
+
+  For Victoria and prior releases the Virtual IP resources are created as part
+  of the overcloud heat stack. This step is not valid for these releases.
+
+Use the vip-data-samples_ in tripleo-heat-templates_ as a reference and
+customize the networks, subnet, fixed_ips, dns_names etc., as per the cluster
+requirements.
+
+Please refer to the :ref:`virtual_ips_definition_opts` reference section on the
+:ref:`custom_networks` document page for a reference on available options in
+the network Virtual IPs data YAML schema.
+
+The below example show a Virtual IPs definition for the default
+network-isolation isolation scenario.
+
+.. code-block:: yaml
+
+  - network: ctlplane
+    dns_name: overcloud
+  - network: external
+    dns_name: overcloud
+  - network: internal_api
+    dns_name: overcloud
+  - network: storage
+    dns_name: overcloud
+  - network: storage_mgmt
+    dns_name: overcloud
+
+Create the overcloud network Virtual IPs on the Undercloud
+----------------------------------------------------------
+
+.. admonition:: Victoria and prior releases
+
+  For Victoria and prior releases the Virtual IP resources are created as part
+  of the overcloud heat stack. This step is not valid for these releases.
+
+Run the "openstack overcloud network vip provision" command to create/update
+the network Virtual IPs on the Undercloud. This command will also generate the
+``vips-deployed-environment.yaml`` environment file which must be be used when
+deploying the overcloud.
+
+.. code-block:: bash
+
+   $ openstack overcloud network vip provision  \
+       --output ~/templates/vips-deployed-environment.yaml \
+       ~/templates/custom_vip_data.yaml
+
+.. note:: This step is optional if using the ``--vip-data`` options with the
+          ``overcloud deploy`` command. In that case workflow to create the
+          Virtual IPs and including the environment is automated.
 
 Generate Templates from Jinja2
 ------------------------------
@@ -864,16 +927,37 @@ type if on bare metal, so that hardware virtualization will be used.
 To deploy with network isolation and include the network environment file, use
 the ``-e`` and ``--networks-file`` parameters with the
 ``openstack overcloud deploy`` command. The following deploy command should
-work for all of the subsequent examples::
+work for all of the subsequent examples:
 
-    openstack overcloud deploy --templates \
-    --networks-file ~/templates/custom_network_data.yaml \
-    -e ~/templates/networks-deployed-environment.yaml \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
+.. code-block:: bash
+
+    openstack overcloud deploy \
+      --templates \
+      --networks-file ~/templates/custom_network_data.yaml \
+      -e ~/templates/networks-deployed-environment.yaml \
+      -e ~/templates/vips-deployed-environment.yaml \
+      -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
+      -e ~/templates/network-environment-overrides.yaml \
+      --ntp-server pool.ntp.org
+
+Alternatively include the network, Virtual  IPs and baremetal provisioning
+in the ``overcloud deploy`` command to do it all in one:
+
+.. code-block:: bash
+
+  openstack overcloud deploy \
+    --templates \
+    --networks-file custom_network_data.yaml \
+    --vip-file custom_vip_data.yaml \
+    --baremetal-deployment baremetal_deployment.yaml \
+    --network-config \
     -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
     -e ~/templates/network-environment-overrides.yaml \
     --ntp-server pool.ntp.org
 
+.. note:: Please refer to :doc:`../provisioning/baremetal_provision`
+          document page for a reference on the ``baremetal_deployment.yaml``
+          used in the above example.
 
 .. admonition:: Victoria and prior releases
 
@@ -995,3 +1079,4 @@ to a provider network if Neutron is to provide DHCP services to tenant VMs::
 .. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
 .. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples/default-network-isolation.yaml
 .. _network-data-samples: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples
+.. _vip-data-samples: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples

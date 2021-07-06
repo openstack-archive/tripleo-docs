@@ -132,6 +132,98 @@ network to the instance.
     network autoconfigured. You can configure it manually or use
     `dhcp-all-interfaces <https://docs.openstack.org/diskimage-builder/elements/dhcp-all-interfaces/README.html>`_.
 
+
+Deploying Manila in the overcloud with CephFS through NFS and a composable network
+----------------------------------------------------------------------------------
+
+The CephFS through NFS back end is composed of Ceph metadata servers (MDS),
+NFS Ganesha (the NFS gateway), and the Ceph cluster service components.
+The manila CephFS NFS driver uses NFS-Ganesha gateway to provide NFSv4 protocol
+access to CephFS shares.
+The Ceph MDS service maps the directories and file names of the file system
+to objects that are stored in RADOS clusters.
+The NFS-Ganesha service runs on the Controller nodes with the Ceph services.
+
+
+CephFS with NFS-Ganesha deployment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CephFS through NFS deployments use an extra isolated network, StorageNFS.
+This network is deployed so users can mount shares over NFS on that network
+without accessing the Storage or Storage Management networks which are
+reserved for infrastructure traffic.
+
+The ControllerStorageNFS custom role configures the isolated StorageNFS network.
+This role is similar to the default `Controller.yaml` role file with the addition
+of the StorageNFS network and the CephNfs service, indicated by the `OS::TripleO::Services:CephNfs`
+service.
+
+
+#. To create the StorageNFSController role, used later in the process by the
+   overcloud deploy command, run::
+
+    openstack overcloud roles generate --roles-path /usr/share/openstack-tripleo-heat-templates/roles \
+      -o /home/stack/roles_data.yaml ControllerStorageNfs Compute CephStorage
+
+#. Run the overcloud deploy command including the new generated `roles_data.yaml`
+   and the `network_data_ganesha.yaml` file that will trigger the generation of
+   this new network. The final overcloud command must look like the following::
+
+     openstack overcloud deploy \
+       --templates /usr/share/openstack-tripleo-heat-templates  \
+       -n /usr/share/openstack-tripleo-heat-templates/network_data_ganesha.yaml \
+       -r /home/stack/roles_data.yaml \
+       -e /home/stack/containers-default-parameters.yaml   \
+       -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml   \
+       -e /home/stack/network-environment.yaml  \
+       -e/usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm.yaml  \
+       -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/ceph-mds.yaml  \
+       -e /usr/share/openstack-tripleo-heat-templates/environments/manila-cephfsganesha-config.yaml
+
+
+.. note::
+
+  The network_data_ganesha.yaml file contains an additional section that defines
+  the isolated StorageNFS network. Although the default settings work for most
+  installations, you must edit the YAML file to add your network settings,
+  including the VLAN ID, subnet, and other settings::
+
+    name: StorageNFS
+    enabled: true
+    vip: true
+    name_lower: storage_nfs
+    vlan: 70
+    ip_subnet: '172.16.4.0/24'
+    allocation_pools: [{'start': '172.16.4.4', 'end': '172.16.4.149'}]
+    ipv6_subnet: 'fd00:fd00:fd00:7000::/64'
+    ipv6_allocation_pools: [{'start': 'fd00:fd00:fd00:7000::10', 'end': 'fd00:fd00:fd00:7000:ffff:ffff:ffff:fffe'}]
+
+
+Configure the StorageNFS network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After the overcloud deployment is over, create a corresponding `StorageNFSSubnet` on
+the neutron-shared provider network.
+The subnet is the same as the storage_nfs network definition in the `network_data_ganesha.yml`
+and ensure that the allocation range for the StorageNFS subnet and the corresponding
+undercloud subnet do not overlap.
+
+.. note::
+
+  No gateway is required because the StorageNFS subnet is dedicated to serving NFS shares
+
+In order to create the storage_nfs subnet, run::
+
+  openstack subnet create --allocation-pool start=172.16.4.150,end=172.16.4.250 \
+    --dhcp --network StorageNFS --subnet-range 172.16.4.0/24 \
+    --gateway none StorageNFSSubnet
+
+#. Replace the `start=172.16.4.150,end=172.16.4.250` IP values with the IP
+   values for your network.
+#. Replace the `172.16.4.0/24` subnet range with the subnet range for your
+   network.
+
+
 Deploying the Overcloud with an External Backend
 ------------------------------------------------
 .. note::
@@ -255,4 +347,3 @@ Accessing the Share
    ``mount`` command.
 
 7. That's it - you're ready to start using Manila!
-

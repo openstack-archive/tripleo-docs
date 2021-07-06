@@ -28,6 +28,7 @@ This section has additional documentation around advanced deployment related top
    container_image_prepare
    ephemeral_heat
    instack_undercloud
+   network_v2
    standalone
    template_deploy
    tips_tricks

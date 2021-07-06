@@ -501,6 +501,8 @@ Example::
   the environments accordingly, for them to be used with ansible interface
   or update them to use ``OS::Heat::Value`` resource.
 
+.. _migrating_existing_network_interface_templates:
+
 Migrating existing Network Interface Configuration Templates
 ------------------------------------------------------------
 

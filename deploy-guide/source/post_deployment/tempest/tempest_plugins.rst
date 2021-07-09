@@ -74,7 +74,3 @@ Below is the detailed list of openstack services wise tempest plugins.
 * Ironic
     * RPM Package: python3-ironic-tests-tempest
     * Source Code: https://opendev.org/openstack/ironic-tempest-plugin
-
-* EC2-API
-    * RPM Package:  python3-ec2api-tests-tempest
-    * Source Code: https://opendev.org/openstack/ec2api-tempest-plugin

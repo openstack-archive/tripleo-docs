@@ -55,10 +55,6 @@ Below is the detailed list of openstack services wise tempest plugins.
     * RPM package: python3-mistral-tests-tempest
     * Source Code: https://opendev.org/openstack/mistral-tempest-plugin
 
-* TripleO-Common
-    * RPM package: python3-tripleo-common-tests-tempest
-    * Source Code: https://opendev.org/openstack/tripleo-common-tempest-plugin
-
 * Manila
     * RPM Package: python3-manila-tests-tempest
     * Source Code: https://opendev.org/openstack/manila-tempest-plugin

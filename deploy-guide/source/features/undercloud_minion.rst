@@ -1,5 +1,8 @@
-Installing a Undercloud Minion
-==============================
+(DEPRECATED) Installing a Undercloud Minion
+===========================================
+
+.. note::
+   The minion functionality is deprecated starting in Wallaby.
 
 .. note::
    This is optional functionality that is helpful for large scale related

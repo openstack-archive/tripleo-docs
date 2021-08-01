@@ -186,10 +186,10 @@ The configuration options you will likely be interested in include:
 ``file`` is the name of the configuration file to use
 containing the configuration for the container you wish to use.
 TripleO creates configuration files for starting containers in
-``/var/lib/tripleo-config/``.  If you look in this directory
+``/var/lib/tripleo-config/container-startup-config``.  If you look in this directory
 you will see a number of files corresponding with the steps in
 TripleO heat templates.  Most of the time, you will likely want to use
-``/var/lib/tripleo-config/hashed-container-startup-config-step_4.json``
+``/var/lib/tripleo-config/container-startup-config/step_4``
 as it contains most of the final startup configurations for the running
 containers.
 
@@ -202,6 +202,15 @@ command to see what containers are running and which config id they
 are using.  This config id corresponds to which file you will find the
 container configuration in.
 
+TripleO uses ``managed_by`` and ``config_id`` labels to help identify the
+containers it is managing. These can be checked by inspecting the labels section
+like so:
+
+::
+
+  # podman inspect nova_api | jq '.[0].Config.Labels | "managed_by=\(.managed_by) config_id=\(.config_id)"'
+  "managed_by=tripleo-Controller config_id=tripleo_step4"
+
 Note that if you wish to replace a currently running container you will
 want to ``sudo podman rm -f`` the running container before starting a new one.
 
@@ -210,7 +219,7 @@ heat api container:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --interactive --shell --user root --container heat_api --action run
+  # paunch debug --file /var/lib/tripleo-config/container-startup-config/step_4  --managed-by=tripleo-Controller --config-id=tripleo_step4 --interactive --shell --user root --container nova_api --action run
 
 This will drop you into an interactive session inside the heat api container,
 starting /bin/bash running as root.
@@ -219,18 +228,18 @@ To see how this container is started by TripleO:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --container heat_api --action print-cmd
+  # paunch debug --file /var/lib/tripleo-config/container-startup-config/step_4 --managed-by=tripleo-Controller --config-id=tripleo_step4 --container nova_api --action print-cmd
 
-  docker run --name heat_api-t7a00bfz --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=b3154865d1f722ace643ffbab206bf91 --net=host --privileged=false --restart=always --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/puppet:/etc/puppet:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/ssh/ssh_known_hosts:/etc/ssh/ssh_known_hosts:ro --volume=/var/lib/kolla/config_files/heat_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/heat_api/etc/heat/:/etc/heat/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf/:/etc/httpd/conf/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.d/:/etc/httpd/conf.d/:ro --volume=/var/lib/config-data/heat_api/etc/httpd/conf.modules.d/:/etc/httpd/conf.modules.d/:ro --volume=/var/lib/config-data/heat_api/var/www/:/var/www/:ro --volume=/var/log/containers/heat:/var/log/heat 192.168.24.1:8787/tripleomaster/centos-binary-heat-api:latest
+  podman run --name nova_api-1jpm5kyv --label config_id=tripleo_step4 --label container_name=nova_api --label managed_by=tripleo-Controller --label config_data={"environment": {"KOLLA_CONFIG_STRATEGY": "COPY_ALWAYS", "TRIPLEO_CONFIG_HASH": "5cbcd2d39667626874f547214d3980ec"}, "healthcheck": {"test": "/openstack/healthcheck"}, "image": "undercloud-0.ctlplane.redhat.local:8787/rh-osbs/rhosp16-openstack-nova-api:16.1_20210726.1", "net": "host", "privileged": false, "restart": "always", "start_order": 2, "user": "root", "volumes": ["/etc/hosts:/etc/hosts:ro", "/etc/localtime:/etc/localtime:ro", "/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro", "/etc/pki/ca-trust/source/anchors:/etc/pki/ca-trust/source/anchors:ro", "/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro", "/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro", "/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro", "/dev/log:/dev/log", "/etc/puppet:/etc/puppet:ro", "/var/log/containers/nova:/var/log/nova:z", "/var/log/containers/httpd/nova-api:/var/log/httpd:z", "/var/lib/kolla/config_files/nova_api.json:/var/lib/kolla/config_files/config.json:ro", "/var/lib/config-data/puppet-generated/nova:/var/lib/kolla/config_files/src:ro"]} --conmon-pidfile=/var/run/nova_api-1jpm5kyv.pid --detach=true --env=KOLLA_CONFIG_STRATEGY=COPY_ALWAYS --env=TRIPLEO_CONFIG_HASH=5cbcd2d39667626874f547214d3980ec --net=host --privileged=false --user=root --volume=/etc/hosts:/etc/hosts:ro --volume=/etc/localtime:/etc/localtime:ro --volume=/etc/pki/ca-trust/extracted:/etc/pki/ca-trust/extracted:ro --volume=/etc/pki/ca-trust/source/anchors:/etc/pki/ca-trust/source/anchors:ro --volume=/etc/pki/tls/certs/ca-bundle.crt:/etc/pki/tls/certs/ca-bundle.crt:ro --volume=/etc/pki/tls/certs/ca-bundle.trust.crt:/etc/pki/tls/certs/ca-bundle.trust.crt:ro --volume=/etc/pki/tls/cert.pem:/etc/pki/tls/cert.pem:ro --volume=/dev/log:/dev/log --volume=/etc/puppet:/etc/puppet:ro --volume=/var/log/containers/nova:/var/log/nova:z --volume=/var/log/containers/httpd/nova-api:/var/log/httpd:z --volume=/var/lib/kolla/config_files/nova_api.json:/var/lib/kolla/config_files/config.json:ro --volume=/var/lib/config-data/puppet-generated/nova:/var/lib/kolla/config_files/src:ro undercloud-0.ctlplane.redhat.local:8787/rh-osbs/rhosp16-openstack-nova-api:16.1_20210726.1
 
 You can also dump the configuration of a container to a file so you can
 edit it and rerun it with different a different configuration:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --container heat_api --action dump-json > heat_api.json
+  # paunch debug --file /var/lib/tripleo-config/container-startup-config/step_4 --container nova_api --action dump-json > nova_api.json
 
-You can then use ``heat_api.json`` as your ``--file`` argument after
+You can then use ``nova_api.json`` as your ``--file`` argument after
 editing it to your liking.
 
 To add configuration elements on the command line you can use the
@@ -239,9 +248,8 @@ the container:
 
 ::
 
-  # paunch debug --file /var/lib/tripleo-config/hashed-container-startup-config-step_4.json --overrides '{"health-cmd": "/usr/bin/curl -f http://localhost:8004/v1/", "health-interval": "30s"}' --container heat_api --action run
-  172ed68eb44ab20551a70a3e33c90a02014f530e42cd7b30255da4577c8ed80c
-
+  # paunch debug --file nova_api.json --overrides '{"health-cmd": "/usr/bin/curl -f http://localhost:8004/v1/", "health-interval": "30s"}' --container nova_api --managed-by=tripleo-Controller --config-id=tripleo_step4 --action run
+    f47949a7cb205083a3adaa1530fcdd4ed7dcfa9b9afb4639468357b36786ecf0
 
 Debugging container-puppet.py
 -----------------------------

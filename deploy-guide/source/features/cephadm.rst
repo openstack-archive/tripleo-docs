@@ -420,6 +420,25 @@ pool used by Glance. The default Glance deployment defined in the Heat
 stack will continue to use the `ceph.client.openstack.keyring` file
 unless that Glance configuration itself is overridden.
 
+Enabling cephadm debug mode
+---------------------------
+
+TripleO can deploy the Ceph cluster enabling the cephadm backend in debug
+mode; this is useful for troubleshooting purposes, and can be activated
+by using a syntax like the following::
+
+  parameter_defaults:
+    CephAdmDebug: true
+
+After step 2, when the Ceph cluster is up and running, after SSH'ing into
+one of your controller nodes run::
+
+    sudo cephadm shell ceph -W cephadm --watch-debug
+
+The command above shows a more verbose cephadm execution, and it's useful
+to identify potential issues with the deployment of the Ceph cluster.
+
+
 Accessing the Ceph Command Line
 -------------------------------
 

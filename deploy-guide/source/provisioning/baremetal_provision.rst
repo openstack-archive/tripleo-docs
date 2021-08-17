@@ -219,6 +219,9 @@ Each ``instances`` entry and the ``defaults`` dict support the following propert
 
 * ``image``: Image details to deploy with. See :ref:`image-properties`
 
+* ``managed``: Boolean to determine whether the instance is actually
+  provisioned with metalsmith, or should be treated as preprovisioned.
+
 * ``name``: The name of a node to deploy this instance on (Cannot be specified
   in ``defaults``)
 

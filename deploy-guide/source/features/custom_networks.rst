@@ -254,12 +254,22 @@ The steps to define your custom networks are:
              Virtual IPs and including the environment is automated.
 
 #. To deploy you pass the ``custom_network_data.yaml`` file via the ``-n``
-   option to the overcloud deploy, for example:
+   option to the overcloud deploy.
+
+   Following are two example deploy commands. The first command assumes that
+   networks, virtual IP addresses and baremetal nodes has been pre-provisioned
+   using the individual commands. Notice that the ``--skip-nodes-and-networks``
+   argument is used in the first example to ensure that these steps are not
+   redundantly repeated. The second example is the *all-in-one* approach where
+   the individual commands to deploy networks, virtual IP addresses and
+   baremetal nodes are not used.
 
    .. code-block:: bash
 
       openstack overcloud deploy --templates \
+        --skip-nodes-and-networks \
         -n custom_network_data.yaml \
+        -e baremetal-deployed-environment.yaml \
         -e networks-deployed-environment.yaml \
         -e vip-deployed-environment.yaml \
         -e custom-net-single-nic-with-vlans.yaml

@@ -208,10 +208,6 @@ Additional configuration
     supports a large variety of switch vendors and models. It is supported
     by TripleO starting with the Rocky release.
 
-* ``IronicIPXEEnabled`` parameter turns on iPXE (HTTP-based) for deployment
-  instead of PXE (TFTP-based). iPXE is more reliable and scales better, so
-  it's on by default. Also iPXE is required for UEFI boot support.
-
 * ``IronicImageDownloadSource`` when using the ``direct`` deploy interface this
   option (introduced in the Stein release) specifies what serves as a source
   for pulling the image from **ironic-python-agent**:

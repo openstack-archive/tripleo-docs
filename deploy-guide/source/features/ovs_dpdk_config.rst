@@ -36,8 +36,7 @@ will do the trick::
 
   openstack overcloud deploy --templates \
     -r roles_data.yaml \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/host-config-and-reboot.yaml \
-    -e /usr/share/openstack-tripleo-heat-templates/environments/neutron-ovs-dpdk.yaml \
+    -e /usr/share/openstack-tripleo-heat-templates/environments/services/neutron-ovs-dpdk.yaml \
     ...
 
 Parameters

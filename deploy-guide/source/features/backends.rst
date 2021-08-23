@@ -11,6 +11,7 @@ OpenStack projects.
    cinder_custom_backend
    cinder_netapp
    cephadm
+   deployed_ceph
    ceph_config
    ceph_external
    domain_specific_ldap_backends

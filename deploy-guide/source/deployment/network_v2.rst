@@ -95,6 +95,12 @@ that it can run all the steps:
    As an external deploy step the neutron ports for Service Virtual IPs are
    created, and the properties of the Virtual IPs are included in hieradata.
 
+   .. admonition:: Ceph
+      :class: ceph
+
+      Optionally Ceph may be deployed after the  baremetal instances
+      are provisioned but before the ephemeral Heat stack is created
+      as described in :doc:`../features/deployed_ceph`.
 
 Using
 -----

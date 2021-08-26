@@ -77,7 +77,7 @@ Installing the Undercloud
    .. admonition:: RHEL
       :class: rhel
 
-      Enable optional repo::
+      Enable optional repo for RHEL7::
 
           sudo yum install -y yum-utils
           sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
@@ -87,14 +87,21 @@ Installing the Undercloud
 
 #. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 
-    sudo yum install -y python-tripleoclient
+    sudo dnf install -y python*-tripleoclient
+
+   .. admonition:: RHEL7 / CentOS 
+
+      For RHEL or CentOS 7 the command would be::
+
+          sudo yum install -y python-tripleoclient
+
 
    .. admonition:: Ceph
       :class: ceph
 
       If you intend to deploy Ceph in the overcloud, or configure the overcloud to use an external Ceph cluster, and are running Pike or newer, then install ceph-ansible on the undercloud::
 
-          sudo yum install -y ceph-ansible
+          sudo dnf install -y ceph-ansible
 
    .. admonition:: TLS
       :class: tls

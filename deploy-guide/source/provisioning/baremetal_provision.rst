@@ -469,6 +469,48 @@ Run arbitrary playbooks with extra variables defined for one of the playbooks:
         param2: value2
     - playbook: b_playbook.yaml
 
+Grow volumes playbook
+^^^^^^^^^^^^^^^^^^^^^
+
+Before custom playbooks are run, an in-built playbook is run to grow the LVM
+volumes of any node deployed with the whole-disk overcloud image
+`overcloud-hardened-uefi-full.qcow2`. The implicit `ansible_playbooks` would be:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: /usr/share/ansible/tripleo-playbooks/cli-overcloud-node-growvols.yaml
+      extra_vars:
+        growvols_args: >
+          /=8GB
+          /tmp=1GB
+          /var/log=10GB
+          /var/log/audit=2GB
+          /home=1GB
+          /var=100%
+
+Each LVM volume is grown by the amount specified until the disk is 100%
+allocated, and any remaining space is given to the `/` volume.  In some cases it
+may be necessary to specify different `growvols_args`. For example the
+`ObjectStorage` role deploys swift storage which stores state in `/srv`, so this
+volume needs the remaining space instead of `/var`. The playbook can be
+explicitly written to override the default `growvols_args` value, for example:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: /usr/share/ansible/tripleo-playbooks/cli-overcloud-node-growvols.yaml
+      extra_vars:
+        growvols_args: >
+          /=8GB
+          /tmp=1GB
+          /var/log=10GB
+          /var/log/audit=2GB
+          /home=1GB
+          /var=1GB
+          /srv=100%
+
+
 .. _deploying-the-overcloud:
 
 Deploying the Overcloud

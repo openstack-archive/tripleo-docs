@@ -134,7 +134,8 @@ configuration must be set in order to disable authentication::
     unset OS_PROJECT_DOMAIN_NAME
     unset OS_USER_DOMAIN_NAME
     OS_AUTH_TYPE=none
-    OS_ENDPOINT=http://192.168.24.2:8006/v1/admin
+    IP=`cat /etc/hosts | grep "undercloud.localdomain undercloud$" | awk '{print $1}'`
+    OS_ENDPOINT=http://$IP:8006/v1/admin
 
 Once the environment is configured, ``openstackclient`` work as expected
 against the Heat API::

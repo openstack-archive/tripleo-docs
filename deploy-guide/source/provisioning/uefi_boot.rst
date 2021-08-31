@@ -31,7 +31,6 @@ in your ``undercloud.conf`` (they are on by default):
 .. code-block:: ini
 
     ipxe_enabled = True
-    inspection_enable_uefi = True
 
 Then you can run introspection as usual.
 

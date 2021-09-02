@@ -53,9 +53,17 @@ is to create a layer on top of the cinder-volume image that will be named
 * Create `~/vendor/tcib/cinder-cooldriver` to hold our container image
   configuration.
 
-  .. code-block:: yaml
+  .. code-block:: shell
 
     mkdir ~/vendor/tcib/cinder-cooldriver
+
+* Optionally, add custom files into the build environment.
+
+  .. code-block:: shell
+
+    mkdir ~/vendor/tcib/cinder-cooldriver/files
+    cp custom-package.rpm ~/vendor/tcib/cinder-cooldriver/files
+
 
 * Create `~/vendor/tcib/cinder-cooldriver/cinder-cooldriver.yaml` file which
   contains the container image configuration:
@@ -66,10 +74,19 @@ is to create a layer on top of the cinder-volume image that will be named
     # that's the parent layer, here cinder-volume
     tcib_from: localhost/tripleomaster/openstack-cinder-volume:latest
     tcib_actions:
+      - user: root
       - run: mkdir /tmp/cooldriver/example.py
+      - run: mkdir -p /rpms
       - run: dnf install -y cooldriver_package
+    tcib_copies:
+      - '{{lookup(''env'',''HOME'')}}/vendor/tcib/cinder-cooldriver/files/custom-package.rpm /rpms'
+    tcib_gather_files: >
+      {{ lookup('fileglob', '~/vendor/tcib/cinder-cooldriver/files/*', wantlist=True) }}
+    tcib_runs:
+      - dnf install -y /rpms/*.rpm
+    tcib_user: cinder
 
-.. note:: the tcib parameters are documented in the `tcib`_ role.
+.. note:: Here `tcib_runs` provides a shortcut to `tcib_actions:run`. See more tcib parameters documented in the `tcib`_ role.
 
 .. _tcib: https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_container_image_build.html#r-o-l-e-d-e-f-a-u-l-t-s
 
@@ -84,6 +101,8 @@ is to create a layer on top of the cinder-volume image that will be named
     └── tcib
         └── cinder-cooldriver
                 └── cinder-cooldriver.yaml
+                └── files
+                    └── custom-package.rpm
 
 * Build the vendor container image:
 

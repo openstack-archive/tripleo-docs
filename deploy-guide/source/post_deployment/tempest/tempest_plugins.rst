@@ -19,10 +19,6 @@ Below is the detailed list of openstack services wise tempest plugins.
     * RPM package name: python3-octavia-tests-tempest
     * Source Code: https://opendev.org/openstack/octavia-tempest-plugin
 
-* Horizon
-    * RPM package name: python3-horizon-tests-tempest
-    * Source Code: https://opendev.org/openstack/tempest-horizon
-
 * Kuryr
     * RPM package: python3-kuryr-tests-tempest
     * Source Code: https://opendev.org/openstack/kuryr-tempest-plugin

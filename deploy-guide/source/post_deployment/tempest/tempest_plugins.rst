@@ -39,10 +39,6 @@ Below is the detailed list of openstack services wise tempest plugins.
     * RPM Package: python3-novajoin-tests-tempest
     * Source Code: https://opendev.org/openstack/novajoin-tempest-plugin
 
-* Sahara
-    * RPM package: python3-sahara-tests-tempest
-    * Source Code: https://opendev.org/openstack/sahara-tests
-
 * zaqar
     * RPM Package: python3-zaqar-tests-tempest
     * Source Code: https://opendev.org/openstack/zaqar-tempest-plugin

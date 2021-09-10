@@ -17,7 +17,7 @@ Containers runtime deployment and configuration notes
 TripleO has transitioned to the `podman`_ container runtime. Podman does not
 use a persistent daemon to manage containers. TripleO wraps the container
 service execution in systemd managed services. These services are named
-tripleo_<container name>. Prior to Stein TripleO deployed the containers
+tripleo_<container name>. Prior to Stein, TripleO deployed the containers
 runtime and image components from the docker packages. The installed components
 include the docker daemon system service and `OCI`_ compliant `Moby`_ and
 `Containerd`_ - the building blocks for the container system.

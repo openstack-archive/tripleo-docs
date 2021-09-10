@@ -253,7 +253,7 @@ deploying the overcloud.
 Generate Templates from Jinja2
 ------------------------------
 
-With Queens cycle, the network configuration templates have been converted to
+With the Queens cycle, the network configuration templates have been converted to
 Jinja2 templates, so that templates can be generated for each role with
 customized network data. A utility script is available to generate the
 templates based on the provided ``roles_data.yaml`` and ``network_data.yaml``
@@ -1090,6 +1090,6 @@ to a provider network if Neutron is to provide DHCP services to tenant VMs::
 
 
 .. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
-.. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples/default-network-isolation.yaml
-.. _network-data-samples: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples
-.. _vip-data-samples: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples
+.. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network-data-samples/default-network-isolation.yaml
+.. _network-data-samples: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network-data-samples/
+.. _vip-data-samples: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network-data-samples/

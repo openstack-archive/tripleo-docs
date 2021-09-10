@@ -187,8 +187,8 @@ The steps to define your custom networks are:
 
    .. admonition:: Ussuri and prior releases
 
-      Prior to Queens the nic config templates are not dynamically generated,
-      so it is necessary to copy those that are in use, and add parameters for
+      Prior to Queens, the nic config templates were not dynamically generated,
+      so it was necessary to copy those that were in use, and add parameters for
       any additional networks, for example::
 
         cp -r /usr/share/openstack-tripleo-heat-templates/network/config/single-nic-vlans custom-single-nic-vlans
@@ -199,7 +199,7 @@ The steps to define your custom networks are:
       ``custom_network_data.yaml``.
 
       .. note::
-         In Queens and later the NIC config templates are dynamically
+         Since Queens, the NIC config templates are dynamically
          generated so this step is only necessary when creating custom NIC
          config templates, not when just adding a custom network.
 

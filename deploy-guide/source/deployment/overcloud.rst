@@ -1,8 +1,8 @@
 Containers based Overcloud Deployment
 ======================================
 
-This documentation explains how to deploy a fully containerized overcloud on
-Docker. This feature is now the default in Queens.
+This documentation explains how to deploy a fully containerized overcloud
+utilizing Podman which is the default since the Stein releasee.
 
 The requirements for a containerized overcloud are the same as for any other
 overcloud deployment. The real difference is in where the overcloud services
@@ -11,7 +11,7 @@ will be deployed (containers vs base OS).
 Architecture
 ------------
 
-The docker-based overcloud architecture is not very different from the
+The container-based overcloud architecture is not very different from the
 baremetal/VM based one. The services deployed in the traditional baremetal
 overcloud are also deployed in the docker-based one.
 

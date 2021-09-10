@@ -12,9 +12,8 @@ configuration with Ansible in TripleO.
 
 Summary
 -------
-Starting with the Queens release, it is possible to use Ansible to apply the
-overcloud configuration. Since the Rocky release, this method is the new default
-behavior.
+Since  the Queens release, it has been possible to use Ansible to apply the
+overcloud configuration and with the Rocky release it became the default.
 
 Ansible is used to replace the communication and transport of the software
 configuration deployment data between Heat and the Heat agent

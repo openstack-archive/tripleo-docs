@@ -3,7 +3,7 @@
 Deploying with IPSec
 ====================
 
-As of the Queens release, it is possible to encrypt communications within the
+Since the Queens release, it is possible to encrypt communications within the
 internal network by setting up IPSec tunnels configured by TripleO.
 
 There are several options that TripleO provides deployers whose requirements call
@@ -87,15 +87,6 @@ With this, your deployment command will be similar to this::
         -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
         -e /home/stack/templates/network-environment.yaml \
         -e /usr/share/openstack-tripleo-heat-templates/environments/ipsec.yaml
-
-.. note:: For the Queens release, you need to specify the config-download
-          related parameters yourself::
-
-              openstack overcloud deploy \
-                  ...
-                  -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml \
-                  --config-download \
-                  ...
 
 To change the default encryption algorithm, you can use an environment file
 that looks as follows::

@@ -336,7 +336,7 @@ setting custom values for this parameter::
 .. admonition:: ceph-ansible 4.0 and newer
    :class: ceph
 
-   Stein's default Ceph is Nautilus, which introduced the Messenger v2 protocol.
+   Stein's default Ceph was Nautilus, which introduced the Messenger v2 protocol.
    ceph-ansible 4.0 and newer added a parameter in order to:
 
    * enable or disable the v1 protocol
@@ -910,7 +910,7 @@ Run a Ceph validation with command like the following::
 
   ansible-playbook -i inventory $BASE/validation-playbooks/ceph-ansible-installed.yaml
 
-For Stein and newer it is possible to run validations using the
+For Stein and newer, it is possible to run validations using the
 `openstack tripleo validator run` command with a syntax like the
 following::
 

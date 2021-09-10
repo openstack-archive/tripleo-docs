@@ -165,21 +165,6 @@ created on the undercloud, one should use a non-root user.
 
             export STABLE_RELEASE="train"
 
-      .. admonition:: Stein
-         :class: stein
-
-         ::
-
-            export STABLE_RELEASE="stein"
-
-      .. admonition:: Queens
-         :class: queens
-
-         ::
-
-            export STABLE_RELEASE="queens"
-
-
 #. Build the required images:
 
 

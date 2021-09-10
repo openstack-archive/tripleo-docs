@@ -180,13 +180,7 @@
 .. note::
     It's possible to enable verbose logging with ``--verbose`` option.
 
-.. note::
-    To install a deprecated instack undercloud, you'll need to deploy
-    with ``--use-heat=False`` option. It only works in Rocky
-    as instack-undercloud was retired in Stein.
-
-
-In Rocky, we will run all the OpenStack services in a moby container runtime
+Since Rocky, we run all the OpenStack services in a moby container runtime
 unless the default settings are overwritten.
 This command requires 2 services to be running at all times. The first one is a
 basic keystone service, which is currently executed by `tripleoclient` itself, the

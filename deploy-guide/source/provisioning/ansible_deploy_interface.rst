@@ -1,17 +1,12 @@
 Extending overcloud nodes provisioning
 ======================================
 
-Starting with the Queens release, the new *ansible* deploy interface is
+Starting with the Queens release, the *ansible* deploy interface became
 available in Ironic. Unlike the default `iSCSI deploy interface`_, it is
 highly customizable through operator-provided Ansible playbooks. These
 playbooks will run on the target image when Ironic boots the deploy ramdisk.
 
 .. TODO(dtantsur): link to ansible interface docs when they merge
-
-.. warning::
-    The ansible deploy interface support in TripleO is technical preview in
-    the Queens release. This guide may change substantially as the feature
-    is stabilizing.
 
 .. note::
     This feature is not related to the ongoing work of switching overcloud

@@ -121,8 +121,8 @@ in an environment file:
   .. admonition:: Stable Branches
      :class: stable
 
-     The ``IronicEnabledDrivers`` option can also be used before the Queens
-     release. It sets the list of enabled classic drivers. The most often used
+     The ``IronicEnabledDrivers`` option can also be used for releases prior
+     to Queens. It sets the list of enabled classic drivers. The most often used
      bare metal driver is ``pxe_ipmitool``. Also enabled by default are
      ``pxe_ilo`` and ``pxe_drac`` drivers.
 
@@ -141,24 +141,10 @@ in an environment file:
    :class: stable
 
   ``NovaSchedulerDefaultFilters`` configures available scheduler filters.
-  Before the Stein release the ``AggregateInstanceExtraSpecsFilter`` could be
+  Before the Stein release, the ``AggregateInstanceExtraSpecsFilter`` could be
   used to separate flavors targeting virtual and bare metal instances.
-  Starting with the Stein release a flavor can only target one of them, so
+  Starting with the Stein release, a flavor can only target one of them, so
   no additional actions are needed.
-
-  * In the Pike, Queens and Rocky releases you can use the following filters::
-
-        parameter_defaults:
-            NovaSchedulerDefaultFilters:
-                - RetryFilter
-                - AggregateInstanceExtraSpecsFilter
-                - AvailabilityZoneFilter
-                - ComputeFilter
-                - ComputeCapabilitiesFilter
-                - ImagePropertiesFilter
-
-    Alternatively, you can skip adding ``cpus`` and ``memory_mb`` to your bare
-    metal nodes. This will make the virtual flavors skip bare metal nodes.
 
 Additional configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~

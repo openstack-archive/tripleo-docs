@@ -26,20 +26,10 @@ to the deployment command::
         <other cli args> \
         -e ~/rhsm.yaml
 
-.. note::
-   This feature requires config-download to be enabled, which wasn't the
-   case in Queens.
-   If you're deploying on this release, make sure you deploy with
-   config-download enabled::
-
-        -e /usr/share/openstack-tripleo-heat-templates/environments/config-download-environment.yaml \
-        --config-download
-
 The ``rhsm.yaml`` environment enables mapping the OS::TripleO::Services::Rhsm to
 the extraconfig service::
 
     resource_registry:
-      # Before Train cycle, the file is in /usr/share/openstack-tripleo-heat-templates/extraconfig/services/rhsm.yaml
       OS::TripleO::Services::Rhsm: /usr/share/openstack-tripleo-heat-templates/deployment/rhsm/rhsm-baremetal-ansible.yaml
     parameter_defaults:
       RhsmVars:

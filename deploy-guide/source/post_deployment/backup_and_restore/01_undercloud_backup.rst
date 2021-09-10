@@ -92,20 +92,13 @@ Database backups
 
 The operator needs to backup all databases in the Undercloud node
 
-.. admonition:: Stein and Train
+.. admonition:: Train
    :class: stable
 
    ::
 
     /bin/hiera -c /etc/puppet/hiera.yaml mysql::server::root_password
     podman exec mysql bash -c "mysqldump -uroot -pPASSWORD --opt --all-databases" > /root/undercloud-all-databases.sql
-
-.. admonition:: Queens
-   :class: stable
-
-   ::
-
-    mysqldump --opt --single-transaction --all-databases > /root/undercloud-all-databases.sql
 
 Filesystem backups
 ~~~~~~~~~~~~~~~~~~

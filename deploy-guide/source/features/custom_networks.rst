@@ -577,7 +577,7 @@ Network Virtual IPs data YAML options
   default: $network_name_virtual_ip
 
 .. _tripleo-heat-templates: https://opendev.org/openstack/tripleo-heat-templates
-.. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/network-data-samples/default-network-isolation.yaml
+.. _default-network-isolation: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network-data-samples/default-network-isolation.yaml
 .. _network_data.yaml: https://opendev.org/openstack/tripleo-heat-templates/src/branch/master/network_data.yaml
 .. _jinja2: http://jinja.pocoo.org/docs/dev/
 .. _tripleo-ansible: https://opendev.org/openstack/tripleo-ansible/src/branch/master/tripleo_ansible/roles/tripleo_network_config/templates

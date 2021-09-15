@@ -187,6 +187,15 @@ Certificate Details
        sudo cp overcloud-cacert.pem /etc/pki/ca-trust/source/anchors/
        sudo update-ca-trust extract
 
+   This certificate location needs to be added to the ``enabled-tls.yaml`` file
+   with the parameter ``PublicTLSCAFile`` like so::
+
+       parameter_defaults:
+           PublicTLSCAFile: '/etc/pki/ca-trust/source/anchors/overcloud-cacert.pem'
+
+   ``PublicTLSCAFile`` ensures the CA Certificate will be added to the ``clouds.yaml``
+   file for the ``cacert`` parameter.
+
    Generate the leaf certificate request and key that will be used for the
    public VIP. To do this, we will create two files for the certificate 
    request. First, we create the server.csr.cnf::

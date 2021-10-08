@@ -538,7 +538,6 @@ The baremetal nodes are provisioned with the following command::
 The overcloud can then be deployed using the output from the provision command::
 
   openstack overcloud deploy \
-    --skip-nodes-and-networks \
     -e /usr/share/openstack-tripleo-heat-templates/environments/deployed-server-environment.yaml \
     -e ~/overcloud-networks-deployed.yaml \
     -e ~/templates/vips-deployed-environment.yaml \

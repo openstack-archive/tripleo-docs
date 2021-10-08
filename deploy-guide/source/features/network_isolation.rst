@@ -928,23 +928,13 @@ type if on bare metal, so that hardware virtualization will be used.
 
 To deploy with network isolation and include the network environment file, use
 the ``-e`` and ``--networks-file`` parameters with the
-``openstack overcloud deploy`` command.
-
-Following are two example deploy commands. The first command assumes that
-networks, virtual IP addresses and baremetal nodes has been pre-provisioned
-using the individual commands. Notice that the ``--skip-nodes-and-networks``
-argument is used in the first example to ensure that these steps are not
-redundantly repeated. The second example is the *all-in-one* approach where the
-individual commands to deploy networks, virtual IP addresses and baremetal
-nodes are not used.
-
-The following deploy commands should work for all of the subsequent examples:
+``openstack overcloud deploy`` command. The following deploy command should
+work for all of the subsequent examples:
 
 .. code-block:: bash
 
     openstack overcloud deploy \
       --templates \
-      --skip-nodes-and-networks \
       --networks-file ~/templates/custom_network_data.yaml \
       -e ~/templates/networks-deployed-environment.yaml \
       -e ~/templates/vips-deployed-environment.yaml \

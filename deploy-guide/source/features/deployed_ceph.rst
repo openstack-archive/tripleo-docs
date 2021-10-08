@@ -195,6 +195,23 @@ The command line interface supports the following options::
 Run `openstack overcloud ceph deploy --help` in your own environment
 to see the latest options which you have available.
 
+
+Ceph Configuration Options
+--------------------------
+
+The `deployed_ceph.yaml` Heat environment file output by `openstack
+overcloud ceph deploy` has `ApplyCephConfigOverridesOnUpdate` set to
+true. This means that services not covered by deployed ceph, e.g. RGW,
+can have the configuration changes that they need applied during
+overcloud deployment. After the deployed ceph process has run and
+then after the overcloud is deployed, it is recommended to update the
+`deployed_ceph.yaml` Heat environment file, or similar, to set
+`ApplyCephConfigOverridesOnUpdate` to false. Any subsequent Ceph
+configuration changes should then be made by the `ceph config
+command`_. For more information on the `CephConfigOverrides` and
+`ApplyCephConfigOverridesOnUpdate` parameters see :doc:`cephadm`.
+
+
 Ceph Spec Options
 -----------------
 
@@ -351,6 +368,7 @@ If a variable above is unused, then it defaults to the ones found in
 the default ``container_image_prepare_defaults.yaml`` file. In other
 words, the above options are overrides.
 
+.. _`ceph config command`: https://docs.ceph.com/en/latest/man/8/ceph/#config
 .. _`ceph_spec_bootstrap`: https://docs.openstack.org/tripleo-ansible/latest/modules/modules-ceph_spec_bootstrap.html
-.. _`Ceph Service Specification`: https://docs.ceph.com/en/latest/cephadm/service-management/#orchestrator-cli-service-spec
-.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/latest/cephadm/osd/#drivegroups
+.. _`Ceph Service Specification`: https://docs.ceph.com/en/pacific/cephadm/service-management/#orchestrator-cli-service-spec
+.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/pacific/cephadm/osd/#drivegroups

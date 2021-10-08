@@ -223,17 +223,14 @@ Overriding Server Configuration after deployment
 ------------------------------------------------
 
 To make a Ceph *server* configuration change, after the cluster has
-been deployed, use the `ceph config command`_. Updating the parameters
-in `CephConfigOverrides` and running a stack update will not change
-the running Ceph server. The parameters in `CephConfigOverrides`
-are only applied to a new Ceph server at bootstrap. A
-'/etc/ceph/ceph.conf' file is not distributed to all Ceph servers and
-instead `Ceph's centralized configuration management`_ is used.
+been deployed, use the `ceph config command`_. A '/etc/ceph/ceph.conf'
+file is not distributed to all Ceph servers and instead `Ceph's
+centralized configuration management`_ is used.
 
 A single '/etc/ceph/ceph.conf' file may be found on the bootstrap node.
 The directives under `CephConfigOverrides` are used to create a config
-file, e.g. ceph_bootstrap.conf, which is passed to `cephadm bootstrap`
-with `--config ceph_bootstrap.conf` so that those directives are
+file, e.g. assimilate_ceph.conf, which is passed to `cephadm bootstrap`
+with `--config assimilate_ceph.conf` so that those directives are
 applied to the new cluster at bootstrap. The option `--output-config
 /etc/ceph/ceph.conf` is also passed to the `cephadm bootstrap` command
 and that's what creates the `ceph.conf` on the bootstrap node. The
@@ -241,16 +238,33 @@ name of the file is `ceph.conf` because the `CephClusterName`
 parameter defaults to "ceph". If `CephClusterName` was set to "foo",
 then the file would be called `/etc/ceph/foo.conf`.
 
+By default the parameters in `CephConfigOverrides` are only applied to
+a new Ceph server at bootstrap. They are ignored during stack updates
+because `ApplyCephConfigOverridesOnUpdate` defaults to false. When
+`ApplyCephConfigOverridesOnUpdate` is set to true, parameters in
+`CephConfigOverrides` are put into a file, e.g. assimilate_ceph.conf,
+and a command like `ceph config assimilate-conf -i
+assimilate_ceph.conf` is run.
+
+When using :doc:`deployed_ceph` the `openstack overcloud ceph deploy`
+command outputs an environment file with
+`ApplyCephConfigOverridesOnUpdate` set to true so that services not
+covered by deployed ceph, e.g. RGW, can have the configuration changes
+that they need applied during overcloud deployment. After the deployed
+ceph process has run and then after the overcloud is deployed, it is
+recommended to set `ApplyCephConfigOverridesOnUpdate` to false.
+
 
 Overriding Client Configuration after deployment
 ------------------------------------------------
 
 To make a Ceph *client* configuration change, update the parameters in
 `CephConfigOverrides` and run a stack update. This will not change the
-configuration for the Ceph servers (as described in the section
-above); only for the Ceph clients. Examples of Ceph clients include
-Nova compute containers, Cinder volume containers, Glance image
-containers, etc.
+configuration for the Ceph servers unless
+`ApplyCephConfigOverridesOnUpdate` is set to true (as described in the
+section above). By default it should only change configurations for
+the Ceph clients. Examples of Ceph clients include Nova compute
+containers, Cinder volume containers, Glance image containers, etc.
 
 The `CephConfigOverrides` directive updates all Ceph client
 configuration files on the overcloud in the `CephConfigPath` (which
@@ -893,11 +907,11 @@ The final overcloud command must look like the following::
 .. _`Ceph Orchestrator`: https://docs.ceph.com/en/latest/mgr/orchestrator/
 .. _`ceph config command`: https://docs.ceph.com/en/latest/man/8/ceph/#config
 .. _`Ceph's centralized configuration management`: https://ceph.io/community/new-mimic-centralized-configuration-management/
-.. _`Ceph Service Specification`: https://docs.ceph.com/en/latest/cephadm/service-management/#orchestrator-cli-service-spec
+.. _`Ceph Service Specification`: https://docs.ceph.com/en/pacific/cephadm/service-management/#orchestrator-cli-service-spec
 .. _`ceph_spec_bootstrap`: https://docs.openstack.org/tripleo-ansible/latest/modules/modules-ceph_spec_bootstrap.html
-.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/latest/cephadm/osd/#drivegroups
+.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/pacific/cephadm/osd/#drivegroups
 .. _`Autoscaling Placement Groups`: https://docs.ceph.com/en/latest/rados/operations/placement-groups/
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`CRUSH Map Rules`: https://docs.ceph.com/en/latest/rados/operations/crush-map-edits/?highlight=ceph%20crush%20rules#crush-map-rules
-.. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/latest/cephadm/osd/
-.. _`osd_memory_target_autotune`: https://docs.ceph.com/en/latest/cephadm/osd/#automatically-tuning-osd-memory
+.. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/pacific/cephadm/osd/
+.. _`osd_memory_target_autotune`: https://docs.ceph.com/en/pacific/cephadm/osd/#automatically-tuning-osd-memory

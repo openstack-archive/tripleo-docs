@@ -1,33 +1,24 @@
 Release Management
 ==================
 
+Releases Overview
+-----------------
+
 Before reading this document and being involved in TripleO release management,
 it's suggested to read the OpenStack Release Management guide_.
 
 .. _guide: https://docs.openstack.org/project-team-guide/release-management.html
 
-Most of TripleO projects follows the cycle-trailing_ release model.
-The details can be found on the releases repository_.
+Most of TripleO projects follows the independent_ release model.
+We will be creating stable branches based on our long term supported releases
+going forward. The details can be found on the releases repository_.
 
-.. _repository: https://opendev.org/openstack/releases/src/branch/master/deliverables
+.. _repository: https://opendev.org/openstack/releases/src/branch/master/deliverables/_independent
 
-.. _cycle-trailing: https://releases.openstack.org/reference/release_models.html#cycle-trailing
+.. _independent: https://releases.openstack.org/reference/release_models.html#independent
 
 All information about previous releases can be found on https://releases.openstack.org.
 This page will document the process of releasing TripleO projects.
-
-
-The first step is to update ReNo_ configuration file for some projects: tripleo-image-elements,
-tripleo-puppet-elements, tripleo-heat-templates and puppet-tripleo.
-
-.. _ReNo: https://docs.openstack.org/reno
-
-Edit releasenotes/source/conf.py file and change this line::
-
-    # The full version, including alpha/beta/rc tags.
-    release = 'X.Y.Z'
-    # The short X.Y.Z version.
-    version = 'X.Y.Z'
 
 The tagging convention can be discussed with the PTL or the Release Liaison of TripleO.
 
@@ -41,24 +32,33 @@ For other projects, there is no need to update anything since the release will b
    Puppet OpenStack modules release management is documented here:
    https://docs.openstack.org/puppet-openstack-guide/releases.html#how-to-release-puppet-modules
 
-.. Note::
-   TripleO UI requires some specific changes to be released too, see https://review.opendev.org/#/c/460664/
-   for an example.
-
-Once this is done, you can submit a patch in openstack/releases and per project create or modify the YAML.
+Once this is done, you can submit a patch in openstack/releases and per project to modify the YAML.
+The openstack/releases project provides tooling to update these files. See the new-release_ comand.
+You can also update the yaml files manually as necessary.
 Example with tripleo-heat-templates, edit deliverables/pike/tripleo-heat-templates.yaml::
 
     ---
     launchpad: tripleo
-    release-model: cycle-trailing
-    releases:
-    - projects:
-      - hash: e6d1aaac5745f2b32d30f3e41ba8c0a50f5b51d7
-        repo: openstack/tripleo-heat-templates
-      version: 7.0.0.0b1
-    send-announcements-to: openstack-announce@lists.openstack.org
+    release-type: python-pypi
     team: tripleo
     type: other
+    repository-settings:
+      openstack/tripleo-heat-templates: {}
+    releases:
+      - version: 15.0.0
+        projects:
+          - repo: openstack/tripleo-heat-templates
+            hash: 1ffbc6cf70c8f79cb3a1e251c9b1e366843ab97c
+      - version: 15.1.0
+        projects:
+          - repo: openstack/tripleo-heat-templates
+            hash: ec8955c26a15f3c9e659b7ae08223c544820af03
+      - version: 16.0.0
+        projects:
+          - repo: openstack/tripleo-heat-template
+            hash: <MY NEW HASH>
+
+.. _new-release: https://releases.openstack.org/reference/using.html#using-new-release-command
 
 Once the file is edited, you can submit it and OpenStack release team will review it. Note that the patch
 requires +1 from TripleO PTL or TripleO Release Liaison_.
@@ -72,38 +72,89 @@ Example with tripleo-heat-templates, edit deliverables/ocata/tripleo-heat-templa
 
     ---
     launchpad: tripleo
+    release-type: python-pypi
     team: tripleo
-    release-notes: https://docs.openstack.org/releasenotes/tripleo-heat-templates/ocata.html
     type: other
-    release-model: cycle-trailing
-    send-announcements-to: openstack-announce@lists.openstack.org
+    repository-settings:
+      openstack/tripleo-heat-templates: {}
     branches:
-      - name: stable/ocata
-        location: 6.0.0.0rc1
+      - name: stable/xena
+        location: 16.0.0
     releases:
-      - version: 6.0.0.0b1
+      - version: 15.0.0
         projects:
           - repo: openstack/tripleo-heat-templates
-            hash: 521779edd4dbeb65e0c62c48567dd478b3fab5a5
-      - version: 6.0.0.0b2
+            hash: 1ffbc6cf70c8f79cb3a1e251c9b1e366843ab97c
+      - version: 15.1.0
         projects:
           - repo: openstack/tripleo-heat-templates
-            hash: 1e88f875239b30de24552450b623e6892941fa1e
-      - version: 6.0.0.0rc1
+            hash: ec8955c26a15f3c9e659b7ae08223c544820af03
+      - version: 16.0.0
         projects:
-          - repo: openstack/tripleo-heat-templates
-            hash: 5340f64c03902b7a76212a579bcc895d56008df3
-      - version: 6.0.0.0rc2
-        projects:
-          - repo: openstack/tripleo-heat-templates
-            hash: 5f278ebc5cd3426d58c8a05c0f58309681efa055
-      - version: 6.0.0
-        diff-start: 5.0.0.0rc2
-        projects:
-          - repo: openstack/tripleo-heat-templates
-            hash: 5f278ebc5cd3426d58c8a05c0f58309681efa055
-
-
+          - repo: openstack/tripleo-heat-template
+            hash: <MY NEW HASH>
 
 Keep in mind that tags, branches, release notes, announcements are generated by the tooling
 and nothing has to be done manually, except what is documented here.
+
+
+Releases for RDO
+----------------
+
+Due to TripleO's switch_ to the independent model, the TripleO project needs to
+cut tags at the end of cycles that will not be supported in the long term. These
+tags are used by the RDO release process to include a build of the TripleO
+rpms in the RDO release.  The process to create the intermediate release would
+be as follows.
+
+.. _switch: https://specs.openstack.org/openstack/tripleo-specs/specs/xena/tripleo-independent-release.html
+
+Update required metadata
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some projects like puppet-tripleo and puppet-pacemaker require the metadata
+be updated in the repository prior to cutting a tag. If the metadata is
+not updated, the tagging patch to openstack/releases will fail CI.
+
+For puppet-tripleo_ and puppet-pacemaker_, update the version information to
+represent the next tag version (e.g. 16.1.0).
+
+.. _puppet-tripleo: https://review.opendev.org/c/openstack/puppet-tripleo/+/813847
+.. _puppet-pacemaker: https://review.opendev.org/c/openstack/puppet-pacemaker/+/813854
+
+
+Get latest promoted content
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+After the previous metadata updates are available in the latest promoted content,
+fetch the version information from RDO which contains the git repository hashes.
+
+An example where this could be found is::
+
+   https://trunk.rdoproject.org/centos8-master/current-tripleo/versions.csv
+
+.. Note::
+   You will needed to adjust the centos8 to centos9 as necessary.
+
+
+Prepare version tags
+^^^^^^^^^^^^^^^^^^^^
+
+Based on the versions.csv data, an openstack/releases patch needs to be created
+to tag the release with the provided hashes. You can determine which TripleO
+projects are needed by finding the projects taged with "team: tripleo_".
+`An example review`_.  Please be aware of changes between versions and create
+the appropriate version number as necessary (e.g. major, feature, or bugfix).
+
+.. _tripleo: https://opendev.org/openstack/releases/src/commit/fcdb1f5b556e99f25f248d38f16ad812489c9be0/deliverables/_independent/tripleo-heat-templates.yaml
+.. _An example review: https://review.opendev.org/c/openstack/releases/+/813852
+
+.. Note::
+   If this is a long term release, this patch should include a stable branch.
+
+Notify RDO team of tags
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Once the release has been created, make sure the RDO team not has been notified
+of the new tags.  They will update the RDO release items to ensure that the
+given openstack release will contained the pinned content.

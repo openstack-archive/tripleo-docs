@@ -9,6 +9,8 @@ important to note that vDPA can't function without OVS Hardware Offload.
 
 Mellanox is the only NIC vendor currently supported with vDPA.
 
+CentOS9/RHEL9 with a kernel of 5.14 or higher is required.
+
 Execute below command to create the ``roles_data.yaml``::
 
   openstack overcloud roles generate -o roles_data.yaml Controller ComputeVdpa
@@ -64,22 +66,30 @@ is mandatory to have it::
     NeutronNetworkVLANRanges:
       - tenant:1300:1399
     NovaSchedulerDefaultFilters:
-      - ...
       - PciPassthroughFilter
       - NUMATopologyFilter
+      - ...
     ComputeVdpaParameters:
       NovaPCIPassthrough:
         - vendor_id: "15b3"
-          product_id: "101d"
+          product_id: "101e"
           address: "06:00.0"
           physical_network: "tenant"
         - vendor_id: "15b3"
-          product_id: "101d"
+          product_id: "101e"
           address: "06:00.1"
           physical_network: "tenant"
       KernelArgs: "[...] iommu=pt intel_iommu=on"
       NeutronBridgeMappings:
         - tenant:br-tenant
+
+.. note::
+    It's important to use the ``product_id`` of a VF device and not a PF
+
+      06:00.1 Ethernet controller [0200]: Mellanox Technologies MT2892 Family [ConnectX-6 Dx] [15b3:101d]
+      06:00.2 Ethernet controller [0200]: Mellanox Technologies ConnectX Family mlx5Gen Virtual Function [15b3:101e]
+
+
 
 
 Network Config
@@ -115,13 +125,13 @@ When creating the network, it has to be mapped to the physical network::
   $ openstack network create \
       --provider-physical-network tenant \
       --provider-network-type vlan \
-      --provider-segment 1337
+      --provider-segment 1337 \
       vdpa_net1
 
   $ openstack subnet create \
       --network vdpa_net1 \
       --subnet-range 192.0.2.0/24 \
-      --dhcp
+      --dhcp \
       vdpa_subnet1
 
 To allocate a port from a vdpa-enabled NIC, create a neutron port and set the
@@ -160,7 +170,7 @@ Example::
       --property trait:CUSTOM_VDPA=required \
       vdpa_ag1
 
-The flavor will map to that new aggregate with the ``traits:CUSTOM_VDPA`` property::
+The flavor will map to that new aggregate with the ``trait:CUSTOM_VDPA`` property::
 
   $ openstack --os-compute-api-version 2.86 flavor create \
       --ram 4096 \
@@ -169,7 +179,7 @@ The flavor will map to that new aggregate with the ``traits:CUSTOM_VDPA`` proper
       --property hw:cpu_policy=dedicated \
       --property hw:cpu_realtime=True \
       --property hw:cpu_realtime_mask=^0 \
-      --property traits:CUSTOM_VDPA=required \
+      --property trait:CUSTOM_VDPA=required \
       vdpa_pinned
 
 .. note::
@@ -191,9 +201,9 @@ Validations
 Confirm that a PCI device is in switchdev mode::
 
   [root@computevdpa-0 ~]# devlink dev eswitch show pci/0000:06:00.0
-  pci/0000:06:00.0: mode switchdev inline-mode none encap enable
+  pci/0000:06:00.0: mode switchdev inline-mode none encap-mode basic
   [root@computevdpa-0 ~]# devlink dev eswitch show pci/0000:06:00.1
-  pci/0000:06:00.1: mode switchdev inline-mode none encap enable
+  pci/0000:06:00.1: mode switchdev inline-mode none encap-mode basic
 
 Verify if offload is enabled in OVS::
 
@@ -258,41 +268,41 @@ Validate that the ``pci/passthrough_whitelist`` contains all the PFs::
 
 Verify the ``nodedev-list`` from ``libvirt``::
 
-  [root@computevdpa-0 ~]# podman exec -u0 nova_libvirt virsh nodedev-list | grep -P "pci_0000_06|enp6|vdpa"
-  net_enp6s0f0_04_3f_72_ee_ec_80
-  net_enp6s0f0_0_5a_86_bd_4b_06_d9
-  net_enp6s0f0_1_72_b9_6b_12_33_57
-  net_enp6s0f0_2_f6_f2_db_7c_52_90
-  net_enp6s0f0_3_66_e5_9e_b8_79_7f
-  net_enp6s0f0_4_32_04_6f_ef_ef_c3
-  net_enp6s0f0_5_a2_fe_8d_4a_95_64
-  net_enp6s0f0_6_8e_23_fa_bb_95_41
-  net_enp6s0f0_7_8a_9f_0f_53_f6_19
-  net_enp6s0f0v0_ee_a1_e2_4e_80_8d
-  net_enp6s0f0v1_ce_b7_e1_33_33_56
-  net_enp6s0f0v2_fe_91_a8_ee_2e_79
-  net_enp6s0f0v3_2a_34_e0_a0_e6_ff
-  net_enp6s0f0v4_26_59_82_da_65_4e
-  net_enp6s0f0v5_a6_fd_db_97_c6_8a
-  net_enp6s0f0v6_36_5d_5c_ff_e8_00
-  net_enp6s0f0v7_4e_23_6c_95_b6_a4
-  net_enp6s0f1_04_3f_72_ee_ec_81
-  net_enp6s0f1_0_0e_0c_86_b5_43_c1
-  net_enp6s0f1_1_be_f5_75_f4_da_b1
-  net_enp6s0f1_2_ea_6a_21_37_91_24
-  net_enp6s0f1_3_06_95_51_55_de_80
-  net_enp6s0f1_4_86_a4_d5_83_bd_56
-  net_enp6s0f1_5_86_d1_a9_ba_b7_f0
-  net_enp6s0f1_6_82_ae_32_56_07_84
-  net_enp6s0f1_7_62_b7_93_7e_5c_30
-  net_enp6s0f1v0_b2_b3_0d_bd_6f_5d
-  net_enp6s0f1v1_4a_24_a1_24_ae_39
-  net_enp6s0f1v2_8e_19_b2_aa_ae_d7
-  net_enp6s0f1v3_b6_e2_4b_fa_d8_f0
-  net_enp6s0f1v4_5e_31_7f_17_ee_4d
-  net_enp6s0f1v5_5e_77_99_09_1a_89
-  net_enp6s0f1v6_96_68_4b_70_c5_1b
-  net_enp6s0f1v7_c2_bb_14_95_81_29
+  [root@computevdpa-0 ~]# podman exec -u0 nova_virtqemud virsh -c qemu:///system nodedev-list | grep -P "pci_0000_06|enp6|vdpa"
+  net_enp6s0f0np0_04_3f_72_ee_ec_84
+  net_enp6s0f0np0_0_1a_c1_a5_25_94_ef
+  net_enp6s0f0np0_1_3a_dc_1d_36_85_af
+  net_enp6s0f0np0_2_6a_95_0c_e9_8f_1a
+  net_enp6s0f0np0_3_ba_c8_5b_f5_70_cc
+  net_enp6s0f0np0_4_9e_03_86_23_cd_65
+  net_enp6s0f0np0_5_0a_5c_8b_c4_00_7a
+  net_enp6s0f0np0_6_2e_f6_bc_e6_6f_cd
+  net_enp6s0f0np0_7_ce_1e_b2_20_5e_15
+  net_enp6s0f1np1_04_3f_72_ee_ec_85
+  net_enp6s0f1np1_0_a6_04_9e_5a_cd_3b
+  net_enp6s0f1np1_1_56_5d_59_b0_df_17
+  net_enp6s0f1np1_2_de_ac_7c_3f_19_b1
+  net_enp6s0f1np1_3_16_0c_8c_47_40_5c
+  net_enp6s0f1np1_4_0e_a6_15_f5_68_77
+  net_enp6s0f1np1_5_e2_73_dc_f9_c2_46
+  net_enp6s0f1np1_6_e6_13_57_c9_cf_0f
+  net_enp6s0f1np1_7_62_10_4f_2b_1b_ae
+  net_vdpa06p00vf2_42_11_c8_97_aa_43
+  net_vdpa06p00vf3_2a_59_5e_32_3e_b7
+  net_vdpa06p00vf4_9a_5c_3f_c9_cc_42
+  net_vdpa06p00vf5_26_73_2a_e3_db_f9
+  net_vdpa06p00vf6_9a_bf_a9_e9_6b_06
+  net_vdpa06p00vf7_d2_1f_cc_00_a9_95
+  net_vdpa06p01vf0_ba_81_cb_7e_01_1d
+  net_vdpa06p01vf1_56_95_fa_5e_4a_51
+  net_vdpa06p01vf2_72_53_64_8d_12_98
+  net_vdpa06p01vf3_9e_ff_1d_6d_c1_4e
+  net_vdpa06p01vf4_96_20_f3_b1_69_ef
+  net_vdpa06p01vf5_ea_0c_8b_0b_3f_ff
+  net_vdpa06p01vf6_0a_53_4e_94_e0_8b
+  net_vdpa06p01vf7_16_84_48_e6_74_59
+  net_vdpa06p02vf0_b2_cc_fa_16_f0_52
+  net_vdpa06p02vf1_0a_12_1b_a2_1a_d3
   pci_0000_06_00_0
   pci_0000_06_00_1
   pci_0000_06_00_2
@@ -311,22 +321,22 @@ Verify the ``nodedev-list`` from ``libvirt``::
   pci_0000_06_01_7
   pci_0000_06_02_0
   pci_0000_06_02_1
-  vdpa_vdpa0
-  vdpa_vdpa1
-  vdpa_vdpa10
-  vdpa_vdpa11
-  vdpa_vdpa12
-  vdpa_vdpa13
-  vdpa_vdpa14
-  vdpa_vdpa15
-  vdpa_vdpa2
-  vdpa_vdpa3
-  vdpa_vdpa4
-  vdpa_vdpa5
-  vdpa_vdpa6
-  vdpa_vdpa7
-  vdpa_vdpa8
-  vdpa_vdpa9
+  vdpa_0000_06_00_2
+  vdpa_0000_06_00_3
+  vdpa_0000_06_00_4
+  vdpa_0000_06_00_5
+  vdpa_0000_06_00_6
+  vdpa_0000_06_00_7
+  vdpa_0000_06_01_0
+  vdpa_0000_06_01_1
+  vdpa_0000_06_01_2
+  vdpa_0000_06_01_3
+  vdpa_0000_06_01_4
+  vdpa_0000_06_01_5
+  vdpa_0000_06_01_6
+  vdpa_0000_06_01_7
+  vdpa_0000_06_02_0
+  vdpa_0000_06_02_1
 
 
 Validate that the vDPA devices have been created, this should match the vdpa
@@ -352,13 +362,73 @@ devices from ``virsh nodedev-list``::
 
 Validate the ``pci_devices`` table in the database from one of the controllers::
 
-  [root@controller-0 ~]# podman exec -u0 $(podman ps -q -f name=galera) mysql -t -D nova -e "select address,product_id,vendor_id,dev_type,dev_id from pci_devices where address like '0000:06:%';"
+  [root@controller-2 neutron]# podman exec -u0 $(podman ps -q -f name=galera) mysql -t -D nova -e "select address,product_id,vendor_id,dev_type,dev_id from pci_devices where address like '0000:06:%' and deleted=0;"
   +--------------+------------+-----------+----------+------------------+
   | address      | product_id | vendor_id | dev_type | dev_id           |
   +--------------+------------+-----------+----------+------------------+
-  | 0000:06:00.0 | 101d       | 15b3      | vdpa     | pci_0000_06_00_0 |
-  | 0000:06:00.1 | 101d       | 15b3      | vdpa     | pci_0000_06_00_1 |
+  | 0000:06:01.1 | 101e       | 15b3      | vdpa     | pci_0000_06_01_1 |
+  | 0000:06:00.2 | 101e       | 15b3      | vdpa     | pci_0000_06_00_2 |
+  | 0000:06:00.3 | 101e       | 15b3      | vdpa     | pci_0000_06_00_3 |
+  | 0000:06:00.4 | 101e       | 15b3      | vdpa     | pci_0000_06_00_4 |
+  | 0000:06:00.5 | 101e       | 15b3      | vdpa     | pci_0000_06_00_5 |
+  | 0000:06:00.6 | 101e       | 15b3      | vdpa     | pci_0000_06_00_6 |
+  | 0000:06:00.7 | 101e       | 15b3      | vdpa     | pci_0000_06_00_7 |
+  | 0000:06:01.0 | 101e       | 15b3      | vdpa     | pci_0000_06_01_0 |
+  | 0000:06:01.2 | 101e       | 15b3      | vdpa     | pci_0000_06_01_2 |
+  | 0000:06:01.3 | 101e       | 15b3      | vdpa     | pci_0000_06_01_3 |
+  | 0000:06:01.4 | 101e       | 15b3      | vdpa     | pci_0000_06_01_4 |
+  | 0000:06:01.5 | 101e       | 15b3      | vdpa     | pci_0000_06_01_5 |
+  | 0000:06:01.6 | 101e       | 15b3      | vdpa     | pci_0000_06_01_6 |
+  | 0000:06:01.7 | 101e       | 15b3      | vdpa     | pci_0000_06_01_7 |
+  | 0000:06:02.0 | 101e       | 15b3      | vdpa     | pci_0000_06_02_0 |
+  | 0000:06:02.1 | 101e       | 15b3      | vdpa     | pci_0000_06_02_1 |
+  | 0000:06:00.2 | 101e       | 15b3      | vdpa     | pci_0000_06_00_2 |
+  | 0000:06:00.3 | 101e       | 15b3      | vdpa     | pci_0000_06_00_3 |
+  | 0000:06:00.4 | 101e       | 15b3      | vdpa     | pci_0000_06_00_4 |
+  | 0000:06:00.5 | 101e       | 15b3      | vdpa     | pci_0000_06_00_5 |
+  | 0000:06:00.6 | 101e       | 15b3      | vdpa     | pci_0000_06_00_6 |
+  | 0000:06:00.7 | 101e       | 15b3      | vdpa     | pci_0000_06_00_7 |
+  | 0000:06:01.0 | 101e       | 15b3      | vdpa     | pci_0000_06_01_0 |
+  | 0000:06:01.1 | 101e       | 15b3      | vdpa     | pci_0000_06_01_1 |
+  | 0000:06:01.2 | 101e       | 15b3      | vdpa     | pci_0000_06_01_2 |
+  | 0000:06:01.3 | 101e       | 15b3      | vdpa     | pci_0000_06_01_3 |
+  | 0000:06:01.4 | 101e       | 15b3      | vdpa     | pci_0000_06_01_4 |
+  | 0000:06:01.5 | 101e       | 15b3      | vdpa     | pci_0000_06_01_5 |
+  | 0000:06:01.6 | 101e       | 15b3      | vdpa     | pci_0000_06_01_6 |
+  | 0000:06:01.7 | 101e       | 15b3      | vdpa     | pci_0000_06_01_7 |
+  | 0000:06:02.0 | 101e       | 15b3      | vdpa     | pci_0000_06_02_0 |
+  | 0000:06:02.1 | 101e       | 15b3      | vdpa     | pci_0000_06_02_1 |
   +--------------+------------+-----------+----------+------------------+
+
+The ``vdpa`` command::
+
+  [root@computevdpa-0 ~]# vdpa dev
+  0000:06:01.0: type network mgmtdev pci/0000:06:01.0 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.6: type network mgmtdev pci/0000:06:00.6 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.4: type network mgmtdev pci/0000:06:00.4 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.2: type network mgmtdev pci/0000:06:00.2 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.1: type network mgmtdev pci/0000:06:01.1 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.7: type network mgmtdev pci/0000:06:00.7 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.5: type network mgmtdev pci/0000:06:00.5 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:00.3: type network mgmtdev pci/0000:06:00.3 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:02.0: type network mgmtdev pci/0000:06:02.0 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.6: type network mgmtdev pci/0000:06:01.6 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.4: type network mgmtdev pci/0000:06:01.4 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.2: type network mgmtdev pci/0000:06:01.2 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:02.1: type network mgmtdev pci/0000:06:02.1 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.7: type network mgmtdev pci/0000:06:01.7 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.5: type network mgmtdev pci/0000:06:01.5 vendor_id 5555 max_vqs 16 max_vq_size 256
+  0000:06:01.3: type network mgmtdev pci/0000:06:01.3 vendor_id 5555 max_vqs 16 max_vq_size 256
+
+Validating the OVN agents::
+
+  (overcloud) [stack@undercloud-0 ~]$ openstack network agent list --host computevdpa-0.home.arpa
+  +--------------------------------------+----------------------+-------------------------+-------------------+-------+-------+----------------------------+
+  | ID                                   | Agent Type           | Host                    | Availability Zone | Alive | State | Binary                     |
+  +--------------------------------------+----------------------+-------------------------+-------------------+-------+-------+----------------------------+
+  | ef2e6ced-e723-449c-bbf8-7513709f33ea | OVN Controller agent | computevdpa-0.home.arpa |                   | :-)   | UP    | ovn-controller             |
+  | 7be39049-db5b-54fc-add1-4a0687160542 | OVN Metadata agent   | computevdpa-0.home.arpa |                   | :-)   | UP    | neutron-ovn-metadata-agent |
+  +--------------------------------------+----------------------+-------------------------+-------------------+-------+-------+----------------------------+
 
 
 Other usefull commands for troubleshooting::

@@ -347,118 +347,142 @@ Extract the needed data from the control plane stack:
 
 .. _reuse_networks_dcn:
 
-Reusing networks from the overcloud
-___________________________________
-When deploying separate stacks it may be necessary to reuse networks, subnets,
-and VIP resources between stacks if desired. Only a single Heat stack can own a
-resource and be responsible for its creation and deletion, however the
-resources can be reused in other stacks.
+Network resource configuration
+______________________________
+Beginning in Wallaby, the Network V2 model is used to provision and manage the
+network related resources (networks, subnets, and ports). Specifying a
+parameter value for ``ManageNetworks`` or using the external resource UUID's is
+deprecated in Wallaby.
 
-ManageNetworks
-##############
-The ``ManageNetworks`` parameter can be set to ``false`` so that the same
-``network_data.yaml`` file can be used across all the stacks. When
-``ManageNetworks`` is set to false, ports will be created for the nodes in the
-separate stacks on the existing networks that were already created in the
-``control-plane`` stack.
+The network resources can either be provisioned and managed with the separate
+``openstack overcloud network`` command or as part of the ``openstack overcloud
+deploy`` command using the cli args (``--networks-file``, ``--vip-file``,
+``--baremetal-deployment``).
 
-When ``ManageNetworks`` is used, it's a global option for the whole stack and
-applies to all of the network, subnet, and segment resources.
+See :ref:`network_v2` for the full details on managing the network resources.
 
-To use ``ManageNetworks``, create an environment file which sets the parameter
-value to ``false``::
+With Network v2, the Heat stack no longer manages any of the network resources.
+As such with using DCN with multi-stack, it is no longer necessary to first
+update the central stack to provision new network resources when deploying a
+new site. Instead, it is all handled as part of the network provisioning
+commands or the overcloud deploy command.
 
-      parameter_defaults:
-        ManageNetworks: false
+The same files used with the cli args (``--networks-file``, ``--vip-file``,
+``--baremetal-deployment``), should be the same files used across all stacks in
+a DCN deployment.
 
-When using ``ManageNetworks``, all network resources (except for ports)
-are managed in the central stack. When the central stack is deployed,
-``ManageNetworks`` should be left unset (or set to True). When a child stack
-is deployed, it is then set to false so that the child stack does not attempt
-to manage the already existing network resources.
+.. admonition:: Victoria and prior releases
 
-Additionally, when adding new network resources, such as entire new leaves when
-deploying spine/leaf, the central stack must first be updated with the new
-``network_data.yaml`` that contains the new leaf definitions. Even though the
-central stack is not directly using the new network resources, it still is
-responsible for creating and managing them. Once the new network resources are
-made available in the central stack, a child stack (such as a new edge site)
-could be deployed using the new networks.
+  When deploying separate stacks it may be necessary to reuse networks, subnets,
+  and VIP resources between stacks if desired. Only a single Heat stack can own a
+  resource and be responsible for its creation and deletion, however the
+  resources can be reused in other stacks.
 
-External UUID's
-###############
-If more fine grained control over which networks should be reused from the
-``control-plane`` stack is needed, then various ``external_resource_*`` fields
-can be added to ``network_data.yaml``. When these fields are present on
-network, subnet, segment, or vip resources, Heat will mark the resources in the
-separate stack as being externally managed, and it won't try to any create,
-update, or delete operations on those resources.
+  **ManageNetworks**
 
-``ManageNetworks`` should not be set when when the ``external_resource_*``
-fields are used.
+  The ``ManageNetworks`` parameter can be set to ``false`` so that the same
+  ``network_data.yaml`` file can be used across all the stacks. When
+  ``ManageNetworks`` is set to false, ports will be created for the nodes in the
+  separate stacks on the existing networks that were already created in the
+  ``control-plane`` stack.
 
-The external resource fields that can be used in ``network_data.yaml`` are as
-follows::
+  When ``ManageNetworks`` is used, it's a global option for the whole stack and
+  applies to all of the network, subnet, and segment resources.
 
-      external_resource_network_id: Existing Network UUID
-      external_resource_subnet_id: Existing Subnet UUID
-      external_resource_segment_id: Existing Segment UUID
-      external_resource_vip_id: Existing VIP UUID
+  To use ``ManageNetworks``, create an environment file which sets the parameter
+  value to ``false``::
 
-These fields can be set on each network definition in the
-`network_data.yaml`` file used for the deployment of the separate stack.
+        parameter_defaults:
+          ManageNetworks: false
 
-Not all networks need to be reused or shared across stacks. The
-`external_resource_*` fields can be set for only the networks that are
-meant to be shared, while the other networks can be newly created and managed.
+  When using ``ManageNetworks``, all network resources (except for ports)
+  are managed in the central stack. When the central stack is deployed,
+  ``ManageNetworks`` should be left unset (or set to True). When a child stack
+  is deployed, it is then set to false so that the child stack does not attempt
+  to manage the already existing network resources.
 
-For example, to reuse the ``internal_api`` network from the control plane stack
-in a separate stack, run the following commands to show the UUIDs for the
-related network resources:
+  Additionally, when adding new network resources, such as entire new leaves when
+  deploying spine/leaf, the central stack must first be updated with the new
+  ``network_data.yaml`` that contains the new leaf definitions. Even though the
+  central stack is not directly using the new network resources, it still is
+  responsible for creating and managing them. Once the new network resources are
+  made available in the central stack, a child stack (such as a new edge site)
+  could be deployed using the new networks.
 
-.. code-block:: bash
+  **External UUID's**
 
-      openstack network show internal_api -c id -f value
-      openstack subnet show internal_api_subnet -c id -f value
-      openstack port show internal_api_virtual_ip -c id -f value
+  If more fine grained control over which networks should be reused from the
+  ``control-plane`` stack is needed, then various ``external_resource_*`` fields
+  can be added to ``network_data.yaml``. When these fields are present on
+  network, subnet, segment, or vip resources, Heat will mark the resources in the
+  separate stack as being externally managed, and it won't try to any create,
+  update, or delete operations on those resources.
 
-Save the values shown in the output of the above commands and add them to the
-network definition for the ``internal_api`` network in the
-``network_data.yaml`` file for the separate stack. An example network
-definition would look like:
+  ``ManageNetworks`` should not be set when when the ``external_resource_*``
+  fields are used.
 
-.. code-block:: bash
+  The external resource fields that can be used in ``network_data.yaml`` are as
+  follows::
 
-      - name: InternalApi
-        external_resource_network_id: 93861871-7814-4dbc-9e6c-7f51496b43af
-        external_resource_subnet_id: c85c8670-51c1-4b17-a580-1cfb4344de27
-        external_resource_vip_id: 8bb9d96f-72bf-4964-a05c-5d3fed203eb7
-        name_lower: internal_api
-        vip: true
-        ip_subnet: '172.16.2.0/24'
-        allocation_pools: [{'start': '172.16.2.4', 'end': '172.16.2.250'}]
-        ipv6_subnet: 'fd00:fd00:fd00:2000::/64'
-        ipv6_allocation_pools: [{'start': 'fd00:fd00:fd00:2000::10', 'end': 'fd00:fd00:fd00:2000:ffff:ffff:ffff:fffe'}]
-        mtu: 1400
+        external_resource_network_id: Existing Network UUID
+        external_resource_subnet_id: Existing Subnet UUID
+        external_resource_segment_id: Existing Segment UUID
+        external_resource_vip_id: Existing VIP UUID
 
-.. note::
+  These fields can be set on each network definition in the
+  `network_data.yaml`` file used for the deployment of the separate stack.
 
-      When *not* sharing networks between stacks, each network defined in
-      ``network_data.yaml`` must have a unique name across all deployed stacks.
-      This requirement is necessary since regardless of the stack, all networks are
-      created in the same tenant in Neutron on the undercloud.
+  Not all networks need to be reused or shared across stacks. The
+  `external_resource_*` fields can be set for only the networks that are
+  meant to be shared, while the other networks can be newly created and managed.
 
-      For example, the network name ``internal_api`` can't be reused between
-      stacks, unless the intent is to share the network between the stacks.
-      The network would need to be given a different ``name`` and
-      ``name_lower`` property such as ``InternalApiCompute0`` and
-      ``internal_api_compute_0``.
+  For example, to reuse the ``internal_api`` network from the control plane stack
+  in a separate stack, run the following commands to show the UUIDs for the
+  related network resources:
 
-If separate storage and storage management networks are used with
-multiple Ceph clusters and Glance servers per site, then a routed
-storage network should be shared between sites for image transfer.
-The storage management network, which Ceph uses to keep OSDs balanced,
-does not need to be shared between sites.
+  .. code-block:: bash
+
+        openstack network show internal_api -c id -f value
+        openstack subnet show internal_api_subnet -c id -f value
+        openstack port show internal_api_virtual_ip -c id -f value
+
+  Save the values shown in the output of the above commands and add them to the
+  network definition for the ``internal_api`` network in the
+  ``network_data.yaml`` file for the separate stack. An example network
+  definition would look like:
+
+  .. code-block:: bash
+
+        - name: InternalApi
+          external_resource_network_id: 93861871-7814-4dbc-9e6c-7f51496b43af
+          external_resource_subnet_id: c85c8670-51c1-4b17-a580-1cfb4344de27
+          external_resource_vip_id: 8bb9d96f-72bf-4964-a05c-5d3fed203eb7
+          name_lower: internal_api
+          vip: true
+          ip_subnet: '172.16.2.0/24'
+          allocation_pools: [{'start': '172.16.2.4', 'end': '172.16.2.250'}]
+          ipv6_subnet: 'fd00:fd00:fd00:2000::/64'
+          ipv6_allocation_pools: [{'start': 'fd00:fd00:fd00:2000::10', 'end': 'fd00:fd00:fd00:2000:ffff:ffff:ffff:fffe'}]
+          mtu: 1400
+
+  .. note::
+
+        When *not* sharing networks between stacks, each network defined in
+        ``network_data.yaml`` must have a unique name across all deployed stacks.
+        This requirement is necessary since regardless of the stack, all networks are
+        created in the same tenant in Neutron on the undercloud.
+
+        For example, the network name ``internal_api`` can't be reused between
+        stacks, unless the intent is to share the network between the stacks.
+        The network would need to be given a different ``name`` and
+        ``name_lower`` property such as ``InternalApiCompute0`` and
+        ``internal_api_compute_0``.
+
+  If separate storage and storage management networks are used with
+  multiple Ceph clusters and Glance servers per site, then a routed
+  storage network should be shared between sites for image transfer.
+  The storage management network, which Ceph uses to keep OSDs balanced,
+  does not need to be shared between sites.
 
 DCN related roles
 _________________
@@ -651,7 +675,9 @@ The ``control-plane`` stack is deployed with the following command::
       --templates /home/centos/tripleo-heat-templates \
       -r roles-data.yaml \
       -e role-counts.yaml \
-      -n network_data.yaml \
+      --networks-file network_data_v2.yaml \
+      --vip-file vip_data.yaml \
+      --baremetal-deployment baremetal_deployment.yaml \
       -e /home/centos/tripleo-heat-templates/environments/docker-ha.yaml \
       -e /home/centos/tripleo/environments/containers-prepare-parameter.yaml \
       -e /home/centos/tripleo-heat-templates/environments/deployed-server-environment.yaml \
@@ -682,8 +708,9 @@ templates directory at ``roles/Controller.yaml``.
    three are recommended in order to have a highly available control
    plane.
 
-``network_data.yaml`` contains the default contents from the templates
-directory.
+``network_data_v2.yaml``, ``vip_data.yaml``, and ``baremetal_deployment.yaml``
+contain the definitions to manage the network resources. See :ref:`network_v2`
+for creating these files.
 
 ``az.yaml`` contains::
 
@@ -716,74 +743,7 @@ ________________________
 The ``central`` stack deploys compute and storage services to be co-located
 at the same site where the ``control-plane`` stack was deployed.
 
-Before the deployment command is run, a new ``networks_data.yaml`` file needs
-to be created and updated with the UUIDs of the existing network resources
-that are reused from the ``control-plane`` stack in the ``central``
-stack as documented in reuse_networks_dcn_.
-
-The following commands are used to show the UUIDs::
-
-    (undercloud) [centos@scale ~]$ openstack network list
-    +--------------------------------------+--------------+--------------------------------------+
-    | ID                                   | Name         | Subnets                              |
-    +--------------------------------------+--------------+--------------------------------------+
-    | 0fcb505b-81c8-483e-93f6-0da574e4acd5 | tenant       | e6544a7f-ec00-4b33-b7b0-a02e1c0f503a |
-    | 40ed54c0-1c85-4bcb-b244-0764f83d2ca8 | management   | 9ca595f9-aa92-415a-9e13-0ed8b9f78e68 |
-    | 447fd403-e977-436d-ba21-7d1ac258dd81 | internal_api | 3449c5f3-ebb0-4e77-b671-eb6ea209a10e |
-    | 47a73786-4066-49ac-9e6a-49fb5d1f964a | storage_mgmt | eb78ae43-c575-4fdd-8c3f-405f4bdd0ca5 |
-    | bf1fbe99-08f9-4f12-9af5-57a4f396b894 | ctlplane     | 5d366b80-a360-4b3d-be5f-c5dbd13fd7eb |
-    | cf19bf6e-1ed5-428b-9aab-727d43e88f3a | external     | 6fc8578c-8028-450a-b83e-bf92cfda61bc |
-    | ef89c994-5b8d-4a5d-aa53-ef02452665d0 | storage      | d6c975db-8943-4261-abf1-f7d2b482d88c |
-    +--------------------------------------+--------------+--------------------------------------+
-    (undercloud) [centos@scale ~]$ openstack subnet list
-    +--------------------------------------+---------------------+--------------------------------------+----------------+
-    | ID                                   | Name                | Network                              | Subnet         |
-    +--------------------------------------+---------------------+--------------------------------------+----------------+
-    | 3449c5f3-ebb0-4e77-b671-eb6ea209a10e | internal_api_subnet | 447fd403-e977-436d-ba21-7d1ac258dd81 | 172.16.2.0/24  |
-    | 5d366b80-a360-4b3d-be5f-c5dbd13fd7eb | ctlplane-subnet     | bf1fbe99-08f9-4f12-9af5-57a4f396b894 | 192.168.0.0/24 |
-    | 6fc8578c-8028-450a-b83e-bf92cfda61bc | external_subnet     | cf19bf6e-1ed5-428b-9aab-727d43e88f3a | 10.0.0.0/24    |
-    | 9ca595f9-aa92-415a-9e13-0ed8b9f78e68 | management_subnet   | 40ed54c0-1c85-4bcb-b244-0764f83d2ca8 | 10.0.1.0/24    |
-    | d6c975db-8943-4261-abf1-f7d2b482d88c | storage_subnet      | ef89c994-5b8d-4a5d-aa53-ef02452665d0 | 172.16.1.0/24  |
-    | e6544a7f-ec00-4b33-b7b0-a02e1c0f503a | tenant_subnet       | 0fcb505b-81c8-483e-93f6-0da574e4acd5 | 172.16.0.0/24  |
-    | eb78ae43-c575-4fdd-8c3f-405f4bdd0ca5 | storage_mgmt_subnet | 47a73786-4066-49ac-9e6a-49fb5d1f964a | 172.16.3.0/24  |
-    +--------------------------------------+---------------------+--------------------------------------+----------------+
-    (undercloud) [centos@scale ~]$ openstack port list
-    +--------------------------------------+-------------------------+-------------------+-----------------------------------------------------------------------------+--------+
-    | ID                                   | Name                    | MAC Address       | Fixed IP Addresses                                                          | Status |
-    +--------------------------------------+-------------------------+-------------------+-----------------------------------------------------------------------------+--------+
-    | 06603164-6fc0-4ca9-b480-5b73736dec01 | openstack-0_Storage     | fa:16:3e:8c:5e:8a | ip_address='172.16.1.200', subnet_id='d6c975db-8943-4261-abf1-f7d2b482d88c' | DOWN   |
-    | 3b2244e4-0bf2-4675-a88f-3c149a5ab634 | openstack-0_External    | fa:16:3e:67:49:95 | ip_address='10.0.0.137', subnet_id='6fc8578c-8028-450a-b83e-bf92cfda61bc'   | DOWN   |
-    | 7ed9ac55-fec0-4320-9ba6-d95bb5207680 | openstack-0_InternalApi | fa:16:3e:df:46:7e | ip_address='172.16.2.36', subnet_id='3449c5f3-ebb0-4e77-b671-eb6ea209a10e'  | DOWN   |
-    | 824081da-9205-4ed9-9a94-047dccceb8ff | storage_mgmt_virtual_ip | fa:16:3e:f9:ff:5a | ip_address='172.16.3.222', subnet_id='eb78ae43-c575-4fdd-8c3f-405f4bdd0ca5' | DOWN   |
-    | 894b834f-b911-42eb-a4b8-08e3b0084825 | public_virtual_ip       | fa:16:3e:d9:d2:f6 | ip_address='10.0.0.136', subnet_id='6fc8578c-8028-450a-b83e-bf92cfda61bc'   | DOWN   |
-    | 9daa4ac1-c7f0-4e25-a6d1-1f00e2f0ee72 | openstack-0_Tenant      | fa:16:3e:eb:b4:f7 | ip_address='172.16.0.107', subnet_id='e6544a7f-ec00-4b33-b7b0-a02e1c0f503a' | DOWN   |
-    | b140c67e-3755-4068-9c61-0349cee5695a | openstack-0_StorageMgmt | fa:16:3e:bc:9e:d7 | ip_address='172.16.3.49', subnet_id='eb78ae43-c575-4fdd-8c3f-405f4bdd0ca5'  | DOWN   |
-    | b9299348-d761-410a-b81d-4d78b2d985a9 | internal_api_virtual_ip | fa:16:3e:9f:fb:fa | ip_address='172.16.2.244', subnet_id='3449c5f3-ebb0-4e77-b671-eb6ea209a10e' | DOWN   |
-    | cdf8edac-55b0-4321-98fd-0201ec554c33 | storage_virtual_ip      | fa:16:3e:35:a6:55 | ip_address='172.16.1.147', subnet_id='d6c975db-8943-4261-abf1-f7d2b482d88c' | DOWN   |
-    | d2d6a257-b43d-4a1c-ab13-cd91aa05d6fe |                         | fa:16:3e:a3:a5:b1 | ip_address='192.168.0.5', subnet_id='5d366b80-a360-4b3d-be5f-c5dbd13fd7eb'  | ACTIVE |
-    +--------------------------------------+-------------------------+-------------------+-----------------------------------------------------------------------------+--------+
-
-A copy of the default ``networks_data.yaml`` file is created::
-
-    cp /home/centos/tripleo-heat-templates/networks_data.yaml site_networks_data.yaml
-
-``site_networks_data.yaml`` is updated the external resource ids for each
-network resource are added. For example, the ``InternalApi`` network definition
-looks like::
-
-    - name: InternalApi
-      external_resource_id: 447fd403-e977-436d-ba21-7d1ac258dd81
-      external_resource_subnet_id: 3449c5f3-ebb0-4e77-b671-eb6ea209a10e
-      external_resource_vip_id: b9299348-d761-410a-b81d-4d78b2d985a9
-      name_lower: internal_api
-      vip: true
-      ip_subnet: '172.16.2.0/24'
-      allocation_pools: [{'start': '172.16.2.4', 'end': '172.16.2.250'}]
-      ipv6_subnet: 'fd00:fd00:fd00:2000::/64'
-      ipv6_allocation_pools: [{'start': 'fd00:fd00:fd00:2000::10', 'end': 'fd00:fd00:fd00:2000:ffff:ffff:ffff:fffe'}]
-      mtu: 1400
-
-The ``central`` stack is then deployed with the following command::
+The ``central`` stack is deployed with the following command::
 
     openstack overcloud deploy \
       --verbose \
@@ -792,6 +752,9 @@ The ``central`` stack is then deployed with the following command::
       -r distributed-roles-data.yaml \
       -n site_network_data.yaml \
       --disable-validations \
+      --networks-file network_data_v2.yaml \
+      --vip-file vip_data.yaml \
+      --baremetal-deployment baremetal_deployment.yaml \
       -e /home/centos/tripleo-heat-templates/environments/docker-ha.yaml \
       -e /home/centos/tripleo/environments/containers-prepare-parameter.yaml \
       -e /home/centos/tripleo-heat-templates/environments/deployed-server-environment.yaml \
@@ -825,6 +788,9 @@ templates directory at ``roles/DistributedComputeHCI.yaml``.
    available Ceph cluster. If more than three such nodes of that role
    are necessary for additional compute and storage resources, then
    use additional nodes from the `DistributedComputeHCIScaleOut` role.
+
+``network_data_v2.yaml``, ``vip_data.yaml``, and ``baremetal_deployment.yaml``
+are the same files used with the ``control-plane`` stack.
 
 ``az.yaml`` contains the same content as was used in the ``control-plane``
 stack::
@@ -932,6 +898,9 @@ The ``edge-0`` stack is deployed with the following command::
       -r distributed-roles-data.yaml \
       -n site_network_data.yaml \
       --disable-validations \
+      --networks-file network_data_v2.yaml \
+      --vip-file vip_data.yaml \
+      --baremetal-deployment baremetal_deployment.yaml \
       -e /home/centos/tripleo-heat-templates/environments/docker-ha.yaml \
       -e /home/centos/tripleo/environments/containers-prepare-parameter.yaml \
       -e /home/centos/tripleo-heat-templates/environments/deployed-server-environment.yaml \
@@ -979,6 +948,13 @@ parameters are set to ``edge-0`` to match the stack name.
 The ``control-plane-export.yaml`` file was generated from the command from
 example_export_dcn_, and is the same file that was used with the ``central``
 stack.
+
+``network_data_v2.yaml``, ``vip_data.yaml``, and ``baremetal_deployment.yaml``
+are the same files used with the ``control-plane`` stack. However, the files
+will need to be modified if the ``edge-0`` or ``edge-1`` stacks require
+addditional provisioning of network resources for new subnets. Update the files
+as needed and continue to use the same files for all ``overcloud deploy``
+commands across all stacks.
 
 The ``edge-1`` stack is deployed with a similar command. The stack is given a
 different name with ``--stack edge-1`` and ``az.yaml`` contains::

@@ -105,13 +105,6 @@ that it can run all the steps:
 Using
 -----
 
-.. note:: When networks, virtual IPs and baremetal nodes are provisioned
-          using the individual commands, i.e not using the *All-in-One*
-          alternative with the ``overcloud deploy`` command, the argument
-          ``--skip-nodes-and-networks`` should be used with the
-          ``overcloud deploy`` command to ensure steps are not redundantly
-          repeated.
-
 Pre-Provision networks
 ......................
 

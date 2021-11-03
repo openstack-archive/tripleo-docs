@@ -394,7 +394,9 @@ Deploying a Standalone OpenStack node
          /var/lib/image-serve \
          /var/lib/containers \
          /etc/systemd/system/tripleo* \
-         /var/lib/mysql/*
+         /var/lib/mysql/* \
+         /etc/openstack
+     rm -rf ~/.config/openstack
      sudo systemctl daemon-reload
 
 Manual deployments with ansible

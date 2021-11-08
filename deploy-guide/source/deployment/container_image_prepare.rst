@@ -12,7 +12,15 @@ Choosing an image registry strategy
 Container images need to be pulled from an image registry which is reliably
 available to overcloud nodes. The three common options to serve images are to
 use the default registry, the registry available on the undercloud, or an
-independently managed registry. During deployment the environment parameter
+independently managed registry.
+
+.. note:: Private SSL-enabled registries with a custom CA are not tested.
+   If you have to use one, the custom CA (certificate authority) that is needed
+   for the registry should be installed before deploying the overcloud. For
+   example, it can be injected into the overcloud image, or installed via first
+   boot scripts.
+
+During deployment the environment parameter
 `ContainerImagePrepare` is used to specify any desired behaviour, including:
 
 - Where to pull images from

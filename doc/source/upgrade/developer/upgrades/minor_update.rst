@@ -107,7 +107,10 @@ upgrade, you can make the `external_update_tasks` the same as
 
 `openstack overcloud update converge`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+.. note::
+    Update Converge is only required for versions less than Wallaby.
+    Update Converge has been removed for Wallaby and beyond.
+ 
 The `update converge` command performs a Heat stack update, reverting
 the previous ``OS::Heat::None`` resource mappings back to the values
 used for regular deployments and configuration updates, and

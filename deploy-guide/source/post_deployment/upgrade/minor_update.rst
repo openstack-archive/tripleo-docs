@@ -99,9 +99,14 @@ the OpenStack release that you currently operate, perform these steps:
 
    If your environment includes Ceph managed by TripleO (i.e. *not*
    what TripleO calls "external Ceph"), you'll want to update Ceph at
-   this point too. 
+   this point too.
 
 #. **Update convergence**
+
+   .. note::
+
+      Update Converge is only required for version less than Wallaby.
+      Converge has been removed for Wallaby and above.
 
    To finish the update procedure, run:
 

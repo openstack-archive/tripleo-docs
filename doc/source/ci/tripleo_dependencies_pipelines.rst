@@ -91,7 +91,7 @@ Here is the config for the `openvswitch dependency pipeline`_:
         baseurl: "https://buildlogs.centos.org/centos/8/nfv/x86_64/openvswitch-2/"
         update_container: false
     dependency_override_repos:
-      - centos-nfv-ovs,http://mirror.centos.org/centos/8/nfv/x86_64/openvswitch-2/
+      - centos-nfv-openvswitch,http://mirror.centos.org/centos/8/nfv/x86_64/openvswitch-2/
     dep_repo_cmd_after: |
       {% if dependency_override_repos is defined %}
       {% for item in dependency_override_repos %}
@@ -109,7 +109,7 @@ than 'normal' version of the package we are testing, OpenvSwitch in this case.
 * `dependency_override_repos`: It is used to disable or override a particular repo.
 
 In the above case, openvswitch-next.repo repo will get generated due to repo setup
-and will disables the centos-nfv-ovs repo.
+and will disables the centos-nfv-openvswitch repo.
 
 Before the deployment, `rdo-jobs/dependency/get-dependency-repo-content.yaml` playbook
 is used to set particular release file (in this case it is

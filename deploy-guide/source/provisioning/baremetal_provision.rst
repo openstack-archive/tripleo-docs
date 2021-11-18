@@ -325,8 +325,8 @@ The ``network_config`` property contains os-net-config related properties.
 * ``public_interface_name``: Which interface to add to the public bridge
   (default: ``nic1``)
 
-* ``network_deployment_actions``: When to apply network configuration changes,
-  allowed values are CREATE and UPDATE. (default: ``CREATE``)
+* ``network_config_update``: Whether to apply network configuration changes,
+  on update or not. Boolean value. (default: ``false``)
 
 * ``net_config_data_lookup``: Per node and/or per node group os-net-config nic
   mapping config.

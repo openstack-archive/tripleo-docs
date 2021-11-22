@@ -123,6 +123,10 @@ The command line interface supports the following options::
                                          [--stack STACK]
                                          [--working-dir WORKING_DIR]
                                          [--roles-data ROLES_DATA]
+                                         [--network-data NETWORK_DATA]
+                                         [--public-network-name PUBLIC_NETWORK_NAME]
+                                         [--cluster-network-name CLUSTER_NETWORK_NAME]
+                                         [--config CONFIG]
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--container-namespace CONTAINER_NAMESPACE]
@@ -155,6 +159,34 @@ The command line interface supports the following options::
                           Path to an alternative roles_data.yaml. Used to decide
                           which node gets which Ceph mon, mgr, or osd service
                           based on the node's role in <deployed_baremetal.yaml>.
+    --network-data NETWORK_DATA
+                          Path to an alternative network_data.yaml. Used to
+                          define Ceph public_network and cluster_network. This
+                          file is searched for networks with name_lower values
+                          of storage and storage_mgmt. If none found, then
+                          search repeats but with service_net_map_replace in
+                          place of name_lower. Use --public-network-name or
+                          --cluster-network-name options to override name of the
+                          searched for network from storage or storage_mgmt to a
+                          customized name. If network_data has no storage
+                          networks, both default to ctlplane. If found network
+                          has >1 subnet, they are all combined (for routed
+                          traffic). If a network has ipv6 true, then the
+                          ipv6_subnet is retrieved instead of the ip_subnet, and
+                          the Ceph global ms_bind_ipv4 is set false and the
+                          ms_bind_ipv6 is set true. Use --config to override
+                          these defaults if desired.
+    --public-network-name PUBLIC_NETWORK_NAME
+                          Name of the network defined in network_data.yaml which
+                          should be used for the Ceph public_network. Defaults
+                          to 'storage'.
+    --cluster-network-name CLUSTER_NETWORK_NAME
+                          Name of the network defined in network_data.yaml which
+                          should be used for the Ceph cluster_network. Defaults
+                          to 'storage_mgmt'.
+    --config CONFIG       Path to an existing ceph.conf with settings to be
+                          assimilated by the new cluster via 'cephadm bootstrap
+                          --config'
     --ceph-spec CEPH_SPEC
                           Path to an existing Ceph spec file. If not provided a
                           spec will be generated automatically based on --roles-
@@ -198,6 +230,17 @@ to see the latest options which you have available.
 
 Ceph Configuration Options
 --------------------------
+
+Any initial Ceph configuration options may be passed to a new cluster
+by putting them in a standard ini-style configuration file and using
+`cephadm bootstrap --config` option. The exact same option is passed
+through to cephadm with `openstack overcloud ceph deploy --config`::
+
+  $ cat <<EOF > initial-ceph.conf
+  [global]
+  osd crush chooseleaf type = 0
+  EOF
+  $ openstack overcloud ceph deploy --config initial-ceph.conf ...
 
 The `deployed_ceph.yaml` Heat environment file output by `openstack
 overcloud ceph deploy` has `ApplyCephConfigOverridesOnUpdate` set to
@@ -311,6 +354,158 @@ passed to a direct call of the ceph_spec_bootstrap ansible module::
   ansible localhost -m ceph_spec_bootstrap \
     -a "deployed_metalsmith=deployed_metal.yaml tripleo_roles=custom_roles.yaml"
 
+Network Options
+---------------
+
+The storage networks defined in the network_data.yaml file as
+described in :doc:`custom_networks` determine which networks
+Ceph is configured to use. When using network isolation, the
+standard is for TripleO to deploy two storage networks which
+map to the two Ceph networks in the following way:
+
+* ``storage`` - Storage traffic, the Ceph ``public_network``,
+  e.g. Nova compute nodes use this network for RBD traffic to the Ceph
+  cluster.
+
+* ``storage_mgmt`` - Storage management traffic (such as replication
+  traffic between storage nodes), the Ceph ``cluster_network``,
+  e.g. Ceph OSDs use this network to replicate data.
+
+``openstack overcloud ceph deploy`` will use the network_data.yaml
+file specified by the ``--network-data`` option to determine which
+networks should be used for the ``public_network`` and
+``cluster_network``. It assumes these networks are named ``storage``
+and ``storage_mgmt`` in the network_data.yaml file unless a different
+name should be used as indicated by the ``--public-network-name`` and
+``--cluster-network-name`` options.
+
+It is necessary to use the ``--network-data`` option when deploying
+with network isolation. Otherwise the default network, i.e. the
+ctlplane network on the undercloud (192.168.24.0/24), will be used for
+both the ``public_network`` and ``cluster_network``.
+
+
+Example: Multiple subnets with custom network names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If network_data.yaml contains the following::
+
+    - name: StorageMgmtCloud0
+      name_lower: storage_mgmt_cloud_0
+      service_net_map_replace: storage_mgmt
+      subnets:
+        storage_mgmt_cloud_0_subnet12:
+          ip_subnet: '172.16.12.0/24'
+        storage_mgmt_cloud_0_subnet13:
+          ip_subnet: '172.16.13.0/24'
+    - name: StorageCloud0
+      name_lower: storage_cloud_0
+      service_net_map_replace: storage
+      subnets:
+        storage_cloud_0_subnet14:
+          ip_subnet: '172.16.14.0/24'
+        storage_cloud_0_subnet15:
+          ip_subnet: '172.16.15.0/24'
+
+Then the Ceph cluster will bootstrap with an initial Ceph
+configuration containing the following::
+
+  [global]
+  public_network = '172.16.14.0/24,172.16.15.0/24'
+  cluster_network = '172.16.12.0/24,172.16.13.0/24'
+  ms_bind_ipv4 = True
+  ms_bind_ipv6 = False
+
+This is because the TripleO client will see that though the
+``name_lower`` value does not match ``storage`` or ``storage_mgmt``
+(they match the custom names ``storage_cloud_0`` and
+``storage_mgmt_cloud_0`` instead), those names do match the
+``service_net_map_replace`` values. If ``service_net_map_replace``
+is in the network_data.yaml, then it is not necessary to use the
+``--public-network-name`` and ``--cluster-network-name``
+options. Alternatively the ``service_net_map_replace`` key could have
+been left out and the ``--public-network-name`` and
+``--cluster-network-name`` options could have been used instead. Also,
+because multiple subnets are used they are concatenated and it is
+assumed that there is routing between the subnets. If there was no
+``subnets`` key, in the network_data.yaml file, then the client would
+have looked instead for the single ``ip_subnet`` key for each network.
+
+By default the Ceph globals `ms_bind_ipv4` is set `true` and
+`ms_bind_ipv6` is set `false`.
+
+Example: IPv6
+^^^^^^^^^^^^^
+
+If network_data.yaml contains the following::
+
+  - name: Storage
+    ipv6: true
+    ipv6_subnet: fd00:fd00:fd00:3000::/64
+    name_lower: storage
+  - name: StorageMgmt
+    ipv6: true
+    ipv6_subnet: fd00:fd00:fd00:4000::/64
+    name_lower: storage_mgmt
+
+Then the Ceph cluster will bootstrap with an initial Ceph
+configuration containing the following::
+
+  [global]
+  public_network = fd00:fd00:fd00:3000::/64
+  cluster_network = fd00:fd00:fd00:4000::/64
+  ms_bind_ipv4 = False
+  ms_bind_ipv6 = True
+
+Because the storage networks in network_data.yaml contain `ipv6:
+true`, the ipv6_subet values are extracted and the Ceph globals
+`ms_bind_ipv4` is set `false` and `ms_bind_ipv6` is set `true`.
+It is not supported to have the ``public_network`` use IPv4 and
+the ``cluster_network`` use IPv6 or vice versa.
+
+Example: Directly setting network and ms_bind options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the above defaults are not desired, then it's possible to create
+an initial-ceph.conf with the ``public_network``, ``cluster_network``,
+``ms_bind_ipv4``, and ``ms_bind_ipv6`` options set to whatever values
+are desired and pass it as in the example below::
+
+  $ cat <<EOF > initial-ceph.conf
+  [global]
+  public_network = 'fd00:fd00:fd00:3000::/64,172.16.14.0/24'
+  cluster_network = 'fd00:fd00:fd00:4000::/64,172.16.12.0/24'
+  ms_bind_ipv4 = true
+  ms_bind_ipv6 = true
+  EOF
+  $ openstack overcloud ceph deploy \
+    --config initial-ceph.conf --network-data network_data.yaml
+
+The above assumes that network_data.yaml contains the following::
+
+  - name: Storage
+    ipv6_subnet: fd00:fd00:fd00:3000::/64
+    ip_subnet: 172.16.14.0/24
+    name_lower: storage
+  - name: StorageMgmt
+    ipv6_subnet: fd00:fd00:fd00:4000::/64
+    ip_subnet: 172.16.12.0/24
+    name_lower: storage_mgmt
+
+The above settings are experimental and untested.
+
+When using the ``--config`` option as above it is still
+important to ensure the TripleO ``storage`` and ``storage_mgmt``
+network names map to the correct ``public_network`` and
+``cluster_network`` since that is how the initial boot address is
+determined.
+
+The ``--config`` option ignores automatically generated initial
+configuration options, i.e. the ``public_network``,
+``cluster_network``, and Ceph ms_bind options which would normally
+be retrieved from network_data.yaml. These variables all need to be
+set explicitly in the file passed as an argument to ``--config``.
+
 Container Options
 -----------------
 
@@ -370,5 +565,5 @@ words, the above options are overrides.
 
 .. _`ceph config command`: https://docs.ceph.com/en/latest/man/8/ceph/#config
 .. _`ceph_spec_bootstrap`: https://docs.openstack.org/tripleo-ansible/latest/modules/modules-ceph_spec_bootstrap.html
-.. _`Ceph Service Specification`: https://docs.ceph.com/en/pacific/cephadm/service-management/#orchestrator-cli-service-spec
-.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/pacific/cephadm/osd/#drivegroups
+.. _`Ceph Service Specification`: https://docs.ceph.com/en/octopus/mgr/orchestrator/#orchestrator-cli-service-spec
+.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/octopus/cephadm/drivegroups/

@@ -907,11 +907,11 @@ The final overcloud command must look like the following::
 .. _`Ceph Orchestrator`: https://docs.ceph.com/en/latest/mgr/orchestrator/
 .. _`ceph config command`: https://docs.ceph.com/en/latest/man/8/ceph/#config
 .. _`Ceph's centralized configuration management`: https://ceph.io/community/new-mimic-centralized-configuration-management/
-.. _`Ceph Service Specification`: https://docs.ceph.com/en/pacific/cephadm/service-management/#orchestrator-cli-service-spec
+.. _`Ceph Service Specification`: https://docs.ceph.com/en/octopus/mgr/orchestrator/#orchestrator-cli-service-spec
 .. _`ceph_spec_bootstrap`: https://docs.openstack.org/tripleo-ansible/latest/modules/modules-ceph_spec_bootstrap.html
-.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/pacific/cephadm/osd/#drivegroups
+.. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/octopus/cephadm/drivegroups/
 .. _`Autoscaling Placement Groups`: https://docs.ceph.com/en/latest/rados/operations/placement-groups/
 .. _`pgcalc`: http://ceph.com/pgcalc
 .. _`CRUSH Map Rules`: https://docs.ceph.com/en/latest/rados/operations/crush-map-edits/?highlight=ceph%20crush%20rules#crush-map-rules
-.. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/pacific/cephadm/osd/
-.. _`osd_memory_target_autotune`: https://docs.ceph.com/en/pacific/cephadm/osd/#automatically-tuning-osd-memory
+.. _`OSD Service Documentation for cephadm`: https://docs.ceph.com/en/latest/cephadm/services/osd/
+.. _`osd_memory_target_autotune`: https://docs.ceph.com/en/latest/cephadm/services/osd/#automatically-tuning-osd-memory

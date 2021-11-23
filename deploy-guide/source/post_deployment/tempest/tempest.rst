@@ -276,7 +276,7 @@ configuration.
 
 .. note::
   To know more about ``python-tempestconf`` visit
-  `python-tempestconf's documentation. <https://docs.openstack.org/python-tempestconf/latest/>`_
+  `python-tempestconf's documentation. <https://docs.opendev.org/openinfra/python-tempestconf/latest/>`_
 
 .. note::
   Not all of the configuration may be discovered by
@@ -354,20 +354,20 @@ Things to keep in mind while using discover-tempest-config
   For example: when **compute.allow_tenant_isolation true** is passed to
   :command:`discover-tempest-config` that value will be set in tempest.conf and will
   override the value set by discovery.
-  `More about override options. <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#override-values>`_
+  `More about override options. <https://docs.opendev.org/openinfra/python-tempestconf/latest/user/usage.html#override-values>`_
 
 * If OpenStack was deployed using TripleO/Director, pass the deployment input
   file tempest-deployer-input.conf to the :command:`discover-tempest-config` command with
   ``--deployer-input`` option. The file contains some version specific values set
   by the installer. More about the argument can be found in
-  `python-tempestconf's CLI documentation. <https://docs.openstack.org/python-tempestconf/latest/cli/cli_options.html>`_
+  `python-tempestconf's CLI documentation. <https://docs.opendev.org/openinfra/python-tempestconf/latest/cli/cli_options.html>`_
 
 * ``--remove`` option can be used to remove values from tempest.conf,
   for example: ``--remove network-feature-enabled.api_extensions=dvr``.
   The feature is useful when some values in tempest.conf are automatically
   set by the discovery, but they are not wanted to be printed to tempest.conf.
   More about the feature can be found
-  `here <https://docs.openstack.org/python-tempestconf/latest/user/usage.html#prevent-some-key-value-pairs-to-be-set-in-tempest-conf>`_.
+  `here <https://docs.opendev.org/openinfra/python-tempestconf/latest/user/usage.html#prevent-some-key-value-pairs-to-be-set-in-tempest-conf>`_.
 
 
 Always save the state of resources before running tempest tests

@@ -128,6 +128,7 @@ The command line interface supports the following options::
                                          [--cluster-network-name CLUSTER_NETWORK_NAME]
                                          [--config CONFIG]
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
+                                         [--crush-hierarchy CEPH_CRUSH_HIERARCHY]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--container-namespace CONTAINER_NAMESPACE]
                                          [--container-image CONTAINER_IMAGE]
@@ -197,6 +198,10 @@ The command line interface supports the following options::
                           defaults to {data_devices: {all: true}} for all
                           service_type osd. Use --osd-spec to override the
                           data_devices value inside the Ceph spec file.
+    --crush-hierarchy CRUSH_HIERARCHY_SPEC
+                          Path to an existing Ceph crush hierarchy spec file that
+                          describes the custom osd location according to the Ceph
+                          specification.
     --container-image-prepare CONTAINER_IMAGE_PREPARE
                           Path to an alternative
                           container_image_prepare_defaults.yaml. Used to control
@@ -313,6 +318,69 @@ devices will be used as shared devices (wal, db). This is because when
 the dynamic Ceph service specification is built whatever is in the
 file referenced by ``--osd-spec`` will be appended to the section of
 the specification if the `service_type` is "osd".
+
+Crush Hierarchy Options
+-----------------------
+
+As described in the previous section, the `ceph_spec_bootstrap`_ Ansible
+module is used to generate the Ceph related spec file which is applied
+using the Ceph orchestrator tool.
+During the Ceph OSDs deployment, a custom crush hierarchy can be defined
+and passed using the ``--crush-hierarchy`` option.
+As per `Ceph Host Management`_, by doing this the `location` attribute is
+added to the Hosts spec.
+The location attribute will only affect the initial CRUSH location
+Subsequent changes of the location property will be ignored. Also, removing
+a host will not remove any CRUSH generated bucket.
+
+
+Example: Apply a custom crush hierarchy to the deployed OSDs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the file ``crush_hierarchy.yaml`` contains something like the following::
+
+    ---
+    ceph_crush_hierarchy:
+      ceph-0:
+        root: default
+        rack: r0
+      ceph-1:
+        root: default
+        rack: r1
+      ceph-2:
+        root: default
+        rack: r2
+
+and the following command is run::
+
+    openstack overcloud ceph deploy \
+            deployed_metal.yaml \
+            -o deployed_ceph.yaml \
+            --osd-spec osd_spec.yaml \
+            --crush-hierarchy crush_hierarchy.yaml
+
+Then the Ceph cluster will bootstrap with the following Ceph OSD layout::
+
+
+    [ceph: root@ceph-0 /]# ceph osd tree
+    ID  CLASS  WEIGHT   TYPE NAME                  STATUS  REWEIGHT  PRI-AFF
+    -1         0.02939  root default
+    -3         0.00980      rack r0
+    -2         0.00980          host ceph-node-00
+     0    hdd  0.00980              osd.0              up   1.00000  1.00000
+    -5         0.00980      rack r1
+    -4         0.00980          host ceph-node-01
+     1    hdd  0.00980              osd.1              up   1.00000  1.00000
+    -7         0.00980      rack r2
+    -6         0.00980          host ceph-node-02
+     2    hdd  0.00980              osd.2              up   1.00000  1.00000
+
+
+.. note::
+
+    Device classes are automatically detected by Ceph, but crush rules are associated to pools
+    and they still be defined using the CephCrushRules parameter during the overcloud deployment.
+    Additional details can be found in the `Overriding crush rules`_ section.
 
 Service Placement Options
 -------------------------
@@ -567,3 +635,5 @@ words, the above options are overrides.
 .. _`ceph_spec_bootstrap`: https://docs.openstack.org/tripleo-ansible/latest/modules/modules-ceph_spec_bootstrap.html
 .. _`Ceph Service Specification`: https://docs.ceph.com/en/octopus/mgr/orchestrator/#orchestrator-cli-service-spec
 .. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/octopus/cephadm/drivegroups/
+.. _`Ceph Host Management`: https://docs.ceph.com/en/latest/cephadm/host-management/#setting-the-initial-crush-location-of-host
+.. _`Overriding crush rules`: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/features/cephadm.html#overriding-crush-rules

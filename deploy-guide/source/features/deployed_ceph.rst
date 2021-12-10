@@ -119,7 +119,9 @@ Deployed Ceph Command Line Interface
 The command line interface supports the following options::
 
   $ openstack overcloud ceph deploy --help
-  usage: openstack overcloud ceph deploy [-h] -o <deployed_ceph.yaml> [-y]
+  usage: openstack overcloud ceph deploy [-h] -o <deployed_ceph.yaml>
+                                         [-y] [--skip-user-create]
+                                         [--cephadm-ssh-user CEPHADM_SSH_USER]
                                          [--stack STACK]
                                          [--working-dir WORKING_DIR]
                                          [--roles-data ROLES_DATA]
@@ -127,8 +129,7 @@ The command line interface supports the following options::
                                          [--public-network-name PUBLIC_NETWORK_NAME]
                                          [--cluster-network-name CLUSTER_NETWORK_NAME]
                                          [--config CONFIG]
-                                         [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
-                                         [--crush-hierarchy CEPH_CRUSH_HIERARCHY]
+                                         [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC | --crush-hierarchy CRUSH_HIERARCHY]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--container-namespace CONTAINER_NAMESPACE]
                                          [--container-image CONTAINER_IMAGE]
@@ -150,7 +151,16 @@ The command line interface supports the following options::
                           Ceph deployment to pass to the overcloud deployment.
     -y, --yes             Skip yes/no prompt before overwriting an existing
                           <deployed_ceph.yaml> output file (assume yes).
-    --stack STACK         Name or ID of heat stack (default=Env:
+    --skip-user-create    Do not create the cephadm SSH user. This user is
+                          necessary to deploy but may be created in a separate
+                          step via 'openstack overcloud ceph user enable'.
+    --cephadm-ssh-user CEPHADM_SSH_USER
+                          Name of the SSH user used by cephadm. Warning: if this
+                          option is used, it must be used consistently for every
+                          'openstack overcloud ceph' call. Defaults to 'ceph-
+                          admin'. (default=Env: CEPHADM_SSH_USER)
+    --stack STACK
+                          Name or ID of heat stack (default=Env:
                           OVERCLOUD_STACK_NAME)
     --working-dir WORKING_DIR
                           The working directory for the deployment where all
@@ -185,23 +195,23 @@ The command line interface supports the following options::
                           Name of the network defined in network_data.yaml which
                           should be used for the Ceph cluster_network. Defaults
                           to 'storage_mgmt'.
-    --config CONFIG       Path to an existing ceph.conf with settings to be
+    --config CONFIG
+                          Path to an existing ceph.conf with settings to be
                           assimilated by the new cluster via 'cephadm bootstrap
                           --config'
     --ceph-spec CEPH_SPEC
                           Path to an existing Ceph spec file. If not provided a
                           spec will be generated automatically based on --roles-
                           data and <deployed_baremetal.yaml>
-    --osd-spec OSD_SPEC   Path to an existing OSD spec file. Mutually exclusive
+    --osd-spec OSD_SPEC
+                          Path to an existing OSD spec file. Mutually exclusive
                           with --ceph-spec. If the Ceph spec file is generated
                           automatically, then the OSD spec in the Ceph spec file
                           defaults to {data_devices: {all: true}} for all
                           service_type osd. Use --osd-spec to override the
                           data_devices value inside the Ceph spec file.
-    --crush-hierarchy CRUSH_HIERARCHY_SPEC
-                          Path to an existing Ceph crush hierarchy spec file that
-                          describes the custom osd location according to the Ceph
-                          specification.
+    --crush-hierarchy CRUSH_HIERARCHY
+                          Path to an existing crush hierarchy spec file.
     --container-image-prepare CONTAINER_IMAGE_PREPARE
                           Path to an alternative
                           container_image_prepare_defaults.yaml. Used to control
@@ -573,6 +583,62 @@ configuration options, i.e. the ``public_network``,
 ``cluster_network``, and Ceph ms_bind options which would normally
 be retrieved from network_data.yaml. These variables all need to be
 set explicitly in the file passed as an argument to ``--config``.
+
+SSH User Options
+----------------
+
+Cephadm must use SSH to connect to all remote Ceph hosts that it
+manages. The "Deployed Ceph" feature creates an account and SSH key
+pair on all Ceph nodes in the overcloud and passes this information
+to cephadm so that it uses this account instead of creating its own.
+The `openstack overcloud ceph deploy` command will automatically
+create this user and distribute their SSH keys. It's also possible
+to create this user and distribute the associated keys in a separate
+step by running `openstack overcloud ceph user enable` and then when
+calling `openstack overcloud ceph deploy` with the
+`--skip-user-create` option. By default the user is called
+`ceph-admin` though both commands support the `--cephadm-ssh-user`
+option to set a different name. If this option is used though, it must
+be used consistently for every `openstack overcloud ceph` call.
+
+The `openstack overcloud ceph user disable --fsid <FSID>` command
+may be run after `openstack overcloud ceph deploy` has been run
+to disable cephadm so that it may not be used to administer the
+Ceph cluster and no `ceph orch ...` CLI commands will function.
+This will also prevent Ceph node overcloud scale operations though
+the Ceph cluster will still be able to read and write data. This same
+command will also remove the public and private SSH keys of the
+cephadm SSH user on overclouds which host Ceph. The "ceph user enable"
+option may then be used to re-distribute the public and private SSH
+keys of the cephadm SSH user and re-enable the cephadm mgr module.
+`openstack overcloud ceph user enable` will only re-enable the cephadm
+mgr module if it is passed the FSID with the `--fsid <FSID>` option.
+The FSID may be found in the deployed_ceph.yaml Heat environment file
+which is generated by the `openstack overcloud ceph deploy -o
+deployed_ceph.yaml` command.
+
+.. warning::
+   Disabling cephadm will disable all Ceph management features
+   described in this document. The `openstack overcloud ceph user
+   disable` command is not recommended unless you have a good reason
+   to disable cephadm.
+
+Both the `openstack overcloud ceph user enable` and `openstack
+overcloud ceph user disable` commands require the path to an existing
+Ceph spec file to be passed as an argument. This is necessary in order
+to determine which hosts require the cephadm SSH user and which of
+those hosts require the private SSH key. Only hosts with the _admin
+label get the private SSH since they need to be able to SSH into other
+Ceph hosts. In the average deployment with three monitor nodes this is
+three hosts. All other Ceph hosts only get the public key added to the
+users authorized_keys file.
+
+See the "Ceph Spec Options" options of this document for where to find
+this file or how to automatically generate one before Ceph deployment
+if you plan to call `openstack overcloud ceph user enable` before
+calling `openstack overcloud ceph deploy`. See `openstack overcloud
+ceph user enable --help` and `openstack overcloud ceph user disable
+--help` for more information.
 
 Container Options
 -----------------

@@ -39,8 +39,8 @@ The ruck monitors the failing jobs and files bugs for all known or confirmed
 things currently affecting TripleO CI.
 
 Launchpad is used as the bug tracker - here is a list of recently created
-`Tripleo launchpad bugs`_. When filing a new bug, the ruck will add the
-appropriate tag(s):
+`Tripleo launchpad bugs`_. When filing a new bug, the ruck will add the correct
+milestone, change the status to "Triaged" add the appropriate tag(s):
 
 * ci: a general tag for all ci related bugs - any bug about a failing CI job
   should have this.
@@ -49,7 +49,9 @@ appropriate tag(s):
 * tempest: bug is tempest related - failing tests or other tempest related error.
 * ci-reproducer: related to the `zuul based job reproducer`_
 * promotion-blocker: this is used when the failing job(s)  is in the promotion
-  criteria (more on that below).
+  criteria (more on that below). Bugs with this tag are picked up by a script
+  running periodically and converted to a CIX card which are tracked twice a week
+  in a CI Escalation Status meeting.
 
 For the periodic promotion jobs the ruck must ensure that the jobs defined as
 being in 'promotion criteria' are passing. The criteria is simply a list of
@@ -57,15 +59,19 @@ jobs which must pass for a promotion to occur (see the promotion_
 docs for more info on the promotion stages in TripleO). This list is maintained
 in a file per branch in the ci-config-dlrnapi-promoter-config_ directory.
 For tripleo-ci promotions we are interested in promotions from current to
-current-tripleo (see promotion_). Thus, looking at master.ini_ at time of
+current-tripleo (see promotion_). Thus, looking at master.yaml_ at time of
 writing for example::
 
-  [current-tripleo]
-  periodic-singlenode-featuresetcontainers-build
-  periodic-tripleo-ci-centos-7-ovb-3ctlr_1comp-featureset001-master
-  periodic-tripleo-ci-centos-7-ovb-1ctlr_1comp-featureset002-master-upload
-  periodic-tripleo-ci-centos-7-multinode-1ctlr-featureset010-master
-  periodic-tripleo-ci-centos-7-scenario001-standalone-master
+  promotions:
+  current-tripleo:
+    candidate_label: tripleo-ci-testing
+    criteria:
+      # Jobs to be added as they are defined and qualified
+      - periodic-tripleo-ci-build-containers-ubi-8-push
+      - periodic-tripleo-centos-8-buildimage-overcloud-full-master
+      - periodic-tripleo-centos-8-buildimage-overcloud-hardened-uefi-full-master
+      - periodic-tripleo-centos-8-buildimage-ironic-python-agent-master
+      - periodic-tripleo-ci-centos-8-standalone-master
   ...
 
 The above means that for a promotion to happen all the jobs defined under
@@ -114,6 +120,7 @@ do their job efficiently. They are known within the squad as 'grafana' and
 * grafana: `http://cockpit-ci.tripleo.org/`_
 * sova: `http://cistatus.tripleo.org/`_
 * etherpad: $varies
+* ci health: `http://ci-health.tripleo.org/`_
 
 The ruck|rover are encouraged to use an etherpad that is kept up to date for
 any ongoing issues actively being worked on. Besides allowing coordination
@@ -182,10 +189,11 @@ red.
 .. _promotion: https://docs.openstack.org/tripleo-docs/latest/ci/stages-overview.html
 .. _`TripleO Squad`: https://docs.openstack.org/tripleo-docs/latest/contributor/index.html#squads
 .. _`TripleO launchpad bugs`: https://bugs.launchpad.net/tripleo/+bugs?orderby=-datecreated&start=0
-.. _ci-config-dlrnapi-promoter-config: https://github.com/rdo-infra/ci-config/blob/master/ci-scripts/dlrnapi_promoter/config/CentOS-7/
-.. _master.ini: https://github.com/rdo-infra/ci-config/blob/7e8c40e2b2b686cc2d1d3e86cf8f9cbbd646a1c3/ci-scripts/dlrnapi_promoter/config/CentOS-7/master.ini#L16-L43
+.. _ci-config-dlrnapi-promoter-config: https://github.com/rdo-infra/ci-config/tree/master/ci-scripts/dlrnapi_promoter/config_environments/rdo/CentOS-8
+.. _master.yaml: https://github.com/rdo-infra/ci-config/blob/cc3999a3fb29736769a8c497f0069e90c035b82c/ci-scripts/dlrnapi_promoter/config_environments/rdo/CentOS-8/master.yaml#L24-L51
 .. _`http://cockpit-ci.tripleo.org/`: http://cockpit-ci.tripleo.org/
 .. _`http://cistatus.tripleo.org/`: http://cistatus.tripleo.org/
+.. _`http://ci-health.tripleo.org/`: http://ci-health.tripleo.org/
 .. _`CI Team Structure`: https://specs.openstack.org/openstack/tripleo-specs/specs/policy/ci-team-structure.html
 .. _`zuul based job reproducer`: https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/roles/create-zuul-based-reproducer/README.md
 .. _`TripleO CI code`: https://opendev.org/openstack/tripleo-ci/src/branch/master/README.rst

@@ -3,10 +3,6 @@
 Standalone Containers based Deployment
 ======================================
 
-.. warning::
-   Standalone deployments are currently only supported in Rocky or newer
-   versions.
-
 This documentation explains how the underlying framework used by the
 Containerized Undercloud deployment mechanism can be reused to deploy a
 single node capable of running OpenStack services for development. Optional
@@ -38,30 +34,11 @@ Deploying a Standalone OpenStack node
 
 #. Enable needed repositories:
 
-   .. note::
-      The Ussuri version of TripleO utilizes Python3 and requires the OS
-      to be RHEL 8 or CentOS 8. It is also recommended that Train be installed
-      on RHEL 8 or CentOS 8.
-
-   .. admonition:: RHEL
-      :class: rhel
-
-      Enable optional repo for RHEL 7::
-
-          sudo yum install -y yum-utils
-          sudo yum-config-manager --enable rhelosp-rhel-7-server-opt
-
    .. include:: ../repositories.rst
 
-#. Install the TripleO CLI, which will pull in all other necessary packages as dependencies.
+#. Install the TripleO CLI, which will pull in all other necessary packages as dependencies::
 
-    For Python3::
-
-       sudo yum install -y python3-tripleoclient
-
-    For Python2.7::
-
-       sudo yum install -y python-tripleoclient
+       sudo dnf install -y python3-tripleoclient
 
    .. admonition:: Ceph
       :class: ceph
@@ -70,13 +47,7 @@ Deploying a Standalone OpenStack node
 
       .. code-block:: bash
 
-         sudo yum install -y util-linux lvm2 cephadm
-
-      .. admonition:: Victoria or earlier
-
-        .. code-block:: bash
-
-           sudo yum install -y util-linux lvm2 ceph-ansible
+         sudo dnf install -y util-linux lvm2 cephadm
 
 #. Generate a file with the default ContainerImagePrepare value::
 
@@ -98,8 +69,7 @@ Deploying a Standalone OpenStack node
          sudo losetup /dev/loop3 /var/lib/ceph-osd.img
          sudo pvcreate /dev/loop3
          sudo vgcreate vg2 /dev/loop3
-         sudo lvcreate -n data-lv2 -l 597 vg2
-         sudo lvcreate -n db-lv2 -l 1194 vg2
+         sudo lvcreate -n data-lv2 -l 1791 vg2
 
       Create a systemd service that restores the device on startup.
 
@@ -284,26 +254,6 @@ Deploying a Standalone OpenStack node
            CephPoolDefaultSize: 1
          EOF
 
-      .. admonition:: Victoria or earlier
-
-        .. code-block:: bash
-
-           cat <<EOF > $HOME/ceph_parameters.yaml
-           parameter_defaults:
-             CephAnsibleDisksConfig:
-               osd_scenario: lvm
-               osd_objectstore: bluestore
-               lvm_volumes:
-                 - data: data-lv2
-                   data_vg: vg2
-                   db: db-lv2
-                   db_vg: vg2
-             CephAnsibleExtraConfig:
-               cluster_network: 192.168.24.0/24
-               public_network: 192.168.24.0/24
-             CephPoolDefaultPgNum: 8
-             CephPoolDefaultSize: 1
-           EOF
 
 #. Run the deploy command:
 
@@ -340,22 +290,6 @@ Deploying a Standalone OpenStack node
            --output-dir $HOME \
            --standalone
 
-      .. admonition:: Victoria or earlier
-
-        .. code-block:: bash
-
-           sudo openstack tripleo deploy \
-             --templates \
-             --local-ip=$IP/$NETMASK \
-             --control-virtual-ip $VIP \
-               -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
-             -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
-             -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
-             -e $HOME/containers-prepare-parameters.yaml \
-             -e $HOME/standalone_parameters.yaml \
-             -e $HOME/ceph_parameters.yaml \
-             --output-dir $HOME \
-             --standalone
 
 #. Check the deployed OpenStack Services
 
@@ -398,6 +332,7 @@ Deploying a Standalone OpenStack node
          /etc/openstack
      rm -rf ~/.config/openstack
      sudo systemctl daemon-reload
+
 
 Manual deployments with ansible
 -------------------------------
@@ -974,7 +909,7 @@ Deploy the second node with the following:
         --local-ip=$IP/$NETMASK \
         -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
         -e /usr/share/openstack-tripleo-heat-templates/environments/standalone/standalone-tripleo.yaml \
-        -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+        -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm-rbd-only.yaml \
         -e $HOME/containers-prepare-parameters.yaml \
         -e $HOME/standalone_parameters.yaml \
         -e $HOME/ceph_parameters.yaml \

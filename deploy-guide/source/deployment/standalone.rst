@@ -69,7 +69,7 @@ Deploying a Standalone OpenStack node
          sudo losetup /dev/loop3 /var/lib/ceph-osd.img
          sudo pvcreate /dev/loop3
          sudo vgcreate vg2 /dev/loop3
-         sudo lvcreate -n data-lv2 -l 1791 vg2
+         sudo lvcreate -n data-lv2 -l +100%FREE vg2
 
       Create a systemd service that restores the device on startup.
 
@@ -232,27 +232,88 @@ Deploying a Standalone OpenStack node
    .. admonition:: Ceph
       :class: ceph
 
-      Create an additional environment file which directs the ceph
-      deployment tool to use the block device with logical volumes
-      created earlier. Set the placement group and replica count to
-      values which fit the number of OSDs being used, e.g. 8
-      and 1 are used for testing with only one OSD.
+      Establish an IP address on which Ceph will listen. Because the
+      192.168.24.0/24 network containing the cloud IP and VIP defined
+      earlier is not configured until `openstack tripleo deploy` is
+      run, we need Ceph to run on a different network if we're going
+      to deploy Ceph before the overcloud as described in
+      :doc:`../features/deployed_ceph`. Any IP on the VM may be used
+      including the IP on the default libvirt network
+      192.168.122.0/24. For example:
 
       .. code-block:: bash
 
-         cat <<EOF > $HOME/ceph_parameters.yaml
-         parameter_defaults:
-           CephSpecFqdn: true
-           CephOsdSpec:
-            data_devices:
-              paths:
-                - /dev/vg2/data-lv2
-           CephConfigOverrides:
-             mon:
-               mon_warn_on_pool_no_redundancy: false
-           CephPoolDefaultPgNum: 8
-           CephPoolDefaultSize: 1
+         export CEPH_IP=192.168.122.252
+
+      Create an OSD spec file which references the block device with
+      the logical volumes created earlier.
+
+      .. code-block:: bash
+
+         cat <<EOF > $HOME/osd_spec.yaml
+         data_devices:
+           paths:
+             - /dev/vg2/data-lv2
          EOF
+
+      Use the Ceph IP and OSD spec file to create a Ceph spec file
+      which will describe the Ceph cluster in a format `cephadm` can
+      parse. The `--standalone` option covers a special case for this
+      scenario because 'openstack overcloud node provision' is not
+      used.
+
+      .. code-block:: bash
+
+         sudo openstack overcloud ceph spec \
+            --standalone \
+            --mon-ip $CEPH_IP \
+            --osd-spec $HOME/osd_spec.yaml \
+            --output $HOME/ceph_spec.yaml
+
+      Create the ceph-admin user by passing the Ceph spec created
+      earlier and use the `--standalone` option.
+
+      .. code-block:: bash
+
+         sudo openstack overcloud ceph user enable \
+            --standalone \
+            $HOME/ceph_spec.yaml \
+
+      Create an initial Ceph configuration file so that so that Ceph
+      is configured for a single node and single OSD deployment:
+
+      .. code-block:: bash
+
+         cat <<EOF > $HOME/initial_ceph.conf
+         [global]
+         osd pool default size = 1
+         osd pool default pg num = 8
+         osd pool default pgp num = 8
+         [mon]
+         mon_warn_on_pool_no_redundancy = false
+         EOF
+
+      Deploy Ceph by passing the IP, Ceph spec and initial Ceph
+      configuration created above. Use the `--standalone` option.
+      User creation is skipped because it was handled in the previous
+      step. Specify what the output deployed Ceph file should be
+      called.
+
+      .. code-block:: bash
+
+         sudo openstack overcloud ceph deploy \
+            --standalone \
+            --mon-ip $CEPH_IP \
+            --ceph-spec $HOME/ceph_spec.yaml \
+            --config $HOME/initial_ceph.conf \
+            --skip-user-create \
+            --output $HOME/deployed_ceph.yaml
+
+      A Ceph RBD cluster should now be deployed and `sudo cephadm
+      shell -- ceph -s` may be used to check its status. The
+      `deployed_ceph.yaml` file is a Heat environment file describing
+      the deployed Ceph cluster and should be used during overcloud
+      deployment.
 
 
 #. Run the deploy command:
@@ -286,7 +347,7 @@ Deploying a Standalone OpenStack node
            -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
            -e $HOME/containers-prepare-parameters.yaml \
            -e $HOME/standalone_parameters.yaml \
-           -e $HOME/ceph_parameters.yaml \
+           -e $HOME/deployed_ceph.yaml \
            --output-dir $HOME \
            --standalone
 
@@ -333,6 +394,24 @@ Deploying a Standalone OpenStack node
      rm -rf ~/.config/openstack
      sudo systemctl daemon-reload
 
+   .. admonition:: Ceph
+      :class: ceph
+
+      To remove Ceph and its block device run the following.
+
+      .. code-block:: bash
+
+         FSID=$(sudo ls /var/lib/ceph)
+         sudo cephadm rm-cluster --force --fsid $FSID
+
+         sudo systemctl stop ceph-osd-losetup.service
+         sudo systemctl disable ceph-osd-losetup.service
+         sudo lvremove --force /dev/vg2/data-lv2
+         sudo vgremove --force vg2
+         sudo pvremove --force /dev/loop3
+         sudo losetup -d /dev/loop3
+         sudo rm -f /var/lib/ceph-osd.img
+         sudo partprobe
 
 Manual deployments with ansible
 -------------------------------
@@ -847,7 +926,7 @@ point where you have the following files:
 
 - `$HOME/standalone_parameters.yaml`
 - `$HOME/containers-prepare-parameters.yaml`
-- `$HOME/ceph_parameters.yaml`
+- `$HOME/deployed_ceph.yaml`
 
 When setting the `$IP` of the second node, keep in mind that it should
 have a way to reach the endpoints of the first node as found in the
@@ -912,7 +991,7 @@ Deploy the second node with the following:
         -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm-rbd-only.yaml \
         -e $HOME/containers-prepare-parameters.yaml \
         -e $HOME/standalone_parameters.yaml \
-        -e $HOME/ceph_parameters.yaml \
+        -e $HOME/deployed_ceph.yaml \
         -e $HOME/standalone_edge.yaml \
         -e $HOME/export_control_plane/passwords.yaml \
         -e $HOME/export_control_plane/endpoint-map.json \

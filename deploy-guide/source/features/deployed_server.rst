@@ -177,13 +177,15 @@ following parameters::
   EC2MetadataIp
   ControlPlaneDefaultRoute
 
-The following is a sample environment file that shows setting these values::
+The following is a sample environment file that shows setting these values
+
+.. code-block:: yaml
 
     parameter_defaults:
 
       NodePortMap:
         controller0:
-          ctlplane
+          ctlplane:
             ip_address: 192.168.100.2
             ip_address_uri: 192.168.100.2
             ip_subnet: 192.168.100.0/24
@@ -213,7 +215,7 @@ The following is a sample environment file that shows setting these values::
             ip_subnet: 172.16.0.10/24
 
         compute0:
-          ctlplane
+          ctlplane:
             ip_address: 192.168.100.3
             ip_address_uri: 192.168.100.3
             ip_subnet: 192.168.100.0/24
@@ -251,7 +253,7 @@ The following is a sample environment file that shows setting these values::
         subnets:
         - ip_version: 4
 
-      VipPortMap
+      VipPortMap:
         external:
           ip_address: 10.0.0.100
           ip_address_uri: 10.0.0.100

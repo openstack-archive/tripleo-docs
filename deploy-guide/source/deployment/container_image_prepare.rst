@@ -219,6 +219,17 @@ The values in the `set` map are used when evaluating the file
 `/usr/share/openstack-tripleo-common/container-images/tripleo_containers.yaml.j2`
 as a Jinja2 template. This file contains the list of every container image and
 how it relates to TripleO services and heat parameters.
+If Ceph is not part of the overcloud deployment, it's possible to skip pulling
+the related containers by setting the `ceph_images` parameter to false as shown
+in the example below::
+
+  ContainerImagePrepare:
+  - push_destination: 192.168.24.1:8787
+    set:
+      ceph_images: false
+
+By doing this, the Ceph container images are not pulled from the remote registry
+during the deployment.
 
 Authenticated Registries
 ........................

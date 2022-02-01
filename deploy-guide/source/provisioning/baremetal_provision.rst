@@ -131,7 +131,6 @@ setting defaults for each role
     defaults:
       networks:
       - network: ctlplane
-        subnet: ctlplane-subnet
         vif: true
       - network: external
         subnet: external_subnet
@@ -152,7 +151,6 @@ setting defaults for each role
     defaults:
       networks:
       - network: ctlplane
-        subnet: ctlplane-subnet
         vif: true
       - network: internalapi
         subnet: internal_api_subnet02

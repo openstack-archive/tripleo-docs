@@ -473,7 +473,7 @@ Run arbitrary playbooks with extra variables defined for one of the playbooks:
 Grow volumes playbook
 ^^^^^^^^^^^^^^^^^^^^^
 
-Before custom playbooks are run, an in-built playbook is run to grow the LVM
+After custom playbooks are run, an in-built playbook is run to grow the LVM
 volumes of any node deployed with the whole-disk overcloud image
 `overcloud-hardened-uefi-full.qcow2`. The implicit `ansible_playbooks` would be:
 
@@ -511,6 +511,34 @@ explicitly written to override the default `growvols_args` value, for example:
           /var=1GB
           /srv=100%
 
+Set kernel arguments playbook
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Features such as DPDK require that kernel arguments are set and the node is
+rebooted before the network configuration is run. A playbook is provided to
+allow this. Here it is run with the default variables set:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: /usr/share/ansible/tripleo-playbooks/cli-overcloud-node-kernelargs.yaml
+      extra_vars:
+        kernel_args: ''
+        reboot_wait_timeout: 900
+        defer_reboot: false
+        tuned_profile: 'throughput-performance'
+        tuned_isolated_cores: ''
+
+Here is an example for a specific DPDK deployment:
+
+.. code-block:: yaml
+
+  ansible_playbooks:
+    - playbook: /usr/share/ansible/tripleo-playbooks/cli-overcloud-node-kernelargs.yaml
+      extra_vars:
+        kernel_args: 'default_hugepagesz=1GB hugepagesz=1G hugepages=64 intel_iommu=on iommu=pt'
+        tuned_isolated_cores: '1-11,13-23'
+        tuned_profile: 'cpu-partitioning'
 
 .. _deploying-the-overcloud:
 

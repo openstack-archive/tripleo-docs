@@ -130,6 +130,7 @@ The command line interface supports the following options::
                                          [--cluster-network-name CLUSTER_NETWORK_NAME]
                                          [--config CONFIG]
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC | --crush-hierarchy CRUSH_HIERARCHY]
+                                         [--ceph-vip CEPH_SERVICES]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--container-namespace CONTAINER_NAMESPACE]
                                          [--container-image CONTAINER_IMAGE]
@@ -203,6 +204,8 @@ The command line interface supports the following options::
                           Path to an existing Ceph spec file. If not provided a
                           spec will be generated automatically based on --roles-
                           data and <deployed_baremetal.yaml>
+    --ceph-vip CEPH_SERVICES
+                          Path to an existing Ceph services/network mapping file
     --osd-spec OSD_SPEC
                           Path to an existing OSD spec file. Mutually exclusive
                           with --ceph-spec. If the Ceph spec file is generated
@@ -328,6 +331,63 @@ devices will be used as shared devices (wal, db). This is because when
 the dynamic Ceph service specification is built whatever is in the
 file referenced by ``--osd-spec`` will be appended to the section of
 the specification if the `service_type` is "osd".
+
+Ceph VIP Options
+----------------
+
+The `--ceph-vip` option may be used to reserve a VIP for each Ceph service
+specified by the 'service/network' mapping defined as input.
+A generic ceph service mapping can be something like the following::
+
+  ---
+  ceph_services:
+    - service: ceph_nfs
+      network: storage_cloud_0
+    - service: ceph_rgw
+      network: storage_cloud_0
+
+For each service added to the list above, a virtual IP on the specified
+network is created to be used as `frontend_vip` of the ingress daemon.
+When no subnet is specified, a default `<network>_subnet` pattern is used.
+If the subnet does not follow the `<network>_subnet` pattern, a subnet for
+the VIP may be specified per service::
+
+  ---
+  ceph_services:
+    - service: ceph_nfs
+      network: storage_cloud_0
+    - service: ceph_rgw
+      network: storage_cloud_0
+      subnet: storage_leafX
+
+When the `subnet` parameter is provided, it will be used by the
+`tripleo_service_vip` Ansible module, otherwise the default pattern is followed.
+This feature also supports the fixed_ips mode. When fixed IPs are defined, the
+module is able to use that input to reserve the VIP on that network. A valid
+input can be something like the following::
+
+  ---
+  fixed: true
+  ceph_services:
+    - service: ceph_nfs
+      network: storage_cloud_0
+      ip_address: 172.16.11.159
+    - service: ceph_rgw
+      network: storage_cloud_0
+      ip_address: 172.16.11.160
+
+When the boolean `fixed` is set to True, the subnet pattern is ignored, and
+a sanity check on the user input is performed, looking for the `ip_address`
+keys associated to the specified services. If the `fixed` keyword is missing,
+the subnet pattern is followed. When the environment file containing the
+'ceph service/network' mapping described above is created, it can be passed
+to the ceph deploy command via the `--ceph-vip` option::
+
+  openstack overcloud ceph deploy \
+          deployed_metal.yaml \
+          -o deployed_ceph.yaml \
+          --ceph-vip ~/ceph_services.yaml
+
 
 Crush Hierarchy Options
 -----------------------

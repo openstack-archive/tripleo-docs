@@ -39,8 +39,8 @@ in its glance, one time in /var/lib subdirectories for PXE/TFTP).
 
 TripleO is supporting only the following operating systems:
 
-* RHEL 7 x86_64
-* CentOS 7 x86_64
+* RHEL 8 (x86_64)
+* CentOS8 Stream (x86_64)
 
 Please also ensure your node clock is set to UTC in order to prevent any issue
 when the OS hwclock syncs to the BIOS clock before applying timezone offset,
@@ -87,7 +87,7 @@ Setting Up The Undercloud Machine
 
 #. Select a machine within the baremetal environment on which to install the
    undercloud.
-#. Install RHEL 7.1 x86_64 or CentOS 7 x86_64 on this machine.
+#. Install RHEL 8 x86_64 or CentOS 8 Stream x86_64 on this machine.
 #. If needed, create a non-root user with sudo access to use for installing the
    Undercloud::
 
@@ -112,9 +112,11 @@ Setting Up The Undercloud Machine
         # Verify repositories are available
         sudo subscription-manager repos --list
         # Enable repositories needed
-        sudo subscription-manager repos --enable=rhel-7-server-rpms \
-             --enable=rhel-7-server-optional-rpms --enable=rhel-7-server-extras-rpms \
-             --enable=rhel-7-server-openstack-6.0-rpms
+        sudo subscription-manager repos \
+          --enable=rhel-8-for-x86_64-baseos-eus-rpms \
+          --enable=rhel-8-for-x86_64-appstream-eus-rpms \
+          --enable=rhel-8-for-x86_64-highavailability-eus-rpms \
+          --enable=ansible-2.9-for-rhel-8-x86_64-rpms
 
  .. admonition:: RHEL Satellite Registration
     :class: satellite
@@ -122,10 +124,10 @@ Setting Up The Undercloud Machine
     To register the host machine to a Satellite, the following repos must
     be synchronized on the Satellite and enabled for registered systems::
 
-        rhel-7-server-rpms
-        rhel-7-server-optional-rpms
-        rhel-7-server-extras-rpms
-        rhel-7-server-openstack-6.0-rpms
+        rhel-8-for-x86_64-baseos-eus-rpms
+        rhel-8-for-x86_64-appstream-eus-rpms
+        rhel-8-for-x86_64-highavailability-eus-rpms
+        ansible-2.9-for-rhel-8-x86_64-rpms
 
     See the `Red Hat Satellite User Guide`_ for how to configure the system to
     register with a Satellite server. It is suggested to use an activation

@@ -155,6 +155,14 @@ The command line interface supports the following options::
     --skip-user-create    Do not create the cephadm SSH user. This user is
                           necessary to deploy but may be created in a separate
                           step via 'openstack overcloud ceph user enable'.
+    --skip-hosts-config   Do not update /etc/hosts on deployed servers. By
+                          default this is configured so overcloud nodes can
+                          reach each other and the undercloud by name.
+    --skip-container-registry-config
+                          Do not update /etc/containers/registries.conf on
+                          deployed servers. By default this is configured so
+                          overcloud nodes can pull containers from the
+                          undercloud registry.
     --cephadm-ssh-user CEPHADM_SSH_USER
                           Name of the SSH user used by cephadm. Warning: if this
                           option is used, it must be used consistently for every
@@ -206,6 +214,9 @@ The command line interface supports the following options::
                           data and <deployed_baremetal.yaml>
     --ceph-vip CEPH_SERVICES
                           Path to an existing Ceph services/network mapping file
+    --single-host-defaults
+                          Adjust configuration defaults to suit a single-host
+                          Ceph cluster.
     --osd-spec OSD_SPEC
                           Path to an existing OSD spec file. Mutually exclusive
                           with --ceph-spec. If the Ceph spec file is generated
@@ -272,6 +283,11 @@ configuration changes should then be made by the `ceph config
 command`_. For more information on the `CephConfigOverrides` and
 `ApplyCephConfigOverridesOnUpdate` parameters see :doc:`cephadm`.
 
+It is supported to pass through the `cephadm --single-host-defaults`
+option, which configures a Ceph cluster to run on a single host::
+
+  openstack overcloud ceph deploy --single-host-defaults
+
 
 Ceph Spec Options
 -----------------
@@ -280,29 +296,70 @@ The roles file, described in the next section, and the output of
 `openstack overcloud node provision` are passed to the
 `ceph_spec_bootstrap`_ Ansible module to create a `Ceph Service
 Specification`_. The `openstack overcloud ceph deploy` command does
-this automatically so it is not necessary to use the options described
-in this section unless desired.
+this automatically so that a spec does usually need to be generated
+separately. However, it is possible to generate a ceph spec before
+deployment with the following command::
 
-It's possible to generate a Ceph Spec on the undercloud before
-deployment by using the `ceph_spec_bootstrap`_ Ansible module
-directly, for example::
+  $ openstack overcloud ceph spec --help
+  usage: openstack overcloud ceph spec [-h] -o <ceph_spec.yaml> [-y]
+                                       [--stack STACK]
+                                       [--working-dir WORKING_DIR]
+                                       [--roles-data ROLES_DATA]
+                                       [--mon-ip MON_IP] [--standalone]
+                                       [--osd-spec OSD_SPEC | --crush-hierarchy CRUSH_HIERARCHY]
+                                       [<deployed_baremetal.yaml>]
 
-  ansible localhost -m ceph_spec_bootstrap \
-          -a deployed_metalsmith=deployed_metal.yaml
+  positional arguments:
+    <deployed_baremetal.yaml>
+                          Path to the environment file output from "openstack
+                          overcloud node provision". This argument may be
+                          excluded only if --standalone is used.
 
-By default the above creates the file ``~/ceph_spec.yaml``. For more
-information on the ``ceph_spec_bootstrap`` module run `ansible-doc
-ceph_spec_bootstrap`. The spec file may then be edited if desired and
-passed directly like this::
+  optional arguments:
+    -h, --help            show this help message and exit
+    -o <ceph_spec.yaml>, --output <ceph_spec.yaml>
+                          The path to the output cephadm spec file to pass to
+                          the "openstack overcloud ceph deploy --ceph-spec
+                          <ceph_spec.yaml>" command.
+    -y, --yes             Skip yes/no prompt before overwriting an existing
+                          <ceph_spec.yaml> output file (assume yes).
+    --stack STACK
+                          Name or ID of heat stack (default=Env:
+                          OVERCLOUD_STACK_NAME)
+    --working-dir WORKING_DIR
+                          The working directory for the deployment where all
+                          input, output, and generated files will be stored.
+                          Defaults to "$HOME/overcloud-deploy/<stack>"
+    --roles-data ROLES_DATA
+                          Path to an alternative roles_data.yaml. Used to decide
+                          which node gets which Ceph mon, mgr, or osd service
+                          based on the node's role in <deployed_baremetal.yaml>.
+    --mon-ip MON_IP
+                          IP address of the first Ceph monitor. Only available
+                          with --standalone.
+    --standalone          Create a spec file for a standalone deployment. Used
+                          for single server development or testing environments.
+    --osd-spec OSD_SPEC
+                          Path to an existing OSD spec file. When the Ceph spec
+                          file is generated its OSD spec defaults to
+                          {data_devices: {all: true}} for all service_type osd.
+                          Use --osd-spec to override the data_devices value
+                          inside the Ceph spec file.
+    --crush-hierarchy CRUSH_HIERARCHY
+                          Path to an existing crush hierarchy spec file.
+  $
+
+The spec file may then be edited if desired and passed directly like
+this::
 
   openstack overcloud ceph deploy \
           deployed_metal.yaml \
           -o deployed_ceph.yaml \
           --ceph-spec ~/ceph_spec.yaml
 
-All available disks (excluding the disk where the operating system is
-installed) are used as OSDs as per the following default inside the
-ceph spec::
+By default the spec instructs cephadm to use all available disks
+(excluding the disk where the operating system is installed) as OSDs.
+The syntax it uses to do this is the following::
 
   data_devices:
     all: true
@@ -328,9 +385,11 @@ and the following command is run::
 
 Then all rotating devices will be data devices and all non-rotating
 devices will be used as shared devices (wal, db). This is because when
-the dynamic Ceph service specification is built whatever is in the
+the dynamic Ceph service specification is built, whatever is in the
 file referenced by ``--osd-spec`` will be appended to the section of
-the specification if the `service_type` is "osd".
+the specification if the `service_type` is "osd". The same
+``--osd-spec`` is available to the `openstack overcloud ceph spec`
+command.
 
 Ceph VIP Options
 ----------------
@@ -486,11 +545,18 @@ containers and when the overcloud is deployed Nova compute services
 will then be set up on the same hosts.
 
 If you wish to generate the ceph spec with the modified placement
-described above before the ceph deployment, then the same file may be
-passed to a direct call of the ceph_spec_bootstrap ansible module::
+described above before the ceph deployment, then the same roles
+file may be passed to the 'openstack overcloud ceph spec' command::
 
-  ansible localhost -m ceph_spec_bootstrap \
-    -a "deployed_metalsmith=deployed_metal.yaml tripleo_roles=custom_roles.yaml"
+  openstack overcloud ceph spec \
+          --stack overcloud \
+          --roles-data custom_roles.yaml \
+          --output ceph_spec.yaml \
+          deployed_metal.yaml
+
+In the above example the `--stack` is used in order to find the
+working directory containing the Ansible inventory which was created
+when `openstack overcloud node provision` was run.
 
 Network Options
 ---------------
@@ -706,11 +772,20 @@ Container Options
 As described in :doc:`../deployment/container_image_prepare` the
 undercloud may be used as a container registry for ceph containers
 and there is a supported syntax to download containers from
-authenticated registries. By default `openstack overcloud ceph deploy`
-will pull the Ceph container in the default
-``container_image_prepare_defaults.yaml`` file. The version of the
-Ceph used in each OpenStack release changes per release and can be
-seen by running a command like this::
+authenticated registries.
+
+By default `openstack overcloud ceph deploy` will pull the Ceph
+container in the default ``container_image_prepare_defaults.yaml``
+file. If a `push_destination` is defined in this file, then the
+overcloud will be configured so it can access the local registry in
+order to download the Ceph container. This means that `openstack
+overcloud ceph deploy` will modify the overcloud's ``/etc/hosts``
+and ``/etc/containers/registries.conf`` files; unless the
+`--skip-hosts-config` and `--skip-container-registry-config` options
+are used or a `push_destination` is not defined.
+
+The version of the Ceph used in each OpenStack release changes per
+release and can be seen by running a command like this::
 
   egrep "ceph_namespace|ceph_image|ceph_tag" \
     /usr/share/tripleo-common/container-images/container_image_prepare_defaults.yaml

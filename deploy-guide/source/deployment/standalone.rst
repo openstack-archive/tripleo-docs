@@ -279,33 +279,39 @@ Deploying a Standalone OpenStack node
             --standalone \
             $HOME/ceph_spec.yaml \
 
-      Create an initial Ceph configuration file so that so that Ceph
-      is configured for a single node and single OSD deployment:
+      Though Ceph will be configured to run on a single host via the
+      `--single-host-defaults` option, this deployment only has a
+      single OSD so it cannot replicate data even on the same host.
+      Create an initial Ceph configuration to disable replication:
 
       .. code-block:: bash
 
          cat <<EOF > $HOME/initial_ceph.conf
          [global]
          osd pool default size = 1
-         osd pool default pg num = 8
-         osd pool default pgp num = 8
          [mon]
          mon_warn_on_pool_no_redundancy = false
          EOF
 
-      Deploy Ceph by passing the IP, Ceph spec and initial Ceph
-      configuration created above. Use the `--standalone` option.
-      User creation is skipped because it was handled in the previous
+      Deploy Ceph by passing the IP, Ceph spec and Ceph conf created
+      above. Use the options `--standalone`, `--single-host-defaults`,
+      `--skip-hosts-config` and `--skip-container-registry-config`.
+      Use `openstack overcloud ceph deploy --help` for details on what
+      these options do. User creation is skipped via
+      `--skip-user-create` because it was handled in the previous
       step. Specify what the output deployed Ceph file should be
       called.
 
       .. code-block:: bash
 
          sudo openstack overcloud ceph deploy \
-            --standalone \
             --mon-ip $CEPH_IP \
             --ceph-spec $HOME/ceph_spec.yaml \
             --config $HOME/initial_ceph.conf \
+            --standalone \
+            --single-host-defaults \
+            --skip-hosts-config \
+            --skip-container-registry-config \
             --skip-user-create \
             --output $HOME/deployed_ceph.yaml
 

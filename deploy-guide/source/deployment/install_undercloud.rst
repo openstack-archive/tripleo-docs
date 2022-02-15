@@ -255,6 +255,11 @@ used for undercloud deployment are stored in the tempdir
 ``~/undercloud-ansible-<XXXX>`` by default.
 
 .. note::
+    In order to obtain the ansible command used for the installation of the
+    Undercloud in the artifacts directory, it is necessary to pass the option
+    ``--reproduce-command`` in the Undercloud deployment command.
+
+.. note::
     Any passwords set in ``undercloud.conf`` will take precedence over the ones in
     ``undercloud-passwords.conf``.
 

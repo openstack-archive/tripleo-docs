@@ -129,6 +129,11 @@ Updating Undercloud Components
        ``--use-heat=False`` option. Note this isn't tested and not supported.
 
    .. note::
+       In order to obtain the ansible command used for the installation of the
+       Undercloud in the artifacts directory, it is necessary to pass the option
+       ``--reproduce-command`` in the Undercloud upgrade command.
+
+   .. note::
        It's possible to enable verbose logging with ``--verbose`` option.
        To cleanup an undercloud after its upgrade, you'll need to set
        upgrade_cleanup to True in undercloud.conf. It'll remove the rpms

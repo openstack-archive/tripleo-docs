@@ -1,5 +1,11 @@
-Advanced Profile Matching
-=========================
+(DEPRECATED)Advanced Profile Matching
+=====================================
+
+.. note:: Flavor based scheduling is not supported since Wallaby as
+   compute service is not used/available in the undercloud. However,
+   one can still assign a profile to a node and use that for node
+   filtering in `Baremetal Provision Configuration`_.
+
 
 Profile matching allows a user to specify precisely which nodes will receive
 which flavor. Here are additional setup steps to take advantage of the profile
@@ -213,3 +219,4 @@ they can be created as follows.
 
 
 .. _Introspection rules: https://docs.openstack.org/ironic-inspector/usage.html#introspection-rules
+.. _Baremetal Provision Configuration: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/provisioning/baremetal_provision.html#baremetal-provision-configuration

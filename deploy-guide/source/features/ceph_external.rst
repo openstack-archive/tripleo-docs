@@ -248,41 +248,17 @@ following parameters to enable backward compatibility features::
     ExtraConfig:
       ceph::profile::params::rbd_default_features: '1'
 
-Configuring Already Deployed Servers to use External Ceph
----------------------------------------------------------
-
-When using ceph-ansible and :doc:`deployed_server`, it is necessary
-to run commands like the following from the undercloud before
-deployment::
-
-    export OVERCLOUD_HOSTS="192.168.1.8 192.168.1.42"
-    bash /usr/share/openstack-tripleo-heat-templates/deployed-server/scripts/enable-ssh-admin.sh
-    for h in $OVERCLOUD_HOSTS ; do
-        ssh $h -l stack "sudo groupadd ceph -g 64045 ; sudo useradd ceph -u 64045 -g ceph"
-    done
-
-In the example above, the OVERCLOUD_HOSTS variable should be set to
-the IPs of the overcloud hosts which will be Ceph clients (e.g. Nova,
-Cinder, Glance, Gnocchi, Manila, etc.). The `enable-ssh-admin.sh`
-script configures a user on the overcloud nodes that Ansible uses to
-configure Ceph. The `for` loop creates the Ceph user on the relevant
-overcloud hosts.
-
-.. note::
-
-    If the overcloud is named differently than the default ("overcloud"),
-    then you'll have to set the OVERCLOUD_PLAN variable as well
-
 Deployment of an Overcloud with External Ceph
 ---------------------------------------------
 
 Finally add the above environment files to the deploy commandline. For
-Ocata and earlier::
+Wallaby and newer use::
 
-  openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/puppet-ceph-external.yaml -e ~/my-additional-ceph-settings.yaml
+  openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/external-ceph.yaml -e ~/my-additional-ceph-settings.yaml
 
-For Pike and later::
+For Train use::
 
   openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible-external.yaml -e ~/my-additional-ceph-settings.yaml
+
 
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars

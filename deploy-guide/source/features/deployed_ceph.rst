@@ -119,8 +119,10 @@ Deployed Ceph Command Line Interface
 The command line interface supports the following options::
 
   $ openstack overcloud ceph deploy --help
-  usage: openstack overcloud ceph deploy [-h] -o <deployed_ceph.yaml>
-                                         [-y] [--skip-user-create]
+  usage: openstack overcloud ceph deploy [-h] -o <deployed_ceph.yaml> [-y]
+                                         [--skip-user-create]
+                                         [--skip-hosts-config]
+                                         [--skip-container-registry-config]
                                          [--cephadm-ssh-user CEPHADM_SSH_USER]
                                          [--stack STACK]
                                          [--working-dir WORKING_DIR]
@@ -128,22 +130,28 @@ The command line interface supports the following options::
                                          [--network-data NETWORK_DATA]
                                          [--public-network-name PUBLIC_NETWORK_NAME]
                                          [--cluster-network-name CLUSTER_NETWORK_NAME]
-                                         [--config CONFIG]
+                                         [--mon-ip MON_IP] [--config CONFIG]
+                                         [--cephadm-extra-args CEPHADM_EXTRA_ARGS]
+                                         [--force] [--ceph-vip CEPH_VIP]
+                                         [--daemons DAEMONS]
+                                         [--single-host-defaults]
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC | --crush-hierarchy CRUSH_HIERARCHY]
-                                         [--ceph-vip CEPH_SERVICES]
+                                         [--standalone]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
+                                         [--cephadm-default-container]
                                          [--container-namespace CONTAINER_NAMESPACE]
                                          [--container-image CONTAINER_IMAGE]
                                          [--container-tag CONTAINER_TAG]
                                          [--registry-url REGISTRY_URL]
                                          [--registry-username REGISTRY_USERNAME]
                                          [--registry-password REGISTRY_PASSWORD]
-                                         <deployed_baremetal.yaml>
+                                         [<deployed_baremetal.yaml>]
 
   positional arguments:
     <deployed_baremetal.yaml>
                           Path to the environment file output from "openstack
-                          overcloud node provision".
+                          overcloud node provision". This argument may be
+                          excluded only if --ceph-spec is used.
 
   optional arguments:
     -h, --help            show this help message and exit
@@ -168,8 +176,7 @@ The command line interface supports the following options::
                           option is used, it must be used consistently for every
                           'openstack overcloud ceph' call. Defaults to 'ceph-
                           admin'. (default=Env: CEPHADM_SSH_USER)
-    --stack STACK
-                          Name or ID of heat stack (default=Env:
+    --stack STACK         Name or ID of heat stack (default=Env:
                           OVERCLOUD_STACK_NAME)
     --working-dir WORKING_DIR
                           The working directory for the deployment where all
@@ -204,21 +211,33 @@ The command line interface supports the following options::
                           Name of the network defined in network_data.yaml which
                           should be used for the Ceph cluster_network. Defaults
                           to 'storage_mgmt'.
-    --config CONFIG
-                          Path to an existing ceph.conf with settings to be
+    --mon-ip MON_IP       IP address of the first Ceph monitor. If not set, an
+                          IP from the Ceph public_network of a server with the
+                          mon label from the Ceph spec is used. IP must already
+                          be active on server.
+    --config CONFIG       Path to an existing ceph.conf with settings to be
                           assimilated by the new cluster via 'cephadm bootstrap
                           --config'
-    --ceph-spec CEPH_SPEC
-                          Path to an existing Ceph spec file. If not provided a
-                          spec will be generated automatically based on --roles-
-                          data and <deployed_baremetal.yaml>
-    --ceph-vip CEPH_SERVICES
-                          Path to an existing Ceph services/network mapping file
+    --cephadm-extra-args CEPHADM_EXTRA_ARGS
+                          String of extra parameters to pass cephadm. E.g. if
+                          --cephadm-extra-args '--log-to-file --skip-prepare-
+                          host', then cephadm boostrap will use those options.
+                          Warning: requires --force as not all possible options
+                          ensure a functional deployment.
+    --force               Run command regardless of consequences.
+    --ceph-vip CEPH_VIP   Path to an existing Ceph services/network mapping
+                          file.
+    --daemons DAEMONS     Path to an existing Ceph daemon options definition.
     --single-host-defaults
                           Adjust configuration defaults to suit a single-host
                           Ceph cluster.
-    --osd-spec OSD_SPEC
-                          Path to an existing OSD spec file. Mutually exclusive
+    --ceph-spec CEPH_SPEC
+                          Path to an existing Ceph spec file. If not provided a
+                          spec will be generated automatically based on --roles-
+                          data and <deployed_baremetal.yaml>. The
+                          <deployed_baremetal.yaml> parameter is optional only
+                          if --ceph-spec is used.
+    --osd-spec OSD_SPEC   Path to an existing OSD spec file. Mutually exclusive
                           with --ceph-spec. If the Ceph spec file is generated
                           automatically, then the OSD spec in the Ceph spec file
                           defaults to {data_devices: {all: true}} for all
@@ -226,6 +245,8 @@ The command line interface supports the following options::
                           data_devices value inside the Ceph spec file.
     --crush-hierarchy CRUSH_HIERARCHY
                           Path to an existing crush hierarchy spec file.
+    --standalone          Use single host Ansible inventory. Used only for
+                          development or testing environments.
     --container-image-prepare CONTAINER_IMAGE_PREPARE
                           Path to an alternative
                           container_image_prepare_defaults.yaml. Used to control
@@ -233,6 +254,11 @@ The command line interface supports the following options::
                           ceph_namespace, ceph_image, and ceph_tag variables in
                           addition to registry authentication via
                           ContainerImageRegistryCredentials.
+    --cephadm-default-container
+                          Use the default continer defined in cephadm instead of
+                          container_image_prepare_defaults.yaml. If this is
+                          used, 'cephadm bootstrap' is not passed the --image
+                          parameter.
 
   container-image-prepare overrides:
     The following options may be used to override individual values set via
@@ -251,6 +277,7 @@ The command line interface supports the following options::
     --registry-password REGISTRY_PASSWORD
 
   This command is provided by the python-tripleoclient plugin.
+
   $
 
 Run `openstack overcloud ceph deploy --help` in your own environment
@@ -288,6 +315,22 @@ option, which configures a Ceph cluster to run on a single host::
 
   openstack overcloud ceph deploy --single-host-defaults
 
+Any option available from running `cephadm bootstrap --help` may be
+passed through `openstack overcloud ceph deploy` with the
+`--cephadm-extra-args` argument. For example::
+
+    openstack overcloud ceph deploy --force \
+      --cephadm-extra-args '--log-to-file --skip-prepare-host' \
+      ...
+
+When the above is run the following will be run on the cephadm
+bootstrap node (the first controller node by default) on the
+overcloud::
+
+  cephadm bootstrap --log-to-file --skip-prepare-host ...
+
+The `--force` option is required when using `--cephadm-extra-args`
+because not all possible options ensure a functional deployment.
 
 Ceph Spec Options
 -----------------

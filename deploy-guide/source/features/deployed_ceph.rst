@@ -211,6 +211,14 @@ The command line interface supports the following options::
                           Name of the network defined in network_data.yaml which
                           should be used for the Ceph cluster_network. Defaults
                           to 'storage_mgmt'.
+    --cluster CLUSTER
+                          Name of the Ceph cluster. If set to 'foo', then the files
+                          /etc/ceph/<FSID>/foo.client.admin.keyring and
+                          /etc/ceph/<FSID>/foo.conf will be created. Otherwise these
+                          files will use the name 'ceph'. Changing this means changing
+                          command line calls too, e.g. 'ceph health' will become 'ceph
+                          --cluster foo health' unless export CEPH_ARGS='--cluster foo'
+                          is used.
     --mon-ip MON_IP       IP address of the first Ceph monitor. If not set, an
                           IP from the Ceph public_network of a server with the
                           mon label from the Ceph spec is used. IP must already
@@ -332,6 +340,45 @@ overcloud::
 The `--force` option is required when using `--cephadm-extra-args`
 because not all possible options ensure a functional deployment.
 
+Ceph Name Options
+-----------------
+
+To use a deploy with a different cluster name than the default of
+"ceph" use the ``--cluster`` option::
+
+  openstack overcloud ceph deploy \
+          --cluster central \
+          ...
+
+The above will result in keyrings and Ceph configuration files being
+created with the name passed to cluster, for example::
+
+  [root@oc0-controller-0 ~]# ls -l /etc/ceph/
+  total 16
+  -rw-------. 1 root root  63 Mar 26 21:49 central.client.admin.keyring
+  -rw-------. 1  167  167 201 Mar 26 22:17 central.client.openstack.keyring
+  -rw-------. 1  167  167 134 Mar 26 22:17 central.client.radosgw.keyring
+  -rw-r--r--. 1 root root 177 Mar 26 21:49 central.conf
+  [root@oc0-controller-0 ~]#
+
+When `cephadm shell` is run on an overcloud node like the above, Ceph
+commands might return the error ``monclient: get_monmap_and_config
+cannot identify monitors to contact`` because the default "ceph" name
+is not used. Thus, if the ``--cluster`` is used when deploying Ceph,
+then use options like the following to run `cephadm shell` after
+deployment::
+
+  cephadm shell --config /etc/ceph/central.conf \
+                --keyring /etc/ceph/central.client.admin.keyring
+
+Another solution is to use the following before running ceph commands::
+
+  cephadm shell --mount /etc/ceph:/etc/ceph
+  export CEPH_ARGS='--cluster central'
+
+After using either of the above standard Ceph commands should work
+within the cephadm shell container.
+
 Ceph Spec Options
 -----------------
 
@@ -339,9 +386,9 @@ The roles file, described in the next section, and the output of
 `openstack overcloud node provision` are passed to the
 `ceph_spec_bootstrap`_ Ansible module to create a `Ceph Service
 Specification`_. The `openstack overcloud ceph deploy` command does
-this automatically so that a spec does usually need to be generated
-separately. However, it is possible to generate a ceph spec before
-deployment with the following command::
+this automatically so that a spec does not usually need to be
+generated separately. However, it is possible to generate a ceph spec
+before deployment with the following command::
 
   $ openstack overcloud ceph spec --help
   usage: openstack overcloud ceph spec [-h] -o <ceph_spec.yaml> [-y]

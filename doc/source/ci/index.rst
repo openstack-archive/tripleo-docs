@@ -18,3 +18,4 @@ TripleO CI Guide
   third_party_dependencies_ci
   content_provider_jobs
   tripleo_dependencies_pipelines
+  tripleo_ci_job_parenting

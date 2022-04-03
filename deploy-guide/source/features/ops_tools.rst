@@ -71,20 +71,25 @@ Before deploying the Overcloud
 
 1. Install client packages on overcloud-full image:
 
-   - Prepare installation script::
+   - Mount the image and create a chroot::
 
-      cat >install.sh<<EOF
-      #!/usr/bin/sh
-      yum install -y centos-release-opstools
-      yum install -y sensu fluentd collectd
-      EOF
+      temp_dir=$(mktemp -d)
+      sudo tripleo-mount-image -a /path/to/overcloud-full.qcow2 -m $temp_dir
+      sudo mount -o bind /dev $temp_dir/dev/
+      sudo cp /etc/resolv.conf $temp_dir/etc/resolv.conf
+      sudo chroot $temp_dir /bin/bash
 
-   - Run the script using virt-customize::
+   - Install the packages inside the chroot::
 
-      LIBGUESTFS_BACKEND=direct virt-customize -a /path/to/overcloud-full.qcow2 \
-        --upload install.sh:/tmp/install.sh \
-        --run-command "sh /tmp/install.sh" \
-        --selinux-relabel
+      dnf install -y centos-release-opstools
+      dnf install -y sensu fluentd collectd
+      exit
+
+   - Unmount the image::
+
+      sudo rm $temp_dir/etc/resolv.conf
+      sudo umount $temp_dir/dev
+      sudo tripleo-unmount-image -m $temp_dir
 
    - Upload new image to undercloud image registry::
 

@@ -538,6 +538,64 @@ to the ceph deploy command via the `--ceph-vip` option::
           --ceph-vip ~/ceph_services.yaml
 
 
+Deploy additional daemons
+-------------------------
+A new option `--daemons` for the `openstack overcloud ceph deploy` command has
+been added and may be used to define additional Ceph daemons that are deployed
+during the Ceph provisioning process.
+This option requires a data structure which defines the services to be
+deployed::
+
+  ceph_nfs:
+    cephfs_data: 'manila_data'
+    cephfs_metadata: 'manila_metadata'
+  ceph_rgw: {}
+  ceph_ingress:
+    tripleo_cephadm_haproxy_container_image: undercloud.ctlplane.mydomain.tld:8787/ceph/haproxy:2.3
+    tripleo_cephadm_keepalived_container_image: undercloud.ctlplane.mydomain.tld:8787/ceph/keepalived:2.5.1
+
+For each service added to the data structure above, additional options can be
+defined and passed as extra_vars to the tripleo-ansible flow. If no option is
+specified, the default values provided by the cephadm tripleo-ansible role will
+be used.
+
+
+Example: deploy HA Ceph NFS daemon
+----------------------------------
+Cephadm is able to deploy and manage the lifecycle of a highly available
+ceph-nfs daemon, called `CephIngress`_, which uses haproxy and keepalived. The
+`--daemon` option described in the previous section, provides:
+
+#. a stable, VIP managed by keepalived used to access the NFS service
+#. fail-over between hosts in case of failure
+#. load distribution across multiple NFS gateways through Haproxy
+
+To deploy a cephadm managed ceph-nfs daemon with the related ingress service,
+create a `ceph_daemons.yaml` spec file with the following definition::
+
+  ceph_nfs:
+    cephfs_data: 'manila_data'
+    cephfs_metadata: 'manila_metadata'
+  ceph_ingress:
+    tripleo_cephadm_haproxy_container_image: undercloud.ctlplane.mydomain.tld:8787/ceph/haproxy:2.3
+    tripleo_cephadm_keepalived_container_image: undercloud.ctlplane.mydomain.tld:8787/ceph/keepalived:2.5.1
+
+When the environment file containing the services definition described above is
+created, it can be passed to the ceph deploy command via the `--daemon`
+option::
+
+  openstack overcloud ceph deploy \
+          deployed_metal.yaml \
+          -o deployed_ceph.yaml \
+          --ceph-vip ~/ceph_services.yaml \
+          --daemon ~/ceph_daemons.yaml
+
+.. note::
+   A VIP must be reserved for the ceph_nfs service and passed to the command
+   above. For further information on reserving a VIP for a Ceph service, see
+   `Ceph VIP Options`_.
+
+
 Crush Hierarchy Options
 -----------------------
 
@@ -928,3 +986,4 @@ words, the above options are overrides.
 .. _`Advanced OSD Service Specifications`: https://docs.ceph.com/en/octopus/cephadm/drivegroups/
 .. _`Ceph Host Management`: https://docs.ceph.com/en/latest/cephadm/host-management/#setting-the-initial-crush-location-of-host
 .. _`Overriding crush rules`: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/features/cephadm.html#overriding-crush-rules
+.. _`CephIngress`: https://docs.ceph.com/en/pacific/cephadm/services/nfs/#high-availability-nfs

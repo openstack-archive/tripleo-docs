@@ -225,7 +225,7 @@ Tag node into the new flavor using the following command
 
 .. code-block:: bash
 
-  openstack baremetal node set --property \
+  baremetal node set --property \
   capabilities='profile:cellcontroller,boot_option:local' <node id>
 
 Verify the tagged cellcontroller:

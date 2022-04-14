@@ -275,7 +275,7 @@ setting below::
 Existing nodes can be updated to use the ``direct`` deploy interface. For
 example::
 
-    openstack baremetal node set --deploy-interface direct 4b64a750-afe3-4236-88d1-7bb88c962666
+    baremetal node set --deploy-interface direct 4b64a750-afe3-4236-88d1-7bb88c962666
 
 .. _deploy_control_plane:
 

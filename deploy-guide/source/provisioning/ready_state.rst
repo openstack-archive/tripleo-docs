@@ -28,4 +28,4 @@ Make sure the nodes have profiles assigned as described in
 :doc:`profile_matching`. Create a JSON file with the target ready-state
 configuration for each profile. Then trigger the configuration::
 
-    openstack baremetal configure ready state ready-state.json
+    baremetal configure ready state ready-state.json

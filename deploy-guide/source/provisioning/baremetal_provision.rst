@@ -586,9 +586,9 @@ The overcloud can then be deployed using the output from the provision command::
 Viewing Provisioned Node Details
 --------------------------------
 
-The commands ``openstack baremetal node list`` and ``openstack baremetal node
-show`` continue to show the details of all nodes, however there are some new
-commands which show a further view of the provisioned nodes.
+The commands ``baremetal node list`` and ``baremetal node show`` continue to
+show the details of all nodes, however there are some new commands which show a
+further view of the provisioned nodes.
 
 The `metalsmith`_ tool provides a unified view of provisioned nodes, along with
 allocations and neutron ports. This is similar to what Nova provides when it
@@ -600,11 +600,11 @@ managed by metalsmith, run::
 The baremetal allocation API keeps an association of nodes to hostnames,
 which can be seen by running::
 
-  openstack baremetal allocation list
+  baremetal allocation list
 
 The allocation record UUID will be the same as the Instance UUID for the node
 which is allocated. The hostname can be seen in the allocation record, but it
-can also be seen in the ``openstack baremetal node show`` property
+can also be seen in the ``baremetal node show`` property
 ``instance_info``, ``display_name``.
 
 

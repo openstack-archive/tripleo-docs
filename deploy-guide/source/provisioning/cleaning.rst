@@ -39,7 +39,7 @@ to wipe the node's metadata starting with the Rocky release:
 
 #. If the node is not in the ``manageable`` state, move it there::
 
-    openstack baremetal node manage <UUID or name>
+    baremetal node manage <UUID or name>
 
 #. Run manual cleaning on a specific node::
 

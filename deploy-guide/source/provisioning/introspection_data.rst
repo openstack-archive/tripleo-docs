@@ -9,7 +9,7 @@ the hardware and puts them as JSON in Swift. Starting with
 ``python-ironic-inspector-client`` version 1.4.0 there is a command to retrieve
 this data::
 
-    openstack baremetal introspection data save <UUID>
+    baremetal introspection data save <UUID>
 
 You can provide a ``--file`` argument to save the data in a file instead of
 displaying it.
@@ -48,7 +48,7 @@ and use that to collect a list of node mac addresses::
     export IRONIC_INSPECTOR_PASSWORD=xxxxxx
 
     # Download the extra introspection data from swift:
-    for node in $(openstack baremetal node list -f value -c UUID);
+    for node in $(baremetal node list -f value -c UUID);
       do swift -U service:ironic -K $IRONIC_INSPECTOR_PASSWORD download ironic-inspector extra_hardware-$node;
     done
 
@@ -71,7 +71,7 @@ Extra data examples
 
 Here is an example of CPU extra data, including benchmark results::
 
-    $ openstack baremetal introspection data save <UUID> | jq '.extra.cpu'
+    $ baremetal introspection data save <UUID> | jq '.extra.cpu'
     {
         "physical": {
             "number": 1
@@ -108,7 +108,7 @@ Here is an example of CPU extra data, including benchmark results::
 
 Here is an example of disk extra data, including benchmark results::
 
-    $ openstack baremetal introspection data save <UUID> | jq '.extra.disk'
+    $ baremetal introspection data save <UUID> | jq '.extra.disk'
     {
         "logical": {
             "count": 1

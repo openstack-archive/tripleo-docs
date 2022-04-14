@@ -127,7 +127,7 @@ be used later during deployment for servers in the ComputeHCI role. We
 will use this server's Ironic UUID so that the playbook gets its
 introspection data::
 
-  [stack@undercloud ~]$ openstack baremetal node list | grep ceph-2
+  [stack@undercloud ~]$ baremetal node list | grep ceph-2
   | ef4cbd49-3773-4db2-80da-4210a7c24047 | ceph-2       | None          | power off   | available | False       |
   [stack@undercloud ~]$
 

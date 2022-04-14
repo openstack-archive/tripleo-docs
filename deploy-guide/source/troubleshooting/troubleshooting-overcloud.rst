@@ -31,7 +31,7 @@ Next, there are a few layers on which the deployment can fail:
 * Post-deploy configuration (Puppet)
 
 As Ironic service is in the middle layer, you can use its shell to guess the
-failed layer. Issue ``openstack baremetal node list`` command to see all
+failed layer. Issue ``baremetal node list`` command to see all
 registered nodes and their current status, you will see something like::
 
     +--------------------------------------+------+---------------+-------------+-----------------+-------------+
@@ -50,7 +50,7 @@ in the resulting table.
 
   You can check the actual cause using the following command::
 
-    $ openstack baremetal node show <UUID> -f value -c maintenance_reason
+    $ baremetal node show <UUID> -f value -c maintenance_reason
 
   For example, **Maintenance** goes to ``True`` automatically, if wrong power
   credentials are provided.
@@ -58,7 +58,7 @@ in the resulting table.
   Fix the cause of the failure, then move the node out of the maintenance
   mode::
 
-    $ openstack baremetal node maintenance unset <NODE UUID>
+    $ baremetal node maintenance unset <NODE UUID>
 
 * If **Provision State** is ``available`` then the problem occurred before
   bare metal deployment has even started. Proceed with `Debugging Using Heat`_.
@@ -75,7 +75,7 @@ in the resulting table.
 * If **Provision State** is ``error`` or ``deploy failed``, then bare metal
   deployment has failed for this node. Look at the **last_error** field::
 
-    $ openstack baremetal node show <UUID> -f value -c last_error
+    $ baremetal node show <UUID> -f value -c last_error
 
   If the error message is vague, you can use logs to clarify it, see
   :ref:`ironic_logs` for details.
@@ -266,7 +266,7 @@ you have enough nodes corresponding to each flavor/profile. Watch
 
 ::
 
-    $ openstack baremetal node show <UUID> --fields properties
+    $ baremetal node show <UUID> --fields properties
 
 It should contain e.g. ``profile:compute`` for compute nodes.
 

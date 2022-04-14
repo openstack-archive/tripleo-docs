@@ -11,17 +11,17 @@ for more details.
 
 For example::
 
-    openstack baremetal node set <UUID> --property root_device='{"wwn": "0x4000cca77fc4dba1"}'
+    baremetal node set <UUID> --property root_device='{"wwn": "0x4000cca77fc4dba1"}'
 
 To remove a hint and fallback to the default behavior::
 
-    openstack baremetal node unset <UUID> --property root_device
+    baremetal node unset <UUID> --property root_device
 
 Note that the root device hints should be assigned *before* both introspection
 and deployment. After changing the root device hints you should either re-run
 introspection or manually fix the ``local_gb`` property for a node::
 
-    openstack baremetal node set <UUID> --property local_gb=<NEW VALUE>
+    baremetal node set <UUID> --property local_gb=<NEW VALUE>
 
 Where the new value is calculated as a real disk size in GiB minus 1 GiB to
 account for partitioning (the introspection process does this calculation
@@ -61,7 +61,7 @@ introspection to figure it out. First start with :ref:`introspection` as usual
 without setting any root device hints. Then use the stored introspection data
 to list all disk devices::
 
-    openstack baremetal introspection data save fdf975ae-6bd7-493f-a0b9-a0a4667b8ef3 | jq '.inventory.disks'
+    baremetal introspection data save fdf975ae-6bd7-493f-a0b9-a0a4667b8ef3 | jq '.inventory.disks'
 
 For **python-ironic-inspector-client** versions older than 1.4.0 you can use
 the ``curl`` command instead, see :ref:`introspection_data` for details.

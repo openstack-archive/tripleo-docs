@@ -138,11 +138,11 @@ Installation Steps
      undercloud::
 
        source ~/stackrc
-       openstack baremetal conductor list
+       baremetal conductor list
 
      Example output::
 
-       (undercloud) [stack@undercloud ~]$ openstack baremetal conductor list
+       (undercloud) [stack@undercloud ~]$ baremetal conductor list
        +------------------------+-----------------+-------+
        | Hostname               | Conductor Group | Alive |
        +------------------------+-----------------+-------+

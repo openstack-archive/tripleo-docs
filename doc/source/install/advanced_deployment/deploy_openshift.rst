@@ -305,7 +305,7 @@ of your OpenShift nodes.
 
    .. code-block:: bash
 
-      openstack baremetal node list
+      baremetal node list
 
 2. Locate the OpenShift node:
 

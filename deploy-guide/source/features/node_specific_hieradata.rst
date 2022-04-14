@@ -26,7 +26,7 @@ Ironic database.
 
 Then extract the machine unique UUID for the target node with a command like::
 
-  openstack baremetal introspection data save NODE-ID | jq .extra.system.product.uuid | tr '[:upper:]' '[:lower:]'
+  baremetal introspection data save NODE-ID | jq .extra.system.product.uuid | tr '[:upper:]' '[:lower:]'
 
 where `NODE-ID` is the target node Ironic UUID. The value returned by the above
 command will be a unique and immutable machine UUID which isn't related to the
@@ -70,8 +70,8 @@ introspection data.
 Export the introspection data from Ironic for the Ceph nodes to be
 deployed::
 
-  openstack baremetal introspection data save oc0-ceph-0 > ceph0.json
-  openstack baremetal introspection data save oc0-ceph-1 > ceph1.json
+  baremetal introspection data save oc0-ceph-0 > ceph0.json
+  baremetal introspection data save oc0-ceph-1 > ceph1.json
   ...
 
 Copy the utility to the stack user's home directory on the undercloud
@@ -80,11 +80,10 @@ be passed during openstack overcloud deployment::
 
   ./make_ceph_disk_list.py -i ceph*.json -o node_data_lookup.json -k by_path
 
-Pass the introspection data file from `openstack baremetal
-introspection data save` for all nodes hosting Ceph OSDs to the
-utility as you may only define `NodeDataLookup` once during a
-deployment. The `-i` option can take an expression like `*.json` or a
-list of files as input.
+Pass the introspection data file from `baremetal introspection data save` for
+all nodes hosting Ceph OSDs to the utility as you may only define
+`NodeDataLookup` once during a deployment. The `-i` option can take an
+expression like `*.json` or a list of files as input.
 
 The `-k` option defines the key of ironic disk data structure to use
 to identify the disk to be used as an OSD. Using `name` is not

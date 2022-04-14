@@ -46,7 +46,7 @@ registration process (which may hang due to this), it means that Ironic is
 unable to verify power management credentials, and you need to fix them.
 Check the ``pm_addr``, ``pm_user`` and ``pm_password`` fields in your
 ``instackenv.json``. In some cases (e.g. when using
-:doc:`../environments/virtualbmc`) you also need a correct ``pm_port``.
+:doc:`../environments/virtual`) you also need a correct ``pm_port``.
 Update the node as explained in `Fixing invalid node information`_.
 
 Fixing invalid node information

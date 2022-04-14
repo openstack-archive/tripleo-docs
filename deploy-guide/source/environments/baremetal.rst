@@ -321,23 +321,8 @@ Generic Hardware Types
   .. admonition:: Virtual
      :class: virtual
 
-     When combined with :doc:`virtualbmc`, this hardware type can be used for
-     developing and testing TripleO in a virtual environment as well.
-
-     .. admonition:: Stable Branch
-        :class: stable
-
-        Prior to the Ocata release, a special ``pxe_ssh`` driver was used for
-        testing Ironic in the virtual environment. This driver connects to the
-        hypervisor to conduct management operations on virtual nodes. In case
-        of this driver, ``pm_addr`` is a hypervisor address, ``pm_user`` is
-        a SSH user name for accessing hypervisor, ``pm_password`` is a private
-        SSH key for accessing hypervisor. Note that private key must not be
-        encrypted.
-
-        .. warning::
-          The ``pxe_ssh`` driver is deprecated and ``pxe_ipmitool`` +
-          :doc:`virtualbmc` should be used instead.
+     This hardware type can be used for developing and testing TripleO in a
+     :doc:`virtual` as well.
 
 * Another generic hardware type is redfish_. It provides support for the
   quite new `Redfish standard`_, which aims to replace IPMI eventually as

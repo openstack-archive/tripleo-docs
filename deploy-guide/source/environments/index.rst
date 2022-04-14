@@ -10,4 +10,3 @@ section contains instructions on how to setup your environments properly.
    standalone
    virtual
    baremetal
-   virtualbmc

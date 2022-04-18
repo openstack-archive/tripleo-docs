@@ -82,7 +82,7 @@ It can also be used for undercloud deployment.
 tripleo-ci-base-standalone-standard
 -----------------------------------
 It contains a set of ansible variables and playbooks used in
-most standalone and standalone scenario jobs.
+vanilla standalone and standalone based scenario jobs.
 
 The standalone job consists of single node overcloud deployment.
 
@@ -99,9 +99,9 @@ tripleo-ci-base-ovb-standard
 It contains a set of ansible variables and playbooks used in
 the virtual baremetal deployment.
 
-The ovb job consists of one undercloud and multiple overcloud
-deployment having one compute and multiple controllers
-on virtual baremetals nodes. It is a replica of
+The ovb job consists of one undercloud and four overcloud
+nodes (one compute and multiple controllers) deployed as
+virtual baremetal nodes. It is a replica of
 real world customer deployments.
 
 It is used in RDO and downstream jobs.
@@ -119,12 +119,12 @@ during build overcloud images and pushing it to image server.
 tripleo-ci-content-provider-standard
 ------------------------------------
 It contains a set of ansible variables and playbooks used for
-building containers and pushing it to local registry,
-building depends-on patches into respective rpm packages via DLRN and
-serving a local yum repos.
+building containers and pushing them to a local registry.
+Depends-on patches are built into respective rpm packages via DLRN and
+served by a local yum repos.
 
-The job is paused to serve container registry and yum repos which later
-on used in dependent jobs.
+The job is `paused`_ to serve container registry and yum repos which
+can be used later in dependent jobs.
 
 Currently these jobs are running in Upstream and Downstream.
 
@@ -134,20 +134,24 @@ Required Project Jobs
 It contains the list of required projects needed for specific type
 of deployment.
 
-For example: `tripleo-ci-build-containers-required-projects-upstream`_ have
-required projects like ansible-role-container-registry,
-kolla, python-tripleoclient, tripleo-ansible used in Upstream for building containers.
+Upstream job `tripleo-ci-build-containers-required-projects-upstream`_
+requires projects like ansible-role-container-registry,
+kolla, python-tripleoclient, tripleo-ansible to build containers.
 
-In RDO, we have `tripleo-ci-build-containers-required-projects-rdo`_ for the same.
+In case of RDO `tripleo-ci-build-containers-required-projects-rdo`_ serves the
+same purpose.
 
 Many Upstream OpenStack projects are forked downstream and have different
 branches.
 
-To accommodate the downstream namespace and branches we can use a downstream
+To accommodate the downstream namespace and branches we use the downstream
 specific required project job (*required-projects-downstream*)
 as a base job with proper branches and override-checkout.
 
-Below is one of the example of container multinode required projects job.
+tripleo-ci-base-required-projects-multinode-internal job defined in the
+examples are perfect example for the same.
+
+Below is one of the examples of container multinode required projects job.
 
 `Upstream`_ ::
 
@@ -218,7 +222,7 @@ Distribution Jobs
 +++++++++++++++++
 
 The TripleO deployment is supported on multiple distro versions.
-Here is the current supported martrix in RDO. Downstream and Upstream.
+Here is the current supported matrix in RDO, Downstream and Upstream.
 
 +----------+------------------------------+-------------+
 | Release  | CentOS/CentOS Stream Version |RHEL Version |
@@ -237,7 +241,7 @@ Here is the current supported martrix in RDO. Downstream and Upstream.
 Each of these distros have different settings which are used in deployment.
 It's easier to maintain separate variables based on distributions.
 
-Below is the example of distro jobs for containers multinode at different levels.
+Below is an example of distro jobs for containers multinode at different levels.
 
 `Upstream Distro Jobs`_ ::
 
@@ -315,7 +319,7 @@ Below is the example of distro jobs for containers multinode at different levels
 Zuul Job Inheritance Order
 ++++++++++++++++++++++++++
 
-Here is the example of Upstream inheritance of tripleo-ci-centos-9-containers-multinode_ job.::
+Here is an example of Upstream inheritance of tripleo-ci-centos-9-containers-multinode_ job.::
 
     tripleo-ci-base-common-required-projects
        |
@@ -366,23 +370,23 @@ RDO
 * `config <https://github.com/rdo-infra/review.rdoproject.org-config/tree/master/zuul.d>`_: Jobs which needs secrets are defined here.
 * `rdo-jobs <https://github.com/rdo-infra/rdo-jobs/tree/master/zuul.d>`_
 
-FAQs regarding tripleo CI jobs
+FAQs regarding TripleO CI jobs
 ++++++++++++++++++++++++++++++
 
 * If we have a new project, which needs to be tested at all places
   and installed from source but
 
-  - cloned from upstream source, then it needs to be added under required-projects
+  - cloned from upstream source, then it must be added under required-projects
     at tripleo-ci-base-common-required-projects job.
 
-  - the project namespace is different in Upstream and downstream, then it needs to be
+  - the project namespace is different in Upstream and downstream, then it must be
     added under required-projects at
     Downstream (tripleo-ci-base-required-projects-multinode-internal) or
     Upstream (tripleo-ci-base-required-projects-multinode-upstream) specific
     required-projects parent job.
 
-  - if the project is only developed at downstream or RDO or Upstream, then it needs
-    to be added under required project at downstream or RDO or Upstream required-projects
+  - if the project is only developed at downstream or RDO or Upstream, then it must
+    be added under required project at downstream or RDO or Upstream required-projects
     parent job.
 
 * In order to add support for new distros, please use required-projects job as a
@@ -391,7 +395,7 @@ FAQs regarding tripleo CI jobs
 * If a project with different branch is re-added in child job required-projects,
   then the child job project will be used in the deployment.
 
-* If a playbook (which calls another role, exists in different repo ) is called at
+* If a playbook (which calls another role, exists in different repo) is called at
   pre-run step in Zuul job, then role specific required projects and roles needs
   to be added at that job level. For example: In `tripleo-ci-containers-rdo-upstream-pre`_
   job, ansible-role-container-registry and triple-ansible is needed for pre.yaml playbook.
@@ -400,12 +404,13 @@ FAQs regarding tripleo CI jobs
 * If a job having pre/post run playbook needs zuul secrets and playbook depends on
   distros, then the job needs to be defined in config repo.
 
-* We should not use branches attributies in Zuul Distro jobs or options jobs.
+* We should not use branches `attributes`_ in Zuul Distro jobs or options jobs.
 
 .. _`zuul.d`: https://opendev.org/openstack/tripleo-ci/src/branch/master/zuul.d
 .. _`parent`: https://zuul-ci.org/docs/zuul/latest/config/job.html#attr-job.parent
 .. _`zuul.d/base-upstream.yaml`: https://opendev.org/openstack/tripleo-ci/src/branch/master/zuul.d/base-upstream.yaml
 .. _`tripleo-ci-build-containers-required-projects-rdo`: https://github.com/rdo-infra/rdo-jobs/commit/86e7e63ce6da27c2815afa845a6878cf96acdb47#diff-4897e02c92e2979a54f09d6eb383dba74c9a9211b065a52f9ecc4efbcce19637R17
+.. _`paused`: https://zuul-ci.org/docs/zuul/latest/job-content.html#pausing-the-job
 .. _`tripleo-ci-build-containers-required-projects-upstream`: https://opendev.org/openstack/tripleo-ci/commit/1d640d09fd808caa33b82f0bdd5622120cebef09
 .. _`Upstream`: https://opendev.org/openstack/tripleo-ci/src/commit/9e270ea7f8c19fc3902a38d87a7ea4ace8219cd9/zuul.d/multinode-jobs.yaml#L17
 .. _`RDO`: https://github.com/rdo-infra/review.rdoproject.org-config/commit/b96b916fb2446171f5040ba8168c470a79f1befa#diff-80b60a19d10a7b56e22da7bfc1926e4e8d2143670b3ec3f26d009bda8e8910bfR527
@@ -414,3 +419,4 @@ FAQs regarding tripleo CI jobs
 .. _`periodic-tripleo-ci-centos-8-containers-multinode-master`: https://review.rdoproject.org/zuul/job/periodic-tripleo-ci-centos-8-containers-multinode-master
 .. _`tripleo-ci-centos-9-containers-multinode`: https://zuul.openstack.org/job/tripleo-ci-centos-9-containers-multinode
 .. _`tripleo-ci-containers-rdo-upstream-pre`: https://opendev.org/openstack/tripleo-ci/commit/05366af2930d76b4791a0fcb1f8ed9fddb132721
+.. _`attributes`: https://opendev.org/openstack/tripleo-ci/commit/bda6e1a61a846890c9cc39d0bc91952e9c6deb8f

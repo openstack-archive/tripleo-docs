@@ -7,6 +7,13 @@ containing Ceph packages, including ceph-ansible if applicable, have
 been enabled and installed as described in
 :doc:`../deployment/index`.
 
+.. warning:: TripleO integration with ceph-ansible became deprecated
+             in Wallaby and support was removed in the next release.
+             TripleO integration with puppet-ceph became deprecated
+             in Pike and support was removed in the next release.
+             For Wallaby and newer use :doc:`deployed_ceph` to have
+             TripleO deploy Ceph.
+
 Deploying an Overcloud with Ceph
 --------------------------------
 
@@ -23,18 +30,16 @@ and also use the `CephExternalMultiConfig` parameter described in the
 :doc:`ceph_external` documentation.
 
 Prior to Pike, TripleO deployed Ceph with `puppet-ceph`_. With the
-Pike release it is possible to use TripleO to deploy Ceph with
-either `ceph-ansible`_ or puppet-ceph, though puppet-ceph is
-deprecated. To deploy Ceph in containers use `ceph-ansible`, for which
-only a containerized Ceph deployment is possible. It is not possible
-to deploy a containerized Ceph with `puppet-ceph`.
+Pike release it became possible to use TripleO to deploy Ceph with
+`ceph-ansible`_ and puppet-ceph became deprecated.
 
 TripleO Wallaby can deploy Ceph Pacific with ceph-ansible though
-Wallaby is the last planned release with ceph-ansible integration.
-Wallaby is also able to deploy a full Ceph RBD cluster using cephadm
-in place of ceph-ansible as described in :doc:`cephadm`. TripleO's
-cephadm integration does not yet support deploying Ceph services like
-RGW, MDS, and Dashboard.
+Wallaby is the last release with ceph-ansible integration.
+Wallaby is also able to deploy a full Ceph cluster, with RBD, RGW,
+MDS, and Dashboard, using cephadm in place of ceph-ansible as
+described in :doc:`cephadm`. The preferred way to deploy Ceph
+with TripleO, in Wallaby and newer, is before the overcloud as
+described in :doc:`deployed_ceph`.
 
 To deploy with Ceph include either of the appropriate environment
 files. For puppet-ceph use "environments/puppet-ceph.yaml"

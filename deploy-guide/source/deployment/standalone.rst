@@ -317,8 +317,7 @@ Deploying a Standalone OpenStack node
       -r /usr/share/openstack-tripleo-heat-templates/roles/Standalone.yaml \
       -e $HOME/containers-prepare-parameters.yaml \
       -e $HOME/standalone_parameters.yaml \
-      --output-dir $HOME \
-      --standalone
+      --output-dir $HOME
 
    .. admonition:: Ceph
       :class: ceph
@@ -337,8 +336,7 @@ Deploying a Standalone OpenStack node
            -e $HOME/containers-prepare-parameters.yaml \
            -e $HOME/standalone_parameters.yaml \
            -e $HOME/ceph_parameters.yaml \
-           --output-dir $HOME \
-           --standalone
+           --output-dir $HOME
 
       .. admonition:: Victoria or earlier
 
@@ -984,8 +982,7 @@ Deploy the second node with the following:
         -e $HOME/export_control_plane/all-nodes-extra-map-data.json \
         -e $HOME/export_control_plane/extra-host-file-entries.json \
         -e $HOME/export_control_plane/oslo.yaml \
-        --output-dir $HOME \
-        --standalone
+        --output-dir $HOME
 
 The example above assumes that ``export_control_plane`` is the name
 of the directory which contains the content extracted from the

@@ -65,7 +65,7 @@ following:
 - The CephMon, CephMgr, and CephOSD services are running on all nodes
   which should have those services
 - It's possible to SSH into a node with the CephMon service and run
-  `sudo cepham shell`
+  `sudo cephadm shell`
 - All OSDs should be running unless there were environmental issues
   (e.g. disks were not cleaned)
 - A ceph configuration file and client admin keyring file in /etc/ceph

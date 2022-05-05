@@ -130,12 +130,19 @@ The command line interface supports the following options::
                                          [--network-data NETWORK_DATA]
                                          [--public-network-name PUBLIC_NETWORK_NAME]
                                          [--cluster-network-name CLUSTER_NETWORK_NAME]
-                                         [--mon-ip MON_IP] [--config CONFIG]
+                                         [--cluster CLUSTER] [--mon-ip MON_IP]
+                                         [--config CONFIG]
                                          [--cephadm-extra-args CEPHADM_EXTRA_ARGS]
-                                         [--force] [--ceph-vip CEPH_VIP]
+                                         [--force]
+                                         [--ansible-extra-vars ANSIBLE_EXTRA_VARS]
+                                         [--ceph-client-username CEPH_CLIENT_USERNAME]
+                                         [--ceph-client-key CEPH_CLIENT_KEY]
+                                         [--skip-cephx-keys]
+                                         [--ceph-vip CEPH_VIP]
                                          [--daemons DAEMONS]
                                          [--single-host-defaults]
-                                         [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC | --crush-hierarchy CRUSH_HIERARCHY]
+                                         [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
+                                         [--crush-hierarchy CRUSH_HIERARCHY]
                                          [--standalone]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--cephadm-default-container]
@@ -211,14 +218,14 @@ The command line interface supports the following options::
                           Name of the network defined in network_data.yaml which
                           should be used for the Ceph cluster_network. Defaults
                           to 'storage_mgmt'.
-    --cluster CLUSTER
-                          Name of the Ceph cluster. If set to 'foo', then the files
-                          /etc/ceph/<FSID>/foo.client.admin.keyring and
-                          /etc/ceph/<FSID>/foo.conf will be created. Otherwise these
-                          files will use the name 'ceph'. Changing this means changing
-                          command line calls too, e.g. 'ceph health' will become 'ceph
-                          --cluster foo health' unless export CEPH_ARGS='--cluster foo'
-                          is used.
+    --cluster CLUSTER     Name of the Ceph cluster. If set to 'foo', then the
+                          files /etc/ceph/<FSID>/foo.conf and
+                          /etc/ceph/<FSID>/foo.client.admin.keyring will be
+                          created. Otherwise these files will use the name
+                          'ceph'. Changing this means changing command line
+                          calls too, e.g. 'ceph health' will become 'ceph
+                          --cluster foo health' unless export CEPH_ARGS='--
+                          cluster foo' is used.
     --mon-ip MON_IP       IP address of the first Ceph monitor. If not set, an
                           IP from the Ceph public_network of a server with the
                           mon label from the Ceph spec is used. IP must already
@@ -233,6 +240,36 @@ The command line interface supports the following options::
                           Warning: requires --force as not all possible options
                           ensure a functional deployment.
     --force               Run command regardless of consequences.
+    --ansible-extra-vars ANSIBLE_EXTRA_VARS
+                          Path to an existing Ansible vars file which can
+                          override any variable in tripleo-ansible. If '--
+                          ansible-extra-vars vars.yaml' is passed, then
+                          'ansible-playbook -e @vars.yaml ...' is used to call
+                          tripleo-ansible Ceph roles. Warning: requires --force
+                          as not all possible options ensure a functional
+                          deployment.
+    --ceph-client-username CEPH_CLIENT_USERNAME
+                          Name of the cephx user. E.g. if 'openstack' is used,
+                          then 'ceph auth get client.openstack' will return a
+                          working user with key and capabilities on the deployed
+                          Ceph cluster. Ignored unless tripleo_cephadm_pools is
+                          set via --ansible-extra-vars. If this parameter is not
+                          set and tripleo_cephadm_keys is set via --ansible-
+                          extra-vars, then 'openstack' will be used. Used to set
+                          CephClientUserName in --output.
+    --ceph-client-key CEPH_CLIENT_KEY
+                          Value of the cephx key. E.g.
+                          'AQC+vYNXgDAgAhAAc8UoYt+OTz5uhV7ItLdwUw=='. Ignored
+                          unless tripleo_cephadm_pools is set via --ansible-
+                          extra-vars. If this parameter is not set and
+                          tripleo_cephadm_keys is set via --ansible-extra-vars,
+                          then a random key will be generated. Used to set
+                          CephClientKey in --output.
+    --skip-cephx-keys     Do not create cephx keys even if tripleo_cephadm_pools
+                          is set via --ansible-extra-vars. If this option is
+                          used, then even the defaults of --ceph-client-key and
+                          --ceph-client-username are ignored, but the pools
+                          defined via --ansible-extra-vars are still be created.
     --ceph-vip CEPH_VIP   Path to an existing Ceph services/network mapping
                           file.
     --daemons DAEMONS     Path to an existing Ceph daemon options definition.
@@ -285,7 +322,6 @@ The command line interface supports the following options::
     --registry-password REGISTRY_PASSWORD
 
   This command is provided by the python-tripleoclient plugin.
-
   $
 
 Run `openstack overcloud ceph deploy --help` in your own environment
@@ -913,6 +949,117 @@ if you plan to call `openstack overcloud ceph user enable` before
 calling `openstack overcloud ceph deploy`. See `openstack overcloud
 ceph user enable --help` and `openstack overcloud ceph user disable
 --help` for more information.
+
+Creating Pools and CephX keys before overcloud deployment (Optional)
+--------------------------------------------------------------------
+
+By default `openstack overcloud ceph deploy` does not create Ceph
+pools or cephx keys to access those pools. Later during overcloud
+deployment the pools and cephx keys are created based on which Heat
+environment files are passed. For most cases only pools for Cinder
+(volumes), Nova (vms), and Glance (images) are created but if the
+Heat environment file to configure additional services are passed,
+e.g. cinder-backup, then the required pools are created.
+
+It is not necessary to create pools and cephx keys before overcloud
+deployment but it is possible. The Ceph pools can be created when
+`openstack overcloud ceph deploy` is run by using the option
+--ansible-extra-vars to set the tripleo_cephadm_pools variable used
+by tripleo-ansible's tripleo_cephadm role.
+
+Create an Ansible extra vars file defining the desired pools::
+
+  cat <<EOF > tripleo_cephadm_ansible_extra_vars.yaml
+  ---
+  tripleo_cephadm_pools:
+    - name: vms
+      pg_autoscale_mode: True
+      target_size_ratio: 0.3
+      application: rbd
+    - name: volumes
+      pg_autoscale_mode: True
+      target_size_ratio: 0.5
+      application: rbd
+    - name: images
+      target_size_ratio: 0.2
+      pg_autoscale_mode: True
+      application: rbd
+  tripleo_ceph_client_vars: /home/stack/overcloud-deploy/overcloud/cephadm/ceph_client.yml
+  EOF
+
+The pool names 'vms', 'volumes', and 'images' used above are
+recommended since those are the default names that the overcloud
+deployment will use when "openstack overcloud deploy" is run, unless
+the Heat parameters NovaRbdPoolName, CinderRbdPoolName, and
+GlanceRbdPoolName are overridden respectively.
+
+In the above example, tripleo_ceph_client_vars is used to direct Ansible
+to save the generated ceph_client.yml file in a cephadm subdirectory of
+the working directory. The tripleo_cephadm role will ensure this directory
+exists before creating the file. If `openstack overcloud export ceph` is
+going to be used, it will expect the Ceph client file to be in this location,
+based on the stack name (e.g. overcloud).
+
+Deploy the Ceph cluster with Ansible extra vars::
+
+  openstack overcloud ceph deploy \
+          deployed-metal-overcloud.yaml \
+          -y -o deployed-ceph-overcloud.yaml \
+          --force \
+          --ansible-extra-vars tripleo_cephadm_ansible_extra_vars.yaml
+
+After Ceph is deployed, the pools should be created and an openstack cephx
+key will also be created to access all of those pools. The contents of
+deployed-ceph-overcloud.yaml will also have the pool and cephx key
+Heat environment parameters set so the overcloud will use the same
+values.
+
+When the tripleo_cephadm_pools variable is set, the Tripleo client will
+create a tripleo_cephadm_keys tripleo-ansible variable structure with
+the client name "openstack" and a generated cephx key like the following::
+
+  tripleo_cephadm_keys:
+    - name: client.openstack
+      key: AQC+vYNXgDAgAhAAc8UoYt+OTz5uhV7ItLdwUw==
+      mode: '0600'
+      caps:
+        mgr: allow *
+        mon: profile rbd
+        osd: profile rbd pool=vms, profile rbd pool=volumes, profile rbd pool=images
+
+It is not recommended to define tripleo_cephadm_keys in the Ansible extra vars file.
+If you prefer to set the key username to something other than "openstack" or prefer
+to pass your own cephx client key (e.g. AQC+vYNXgDAgAhAAc8UoYt+OTz5uhV7ItLdwUw==),
+then use following parameters::
+
+  --ceph-client-username (default: openstack)
+  --ceph-client-key (default: auto generates a valid cephx key)
+
+Both of the above parameters are ignored unless tripleo_cephadm_pools is set via
+--ansible-extra-vars. If tripleo_cephadm_pools is set then a cephx key to access
+all of the pools will always be created unless --skip-cephx-keys is used.
+
+If you wish to re-run 'openstack overcloud ceph deploy' for any
+reason and have created-cephx keys in previous runs, then you may use
+the --ceph-client-key parameter from the previous run to prevent a new
+key from being generated. The key value can be found in the file which
+is output from he previous run (e.g. --output <deployed_ceph.yaml>).
+
+If any of the above parameters are used, then the generated deployed Ceph output
+file (e.g. --output <deployed_ceph.yaml>) will contain the values of the above
+variables mapped to their TripleO Heat template environment variables to ensure a
+consistent overcloud deployment::
+
+  CephPools: {{ tripleo_cephadm_pools }}
+  CephClientConfigVars: {{ tripleo_ceph_client_vars }}
+  CephClientKey: {{ ceph_client_username }}
+  CephClientUserName: {{ ceph_client_key }}
+
+The CephPools Heat parameter above has always supported idempotent
+updates. It will be pre-populated with the pools from
+tripleo_cephadm_pools after Ceph is deployed. The deployed_ceph.yaml
+which is output can also be updated so that additional pools can be
+created when the overcloud is deployed.
 
 Container Options
 -----------------

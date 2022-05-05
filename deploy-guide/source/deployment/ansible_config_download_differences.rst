@@ -4,7 +4,7 @@ Ansible config-download differences
 ===================================
 With the Queens release, it became possible to use Ansible to apply the
 overcloud configuration and this method became the default behavior with
-the Rockt release.
+the Rocky release.
 
 The feature is fully documented at
 :doc:`ansible_config_download`, while this page details

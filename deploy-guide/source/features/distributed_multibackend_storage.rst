@@ -1,10 +1,9 @@
 Distributed Multibackend Storage
 ================================
 
-In Ussuri and newer, |project| is able to extend
-:doc:`distributed_compute_node` to include distributed image
-management and persistent storage with the benefits of using
-OpenStack and Ceph.
+|project| is able to extend :doc:`distributed_compute_node` to include
+distributed image management and persistent storage with the benefits
+of using OpenStack and Ceph.
 
 Features
 --------
@@ -200,6 +199,13 @@ files of an example DCN deployment with distributed image
 management. It is based on the :doc:`distributed_compute_node`
 example and does not cover redundant aspects of it such as networking.
 
+This example assumes that the VIPs and Networks have already been
+provisioned as described in :doc:`../deployment/network_v2`. We assume
+that ``~/deployed-vips-control-plane.yaml`` was created by the output
+of `openstack overcloud network vip provision` and that
+``~/deployed-network-control-plane.yaml`` was created by the output of
+`openstack overcloud network provision`.
+
 Create a separate external Cephx key (optional)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -242,18 +248,87 @@ Generate the roles used for the deployment::
 
   openstack overcloud roles generate Controller ComputeHCI -o ~/control-plane/control_plane_roles.yaml
 
-To determine the number of nodes per role create
-``~/control-plane/roles-counts.yaml`` with the following::
-
-  parameter_defaults:
-    ControllerCount: 3
-    ComputeHCICount: 3
-
 If you do not wish to hyper-converge the compute nodes with Ceph OSD
-services, then substitute `CephStorage` for `ComputeHCI` and increment
-the number of `Compute` nodes. There should at least three
-`Controller` nodes and at least three `CephStorage` or `ComputeHCI`
-nodes in order to have a redundant Ceph cluster.
+services, then substitute `CephStorage` and `Compute` for `ComputeHCI`.
+There should at least three `Controller` nodes and at least three
+`CephStorage` or `ComputeHCI` nodes in order to have a redundant Ceph
+cluster.
+
+The roles should align to hosts which are provisioned as described in
+:doc:`../provisioning/baremetal_provision`. Since each site should
+use a separate stack, this example assumes that ``--stack
+control-plane`` was passed to the `openstack overcloud node provision`
+command and that ``~/deployed-metal-control-plane.yaml`` was the
+output of the same command. We also assume that the
+``--network-config`` option was used to configure the network
+when the hosts were provisioned.
+
+
+Deploy the central Ceph cluster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use the `openstack overcloud ceph deploy` command as described in
+:doc:`deployed_ceph` to deploy the central Ceph cluster::
+
+  openstack overcloud ceph deploy \
+          ~/deployed-metal-control-plane.yaml \
+          --output ~/control-plane/deployed-ceph-control-plane.yaml \
+          --config ~/control-plane/initial-ceph.conf \
+          --container-image-prepare ~/containers-prepare-parameter.yaml \
+          --network-data ~/network-data.yaml \
+          --roles-data ~/control-plane/control_plane_roles.yaml \
+          --cluster central \
+          --stack control-plane
+
+The output of the above command,
+``--output ~/control-plane/deployed-ceph-control-plane.yaml``, will be
+used when deploying the overcloud in the next section.
+
+The ``--config ~/control-plane/initial-ceph.conf`` is optional and
+may be used for initial Ceph configuration. If the Ceph cluster
+will be hyper-converged with compute services then create this file
+like the following so Ceph will not consume memory that Nova compute
+instances will need::
+
+    $ cat <<EOF > ~/control-plane/initial-ceph.conf
+    [osd]
+    osd_memory_target_autotune = true
+    osd_numa_auto_affinity = true
+    [mgr]
+    mgr/cephadm/autotune_memory_target_ratio = 0.2
+    EOF
+    $
+
+The ``--container-image-prepare`` and ``--network-data`` options are
+included to make the example complete but are not displayed in this
+document. Both are necessary so that ``cephadm`` can download the Ceph
+container from the undercloud and so that the correct storage networks
+are used.
+
+Passing ``--stack control-plane`` directs the above command to use the
+working directory (e.g. ``$HOME/overcloud-deploy/<STACK>``) which was
+created by `openstack overcloud node provision`. This directory
+contains the Ansible inventory and is where generated files from the
+Ceph deployment will be stored.
+
+Passing ``--cluster central`` changes the name of Ceph cluster. As
+multiple Ceph clusters will be deployed, each is given a separate
+name. This name is inherited in the cephx key and configuration files.
+
+After Ceph is deployed, confirm that the central admin cephx key and
+Ceph configuration file have been configured on one of the
+controllers::
+
+    [root@oc0-controller-0 ~]# ls -l /etc/ceph/
+    -rw-------. 1 root root  63 Mar 26 21:49 central.client.admin.keyring
+    -rw-r--r--. 1 root root 177 Mar 26 21:49 central.conf
+    [root@oc0-controller-0 ~]#
+
+From one of the controller nodes confirm that the `cephadm shell`
+functions when passed these files::
+
+  cephadm shell --config /etc/ceph/central.conf \
+                --keyring /etc/ceph/central.client.admin.keyring
 
 Deploy the control-plane stack
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -265,18 +340,17 @@ Deploy the control-plane stack::
          --templates /usr/share/openstack-tripleo-heat-templates/ \
          -r ~/control-plane/control_plane_roles.yaml \
          -n ~/network-data.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/net-multiple-nics.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/disable-telemetry.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/podman.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/disable-swift.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+         -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm-rbd-only.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/cinder-backup.yaml \
-         -e ~/control-plane/role-counts.yaml \
-         -e ~/control-plane/ceph.yaml \
+         -e ~/control-plane/deployed-ceph-control-plane.yaml \
          -e ~/control-plane/ceph_keys.yaml \
+         -e ~/deployed-vips-control-plane.yaml \
+         -e ~/deployed-network-control-plane.yaml \
+         -e ~/deployed-metal-control-plane.yaml \
          -e ~/control-plane/glance.yaml
+
 
 Passing ``-e ~/control-plane/ceph_keys.yaml`` is only required if you
 followed the optional section called "Create a separate external Cephx
@@ -293,8 +367,18 @@ but are not displayed in this document. For more information on
 configuring networks with distributed compute nodes see
 :doc:`distributed_compute_node`.
 
-The ``environments/ceph-ansible/ceph-ansible.yaml`` results in
-ceph-ansible deploying Ceph as part of the ``control-plane`` stack.
+The ``environments/cephadm/cephadm-rbd-only.yaml`` results in
+additional configuration of ceph for the ``control-plane`` stack. It
+creates the pools for the OpenStack services being deployed and
+creates the cephx keyring for the `openstack` cephx user and
+distributes the keys and conf files so OpenStack can be a client of
+the Ceph cluster. RGW is not deployed simply because an object storage
+system is not needed for this example. However, if an object storage
+system is desired at the Central site, substitute
+``environments/cephadm/cephadm.yaml`` for
+``environments/cephadm/cephadm-rbd-only.yaml`` and Ceph RGW will also
+be configured at the central site.
+
 This file also contains both `NovaEnableRbdBackend: true` and
 `GlanceBackend: rbd`. When both of these settings are used, the Glance
 `image_import_plugins` setting will contain `image_conversion`. With
@@ -307,17 +391,6 @@ you need to disable image conversion you may override the
    parameter_defaults:
      GlanceImageImportPlugin: []
 
-The ``ceph.yaml`` file contains the following which sets the name of
-the Ceph cluster to "central"::
-
-  parameter_defaults:
-    CephClusterName: central
-
-The ``ceph.yaml`` file should also contain additional parameters like
-`CephAnsibleDisksConfig`, `CephPoolDefaultSize`,
-`CephPoolDefaultPgNum` to configure the Ceph cluster relative to the
-available hardware as described in :doc:`ceph_config`.
-
 The ``glance.yaml`` file sets the following to configue the local Glance backend::
 
   parameter_defaults:
@@ -327,35 +400,30 @@ The ``glance.yaml`` file sets the following to configue the local Glance backend
     GlanceBackendID: central
     GlanceStoreDescription: 'central rbd glance store'
 
-The ``environments/disable-swift.yaml`` file was passed to disable
-Swift simply because an object storage system is not needed for this
-example. However, if an object storage system is desired at the
-Central site, substitute ``environments/ceph-ansible/ceph-rgw.yaml``
-in its place to configure Ceph RGW.
-
 The ``environments/cinder-backup.yaml`` file is not used in this
 deployment. It's possible to enable the Cinder-backup service by using
 this file but it will only write to the backups pool of the central
 Ceph cluster.
 
-The ``~/control-plane/ceph_keys.yaml`` and
-``~/control-plane/role-counts.yaml`` files were created in the
+All files matching ``deployed-*.yaml`` should have been created in the
 previous sections.
+
+The optional ``~/control-plane/ceph_keys.yaml`` file was created in
+the previous sections.
 
 Extract overcloud control-plane and Ceph configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use the `openstack overcloud export` command to create
-``~/control-plane-export.yaml`` as described in
-:doc:`distributed_compute_node`::
+Once the overcloud control plane has been deployed, data needs to be
+retrieved from it to pass as input values into the separate DCN
+deployment.
 
-  openstack overcloud export \
-          --stack control-plane \
-          --output-file ~/control-plane-export.yaml
+The Heat export file is created automatically within the working
+directory as described in :doc:`distributed_compute_node`. Confirm
+this file was created for the control-plane as it will be used in the
+next section::
 
-You may need to pass the `--config-download-dir` option if you
-deployed with a manual config-download as described in
-:doc:`../deployment/ansible_config_download`.
+  stat ~/overcloud-deploy/control-plane/control-plane-export.yaml
 
 Use the `openstack overcloud export ceph` command to create
 ``~/central_ceph_external.yaml``::
@@ -415,18 +483,13 @@ cluster.
 
 The ``openstack overcloud export ceph`` command will obtain all of the
 values from the config-download directory of the stack specified by
-`--stack` option. All values, except `external_cluster_mon_ips`,
-are extracted from the `ceph-ansible/group_vars/all.yml` file. The
-value for `external_cluster_mon_ips` is populated with a concatenation
-of each storage_ip of all nodes running the CephMon service. These
-values are in the ceph-ansible inventory. Both the inventory and
-group_vars for the ceph-ansible subdirectory within the
-config-download directory are genereated when config-download executes
-the tripleo-ansible role `tripleo_ceph_work_dir`. It should not be
-necessary to extract these values manually as the ``openstack
-overcloud export ceph`` command will genereate a valid YAML file with
-`CephExternalMultiConfig` populated for all stacks passed with the
-`--stack` option.
+`--stack` option. All values are extracted from the
+``cephadm/ceph_client.yml`` file. This file is genereated when
+config-download executes the export tasks from the tripleo-ansible
+role `tripleo_cephadm`. It should not be necessary to extract these
+values manually as the ``openstack overcloud export ceph`` command
+will genereate a valid YAML file with `CephExternalMultiConfig`
+populated for all stacks passed with the `--stack` option.
 
 The `ceph_conf_overrides` section of the file genereated by ``openstack
 overcloud export ceph`` should look like the following::
@@ -560,15 +623,6 @@ default to connect to a local `HaProxyEdge` service which in turn
 proxies image requests to the Glance servers running on the
 `DistributedComputeHCI` roles.
 
-To determine the number of each nodes create ``~/dcn0/roles-counts.yaml``
-with the following::
-
-  parameter_defaults:
-    ControllerCount: 0
-    ComputeCount: 0
-    DistributedComputeHCICount: 3
-    DistributedComputeHCIScaleOutCount: 1
-
 If you do not wish to hyper-converge the compute nodes with Ceph OSD
 services, then substitute `DistributedCompute` for
 `DistributedComputeHCI` and `DistributedComputeScaleOut` for
@@ -593,6 +647,74 @@ necessary to deploy the `ScaleOut` roles if more than three
 Three are needed for the Cinder active/active service and if
 applicable the Ceph Monitor and Manager services.
 
+The roles should align to hosts which are deployed as described in
+:doc:`../provisioning/baremetal_provision`. Since each site should
+use a separate stack, this example assumes that ``--stack
+dcn0`` was passed to the `openstack overcloud node provision`
+command and that ``~/deployed-metal-dcn0.yaml`` was the
+output of the same command. We also assume that the
+``--network-config`` option was used to configure the network when the
+hosts were provisioned.
+
+Deploy the dcn0 Ceph cluster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use the `openstack overcloud ceph deploy` command as described in
+:doc:`deployed_ceph` to deploy the first DCN Ceph cluster::
+
+  openstack overcloud ceph deploy \
+          ~/deployed-metal-dcn0.yaml \
+          --output ~/dcn0/deployed-ceph-dcn0.yaml \
+          --config ~/dcn0/initial-ceph.conf \
+          --container-image-prepare ~/containers-prepare-parameter.yaml \
+          --network-data ~/network-data.yaml \
+          --roles-data ~/dcn0/dcn_roles.yaml \
+          --cluster dcn0 \
+          --stack dcn0
+
+The output of the above command,
+``--output ~/dcn0/deployed-ceph-dcn0.yaml``, will be
+used when deploying the overcloud in the next section.
+
+The ``--config ~/dcn0/initial-ceph.conf`` is optional and
+may be be used for initial Ceph configuration. If the Ceph cluster
+will be hyper-converged with compute services then create this file
+like the following so Ceph will not consume memory that Nova compute
+instances will need::
+
+    $ cat <<EOF > ~/dcn0/initial-ceph.conf
+    [osd]
+    osd_memory_target_autotune = true
+    osd_numa_auto_affinity = true
+    [mgr]
+    mgr/cephadm/autotune_memory_target_ratio = 0.2
+    EOF
+    $
+
+The ``--container-image-prepare`` and ``--network-data`` options are
+included to make the example complete but are not displayed in this
+document. Both are necessary so that ``cephadm`` can download the Ceph
+container from the undercloud and so that the correct storage networks
+are used.
+
+Passing ``--stack dcn0`` directs the above command to use the
+working directory (e.g. ``$HOME/overcloud-deploy/<STACK>``) which was
+created by `openstack overcloud node provision`. This directory
+contains the Ansible inventory and is where generated files from the
+Ceph deployment will be stored.
+
+Passing ``--cluster dcn0`` changes the name of Ceph cluster. As
+multiple Ceph clusters will be deployed, each is given a separate
+name. This name is inherited in the cephx key and configuration files.
+
+After Ceph is deployed, confirm that the dcn0 admin cephx key and
+Ceph configuration file have been configured in ``/etc/ceph``.
+Ensure the `cephadm shell` functions when passed these files::
+
+  cephadm shell --config /etc/ceph/dcn0.conf \
+                --keyring /etc/ceph/dcn0.client.admin.keyring
+
+
 Deploy the dcn0 stack
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -603,18 +725,17 @@ Deploy the dcn0 stack::
          --templates /usr/share/openstack-tripleo-heat-templates/ \
          -r ~/dcn0/dcn_roles.yaml \
          -n ~/network-data.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/net-multiple-nics.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/network-isolation.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/network-environment.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/disable-telemetry.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/podman.yaml \
-         -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible.yaml \
+         -e /usr/share/openstack-tripleo-heat-templates/environments/cephadm/cephadm-rbd-only.yaml \
          -e /usr/share/openstack-tripleo-heat-templates/environments/dcn-storage.yaml \
-         -e ~/control-plane-export.yaml \
+         -e ~/overcloud-deploy/control-plane/control-plane-export.yaml \
          -e ~/central_ceph_external.yaml \
+         -e ~/dcn0/deployed-ceph-dcn0.yaml \
          -e ~/dcn0/dcn_ceph_keys.yaml \
-         -e ~/dcn0/role-counts.yaml \
-         -e ~/dcn0/ceph.yaml \
+         -e deployed-vips-dcn0.yaml \
+         -e deployed-network-dcn0.yaml \
+         -e deployed-metal-dcn0.yaml \
          -e ~/dcn0/az.yaml \
          -e ~/dcn0/glance.yaml
 
@@ -643,17 +764,6 @@ booting an instance from a volume on DCN nodes because Nova will
 attempt to create a volume using the same availability zone as what is
 assigned to the instance.
 
-The ``~/dcn0/ceph.yaml`` file contains the following which sets the
-name of the ceph cluster to "dcn0"::
-
-  parameter_defaults:
-    CephClusterName: dcn0
-
-The ``~/dcn0/ceph.yaml`` file should also contain additional
-parameters like `CephAnsibleDisksConfig`, `CephPoolDefaultSize`,
-`CephPoolDefaultPgNum` to configure the Ceph cluster relative to
-the available hardware as described in :doc:`ceph_config`.
-
 The ``~/dcn0/az.yaml`` file contains the following::
 
   parameter_defaults:
@@ -668,13 +778,17 @@ default of "dcn" to "dcn0" found in `environments/dcn-storage.yaml`. See
 :doc:`distributed_compute_node` for details on the other parameters
 above.
 
-The ``~/control-plane-export.yaml``, ``~/dcn0/dcn_ceph_keys.yaml``,
-``~/dcn0/glance.yaml``, and ``role-counts.yaml`` files were created in
-the previous steps. The ``~/central_ceph_external.yaml`` file should
-also have been created in a previous step. Deployment with this file
-is only necessary if images on DCN sites will be pushed back to the
-central site so that they may then be shared with other DCN sites.
-This may be useful for sharing snapshots between sites.
+The ``~/overcloud-deploy/control-plane/control-plane-export.yaml``,
+``~/dcn0/dcn_ceph_keys.yaml``, ``~/dcn0/glance.yaml``, and
+``role-counts.yaml`` files were created in the previous steps. The
+``~/central_ceph_external.yaml`` file should also have been created in
+a previous step. Deployment with this file is only necessary if images
+on DCN sites will be pushed back to the central site so that they may
+then be shared with other DCN sites. This may be useful for sharing
+snapshots between sites.
+
+All files matching ``deployed-*.yaml`` should have been created in the
+previous sections.
 
 Deploy additional DCN sites
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -685,7 +799,7 @@ should be generated for each DCN site as described under `Create extra
 Ceph key`. Other than that, the same process may be continued to
 deploy as many DCN sites as needed. Once all of the desired DCN sites
 have been deployed proceed to the next section. The
-``~/control-plane-export.yaml`` and ``~/central_ceph_external.yaml``
+``~/overcloud-deploy/control-plane/control-plane-export.yaml`` and ``~/central_ceph_external.yaml``
 which were created earlier may be reused for each DCN deployment and
 do not need to be recreated. The roles in the previous section were
 created specifically for dcn0 to allow for variations between DCN
@@ -896,9 +1010,11 @@ avoid file overwrites. If the name is not set it will default to
 "ceph".
 
 In each `openstack overcloud deploy` command in the previous sections
-replace ``environments/ceph-ansible/ceph-ansible.yaml`` with
-``environments/ceph-ansible/ceph-ansible-external.yaml`` and replace
-``ceph.yaml`` with ``external-ceph-<SITE>.yaml`` as described above.
+replace ``environments/cephadm/cephadm-rbd-only.yaml`` with
+``environments/external-ceph.yaml`` and replace the
+``deployed-ceph-<SITE>.yaml`` with ``external-ceph-<SITE>.yaml`` as
+described above.
+
 Thus, for a three stack deployment the following will be the case.
 
 - The initial deployment of the cental stack is configured with one
@@ -933,9 +1049,8 @@ However, the `ceph auth add` command and `external-ceph-<SITE>.yaml`
 site file described above contain all of the information necessary
 to populate the `CephExternalMultiConfig` parameter.
 
-If the external Ceph cluster at each DCN site had the ceph-ansible
-`cluster` parameter set to its default value of "ceph", then you
-should still define a unique cluster name within the
+If the external Ceph cluster at each DCN site has the default name of
+"ceph", then you should still define a unique cluster name within the
 `CephExternalMultiConfig` parameter like the following::
 
   parameter_defaults:

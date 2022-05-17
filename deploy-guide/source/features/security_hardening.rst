@@ -89,7 +89,7 @@ SSH ``/etc/issue`` Banner text can be set using the following parameters in an
 environment file::
 
     resource_registry:
-      OS::TripleO::Services::Sshd: ../deployment/sshd/sshd-baremetal-puppet.yaml
+      OS::TripleO::Services::Sshd: ../deployment/sshd/sshd-baremetal-ansible.yaml
 
     parameter_defaults:
       BannerText: |

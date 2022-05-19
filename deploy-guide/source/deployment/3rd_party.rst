@@ -370,18 +370,28 @@ kernel module is deployed on the host
 .....................................
 
 The kernel module is deployed on the base Operating System via RPM or DKMS.
-It is suggested to deploy the module via virt-customize.
-The libguestfs-tools package contains the virt-customize tool. Install the libguestfs-tools::
+Deploy the module by using the ``tripleo-mount-image`` tool and create a
+``chroot``.
 
-    sudo yum install libguestfs-tools
+First you need to create a repository file where the module will be downloaded from, and copy the repo file into the image::
 
-Then you need to create a repository file where the module will be downloaded from, and uplaod the repo into the image::
+    temp_dir=$(mktemp -d)
+    sudo tripleo-mount-image -a /path/to/overcloud-full.qcow2 -m $temp_dir
+    sudo cp my-repo.repo $temp_dir/etc/yum.repos.d/
 
-    virt-customize --selinux-relabel -a overcloud-full.qcow2 --upload my-repo.repo:/etc/yum.repos.d/
+You can now start a chroot and install the rpm that contains the kernel module::
 
-Once the repository is deployed, you can now install the rpm that contains the kernel module::
+    sudo mount -o bind /dev $temp_dir/dev/
+    sudo cp /etc/resolv.conf $temp_dir/etc/resolv.conf
+    sudo chroot $temp_dir /bin/bash
+    dnf install my-rpm
+    exit
 
-    virt-customize --selinux-relabel -a overcloud-full.qcow2 --install my-rpm
+Then unmount the image::
+
+    sudo rm $temp_dir/etc/resolv.conf
+    sudo umount $temp_dir/dev
+    sudo tripleo-unmount-image -m $temp_dir
 
 Now that the rpm is deployed with the kernel module, we need to configure TripleO to load it.
 To configure an extra kernel module named "dpdk_module" for a specific role, we would add::

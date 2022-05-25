@@ -311,6 +311,163 @@ passed to a direct call of the ceph_spec_bootstrap ansible module::
   ansible localhost -m ceph_spec_bootstrap \
     -a "deployed_metalsmith=deployed_metal.yaml tripleo_roles=custom_roles.yaml"
 
+Network Options
+---------------
+
+The storage networks defined in the network_data.yaml file as
+described in :doc:`custom_networks` determine which networks
+Ceph is configured to use. When using network isolation, the
+standard is for TripleO to deploy two storage networks which
+map to the two Ceph networks in the following way:
+
+* ``storage`` - Storage traffic, the Ceph ``public_network``,
+  e.g. Nova compute nodes use this network for RBD traffic to the Ceph
+  cluster.
+
+* ``storage_mgmt`` - Storage management traffic (such as replication
+  traffic between storage nodes), the Ceph ``cluster_network``,
+  e.g. Ceph OSDs use this network to replicate data.
+
+``openstack overcloud ceph deploy`` will use the network_data.yaml
+file specified by the ``--network-data`` option to determine which
+networks should be used for the ``public_network`` and
+``cluster_network``. It assumes these networks are named ``storage``
+and ``storage_mgmt`` in the network_data.yaml file unless a different
+name should be used as indicated by the ``--public-network-name`` and
+``--cluster-network-name`` options.
+
+It is necessary to use the ``--network-data`` option when deploying
+with network isolation. Otherwise the default network, i.e. the
+ctlplane network on the undercloud (192.168.24.0/24), will be used for
+both the ``public_network`` and ``cluster_network``.
+
+
+Example: Multiple subnets with custom network names
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If network_data.yaml contains the following::
+
+    - name: StorageMgmtCloud0
+      name_lower: storage_mgmt_cloud_0
+      service_net_map_replace: storage_mgmt
+      subnets:
+        storage_mgmt_cloud_0_subnet12:
+          ip_subnet: '172.16.12.0/24'
+        storage_mgmt_cloud_0_subnet13:
+          ip_subnet: '172.16.13.0/24'
+    - name: StorageCloud0
+      name_lower: storage_cloud_0
+      service_net_map_replace: storage
+      subnets:
+        storage_cloud_0_subnet14:
+          ip_subnet: '172.16.14.0/24'
+        storage_cloud_0_subnet15:
+          ip_subnet: '172.16.15.0/24'
+
+Then the Ceph cluster will have the following parameters set::
+
+  [global]
+  public_network = '172.16.14.0/24,172.16.15.0/24'
+  cluster_network = '172.16.12.0/24,172.16.13.0/24'
+  ms_bind_ipv4 = True
+  ms_bind_ipv6 = False
+
+This is because the TripleO client will see that though the
+``name_lower`` value does not match ``storage`` or ``storage_mgmt``
+(they match the custom names ``storage_cloud_0`` and
+``storage_mgmt_cloud_0`` instead), those names do match the
+``service_net_map_replace`` values. If ``service_net_map_replace``
+is in the network_data.yaml, then it is not necessary to use the
+``--public-network-name`` and ``--cluster-network-name``
+options. Alternatively the ``service_net_map_replace`` key could have
+been left out and the ``--public-network-name`` and
+``--cluster-network-name`` options could have been used instead. Also,
+because multiple subnets are used they are concatenated and it is
+assumed that there is routing between the subnets. If there was no
+``subnets`` key, in the network_data.yaml file, then the client would
+have looked instead for the single ``ip_subnet`` key for each network.
+
+By default the Ceph global `ms_bind_ipv4` is set `true` and
+`ms_bind_ipv6` is set `false`.
+
+Example: IPv6
+^^^^^^^^^^^^^
+
+If network_data.yaml contains the following::
+
+  - name: Storage
+    ipv6: true
+    ipv6_subnet: fd00:fd00:fd00:3000::/64
+    name_lower: storage
+  - name: StorageMgmt
+    ipv6: true
+    ipv6_subnet: fd00:fd00:fd00:4000::/64
+    name_lower: storage_mgmt
+
+Then the Ceph cluster will have the following parameters set::
+
+  [global]
+  public_network = fd00:fd00:fd00:3000::/64
+  cluster_network = fd00:fd00:fd00:4000::/64
+  ms_bind_ipv4 = False
+  ms_bind_ipv6 = True
+
+Because the storage networks in network_data.yaml contain `ipv6:
+true`, the ipv6_subet values are extracted and the Ceph globals
+`ms_bind_ipv4` is set `false` and `ms_bind_ipv6` is set `true`.
+It is not supported to have the ``public_network`` use IPv4 and
+the ``cluster_network`` use IPv6 or vice versa.
+
+Example: Directly setting network and ms_bind options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If the examples above are not sufficient for your Ceph network needs,
+then it's possible to create an initial-ceph.conf with the four
+parameters ``public_network``, ``cluster_network``, ``ms_bind_ipv4``,
+and ``ms_bind_ipv6`` options set to whatever values are desired.
+
+When using the ``--config`` option it is still important to ensure the
+TripleO ``storage`` and ``storage_mgmt`` network names map to the
+correct ``public_network`` and ``cluster_network`` so that the rest of
+the deployment is consistent.
+
+The four parameters, ``public_network``, ``cluster_network``,
+``ms_bind_ipv4``, and ``ms_bind_ipv6``, are always set in the Ceph
+cluster (with `ceph config set global`) from the ``--network-data``
+file unless those parameters are explicitly set in the ``--config``
+file. In that case the values in the ``--network-data`` file are not
+set directly in the Ceph cluster though other aspects of the overcloud
+deployment treat the ``--network-data`` file as authoritative
+(e.g. when Ceph RGW is set) so both sources should be consistent if
+the ``--config`` file has any of these four parameters.
+
+An example of setting the four parameters in the initial Ceph
+configuration is below::
+
+  $ cat <<EOF > initial-ceph.conf
+  [global]
+  public_network = 'fd00:fd00:fd00:3000::/64,172.16.14.0/24'
+  cluster_network = 'fd00:fd00:fd00:4000::/64,172.16.12.0/24'
+  ms_bind_ipv4 = true
+  ms_bind_ipv6 = true
+  EOF
+  $ openstack overcloud ceph deploy \
+    --config initial-ceph.conf --network-data network_data.yaml
+
+The above assumes that network_data.yaml contains the following::
+
+  - name: Storage
+    ipv6_subnet: fd00:fd00:fd00:3000::/64
+    ip_subnet: 172.16.14.0/24
+    name_lower: storage
+  - name: StorageMgmt
+    ipv6_subnet: fd00:fd00:fd00:4000::/64
+    ip_subnet: 172.16.12.0/24
+    name_lower: storage_mgmt
+
+The above settings, which mix IPv4 and IPv6, are experimental and
+untested.
+
 Container Options
 -----------------
 

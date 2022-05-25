@@ -795,8 +795,7 @@ If network_data.yaml contains the following::
         storage_cloud_0_subnet15:
           ip_subnet: '172.16.15.0/24'
 
-Then the Ceph cluster will bootstrap with an initial Ceph
-configuration containing the following::
+Then the Ceph cluster will have the following parameters set::
 
   [global]
   public_network = '172.16.14.0/24,172.16.15.0/24'
@@ -819,7 +818,7 @@ assumed that there is routing between the subnets. If there was no
 ``subnets`` key, in the network_data.yaml file, then the client would
 have looked instead for the single ``ip_subnet`` key for each network.
 
-By default the Ceph globals `ms_bind_ipv4` is set `true` and
+By default the Ceph global `ms_bind_ipv4` is set `true` and
 `ms_bind_ipv6` is set `false`.
 
 Example: IPv6
@@ -836,8 +835,7 @@ If network_data.yaml contains the following::
     ipv6_subnet: fd00:fd00:fd00:4000::/64
     name_lower: storage_mgmt
 
-Then the Ceph cluster will bootstrap with an initial Ceph
-configuration containing the following::
+Then the Ceph cluster will have the following parameters set::
 
   [global]
   public_network = fd00:fd00:fd00:3000::/64
@@ -854,10 +852,28 @@ the ``cluster_network`` use IPv6 or vice versa.
 Example: Directly setting network and ms_bind options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If the above defaults are not desired, then it's possible to create
-an initial-ceph.conf with the ``public_network``, ``cluster_network``,
-``ms_bind_ipv4``, and ``ms_bind_ipv6`` options set to whatever values
-are desired and pass it as in the example below::
+If the examples above are not sufficient for your Ceph network needs,
+then it's possible to create an initial-ceph.conf with the four
+parameters ``public_network``, ``cluster_network``, ``ms_bind_ipv4``,
+and ``ms_bind_ipv6`` options set to whatever values are desired.
+
+When using the ``--config`` option it is still important to ensure the
+TripleO ``storage`` and ``storage_mgmt`` network names map to the
+correct ``public_network`` and ``cluster_network`` so that the rest of
+the deployment is consistent.
+
+The four parameters, ``public_network``, ``cluster_network``,
+``ms_bind_ipv4``, and ``ms_bind_ipv6``, are always set in the Ceph
+cluster (with `ceph config set global`) from the ``--network-data``
+file unless those parameters are explicitly set in the ``--config``
+file. In that case the values in the ``--network-data`` file are not
+set directly in the Ceph cluster though other aspects of the overcloud
+deployment treat the ``--network-data`` file as authoritative
+(e.g. when Ceph RGW is set) so both sources should be consistent if
+the ``--config`` file has any of these four parameters.
+
+An example of setting the four parameters in the initial Ceph
+configuration is below::
 
   $ cat <<EOF > initial-ceph.conf
   [global]
@@ -880,19 +896,8 @@ The above assumes that network_data.yaml contains the following::
     ip_subnet: 172.16.12.0/24
     name_lower: storage_mgmt
 
-The above settings are experimental and untested.
-
-When using the ``--config`` option as above it is still
-important to ensure the TripleO ``storage`` and ``storage_mgmt``
-network names map to the correct ``public_network`` and
-``cluster_network`` since that is how the initial boot address is
-determined.
-
-The ``--config`` option ignores automatically generated initial
-configuration options, i.e. the ``public_network``,
-``cluster_network``, and Ceph ms_bind options which would normally
-be retrieved from network_data.yaml. These variables all need to be
-set explicitly in the file passed as an argument to ``--config``.
+The above settings, which mix IPv4 and IPv6, are experimental and
+untested.
 
 SSH User Options
 ----------------

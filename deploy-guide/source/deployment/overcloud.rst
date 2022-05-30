@@ -2,7 +2,7 @@ Containers based Overcloud Deployment
 ======================================
 
 This documentation explains how to deploy a fully containerized overcloud
-utilizing Podman which is the default since the Stein releasee.
+utilizing Podman which is the default since the Stein release.
 
 The requirements for a containerized overcloud are the same as for any other
 overcloud deployment. The real difference is in where the overcloud services

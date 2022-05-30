@@ -8,14 +8,14 @@ OpenvSwitch before network deployment (os-net-config), but after the
 hugepages are created (hugepages are created using kernel args). This
 requirement is also valid for some 3rd party SDN integration. This kind of
 configuration requires additional TripleO service definitions. This document
-explains how to acheive such deployments on and after `train` release.
+explains how to achieve such deployments on and after `train` release.
 
 .. note::
 
-        In `queens` release, the resource `PreNetworkConfig` can be overriden to
+        In `queens` release, the resource `PreNetworkConfig` can be overridden to
         achieve the required behavior, which has been deprecated from `train`
         onwards. The implementations based on `PreNetworkConfig` should be
-        moved to other available aternates.
+        moved to other available alternates.
 
 The TripleO service `OS::TripleO::BootParams` configures the parameter
 `KernelArgs` and reboots the node using the `tripleo-ansible` role

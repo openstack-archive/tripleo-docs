@@ -354,7 +354,7 @@ The command line interface supports the following options::
                           addition to registry authentication via
                           ContainerImageRegistryCredentials.
     --cephadm-default-container
-                          Use the default continer defined in cephadm instead of
+                          Use the default container defined in cephadm instead of
                           container_image_prepare_defaults.yaml. If this is
                           used, 'cephadm bootstrap' is not passed the --image
                           parameter.
@@ -445,7 +445,7 @@ initial Ceph configuration file which can be passed with the --config
 option. These settings may also be modified after `openstack overcloud
 ceph deploy`.
 
-The deprecated Heat paramters `CephPoolDefaultSize` and
+The deprecated Heat parameters `CephPoolDefaultSize` and
 `CephPoolDefaultPgNum` no longer have any effect as these
 configurations are not made during overcloud deployment.
 However, during overcloud deployment pools are created and
@@ -956,7 +956,7 @@ Then the Ceph cluster will have the following parameters set::
   ms_bind_ipv6 = True
 
 Because the storage networks in network_data.yaml contain `ipv6:
-true`, the ipv6_subet values are extracted and the Ceph globals
+true`, the ipv6_subset values are extracted and the Ceph globals
 `ms_bind_ipv4` is set `false` and `ms_bind_ipv6` is set `true`.
 It is not supported to have the ``public_network`` use IPv4 and
 the ``cluster_network`` use IPv6 or vice versa.

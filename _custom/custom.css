@@ -27,7 +27,7 @@
   color: rgba(0, 0, 0, 0.9) !important;
 }
 
-/* NOTES, ADMONITTIONS AND TAGS */
+/* NOTES, ADMONITIONS AND TAGS */
 .admonition {
   font-size: 85%; /* match code size */
   background: rgb(240, 240, 240);

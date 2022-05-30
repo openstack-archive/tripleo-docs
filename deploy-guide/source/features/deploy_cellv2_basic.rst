@@ -283,7 +283,7 @@ by this ansible way.
 
 .. code-block:: bash
 
-  export CONTAINERCLI=podman  #choose appropriate contaier cli here
+  export CONTAINERCLI=podman  #choose appropriate container cli here
   source stackrc
   mkdir inventories
   for i in overcloud cell1; do \

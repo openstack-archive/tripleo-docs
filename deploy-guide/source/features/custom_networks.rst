@@ -384,7 +384,7 @@ Network data YAML options
   See `Options for network data YAML subnet definitions`_ for a list of all
   documented sub-options for the subnet definitions.
 
-  type: *dictonary*
+  type: *dictionary*
 
 
 Options for network data YAML subnet definitions
@@ -419,7 +419,7 @@ Options for network data YAML subnet definitions
 
   type: *list*
 
-  elements: *dictonary*
+  elements: *dictionary*
 
   :suboptions:
 
@@ -447,7 +447,7 @@ Options for network data YAML subnet definitions
 
   type: *list*
 
-  elements: *dictonary*
+  elements: *dictionary*
 
   :suboptions:
 
@@ -475,7 +475,7 @@ Options for network data YAML subnet definitions
 
   type: *list*
 
-  elements: *dictonary*
+  elements: *dictionary*
 
   :suboptions:
 
@@ -504,7 +504,7 @@ Options for network data YAML subnet definitions
 
   type: *list*
 
-  elements: *dictonary*
+  elements: *dictionary*
 
   :suboptions:
 

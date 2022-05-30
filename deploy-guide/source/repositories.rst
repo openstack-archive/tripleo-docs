@@ -7,7 +7,7 @@
 #. Download and install the python-tripleo-repos RPM from
    the appropriate RDO repository
 
-   .. admonition:: CentOS Strem 8
+   .. admonition:: CentOS Stream 8
       :class: centos8
 
       Current `Centos 8 RDO repository <https://trunk.rdoproject.org/centos8/component/tripleo/current/>`_.

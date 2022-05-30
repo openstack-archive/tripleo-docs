@@ -20,7 +20,7 @@ the cell host discovery:
   # CONTAINERCLI can be either docker or podman
   export CONTAINERCLI='docker'
 
-  # run cell host dicovery
+  # run cell host discovery
   ssh heat-admin@${CTRL_IP} sudo ${CONTAINERCLI} exec -i -u root nova_api \
   nova-manage cell_v2 discover_hosts --by-service --verbose
 
@@ -34,7 +34,7 @@ the cell host discovery:
 
 .. note::
 
-  Optionally the cell uuid cal be specificed to the `discover_hosts` and
+  Optionally the cell uuid cal be specified to the `discover_hosts` and
   `list_hosts` command to only target against a specific cell.
 
 Delete a compute from a cell

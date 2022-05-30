@@ -400,7 +400,7 @@ Example ``roles_data`` below. (The list of default services has been left out.)
   #############################################################################
   - name: Controller
     description: |
-      Controller role that has all the controler services loaded and handles
+      Controller role that has all the controller services loaded and handles
       Database, Messaging and Network functions.
     CountDefault: 1
     tags:
@@ -557,7 +557,7 @@ network configuration templates as needed.
           be used for both compute roles (``computeleaf0`` and
           ``computeleaf1``).
 
-Create a environement file (``network-environment-overrides.yaml``) with
+Create a environment file (``network-environment-overrides.yaml``) with
 ``resource_registry`` overrides to specify the network configuration templates
 to use. For example::
 

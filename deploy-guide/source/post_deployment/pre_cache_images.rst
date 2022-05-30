@@ -17,7 +17,7 @@ where instance creation times must be minimized.
    Since Ussuri Nova also provides an API to pre-cache images on Compute nodes.
    See the `Nova Image pre-caching documentation <https://docs.openstack.org/nova/ussuri/admin/image-caching.html#image-pre-caching>`_.
 
-.. note:: The Nova Image Cache is not used when using Ceph RBD for Glange images and Nova ephemeral disk. See `Nova Image Caching documentation <https://docs.openstack.org/nova/ussuri/admin/image-caching.html>`_.
+.. note:: The Nova Image Cache is not used when using Ceph RBD for Glance images and Nova ephemeral disk. See `Nova Image Caching documentation <https://docs.openstack.org/nova/ussuri/admin/image-caching.html>`_.
 
 Image Cache Cleanup
 -------------------
@@ -131,7 +131,7 @@ Pre-caching on one node and distributing to remaining nodes
 In the case of a :doc:`../features/distributed_compute_node` it may be desirable to transfer an image to a single compute node at a remote site and then redistribute it from that node to the remaining compute nodes.
 The SSH/SCP configuration that exists between the compute nodes to support cold migration/resize is reused for this purpose.
 
-.. warning:: SSH/SCP is inefficient over high latency networks. The method should only be used when the compute nodes targetted by the playbook are all within the same site. To ensure this is the case set tripleo_nova_image_cache_plan to the stack name of the site. Multiple runs of ansible-playbook are then required, targetting a different site each time.
+.. warning:: SSH/SCP is inefficient over high latency networks. The method should only be used when the compute nodes targeted by the playbook are all within the same site. To ensure this is the case set tripleo_nova_image_cache_plan to the stack name of the site. Multiple runs of ansible-playbook are then required, targeting a different site each time.
 
 To enable this simply set `tripleo_nova_image_cache_use_proxy: true` in the arguments file.
 The image is distributed from the first compute node by default. To use a specific compute node also set `tripleo_nova_image_cache_proxy_hostname`.

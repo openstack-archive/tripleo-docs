@@ -53,7 +53,7 @@ Preparing the Baremetal Environment
 Networking
 ^^^^^^^^^^
 
-The overcloud nodes will be deployed from the undercloud machine and therefore the machines need to have their network settings modified to allow for the overcloud nodes to be PXE boot'ed using the undercloud machine. As such, the setup requires that:
+The overcloud nodes will be deployed from the undercloud machine and therefore the machines need to have their network settings modified to allow for the overcloud nodes to be PXE booted using the undercloud machine. As such, the setup requires that:
 
 * All overcloud machines in the setup must support IPMI
 * A management provisioning network is setup for all of the overcloud machines.

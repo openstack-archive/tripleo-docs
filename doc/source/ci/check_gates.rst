@@ -115,7 +115,7 @@ Troubleshooting a failed job
 
 When your newly added job fails, you may want to download its logs for a local
 inspection and root cause analysis. Use the
-`tripleo-ci gethelogs script
+`tripleo-ci getthelogs script
 <https://github.com/openstack-infra/tripleo-ci/blob/master/scripts/getthelogs>`_
 for that.
 
@@ -157,7 +157,7 @@ Some of the overridable settings are:
  - `tempest_format`: To run tempest using different format (packages, containers, venv).
  - `tempest_extra_config`: A dict of additional tempest config to be overridden.
  - `tempest_plugins`: A list of tempest plugins needs to be installed.
- - `standalone_environment_files`: List of environment files to be overriden
+ - `standalone_environment_files`: List of environment files to be overridden
    by the featureset configuration on standalone deployment. The environment
    file should exist in tripleo-heat-templates repo.
  - `test_white_regex`: Regex to be used by tempest

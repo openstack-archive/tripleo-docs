@@ -23,7 +23,7 @@ These roles can be listed using the `tripleoclient` by running::
 With these provided roles, the user deploying the overcloud can generate a
 `roles_data.yaml` file that contains the roles they would like to use for the
 overcloud nodes.  Additionally the user can manage their personal custom roles
-in a similar manor by storing the individual files in a directory and using
+in a similar manner by storing the individual files in a directory and using
 the `tripleoclient` to generate their `roles_data.yaml`. For example, a user
 can execute the following to create a `roles_data.yaml` containing only the
 `Controller` and `Compute` roles::

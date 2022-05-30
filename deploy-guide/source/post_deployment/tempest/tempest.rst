@@ -678,7 +678,7 @@ Generate tempest.conf and run tempest tests within the container
       with a command which copies your `tempest.conf` from `container_tempest`
       directory to `tempest_workspace/etc` directory::
 
-        $ cp /home/stack/container_tempest/tempets.conf /home/stack/tempest_workspace/etc/tempest.conf
+        $ cp /home/stack/container_tempest/tempest.conf /home/stack/tempest_workspace/etc/tempest.conf
 
 * Set executable privileges to the `tempest_script.sh` script::
 

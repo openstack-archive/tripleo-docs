@@ -810,7 +810,7 @@ Following there is a list of all the changes needed:
 
 10. If using a modified version of the core Heat template collection from
     Newton, you need to re-apply your customizations to a copy of the Queens
-    version. To do this, use a git version control system or similar toolings
+    version. To do this, use a git version control system or similar tooling
     to compare.
 
 

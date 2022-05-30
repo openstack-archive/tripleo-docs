@@ -323,7 +323,7 @@ For reference, the Novajoin based composable service is located at
 tripleo-ipa Composable Service
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're deploying *TLS-everwhere* with tripleo-ipa prior to Victoria, you need to
+If you're deploying *TLS-everywhere* with tripleo-ipa prior to Victoria, you need to
 override the default Novajoin composable service. Add the following composable service to
 the ``resource_registry`` in ``tls-parameters.yaml``::
 

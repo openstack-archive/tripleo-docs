@@ -26,7 +26,7 @@ how to use this command as an operator.
 
 .. _building_containers_deploy_guide: https://docs.openstack.org/project-deploy-guide/tripleo-docs/latest/deployment/3rd_party.html
 
-One of the TipleO CI jobs that executes this command is the
+One of the TripleO CI jobs that executes this command is the
 tripleo-build-containers-centos-7_ job. This job invokes the overcloud container
 image build command in the build.sh.j2_ template::
 

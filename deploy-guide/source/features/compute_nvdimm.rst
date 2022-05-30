@@ -72,12 +72,12 @@ Examples
             NovaPMEMNamespaces: "6G:ns1,6G:ns1,6G:ns2,100G:ns3"
 
 
-The following example will peform following steps:
+The following example will perform following steps:
 * ensure **ndctl** tool is installed on hosts with role **ComputePMEM**
 * create PMEM namespaces as specified in the **NovaPMEMNamespaces** parameter.
 - ns0, ns1, ns2 with size 6GiB
 - ns3 with size 100GiB
-* set Nova prameter **pmem_namespaces** in nova.conf to map create namespaces to vPMEM as specified in **NovaPMEMMappings**.
+* set Nova parameter **pmem_namespaces** in nova.conf to map create namespaces to vPMEM as specified in **NovaPMEMMappings**.
 In this example the label '6GB' will map to one of ns0, ns1 or ns2 namespace and the label 'LARGE' will map to ns3 namespace.
 
 After deployment you need to configure flavors as described in documentation `Nova: Configure a flavor <https://docs.openstack.org/nova/latest/admin/virtual-persistent-memory.html#configure-a-flavor>`_

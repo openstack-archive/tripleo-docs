@@ -81,7 +81,7 @@ What are these above vars:
 * `tempest_tempest_conf_overrides`: In order to pass additional tempest configuration to python-tempestconf tool, we can pass a dictionary of values.
 * `tempest_test_whitelist`: We need to pass a list of tests which we wish to run on the target host as a list.
 * `tempest_test_blacklist`: In order to skip tempest tests, we can pass the list here.
-* `gather_facts`: We need to set gather_facts to true as os_tempest rely on targetted environment facts for installing stuff.
+* `gather_facts`: We need to set gather_facts to true as os_tempest rely on targeted environment facts for installing stuff.
 
 
 Here are the `defaults vars of os_tempest role <https://docs.openstack.org/openstack-ansible-os_tempest/latest/user/default.html>`_.

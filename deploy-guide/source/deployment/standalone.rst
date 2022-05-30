@@ -127,7 +127,7 @@ Deploying a Standalone OpenStack node
    be bound to by haproxy while the other by backend services on the same.
 
    .. Note: The following example utilizes 2 interfaces. NIC1 which will serve as
-      the management inteface. It can have any address and will be left untouched.
+      the management interface. It can have any address and will be left untouched.
       NIC2 will serve as the OpenStack & Provider network NIC. The following
       exports should be configured for your network and interface.
 
@@ -179,7 +179,7 @@ Deploying a Standalone OpenStack node
    floating IP.
 
    .. Note: NIC1 will serve as the management, OpenStack and Provider network
-      inteface. The exports should be configured for your network and interface.
+      interface. The exports should be configured for your network and interface.
 
    .. code-block:: bash
 

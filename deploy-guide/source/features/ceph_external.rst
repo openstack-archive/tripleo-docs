@@ -94,7 +94,7 @@ Do not use `CephExternalMultiConfig` when configuring an overcloud to
 use only one external Ceph cluster. Instead follow the example in the
 previous section. The example in the previous section and the method
 of deploying an internal Ceph cluster documented in
-:doc:`ceph_config` are mutually exclusive per Heat stack. The
+:doc:`deployed_ceph` are mutually exclusive per Heat stack. The
 following scenarios are the only supported ones in which
 `CephExternalMultiConfig` may be used per Heat stack:
 
@@ -102,7 +102,7 @@ following scenarios are the only supported ones in which
   section, in addition to multiple external Ceph clusters configured
   via `CephExternalMultiConfig`.
 
-* One internal Ceph cluster, as described in :doc:`ceph_config` in
+* One internal Ceph cluster, as described in :doc:`deployed_ceph` in
   addition to multiple external ceph clusters configured via
   `CephExternalMultiConfig`.
 
@@ -211,7 +211,7 @@ overcloud to connect to an external ceph cluster:
   ceph-ansible, then the deployer of that cluster could share that map
   with the TripleO deployer so that it could be used as a list item of
   `CephExternalMultiConfig`. Similarly, the `CephExtraKeys` parameter,
-  described in the :doc:`ceph_config` documentation, has the same
+  described in the :doc:`deployed_ceph` documentation, has the same
   syntax.
 
 Deploying Manila with an External CephFS Service

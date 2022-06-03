@@ -115,7 +115,7 @@ Ceph Deployment Types
 
 |project| supports two types of Ceph deployments. An "internal" Ceph
 deployment is one where a Ceph cluster is deployed as part of the
-overcloud as described in :doc:`ceph_config`. An "external" Ceph
+overcloud as described in :doc:`deployed_ceph`. An "external" Ceph
 deployment is one where a Ceph cluster already exists and an overcloud
 is configured to be a client of that Ceph cluster as described in
 :doc:`ceph_external`. Ceph external deployments have special meaning
@@ -160,7 +160,7 @@ types of deployments as described in the following sequence:
   as an additional RBD backend.
 
 The above sequence is possible by using the `CephExtraKeys` parameter
-as described in :doc:`ceph_config` and the `CephExternalMultiConfig`
+as described in :doc:`deployed_ceph` and the `CephExternalMultiConfig`
 parameter described in :doc:`ceph_external`.
 
 Decide which cephx key will be used to access remote Ceph clusters
@@ -239,7 +239,7 @@ Ceph cluster with pools which may be accessed by the cephx user
 "client.external". The same parameters will be used later when the
 DCN overclouds are configured as external Ceph clusters. For more
 information on the `CephExtraKeys` parameter see the document
-:doc:`ceph_config` section called `Configuring CephX Keys`.
+:doc:`deployed_ceph` section called `Overriding CephX Keys`.
 
 Create control-plane roles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -128,14 +128,18 @@ Interacting with ephemeral Heat
 
 With the ephemeral Heat process launched and running, ``openstackclient`` can be
 used to interact with the Heat API. The following shell environment
-configuration must be set in order to disable authentication::
+configuration must set up access to the Heat API::
 
+    unset OS_CLOUD
     unset OS_PROJECT_NAME
     unset OS_PROJECT_DOMAIN_NAME
     unset OS_USER_DOMAIN_NAME
     OS_AUTH_TYPE=none
-    IP=`cat /etc/hosts | grep "undercloud.localdomain undercloud$" | awk '{print $1}'`
-    OS_ENDPOINT=http://$IP:8006/v1/admin
+    OS_ENDPOINT=http://127.0.0.1:8006/v1/admin
+
+You can also use the ``OS_CLOUD`` environment to set up the same::
+
+    export OS_CLOUD=heat
 
 Once the environment is configured, ``openstackclient`` work as expected
 against the Heat API::

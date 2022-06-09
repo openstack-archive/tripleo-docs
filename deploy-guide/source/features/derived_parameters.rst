@@ -196,7 +196,7 @@ devices like ``CephAnsibleDisksConfig``, setting the count directly is
 necessary in order to know how much CPU/RAM to reserve. Similarly,
 because a device path is not hard coded, we cannot look up that device
 in Ironic to determine its type. For information on the
-``CephOsdSpec`` parameter see the :doc:`cephadm` documentation.
+``CephOsdSpec`` parameter see the :doc:`deployed_ceph` documentation.
 
 ``CephHciOsdType`` is the type of data_device (not db_device) used for
 each OSD and must be one of hdd, ssd, or nvme. These are used by

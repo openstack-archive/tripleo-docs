@@ -559,9 +559,7 @@ major-upgrade-composable-steps that come first, as described above.
       ensure the devices list has been migrated to the format expected by
       ceph-ansible. It is possible to use the ``CephAnsibleExtraConfig`` and
       ``CephAnsibleDisksConfig`` parameters to pass arbitrary variables to
-      ceph-ansible, like ``devices`` and ``dedicated_devices``.  See the
-      `ceph-ansible scenarios`_ or the :doc:`TripleO Ceph config guide
-      <../../features/ceph_config>`
+      ceph-ansible, like ``devices`` and ``dedicated_devices``.
 
       The other parameters (for example ``CinderRbdPoolName``,
       ``CephClientUserName``, ...) will behave as they used to with puppet-ceph

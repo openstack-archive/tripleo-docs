@@ -146,7 +146,7 @@ Accessing the ramdisk
 
 Note that the introspection ramdisk is by default built with the
 `dynamic-login element
-<https://docs.openstack.org/diskimage-builder/elements/dynamic-login/README.html>`_,
+<https://docs.openstack.org/diskimage-builder/latest/elements/dynamic-login/README.html>`_,
 so you can set up an SSH key and log into it for debugging.
 
 First, think of a temporary root password. Generate a hash by feeding it

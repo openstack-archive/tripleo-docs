@@ -303,7 +303,7 @@ that will be run against the nodes in each role.
       debug:
         msg: "A message"
 
-To provision baremetal nodes, create neuron port resource and apply network
+To provision baremetal nodes, create neutron port resource and apply network
 configuration as defined in the above definition run the ``openstack overcloud
 node provision`` command including the ``--network-config`` argument as shown
 in the below example:

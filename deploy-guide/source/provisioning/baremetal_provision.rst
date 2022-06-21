@@ -239,7 +239,7 @@ Each ``instances`` entry and the ``defaults`` dict support the following propert
   See :ref:`scaling-down`
 
 * ``resource_class``: Selection criteria to match the node's resource class,
-  defaults to ``baremetal``
+  defaults to ``baremetal``. See :doc:`./profile_matching`
 
 * ``root_size_gb``: Size of the root partition in GiB, defaults to 49
 

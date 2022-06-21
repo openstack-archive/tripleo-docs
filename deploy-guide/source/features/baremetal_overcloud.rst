@@ -55,12 +55,6 @@ TripleO workflows. E.g. for node using IPMI::
     TripleO-specific, e.g. they force local boot instead of network boot used
     by default in Ironic.
 
-.. note::
-    If you use :doc:`../environments/virtualbmc`, make sure to follow
-    :ref:`create-vbmc` for the overcloud nodes as well, and correctly populate
-    ``ipmi_port``. If needed, change ``ipmi_address`` to the address of the
-    virtual host, which is accessible from controllers.
-
 Then enroll only ``undercloud.json`` in your undercloud::
 
     source stackrc

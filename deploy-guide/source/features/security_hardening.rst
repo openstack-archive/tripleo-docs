@@ -151,7 +151,7 @@ deployment when needed. For example, for Zabbix monitoring system.
           action: accept
 
 Rules can also be used to restrict access. The number used at definition of a
-rule will determine where the iptables rule will be inserted. For example,
+rule will determine where the nftables rule will be inserted. For example,
 rabbitmq rule number is 109 by default. If you want to restrain it, you could
 do.
 
@@ -177,13 +177,13 @@ do.
 
 In this example, 098 and 099 are arbitrarily numbers that are smaller than the
 default rabbitmq rule number. To know the number of a rule, inspect the active
-iptables rules on an appropriate node (controller, in case of rabbitmq)
+nftables rules on an appropriate node (controller, in case of rabbitmq)
 
 .. code-block:: shell
 
-    iptables-save
+    nft list chain inet filter TRIPLEO_INPUT
     [...]
-    -A INPUT -p tcp -m multiport --dports 4369,5672,25672 -m comment --comment "109 rabbitmq" -m state --state NEW -j ACCEPT
+    tcp dport { 4369, 5672, 25672-25683 } ct state new counter packets 0 bytes 0 accept comment "109 rabbitmq"
 
 Alternatively it's possible to get the information in tripleo service in the
 definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`.

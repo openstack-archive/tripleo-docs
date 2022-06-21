@@ -38,7 +38,7 @@ the following procedure:
 On all the controller nodes, drop connections to the database port via the VIP by running::
 
   MYSQLIP=$(grep -A1 'listen mysql' /var/lib/config-data/haproxy/etc/haproxy/haproxy.cfg | grep bind | awk '{print $2}' | awk -F":" '{print $1}')
-  sudo /sbin/iptables -I INPUT -d $MYSQLIP -p tcp --dport 3306 -j DROP
+  sudo nft add rule inet filter TRIPLEO_INPUT tcp dport 3306 ip daddr $MYSQLIP drop
 
 This will isolate all the MySQL traffic to the nodes.
 
@@ -118,9 +118,12 @@ Test clustercheck on each controller node via xinetd.d::
   # curl overcloud-controller-1:9200
   # curl overcloud-controller-2:9200
 
-Remove the iptables rule from each node for the services to restore access to the database::
+Remove the firewall rule from each node for the services to restore access to the database::
 
-  sudo /sbin/iptables -D INPUT -d $MYSQLIP -p tcp --dport 3306 -j DROP
+  sudo nft -a list chain inet filter TRIPLEO_INPUT | grep mysql
+  [...]
+  tcp dport 3306 ip daddr $MYSQLIP drop # handle 499
+  sudo nft delete rule inet filter TRIPLEO_INPUT handle 499
 
 Filesystem restore
 ------------------

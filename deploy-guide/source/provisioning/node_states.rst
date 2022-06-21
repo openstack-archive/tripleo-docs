@@ -37,7 +37,7 @@ The ``manage`` action
 can be used to bring nodes from enroll_ to ``manageable`` or nodes already
 moved to available_ state back to ``manageable`` for configuration::
 
-    openstack baremetal node manage <NAME OR UUID>
+    baremetal node manage <NAME OR UUID>
 
 available
 ---------
@@ -51,4 +51,4 @@ in this state.
    Nodes which failed introspection stay in ``manageable`` state and must be
    reintrospected or made ``available`` manually::
 
-    openstack baremetal node provide <NAME OR UUID>
+    baremetal node provide <NAME OR UUID>

@@ -60,16 +60,16 @@ For example, a wrong MAC can be fixed in two steps:
 * Find out the assigned port UUID by running
   ::
 
-    $ openstack baremetal port list --node <NODE UUID>
+    $ baremetal port list --node <NODE UUID>
 
 * Update the MAC address by running
   ::
 
-    $ openstack baremetal port set --address <NEW MAC> <PORT UUID>
+    $ baremetal port set --address <NEW MAC> <PORT UUID>
 
 A Wrong IPMI address can be fixed with the following command::
 
-    $ openstack baremetal node set <NODE UUID> --driver-info ipmi_address=<NEW IPMI ADDRESS>
+    $ baremetal node set <NODE UUID> --driver-info ipmi_address=<NEW IPMI ADDRESS>
 
 Node power state is not enforced by Ironic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -103,7 +103,7 @@ power management, and it gets stuck in an abnormal state.
 Ironic requires that nodes that cannot be operated normally are put in the
 maintenance mode. It is done by the following command::
 
-    $ openstack baremetal node maintenance set <NODE UUID> --reason "<EXPLANATION>"
+    $ baremetal node maintenance set <NODE UUID> --reason "<EXPLANATION>"
 
 Ironic will stop checking power and health state for such nodes, and Nova will
 not pick them for deployment. Power command will still work on them, though.
@@ -112,11 +112,11 @@ After a node is in the maintenance mode, you can attempt repairing it, e.g. by
 `Fixing invalid node information`_. If you manage to make the node operational
 again, move it out of the maintenance mode::
 
-    $ openstack baremetal node maintenance unset <NODE UUID>
+    $ baremetal node maintenance unset <NODE UUID>
 
 If repairing is not possible, you can force deletion of such node::
 
-    $ openstack baremetal node delete <NODE UUID>
+    $ baremetal node delete <NODE UUID>
 
 Forcing node removal will leave it powered on, accessing the network with
 the old IP address(es) and with all services running. Before proceeding, make
@@ -189,4 +189,4 @@ How can introspection be stopped?
 
 Introspection for a node can be stopped with the following command::
 
-    $ openstack baremetal introspection abort <NODE UUID>
+    $ baremetal introspection abort <NODE UUID>

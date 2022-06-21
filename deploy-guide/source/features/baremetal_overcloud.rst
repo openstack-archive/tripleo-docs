@@ -298,11 +298,11 @@ Check that Ironic works by connecting to the overcloud and trying to list the
 nodes (you should see an empty response, but not an error)::
 
     source overcloudrc
-    openstack baremetal node list
+    baremetal node list
 
 You can also check the enabled driver list::
 
-    $ openstack baremetal driver list
+    $ baremetal driver list
     +---------------------+-------------------------+
     | Supported driver(s) | Active host(s)          |
     +---------------------+-------------------------+
@@ -318,7 +318,7 @@ You can also check the enabled driver list::
 
 For HA configuration you should see all three controllers::
 
-    $ openstack baremetal driver list
+    $ baremetal driver list
     +---------------------+------------------------------------------------------------------------------------------------------------+
     | Supported driver(s) | Active host(s)                                                                                             |
     +---------------------+------------------------------------------------------------------------------------------------------------+
@@ -507,7 +507,7 @@ and/or ``rescuing_network`` to the ``driver_info`` dictionary when
 After enrolling nodes, you can update each of them with the following
 command (adjusting it for your release)::
 
- openstack baremetal node set <node> \
+ baremetal node set <node> \
      --driver-info cleaning_network=<network uuid> \
      --driver-info provisioning_network=<network uuid> \
      --driver-info rescuing_network=<network uuid>
@@ -746,12 +746,12 @@ The ``overcloud-nodes.yaml`` file prepared in the previous steps can now be
 imported in Ironic::
 
     source overcloudrc
-    openstack baremetal create overcloud-nodes.yaml
+    baremetal create overcloud-nodes.yaml
 
 .. warning::
     This command is provided by Ironic, not TripleO. It also does not feature
     support for updates, so if you need to change something, you have to use
-    ``openstack baremetal node set`` and similar commands.
+    ``baremetal node set`` and similar commands.
 
 The nodes appear in the ``enroll`` provision state, you need to check their BMC
 credentials and make them available::
@@ -759,15 +759,15 @@ credentials and make them available::
     DEPLOY_KERNEL=$(openstack image show deploy-kernel -f value -c id)
     DEPLOY_RAMDISK=$(openstack image show deploy-ramdisk -f value -c id)
 
-    for uuid in $(openstack baremetal node list --provision-state enroll -f value -c UUID);
+    for uuid in $(baremetal node list --provision-state enroll -f value -c UUID);
     do
-        openstack baremetal node set $uuid \
+        baremetal node set $uuid \
             --driver-info deploy_kernel=$DEPLOY_KERNEL \
             --driver-info deploy_ramdisk=$DEPLOY_RAMDISK \
             --driver-info rescue_kernel=$DEPLOY_KERNEL \
             --driver-info rescue_ramdisk=$DEPLOY_RAMDISK
-        openstack baremetal node manage $uuid --wait &&
-            openstack baremetal node provide $uuid
+        baremetal node manage $uuid --wait &&
+            baremetal node provide $uuid
     done
 
 The deploy kernel and ramdisk were created as part of `Adding deployment
@@ -777,7 +777,7 @@ The ``baremetal node provide`` command makes a node go through cleaning
 procedure, so it might take some time depending on the configuration. Check
 your nodes status with::
 
-    openstack baremetal node list --fields uuid name provision_state last_error
+    baremetal node list --fields uuid name provision_state last_error
 
 Wait for all nodes to reach the ``available`` state. Any failures during
 cleaning has to be corrected before proceeding with deployment.
@@ -824,7 +824,7 @@ Check that nodes are really enrolled and the power state is reflected correctly
 (it may take some time)::
 
     $ source overcloudrc
-    $ openstack baremetal node list
+    $ baremetal node list
     +--------------------------------------+------------+---------------+-------------+--------------------+-------------+
     | UUID                                 | Name       | Instance UUID | Power State | Provisioning State | Maintenance |
     +--------------------------------------+------------+---------------+-------------+--------------------+-------------+
@@ -961,8 +961,8 @@ do this each baremetal node must first be configured to boot from a volume.
 The connector ID for each node should be unique, below we achieve this by
 incrementing the value of <NUM>::
 
-    $ openstack baremetal node set --property capabilities=iscsi_boot:true --storage-interface cinder <NODEID>
-    $ openstack baremetal volume connector create --node <NODEID> --type iqn --connector-id iqn.2010-10.org.openstack.node<NUM>
+    $ baremetal node set --property capabilities=iscsi_boot:true --storage-interface cinder <NODEID>
+    $ baremetal volume connector create --node <NODEID> --type iqn --connector-id iqn.2010-10.org.openstack.node<NUM>
 
 The image used should be configured to boot from a iSCSI root disk, on Centos
 7 this is achieved by ensuring that the `iscsi` module is added to the ramdisk
@@ -1134,7 +1134,7 @@ If not already provided in ``overcloud-nodes.yaml`` above, the
 local-link-connection  values for `switch_info`, `port_id` and `switch_id`
 can be provided here::
 
-  openstack baremetal port set --local-link-connection switch_info=switch1 \
+  baremetal port set --local-link-connection switch_info=switch1 \
     --local-link-connection port_id=xe-0/0/7 \
     --local-link-connection switch_id=00:00:00:00:00:00 <PORTID>
 

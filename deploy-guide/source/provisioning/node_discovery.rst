@@ -111,7 +111,7 @@ the discovery process:
 
 .. code-block:: console
 
-    openstack baremetal introspection rule import /path/to/rules.json
+    baremetal introspection rule import /path/to/rules.json
 
 See :doc:`profile_matching` for more examples on introspection rules.
 

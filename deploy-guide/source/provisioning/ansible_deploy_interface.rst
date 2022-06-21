@@ -109,8 +109,8 @@ Configuring nodes
 Nodes have to be explicitly configured to use the Ansible deploy. For example,
 to configure all nodes, use::
 
-    for node in $(openstack baremetal node list -f value -c UUID); do
-        openstack baremetal node set $node --deploy-interface ansible
+    for node in $(baremetal node list -f value -c UUID); do
+        baremetal node set $node --deploy-interface ansible
     done
 
 Editing playbooks
@@ -149,8 +149,8 @@ nodes.
 #. Set the newly introduced ``kernel_params`` extra variable to the desired
    kernel parameters. For example, to update only compute nodes use::
 
-    for node in $(openstack baremetal node list -c Name -f value | grep compute); do
-        openstack baremetal node set $node \
+    for node in $(baremetal node list -c Name -f value | grep compute); do
+        baremetal node set $node \
             --extra kernel_params='param1=value1 param2=value2'
     done
 

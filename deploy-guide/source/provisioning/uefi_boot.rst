@@ -44,19 +44,19 @@ configure introspected nodes to deploy in UEFI mode as well.
 
 Here is how the ``properties`` field looks for nodes configured in BIOS mode::
 
-    $ openstack baremetal node show <NODE> -f value -c properties
+    $ baremetal node show <NODE> -f value -c properties
     {u'capabilities': u'profile:compute,boot_mode:bios', u'memory_mb': u'6144', u'cpu_arch': u'x86_64', u'local_gb': u'49', u'cpus': u'1'}
 
 Note that ``boot_mode:bios`` capability is set. For a node in UEFI mode, it
 will look like this::
 
-    $ openstack baremetal node show <NODE> -f value -c properties
+    $ baremetal node show <NODE> -f value -c properties
     {u'capabilities': u'profile:compute,boot_mode:uefi', u'memory_mb': u'6144', u'cpu_arch': u'x86_64', u'local_gb': u'49', u'cpus': u'1'}
 
 You can change the boot mode with the following command (required for UEFI
 before the Pike release)::
 
-    $ openstack baremetal node set <NODE> --property capabilities=profile:compute,boot_mode:uefi
+    $ baremetal node set <NODE> --property capabilities=profile:compute,boot_mode:uefi
 
 .. warning::
     Do not forget to copy all other capabilities, e.g. ``profile`` and

@@ -270,10 +270,10 @@ the ones used in the ``subnets`` option in the undercloud configuration.
 
    To set all nodes to ``manageable`` state run the following command::
 
-       for node in $(openstack baremetal node list -f value -c Name); do \
-           openstack baremetal node manage $node --wait; done
+       for node in $(baremetal node list -f value -c Name); do \
+           baremetal node manage $node --wait; done
 
-#. Use ``openstack baremetal port list --node <node-uuid>`` command to find out
+#. Use ``baremetal port list --node <node-uuid>`` command to find out
    which baremetal ports are associated with which baremetal node. Then set the
    ``physical-network`` for the ports.
 
@@ -283,11 +283,11 @@ the ones used in the ``subnets`` option in the undercloud configuration.
    the baremetal port connected to ``leaf0`` use ``ctlplane``. The remaining
    ports use the ``leafX`` names::
 
-     $ openstack baremetal port set --physical-network ctlplane <port-uuid>
+     $ baremetal port set --physical-network ctlplane <port-uuid>
 
-     $ openstack baremetal port set --physical-network leaf1 <port-uuid>
-     $ openstack baremetal port set --physical-network leaf2 <port-uuid>
-     $ openstack baremetal port set --physical-network leaf2 <port-uuid>
+     $ baremetal port set --physical-network leaf1 <port-uuid>
+     $ baremetal port set --physical-network leaf2 <port-uuid>
+     $ baremetal port set --physical-network leaf2 <port-uuid>
 
 #. Make sure the nodes are in ``available`` state before deploying the
    overcloud::

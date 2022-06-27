@@ -42,7 +42,7 @@ Updating Undercloud Components
 
    .. code-block:: bash
 
-      sudo yum clean all
+      sudo dnf clean all
       sudo rm -rf /var/cache/yum
 
 #. Update required package:
@@ -97,7 +97,7 @@ Updating Undercloud Components
 
    .. code-block:: bash
 
-      sudo yum update python-tripleoclient* openstack-tripleo-common openstack-tripleo-heat-templates
+      sudo dnf update python3-tripleoclient* openstack-tripleo-common openstack-tripleo-heat-templates
 
 #. As part of the undercloud install, an image registry is configured on port
    `8787`.  This is used to increase reliability of overcloud image pulls, and

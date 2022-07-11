@@ -599,6 +599,30 @@ the specification if the `service_type` is "osd". The same
 ``--osd-spec`` is available to the `openstack overcloud ceph spec`
 command.
 
+Another possible variation of the ``osd_spec.yaml`` file is the
+following::
+
+  data_devices:
+    model: 'SAMSUNG'
+  osds_per_device: 2
+
+In the above example we use the `model` under `data_devices` to only
+create OSDs on that model of device and we configure two OSDs per
+device. Note that `osds_per_device` does not go under `data_devices`
+but on the same level. The above was created after using the following
+command on an already running system to find a way to refer only to a
+particular device. In this case the ATA_INTEL devices are not
+configured as OSDs but the three SAMSUNG devices are configured as
+OSDs::
+
+  [ceph: root@controller-0 /]# ceph orch device ls | grep cephstorage-2
+  cephstorage-2  /dev/nvme0n1  ssd   SAMSUNG MZ1LW960HMJP-00003_S2X6NY0KB00178              960G             Insufficient space (<10 extents) on vgs, LVM detected, locked
+  cephstorage-2  /dev/nvme1n1  ssd   SAMSUNG MZQLB960HAJR-00007_S437NA0N506009              960G             Insufficient space (<10 extents) on vgs, LVM detected, locked
+  cephstorage-2  /dev/nvme2n1  ssd   SAMSUNG MZQLB960HAJR-00007_S437NA0N506027              960G  Yes
+  cephstorage-2  /dev/sdb      ssd   ATA_INTEL_SSDSC2KB960G8_PHYF039400YC960CGN             960G  Yes
+  cephstorage-2  /dev/sdc      ssd   ATA_INTEL_SSDSC2KB960G8_PHYF039402F2960CGN             960G  Yes
+  [ceph: root@controller-0 /]#
+
 The :doc:`node_specific_hieradata` feature is not supported by the
 cephadm integration but the `Advanced OSD Service Specifications`_ has
 a `host_pattern` parameter which specifies which host to target for
@@ -1661,10 +1685,24 @@ the following example we will identify the OSDs of the host ceph-2::
   ... <redacted>
   [ceph: root@oc0-controller-0 /]#
 
-As per the example above the ceph-2 host has OSDs 5,7,9,11 which can
+First we need to update the Ceph spec defined in the server. Otherwise
+the Ceph Manager will try to recreate the OSDs when we remove them
+with `ceph orch osd rm`. Export the Ceph spec, edit it, and reapply
+the modified Ceph spec::
+
+  [ceph: root@oc0-controller-0 /]# ceph orch ls --export > spec.yml
+  [ceph: root@oc0-controller-0 /]# vi spec.yml
+  [ceph: root@oc0-controller-0 /]# ceph orch apply -i spec.yml
+  [ceph: root@oc0-controller-0 /]#
+
+In the step where the spec is edited, update the `service_type: osd`
+hosts list to remove the "ceph-2" host and remove the `service_type:
+host` entry for the "ceph-2" host.
+
+As per `ceph osd tree`, the ceph-2 host has OSDs 5,7,9,11 which can
 be removed by running `ceph orch osd rm 5 7 9 11`. For example::
 
-  [ceph: root@oc0-controller-0 /]# ceph orch osd rm 5 7 9 11
+  [ceph: root@oc0-controller-0 /]# ceph orch osd rm --zap 5 7 9 11
   Scheduled OSD(s) for removal
   [ceph: root@oc0-controller-0 /]# ceph orch osd rm status
   OSD_ID  HOST        STATE     PG_COUNT  REPLACE  FORCE  DRAIN_STARTED_AT
@@ -1673,7 +1711,9 @@ be removed by running `ceph orch osd rm 5 7 9 11`. For example::
   11      ceph-2      draining  14        False    False  2021-04-23 21:35:50.243762
   [ceph: root@oc0-controller-0 /]#
 
-Use `ceph orch osd rm status` to check the status::
+The `--zap` option is used to clean the disks so that they can be
+easily added back to the ceph cluster if necessary. Use `ceph orch osd
+rm status` to check the status::
 
   [ceph: root@oc0-controller-0 /]# ceph orch osd rm status
   OSD_ID  HOST        STATE                    PG_COUNT  REPLACE  FORCE  DRAIN_STARTED_AT
@@ -1771,22 +1811,24 @@ to be adjusted after the deployment use `ceph config set osd <key>
 <value>`.
 
 To limit Nova resources add parameters to `ceph-overrides.yaml`
-like the following::
+like the following but modify the NovaReservedHostMemory to suit your
+environment::
 
   parameter_defaults:
-    CephHciOsdType: hdd
-    CephHciOsdCount: 4
+    ComputeHCIParameters:
+      NovaReservedHostMemory: 75000
 
-The `CephHciOsdType` and `CephHciOsdCount` parameters are used by the
-Derived Parameters workflow to tune the Nova scheduler to not allocate
-a certain amount of memory and CPU from the hypervisor to virtual
-machines so that Ceph can use them instead. See the
-:doc:`derived_parameters` documentation for details. If you do not use
-Derived Parameters workflow, then at least set the
-`NovaReservedHostMemory` to the number of OSDs multipled by 5 GB per
-OSD per host.
+The `NovaReservedHostMemory` above overrides the default value of
+`reserved_host_memory_mb` in /etc/nova/nova.conf. The value may be
+set so that the Nova scheduler does not give memory to a virtual
+machine that a Ceph OSD on the same server will need. The example
+above reserves 5 GB per OSD for 10 OSDs per host in addition to the
+default reserved memory for the hypervisor. In an IOPS-optimized
+cluster performance can be improved by reserving more memory per OSD.
+The 5 GB number is provided as a starting point which can be further
+tuned if necessary.
 
-Deploy the Ceph with `openstack overcloud ceph deploy` and be sure to
+Deploy Ceph with `openstack overcloud ceph deploy` and be sure to
 pass the initial Ceph configuration file with Ceph HCI tunings. Then
 deploy the overcloud with `openstack overcloud deploy` and the as
 described in "Scenario: Deploy Ceph with TripleO and Metalsmith" but
@@ -1834,6 +1876,13 @@ example OSD, use commands like this::
   10
   [ceph: root@oc0-controller-0 /]#
 
+On the compute node, verify that the `reserved_host_memory_mb` was
+applied::
+
+  $ sudo podman exec -ti nova_compute /bin/bash
+  # grep reserved_host_memory_mb /etc/nova/nova.conf
+  reserved_host_memory_mb=75000
+  #
 
 .. _`cephadm`: https://docs.ceph.com/en/latest/cephadm/index.html
 .. _`cleaning instructions in the Ironic documentation`: https://docs.openstack.org/ironic/latest/admin/cleaning.html

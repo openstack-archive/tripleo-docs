@@ -68,7 +68,7 @@ whitespace. That is, for the
         overcloud_container_image_build = tripleoclient.v1.container_image:BuildImage
 
 The value in each *key=value* pair provides us with the file and class name
-used in the tripleoclient namespace for this comand. For **overcloud_container_image_build** we have
+used in the tripleoclient namespace for this command. For **overcloud_container_image_build** we have
 **tripleoclient.v1.container_image:BuildImage**, which means this command is
 defined in a class called **BuildImage** inside the `tripleoclient/v1/container_image.py`_
 file.

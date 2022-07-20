@@ -33,7 +33,7 @@ For other projects, there is no need to update anything since the release will b
    https://docs.openstack.org/puppet-openstack-guide/releases.html#how-to-release-puppet-modules
 
 Once this is done, you can submit a patch in openstack/releases and per project to modify the YAML.
-The openstack/releases project provides tooling to update these files. See the new-release_ comand.
+The openstack/releases project provides tooling to update these files. See the new-release_ command.
 You can also update the yaml files manually as necessary.
 Example with tripleo-heat-templates, edit deliverables/pike/tripleo-heat-templates.yaml::
 

@@ -100,7 +100,7 @@ build any dependent changes (i.e. depends-on in the code submission). This is
 done with `build-test-packages`_ invoked in the `multinode-standalone-pre.yml`_.
 We ensure that the built repo is available to child jobs by setting the
 `ib_create_web_repo variable`_ when built-test-packages is invoked by a
-provider job. This `makes the repo availabe via a HTTP server`_ on the
+provider job. This `makes the repo available via a HTTP server`_ on the
 content provider node that consumers then retrieve as described below.
 
 The Content Consumers
@@ -170,7 +170,7 @@ or upgrade part of the test.
 .. _`we set the docker_registry_host`: https://opendev.org/openstack/tripleo-quickstart-extras/src/commit/e61200fec8acccb3d5fe20f68b64156a3daadb8a/roles/extras-common/defaults/main.yml#L44
 .. _`build-test-packages`: https://opendev.org/openstack/tripleo-quickstart-extras/src/branch/master/roles/build-test-packages/
 .. _`ib_create_web_repo variable`: https://opendev.org/openstack/tripleo-quickstart-extras/src/commit/e61200fec8acccb3d5fe20f68b64156a3daadb8a/roles/install-built-repo/defaults/main.yml#L11
-.. _`makes the repo availabe via a HTTP server`: https://opendev.org/openstack/tripleo-quickstart-extras/src/commit/e61200fec8acccb3d5fe20f68b64156a3daadb8a/roles/install-built-repo/templates/install-built-repo.sh.j2#L17-L23
+.. _`makes the repo available via a HTTP server`: https://opendev.org/openstack/tripleo-quickstart-extras/src/commit/e61200fec8acccb3d5fe20f68b64156a3daadb8a/roles/install-built-repo/templates/install-built-repo.sh.j2#L17-L23
 .. _`install-built-repo`: https://opendev.org/openstack/tripleo-ci/src/commit/fbaaa3324712b9a718ce17c82bb190d09cca95be/playbooks/tripleo-ci/install-built-repo.yml#L16-L27
 .. _`appropriate base job definitions`: https://opendev.org/openstack/tripleo-ci/src/commit/fbaaa3324712b9a718ce17c82bb190d09cca95be/zuul.d/base.yaml#L184
 .. _`run tripleo-ci-centos-8-scenario001-standalone as a consumer job`: https://opendev.org/openstack/tripleo-ci/src/commit/fbaaa3324712b9a718ce17c82bb190d09cca95be/zuul.d/standalone-jobs.yaml#L483-L492

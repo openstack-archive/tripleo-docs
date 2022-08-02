@@ -201,6 +201,33 @@ definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`.
 Additional information regarding the the available interface options, the role,
 some of the implementation details can be reviewed `here <https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_firewall.html>`_.
 
+VXLAN and nftables
+~~~~~~~~~~~~~~~~~~
+
+In order to properly get VXLAN support, you have to add a couple of rules to
+the Undercloud firewall. This is especially true for a lab environment, or on
+the upstream CI infrastructure. Here's an example of the custom rules for
+the CI, feel free to adapt them. Note that the network is the one used on the
+eth0 interface, aka "public" one of the Undercloud.
+
+.. code-block:: yaml
+
+  parameter_defaults:
+    ExtraFirewallRules:
+      '020 Allow VXLan from CI infra network':
+        proto: "udp"
+        dport: 4789
+        source: "PUBLIC_NETWORK_CIDR"
+        state: []
+      '021 Allow OTV for vxlan from CI infra network':
+        proto: "udp"
+        dport: 8472
+        source: "PUBLIC_NETWORK_CIDR"
+        state: []
+
+.. note:: The ``state: []`` is mandatory in order to not only catch the NEW
+          connection (default with the nftables and iptables modules).
+
 AIDE - Intrusion Detection
 --------------------------
 

@@ -293,14 +293,28 @@ Deploying a Standalone OpenStack node
          mon_warn_on_pool_no_redundancy = false
          EOF
 
-      Deploy Ceph by passing the IP, Ceph spec and Ceph conf created
-      above. Use the options `--standalone`, `--single-host-defaults`,
-      `--skip-hosts-config` and `--skip-container-registry-config`.
-      Use `openstack overcloud ceph deploy --help` for details on what
-      these options do. User creation is skipped via
-      `--skip-user-create` because it was handled in the previous
-      step. Specify what the output deployed Ceph file should be
-      called.
+      Additional Ceph daemons can be added to the Ceph cluster, but only Ceph
+      mds and nfs daemons are supported. Create a Ceph_daemon spec definition,
+      and add the required information for each daemon:
+
+      .. code-block:: bash
+
+         cat <<EOF > $HOME/ceph_daemon.yaml
+         ceph_nfs: 
+           cephfs_data: 'manila_data'
+           cephfs_metadata: 'manila_metadata'
+         EOF
+
+      Deploy Ceph by passing the IP, Ceph spec,  Ceph conf and Ceph daemon
+      definition created above. Use the options `--standalone`,
+      `--single-host-defaults`, `--skip-hosts-config` and
+      `--skip-container-registry-config`. Use `openstack overcloud ceph deploy
+      --help` for details on what these options do. User creation is skipped
+      via `--skip-user-create` because it was handled in the previous step.
+      Specify what the output deployed Ceph file should be called. The
+      CephIngress deployment can be skipped in a standalone environment if
+      there is no network isolation and the CephNFS daemon already has a stable
+      floating ip.
 
       .. code-block:: bash
 
@@ -308,6 +322,7 @@ Deploying a Standalone OpenStack node
             --mon-ip $CEPH_IP \
             --ceph-spec $HOME/ceph_spec.yaml \
             --config $HOME/initial_ceph.conf \
+            --daemon $HOME/ceph_daemon.yaml \
             --standalone \
             --single-host-defaults \
             --skip-hosts-config \

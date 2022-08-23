@@ -29,7 +29,7 @@ in parent job.
 TripleO CI Base jobs
 ++++++++++++++++++++
 
-TripleO CI base jobs are defined in `zuul.d/base-upstream.yaml`_ file
+TripleO CI base jobs are defined in `zuul.d/base.yaml`_ file
 in tripleo-ci repo.
 
 Below is the list of base jobs and each is explained in a little more detail
@@ -408,7 +408,7 @@ FAQs regarding TripleO CI jobs
 
 .. _`zuul.d`: https://opendev.org/openstack/tripleo-ci/src/branch/master/zuul.d
 .. _`parent`: https://zuul-ci.org/docs/zuul/latest/config/job.html#attr-job.parent
-.. _`zuul.d/base-upstream.yaml`: https://opendev.org/openstack/tripleo-ci/src/branch/master/zuul.d/base-upstream.yaml
+.. _`zuul.d/base.yaml`: https://opendev.org/openstack/tripleo-ci/src/branch/master/zuul.d/base.yaml
 .. _`tripleo-ci-build-containers-required-projects-rdo`: https://github.com/rdo-infra/rdo-jobs/commit/86e7e63ce6da27c2815afa845a6878cf96acdb47#diff-4897e02c92e2979a54f09d6eb383dba74c9a9211b065a52f9ecc4efbcce19637R17
 .. _`paused`: https://zuul-ci.org/docs/zuul/latest/job-content.html#pausing-the-job
 .. _`tripleo-ci-build-containers-required-projects-upstream`: https://opendev.org/openstack/tripleo-ci/commit/1d640d09fd808caa33b82f0bdd5622120cebef09

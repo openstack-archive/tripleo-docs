@@ -327,3 +327,66 @@ role and where expected Nova settings were applied::
   reserved_host_memory_mb=75000
   cpu_allocation_ratio=8.2
   #
+
+Migrating Away from Derived Paramters
+-------------------------------------
+
+If a stack update is run without the -p option (and it was used
+previously), then any derived parameters will no longer be applied to
+the overcloud. An example of this is the following process:
+
+1. Deploy an overcloud using `-p plan-environment-derived-params.yaml` to set a `reserved_host_memory_mb`
+2. Observe the `reserved_host_memory_mb` in `/etc/nova/nova.conf`
+3. Run a stack update without using `-p plan-environment-derived-params.yaml`
+4. Observe that the derived `reserved_host_memory_mb` will not be in the `/etc/nova/nova.conf`
+
+Thus, to migrate away from using derived parameters, take note of what
+parameters and values were derived and then create a Heat enviornment
+file which sets them directly.
+
+One way to take note what parameters and values were derived is to
+look search the output of the `openstack overcloud deploy -p ...`
+comamnd for the string "derived_parameters". For example::
+
+        "derived_parameters": {
+            "ComputeHCIParameters": {
+                "NovaReservedHostMemory": 15360
+            }
+        },
+
+If the above is not available, then it can be observed directly on the
+system which was deployed with derived parameters. For example::
+
+  [root@compute-hci-2 ~]# podman exec -ti nova_compute /bin/bash
+  bash-5.1$ grep reserved_host_memory_mb /etc/nova/nova.conf
+  #reserved_host_memory_mb=512
+  reserved_host_memory_mb=15360
+  bash-5.1$
+
+From there it can be converted from a derived to a standard
+paramter like this::
+
+  parameter_defaults:
+    ComputeHCIParameters:
+      NovaReservedHostMemory: 15360
+
+After the parameter has been set as described above it is no longer
+necessary to deploy the overcloud with the -p option.
+
+The list of available parameters that derived paramters can set is
+below. The are NovaReservedHostMemory and NovaCPUAllocationRatio are
+controlled by the HCI workflow while the others are from the NFV
+worklfows.
+
+- IsolCpusList
+- KernelArgs
+- NeutronPhysnetNUMANodesMapping
+- NeutronTunnelNUMANodes
+- NovaCPUAllocationRatio
+- NovaComputeCpuDedicatedSet
+- NovaComputeCpuSharedSet
+- NovaReservedHostMemory
+- NovaReservedHostMemory
+- OvsDpdkCoreList
+- OvsDpdkSocketMemory
+- OvsPmdCoreList

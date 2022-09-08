@@ -15,7 +15,6 @@ Documentation on additional features for |project|.
    deploy_cellv2
    deploy_swift
    deployed_server
-   derived_parameters
    designate
    disable_telemetry
    distributed_compute_node

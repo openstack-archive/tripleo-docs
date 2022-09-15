@@ -148,7 +148,7 @@ deployment when needed. For example, for Zabbix monitoring system.
           dport: 10050
           proto: tcp
           source: 10.0.0.8
-          action: accept
+          jump: accept
 
 Rules can also be used to restrict access. The number used at definition of a
 rule will determine where the nftables rule will be inserted. For example,
@@ -166,14 +166,14 @@ do.
           - 25672
           proto: tcp
           source: 10.0.0.0/24
-          action: accept
+          jump: accept
         '099 drop other rabbit access':
           dport:
           - 4369
           - 5672
           - 25672
           proto: tcp
-          action: drop
+          jump: drop
 
 In this example, 098 and 099 are arbitrarily numbers that are smaller than the
 default rabbitmq rule number. To know the number of a rule, inspect the active

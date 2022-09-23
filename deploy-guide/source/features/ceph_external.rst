@@ -260,5 +260,135 @@ For Train use::
 
   openstack overcloud deploy --templates -e /usr/share/openstack-tripleo-heat-templates/environments/ceph-ansible/ceph-ansible-external.yaml -e ~/my-additional-ceph-settings.yaml
 
+Standalone Ansible Roles for External Ceph
+------------------------------------------
+
+To configure an overcloud to use an external Ceph cluster, a directory
+(e.g. /etc/ceph) in the overcloud containers should be populated with
+Ceph configuration files and overcloud services (e.g. Nova) should be
+configured to use those files. Tripleo provides Ansible roles to do
+this standalone without tripleo-heat-templates or config-download.
+
+Single Ceph Cluster
+^^^^^^^^^^^^^^^^^^^
+
+The `tripleo_ceph_client_files` Ansible role copies files from a
+source directory (`tripleo_ceph_client_files_source`) on the host
+where Ansible is run to a destination directory
+(`tripleo_ceph_client_config_home`) on the overcloud nodes.
+The user must create and populate the
+`tripleo_ceph_client_files_source` directory with actual Ceph
+configuration and cephx key files before running the role. For
+example::
+
+  $ ls -l /home/stack/ceph_files/
+  total 16
+  -rw-r--r--. 1 stack stack 245 Nov 14 13:40 ceph.client.openstack.keyring
+  -rw-r--r--. 1 stack stack 173 Nov 14 13:40 ceph.conf
+
+If the above directory exists on the host where the `ansible-playbook`
+command is run, then the `tripleo_ceph_client_files_source` parameter
+should be set to `/home/stack/ceph_files/`. The optional parameter
+`tripleo_ceph_client_config_home` defaults to
+`/var/lib/tripleo-config/ceph` since OpenStack containers will bind
+mount this directory to `/etc/ceph`. The `tripleo_nova_libvirt`
+Ansible role will add a secret key to libvirt so that it uses the
+cephx key put in place by the `tripleo_ceph_client_files` role; it
+does this if either `tripleo_nova_libvirt_enable_rbd_backend` or
+`tripleo_cinder_enable_rbd_backend` are true. When these roles
+are used to configure a compute node the following `group_vars` should
+be set::
+
+  tripleo_ceph_client_files_source: /home/stack/ceph_files
+  tripleo_ceph_client_config_home: /var/lib/tripleo-config/ceph
+  tripleo_nova_libvirt_enable_rbd_backend: true
+  tripleo_cinder_enable_rbd_backend: true
+
+The `tripleo_ceph_client_files` role may then be included in a
+playbook as follows in order to configure a standalone compute node to
+use a single Ceph cluster::
+
+    - name: configure ceph client
+      import_role:
+        name: tripleo_ceph_client_files
+
+In order for Nova to use the Ceph cluster, the `libvirt` section of
+the `nova.conf` file should be configured. The `tripleo_nova_compute`
+role `tripleo_nova_compute_config_overrides` variable may be set as
+follows in the inventory to set the `libvirt` values along with
+others::
+
+  Compute:
+    vars:
+      tripleo_nova_compute_config_overrides:
+        libvirt:
+          images_rbd_ceph_conf: /etc/ceph/ceph.conf
+          images_rbd_glance_copy_poll_interval: '15'
+          images_rbd_glance_copy_timeout: '600'
+          images_rbd_glance_store_name: default_backend
+          images_rbd_pool: vms
+          images_type: rbd
+          rbd_secret_uuid: 604c9994-1d82-11ed-8ae5-5254003d6107
+          rbd_user: openstack
+
+TripleO's convention is to set the `rbd_secret_uuid` to the FSID of
+the Ceph cluster. The FSID should be in the ceph.conf file. The
+`tripleo_nova_libvirt` role will use `virsh secret-*` commands so that
+libvirt can retrieve the cephx secret using the FSID as a key. This
+can be confirmed after running Ansible with `podman exec
+nova_virtsecretd virsh secret-get-value $FSID`.
+
+The `tripleo_ceph_client_files` role only supports the _configure_
+aspect of the standalone tripleo-ansible roles because it just
+configures one or more pairs of files on its target nodes. Thus, the
+`import_role` example above could be placed in a playbook file like
+`deploy-tripleo-openstack-configure.yml`, before the roles for
+`tripleo_nova_libvirt` and `tripleo_nova_compute` are imported.
+
+Multiple Ceph Clusters
+^^^^^^^^^^^^^^^^^^^^^^
+
+To configure more than one Ceph backend include the
+`tripleo_ceph_client_files` role from the single cluster example
+above. Populate the `tripleo_ceph_client_files_source` directory with
+all of the ceph configuration and cephx key files For example::
+
+  $ ls -l /home/stack/ceph_files/
+  total 16
+  -rw-r--r--. 1 stack stack 213 Nov 14 13:41 ceph2.client.openstack.keyring
+  -rw-r--r--. 1 stack stack 228 Nov 14 13:41 ceph2.conf
+  -rw-r--r--. 1 stack stack 245 Nov 14 13:40 ceph.client.openstack.keyring
+  -rw-r--r--. 1 stack stack 173 Nov 14 13:40 ceph.conf
+
+For multiple Ceph clusters, the `tripleo_nova_libvirt` role expects a
+`tripleo_cinder_rbd_multi_config` Ansible variable like this::
+
+  tripleo_cinder_rbd_multi_config:
+    ceph2:
+      CephClusterName: ceph2
+      CephClientUserName: openstack
+
+It is not necessary to put the default Ceph cluster (named "ceph" from
+the single node example) in `tripleo_cinder_rbd_multi_config`. Only
+the additional clusters (e.g. ceph2) and name their keys so they
+match the `CephClusterName`. In the above example, the
+`CephClusterName` value "ceph2" matches the "ceph2.conf" and
+"ceph2.client.openstack.keyring". Also, the `CephClientUserName` value
+"openstack" matches "ceph2.client.openstack.keyring". The
+`tripleo_nova_libvirt` Ansible role uses the
+`tripleo_cinder_rbd_multi_config` map as a guide to know which libvirt
+secrets to create and which cephx keys to make available within the
+Nova containers.
+
+If the combined examples above from the single cluster section for
+the primary cluster "ceph" and this section for the seconary Ceph
+cluster "ceph2" are used, then the directory defined by
+`tripleo_ceph_client_config_home` will be populated with four files:
+`ceph.conf`, `ceph2.conf`, `ceph.client.openstack.keyring` and
+`ceph2.client.openstack.keyring`, which will be mounted into the Nova
+containers and two libvirt secrets will be created for each cephx
+key. To add more Ceph clusters, extend the list
+`tripleo_cinder_rbd_multi_config` and populate
+`tripleo_ceph_client_files_source` with additional files.
 
 .. _`ceph-ansible/group_vars`: https://github.com/ceph/ceph-ansible/tree/master/group_vars

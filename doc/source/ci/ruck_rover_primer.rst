@@ -52,6 +52,7 @@ milestone, change the status to "Triaged" add the appropriate tag(s):
   criteria (more on that below). Bugs with this tag are picked up by a script
   running periodically and converted to a CIX card which are tracked twice a week
   in a CI Escalation Status meeting.
+* ovb: bug is related to ovb (openstack-virtual-baremetal) jobs.
 
 For the periodic promotion jobs the ruck must ensure that the jobs defined as
 being in 'promotion criteria' are passing. The criteria is simply a list of

@@ -62,10 +62,25 @@ Alternatively `NovaImageCacheTTL` can be set for individual compute roles::
 Pre-caching a list of images on all Compute nodes
 -------------------------------------------------
 
-Generate an ansible inventory for the stack name (default `overcloud`)::
+Get an ansible inventory for the stack name (default `overcloud`):
 
-    [stack@undercloud-0 ~]$ . stackrc
-    (undercloud) [stack@undercloud-0 ~]$ tripleo-ansible-inventory --plan overcloud --static-yaml-inventory inventory.yaml
+.. admonition:: Wallaby
+   :class: wallaby
+
+   ``tripleo-ansible-inventory`` is deprecated as of Wallaby.
+
+   .. code-block:: bash
+
+      [stack@undercloud-0 ~]$ mkdir -p inventories
+      [stack@undercloud-0 ~]$ . stackrc
+      (undercloud) [stack@undercloud-0 ~]$ tripleo-ansible-inventory \
+        --plan overcloud --static-yaml-inventory inventories/inventory.yaml
+
+.. code-block:: bash
+
+   [stack@undercloud-0 ~]$ find ~/overcloud-deploy/*/config-download \
+     -name tripleo-ansible-inventory.yaml |\
+     while read f; do cp $f inventories/$(basename $(dirname $f)).yaml; done
 
 Determine the list of image IDs to pre-cache::
 
@@ -92,7 +107,7 @@ Source the overcloud rc file to provide the necessary credentials for image down
 
 Run the `tripleo_nova_image_cache` playbook::
 
-    (overcloud) [stack@undercloud-0 ~]$ ansible-playbook -i inventory.yaml --extra-vars "@nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
+    (overcloud) [stack@undercloud-0 ~]$ ansible-playbook -i inventories --extra-vars "@nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
 
     PLAY [TripleO Nova image cache management] ***************************************************************************************************************************************************************************************************
 
@@ -111,16 +126,37 @@ Run the `tripleo_nova_image_cache` playbook::
 Multi-stacks inventory
 ----------------------
 
-When a multi-stack deployment is used, such as in :doc:`../features/distributed_compute_node`
-and :doc:`../features/deploy_cellv2`, a single inventory file can be
-generated for all stacks allowing images to be cached on all compute nodes
-with a single playbook run.
+When a multi-stack deployment is used, such as in
+:doc:`../features/distributed_compute_node` and
+:doc:`../features/deploy_cellv2`, a merged inventory allows images to be cached
+on all compute nodes with a single playbook run.
 
-A multi-stack inventory can be created by specifying a comma separated list of stacks::
+For each deployed stack, its ansible inventory is generated in
+``overcloud-deploy/<stack>/config-download/tripleo-ansible-inventory.yaml``.
+Collect all inventories under the ``inventories`` directory:
 
-    [stack@undercloud-0 ~]$ . stackrc
-    (undercloud) [stack@undercloud-0 ~]$ tripleo-ansible-inventory --plan overcloud,site1,site2 --static-yaml-inventory multiinventory.yaml
+.. admonition:: Wallaby
+   :class: wallaby
 
+   ``tripleo-ansible-inventory`` is deprecated as of Wallaby. A multi-stack
+   inventory can be created by specifying a comma separated list of stacks:
+
+   .. code-block:: bash
+
+      [stack@undercloud-0 ~]$ mkdir -p inventories
+      [stack@undercloud-0 ~]$ . stackrc
+      (undercloud) [stack@undercloud-0 ~]$ tripleo-ansible-inventory \
+        --plan overcloud,site1,site2 \
+        --static-yaml-inventory inventories/multiinventory.yaml
+
+.. code-block:: bash
+
+   [stack@undercloud-0 ~]$ mkdir -p inventories
+   [stack@undercloud-0 ~]$ find ~/overcloud-deploy/*/config-download \
+     -name tripleo-ansible-inventory.yaml |\
+     while read f; do cp $f inventories/$(basename $(dirname $f)).yaml; done
+
+When all inventory files are stored in a single directory, ansible merges it.
 The playbook can then be run once as in :ref:`cache_all_computes` to pre-cache on all compute nodes.
 
 .. _scp_distribution:
@@ -146,7 +182,7 @@ For example::
     tripleo_nova_image_cache_plan: dcn1
     EOF
 
-    (central) [stack@undercloud-0 ~]$ ansible-playbook -i multiinventory.yaml --extra-vars "@dcn1_nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
+    (central) [stack@undercloud-0 ~]$ ansible-playbook -i inventories --extra-vars "@dcn1_nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
 
     PLAY [TripleO Nova image cache management] ***************************************************************************************************************************************************************************************************
 
@@ -170,7 +206,7 @@ For example::
     tripleo_nova_image_cache_plan: dcn2
     EOF
 
-    (central) [stack@undercloud-0 ~]$ ansible-playbook -i multiinventory.yaml --extra-vars "@dcn2_nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
+    (central) [stack@undercloud-0 ~]$ ansible-playbook -i inventories --extra-vars "@dcn2_nova_cache_args.yml" /usr/share/ansible/tripleo-playbooks/tripleo_nova_image_cache.yml
 
     PLAY [TripleO Nova image cache management] ***************************************************************************************************************************************************************************************************
     ...

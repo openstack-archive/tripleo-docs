@@ -2,19 +2,19 @@
 
 .. note::
    Python3 is required for current releases of OpenStack which is
-   supported on CentOS Stream 8.
+   supported on CentOS Stream 9.
 
 #. Download and install the python-tripleo-repos RPM from
    the appropriate RDO repository
 
-   .. admonition:: CentOS Stream 8
-      :class: centos8
+   .. admonition:: CentOS Stream 9
+      :class: centos9
 
-      Current `Centos 8 RDO repository <https://trunk.rdoproject.org/centos8/component/tripleo/current/>`_.
+      Current `Centos 9 RDO repository <https://trunk.rdoproject.org/centos9/component/tripleo/current/>`_.
 
        .. code-block:: bash
 
-          sudo dnf install -y https://trunk.rdoproject.org/centos8/component/tripleo/current/python3-tripleo-repos-<version>.el8.noarch.rpm
+          sudo dnf install -y https://trunk.rdoproject.org/centos9/component/tripleo/current/python3-tripleo-repos-<version>.el9.noarch.rpm
 
    .. note::
 

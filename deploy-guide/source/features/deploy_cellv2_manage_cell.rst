@@ -73,7 +73,8 @@ Delete a compute from a cell
 
   .. code-block:: bash
 
-    sudo yum install python2-osc-placement
+    sudo dnf install python3-osc-placement
+    source overcloudrc
     openstack resource provider list
     +--------------------------------------+---------------------------------------+------------+
     | uuid                                 | name                                  | generation |
@@ -152,11 +153,10 @@ Delete a cell
 
     This step is required as otherwise adding a compute node with the same hostname
     will make it to fail to register as a resource with the placement service.
-    In case of Centos/RHEL 8 the required packages is `python3-osc-placement`:
 
   .. code-block:: bash
 
-    sudo yum install python2-osc-placement
+    sudo dnf install python3-osc-placement
     source overcloudrc
     openstack resource provider list
     +--------------------------------------+---------------------------------------+------------+

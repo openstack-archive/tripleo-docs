@@ -15,20 +15,6 @@ Prior to Stein, containerized OpenStack deployments used Docker.
 Starting with the Stein release, Docker is no longer part of OpenStack,
 and Podman has taken its place.  The notes here are regarding Stein and later.
 
-sudo
-----
-
-On CentOS 7, podman cannot function with administrative privileges due to
-user namespaces not being enabled in an older kernel.  The workaround is
-simply to run podman commands with sudo as a prefix.
-
-If you see the following, simply remember to add sudo to your command::
-
-    $ podman ps
-    cannot clone: Invalid argument
-    user namespaces are not enabled in /proc/sys/user/max_user_namespaces
-    ERRO[0000] cannot re-exec process
-
 Monitoring containers
 ---------------------
 

@@ -39,8 +39,8 @@ in its glance, one time in /var/lib subdirectories for PXE/TFTP).
 
 TripleO is supporting only the following operating systems:
 
-* RHEL 8 (x86_64)
-* CentOS8 Stream (x86_64)
+* RHEL 9 (x86_64)
+* CentOS Stream 9 (x86_64)
 
 Please also ensure your node clock is set to UTC in order to prevent any issue
 when the OS hwclock syncs to the BIOS clock before applying timezone offset,
@@ -87,7 +87,7 @@ Setting Up The Undercloud Machine
 
 #. Select a machine within the baremetal environment on which to install the
    undercloud.
-#. Install RHEL 8 x86_64 or CentOS 8 Stream x86_64 on this machine.
+#. Install RHEL 9 x86_64 or CentOS Stream 9 x86_64 on this machine.
 #. If needed, create a non-root user with sudo access to use for installing the
    Undercloud::
 

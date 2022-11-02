@@ -32,11 +32,9 @@ containerized stateful services, like the messaging system or database.
 .. _Containerd: https://github.com/containerd/containerd
 .. _Bundle: https://wiki.clusterlabs.org/wiki/Bundle_Walk-Through
 
-Currently we provide a ``ContainerCli`` parameter which can be used to switch
-between podman and docker container runtimes.  The default for the undercloud
-is podman, while the default for the overcloud is docker due to pacemaker
-limitations when running under CentOS 7. We expect to switch to podman by
-default for the overcloud once CentOS 8 becomes the default.
+Currently we provide a ``ContainerCli`` parameter which can be used to change
+the container runtimes, but only podman is supported for both undercloud and
+overcloud.
 
 We have provided various ``Container*`` configuration parameters in TripleO
 Heat Templates for operators to tune some of the container based settings.

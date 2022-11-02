@@ -293,7 +293,7 @@ Configure Kolla to build images for TripleO, in `/etc/kolla/kolla-build.conf`::
   registry=192.168.24.1:8787
   tag=latest
   template_override=/usr/share/tripleo-common/container-images/tripleo_kolla_template_overrides.j2
-  rpm_setup_config=http://trunk.rdoproject.org/centos7/current-tripleo/delorean.repo,http://trunk.rdoproject.org/centos7/delorean-deps.repo
+  rpm_setup_config=http://trunk.rdoproject.org/centos9/current-tripleo/delorean.repo,http://trunk.rdoproject.org/centos9/delorean-deps.repo
   push=True
 
 Use the following command to build all of the container images used in TripleO::
@@ -301,10 +301,6 @@ Use the following command to build all of the container images used in TripleO::
   openstack overcloud container image build \
         --config-file /usr/share/tripleo-common/container-images/overcloud_containers.yaml \
         --kolla-config-file /etc/kolla/kolla-build.conf
-
-.. note:: Add --use-buildah argument to use Buildah instead of Docker.
-          It'll be the default once CentOS8 becomes the testing platform during the Train cycle
-          and onward.
 
 Or use `kolla-build` to build the images yourself, which provides more
 flexibility and allows you to rebuild selectively just the images matching

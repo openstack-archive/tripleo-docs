@@ -50,7 +50,7 @@ Architecture
 Deploying the Operational Tool Server
 -------------------------------------
 
-There is an ansible project called opstools-ansible (OpsTools_) on github that helps to install the Operator Server, further documentation of the operational tool server instalation can be founded at (OpsToolsDoc_).
+There is an ansible project called opstools-ansible (OpsTools_) on github that helps to install the Operator Server, further documentation of the operational tool server installation can be founded at (OpsToolsDoc_).
 
 .. _OpsTools: https://github.com/centos-opstools/opstools-ansible
 .. _OpsToolsDoc: https://github.com/centos-opstools/opstools-doc
@@ -135,7 +135,7 @@ Before deploying the Overcloud
          LoggingSharedKey: secret           # The key
          LoggingSSLCertificate: |           # The content of the SSL Certificate
            -----BEGIN CERTIFICATE-----
-           ...contens of server.pem here...
+           ...contents of server.pem here...
            -----END CERTIFICATE-----
 
    - Performance Monitoring::

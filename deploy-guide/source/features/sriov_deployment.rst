@@ -26,7 +26,7 @@ baremetal on which SR-IOV needs to be enabled.
 
 Also, SR-IOV requires mandatory kernel parameters to be set, like
 ``intel_iommu=on iommu=pt`` on Intel machines. In order to enable the
-configuration of kernel parametres to the host, host-config-pre-network
+configuration of kernel parameters to the host, host-config-pre-network
 environment file has to be added for the deploy command.
 
 Adding the following arguments to the ``openstack overcloud deploy`` command

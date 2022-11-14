@@ -10,7 +10,7 @@ briefly remind folks of their options.
 ---------------------------------------------------------------
 
 RDO's zuul is setup to directly inherit from upstream zuul. Any TripleO
-job that executes upstream should be rerunable in RDO's zuul. A distinct
+job that executes upstream should be re-runnable in RDO's zuul. A distinct
 advantage here is that you can ask RDO admins to hold the job for you,
 get your ssh keys on the box and debug the live environment. It's good
 stuff. To hold a node, ask your friends in #rhos-ops

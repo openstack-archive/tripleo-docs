@@ -142,7 +142,7 @@ Prepare version tags
 
 Based on the versions.csv data, an openstack/releases patch needs to be created
 to tag the release with the provided hashes. You can determine which TripleO
-projects are needed by finding the projects taged with "team: tripleo_".
+projects are needed by finding the projects tagged with "team: tripleo_".
 `An example review`_.  Please be aware of changes between versions and create
 the appropriate version number as necessary (e.g. major, feature, or bugfix).
 

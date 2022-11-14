@@ -18,7 +18,7 @@ and only see the ``enroll`` state if their power management fails to validate::
         openstack overcloud import instackenv.json
 
 Nodes can optionally be introspected in this step by passing the --provide flag
-which will progress them through through the manageable_ state and eventually to
+which will progress them through the manageable_ state and eventually to
 the available_ state ready for deployment.
 
 manageable

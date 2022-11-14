@@ -144,7 +144,7 @@ with ``--override-ansible-cfg`` on the deployment command.
 
 For example the following command will use the configuration options from
 ``/home/stack/ansible.cfg``. Any options specified in the override file will
-take precendence over the defaults::
+take precedence over the defaults::
 
     openstack overcloud deploy \
       ...

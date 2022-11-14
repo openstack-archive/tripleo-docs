@@ -8,7 +8,7 @@ Bare Metal service to provision baremetal before the overcloud is deployed.
 This adds a new provision step before the overcloud deploy, and the output of
 the provision is a valid :doc:`../features/deployed_server` configuration.
 
-In the Wallaby release the baremetal provisining was extended to also manage
+In the Wallaby release the baremetal provisioning was extended to also manage
 the neutron API resources for :doc:`../features/network_isolation` and
 :doc:`../features/custom_networks`, and apply network configuration on the
 provisioned nodes using os-net-config.

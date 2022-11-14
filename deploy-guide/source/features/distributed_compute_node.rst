@@ -972,7 +972,7 @@ the command from example_export_dcn_ (Victoria or prior releases).
 ``network_data_v2.yaml``, ``vip_data.yaml``, and ``baremetal_deployment.yaml``
 are the same files used with the ``control-plane`` stack. However, the files
 will need to be modified if the ``edge-0`` or ``edge-1`` stacks require
-addditional provisioning of network resources for new subnets. Update the files
+additional provisioning of network resources for new subnets. Update the files
 as needed and continue to use the same files for all ``overcloud deploy``
 commands across all stacks.
 

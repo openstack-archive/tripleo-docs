@@ -87,7 +87,7 @@ that it can run all the steps:
 
    The environment files with the parameters and resource registry overrides
    required is automatically included when the ``overcloud deploy`` command is
-   run with the arguments: ``--vip-file``, ``--baremetal-deployement`` and
+   run with the arguments: ``--vip-file``, ``--baremetal-deployment`` and
    ``--network-config``.
 
 #. Run Config-Download and the deploy-steps playbook
@@ -369,7 +369,7 @@ Migrating existing deployments
 
 To facilitate the migration for deployed overclouds tripleoclient commands to
 extract information from deployed overcloud stacks has been added. During the
-upgrade to Wallaby these tools will be executed as part of the underlcoud
+upgrade to Wallaby these tools will be executed as part of the undercloud
 upgrade, placing the generated YAML definition files in the working directory
 (Defaults to: ``~/overcloud-deploy/$STACK_NAME/``). Below each export command
 is described, and examples to use them manually with the intent for developers
@@ -379,7 +379,7 @@ during the undercloud upgrade.
 There is also a tool ``convert_heat_nic_config_to_ansible_j2.py`` that can be
 used to convert heat template NIC config to Ansible j2 templates.
 
-.. warning:: If migrating to use Networking v2 while using the non-Epemeral
+.. warning:: If migrating to use Networking v2 while using the non-Ephemeral
              heat i.e ``--heat-type installed``, the existing overcloud stack
              must **first** be updated to set the ``deletion_policy`` for
              ``OS::Nova`` and ``OS::Neutron`` resources. This can be done
@@ -474,7 +474,7 @@ generate a Baremetal Provision definition YAML file from a deployed overcloud
 stack. The YAML definition file can then be used with ``openstack overcloud
 node provision`` command and/or the ``openstack overcloud deploy`` command.
 
-**Example**: Export deployed overcloud nodes to Baremtal Deployment YAML
+**Example**: Export deployed overcloud nodes to Baremetal Deployment YAML
 definition
 
 .. code-block:: bash

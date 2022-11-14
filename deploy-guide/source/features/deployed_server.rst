@@ -102,7 +102,7 @@ Deploying the Overcloud
 
 Provision networks and ports if using Neutron
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If using Neutron for resource managment, Network resources for the deployment
+If using Neutron for resource management, Network resources for the deployment
 still must be provisioned with the ``openstack overcloud network provision``
 command as documented in :ref:`custom_networks`.
 
@@ -559,7 +559,7 @@ The following is a sample environment file that shows setting these values
 
     Use ``DeployedServerPortMap`` to assign an ControlPlane Virtual IP address from
     any CIDR, and the ``RedisVirtualFixedIPs`` and ``OVNDBsVirtualFixedIPs``
-    parameters to assing the ``RedisVip`` and ``OVNDBsVip``::
+    parameters to assign the ``RedisVip`` and ``OVNDBsVip``::
 
       resource_registry:
         OS::TripleO::DeployedServer::ControlPlanePort: /usr/share/openstack-tripleo-heat-templates/deployed-server/deployed-neutron-port.yaml

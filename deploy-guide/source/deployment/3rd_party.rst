@@ -216,7 +216,7 @@ Here are some of them:
 Tips and Tricks with tripleo_container_image_build
 ..................................................
 
-Here's a non-exaustive list of tips and tricks that might make things faster,
+Here's a non-exhaustive list of tips and tricks that might make things faster,
 especially on a dev env where you need to build multiple times the containers.
 
 Inject a caching proxy

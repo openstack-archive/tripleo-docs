@@ -2,7 +2,7 @@ Tolerate deployment failures
 ============================
 
 When proceeding to large scale deployments, it happens very often to have
-infrastucture problems such as network outages, wrong configurations applied
+infrastructure problems such as network outages, wrong configurations applied
 on hardware, hard drive issues, etc.
 
 It is unpleasant to deploy hundred of nodes and only have a few of them which

@@ -140,7 +140,7 @@ Hack the promotion with testproject
 Finally testproject_ and the ability to run individual periodic jobs on
 demand is an important part of the ruck|rover toolbox. In some cases you may
 want to run a job for verification of a given launchpad bug that affects
-perioric jobs.
+periodic jobs.
 
 However another important use is when the ruck|rover notice that one of the
 jobs in criteria failed on something they (now) know how to fix, or on some
@@ -191,7 +191,7 @@ at time of writing we see::
     priority=1
 
 So the centos7 master tripleo-ci-testing *hash* is
-*544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9a*. The corrresponding repo
+*544864ccc03b053317f5408b0c0349a42723ce73_ebb98bd9a*. The corresponding repo
 is given by the baseurl above and if you navigate to that URL with your
 browser you can see the list of packages used in the jobs. Thus, the job
 specified in the example above for testproject

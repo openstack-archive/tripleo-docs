@@ -58,7 +58,7 @@ run of a group or specific validations.
 
 ``--extra-vars-file``: This
 option allows to add a valid ``JSON`` or ``YAML``
-file contaning extra variables to a run of a group or specific validations.
+file containing extra variables to a run of a group or specific validations.
 
 .. code-block:: bash
 

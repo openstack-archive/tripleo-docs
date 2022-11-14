@@ -92,13 +92,13 @@ In some cases bugs are fixed once a new version of some service is released
 service/project). In this case the rover is expected to know what that fix is
 and do everything they can to make it available in the jobs. This will range
 from posting gerrit reviews to bump some service version in requirements.txt
-through to simply harrassing the 'right folks' ;) in the relevant `TripleO Squad`_.
+through to simply harassing the 'right folks' ;) in the relevant `TripleO Squad`_.
 
 In other cases bugs may be deprioritized - for example if the job is non voting
 or is not in the promotion criteria then any related bugs are less likely to
 be getting the rover's attention. If you are interested in such jobs or bugs
 then you should go to #OFTC oooq channel and find the folks with "ruck" or
-"rover" in their nick and harrass them about it!
+"rover" in their nick and harass them about it!
 
 Of course for other cases there are bona fide bugs with the `TripleO CI code`_
 that the rover is expected to fix. To avoid being overwhelmed time management
@@ -177,7 +177,7 @@ Grafana is also useful for tracking promotions across branches.
    represent promotions and height shows the number of promotions on that day.
 
 
-Finally grafana tracks a list of all running jobs hilighting the failures in
+Finally grafana tracks a list of all running jobs highlighting the failures in
 red.
 
 .. image:: ./_images/grafana3.png

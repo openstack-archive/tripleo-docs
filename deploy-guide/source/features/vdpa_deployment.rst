@@ -34,7 +34,7 @@ baremetal on which vDPA needs to be enabled.
 
 Also, vDPA requires mandatory kernel parameters to be set, like
 ``intel_iommu=on iommu=pt`` on Intel machines. In order to enable the
-configuration of kernel parametres to the host, The ``KernelArgs`` role
+configuration of kernel parameters to the host, The ``KernelArgs`` role
 parameter has to be defined accordingly.
 
 Adding the following arguments to the ``openstack overcloud deploy`` command
@@ -146,7 +146,7 @@ Scheduling instances
 
 Normally, the ``PciPassthroughFilter`` is sufficient to ensure that a vDPA instance will
 land on a vDPA host. If we want to prevent other instances from using a vDPA host, we need
-to setup the `isolate-aggreate feature
+to setup the `isolate-aggregate feature
 <https://docs.openstack.org/nova/latest/reference/isolate-aggregates.html>`_.
 
 Example::
@@ -431,7 +431,7 @@ Validating the OVN agents::
   +--------------------------------------+----------------------+-------------------------+-------------------+-------+-------+----------------------------+
 
 
-Other usefull commands for troubleshooting::
+Other useful commands for troubleshooting::
 
   [root@computevdpa-0 ~]# ovs-appctl dpctl/dump-flows -m type=offloaded
   [root@computevdpa-0 ~]# ovs-appctl dpctl/dump-flows -m

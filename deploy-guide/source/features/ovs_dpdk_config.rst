@@ -91,7 +91,7 @@ Example::
                   type: ovs_dpdk_port
                   name: dpdk0
                   mtu: 2000
-                  rx_queu: 2
+                  rx_queue: 2
                   members:
                     -
                       type: interface

@@ -89,7 +89,7 @@ Here are a non-exhaustive list of things that are expected:
    which doesn't only mean +1/-1, but also comments the code that confirm
    that the patch is ready (or not) to be merged into the repository.
    This capacity to provide these kind of reviews is strongly evaluated when
-   recruiting new core reviewers. It is prefered to provide quality reviews
+   recruiting new core reviewers. It is preferred to provide quality reviews
    over quantity. A negative review needs productive feedback and harmful
    comments won't help to build credibility within the team.
 

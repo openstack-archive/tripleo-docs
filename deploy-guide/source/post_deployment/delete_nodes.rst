@@ -11,7 +11,7 @@ by following the process outlined in on this page.
    If you're just scaling down nodes and plan to re-use them. Use :ref:`scale_roles`
    instead. For temporary issues with nodes, they can be blacklisted temporarily
    using ``DeploymentServerBlacklist``.
-   This guide is specifcally for removing nodes from the environment.
+   This guide is specifically for removing nodes from the environment.
 
 .. note::
    If your Compute node is still hosting VM's, ensure they are migrated to

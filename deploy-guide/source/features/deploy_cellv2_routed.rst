@@ -147,7 +147,7 @@ been added to the network definitions in the network_data.yaml file format:
 
   The cell controllers use virtual IPs, therefore the existing VIPs from the
   central overcloud stack should not be referenced. In case cell controllers
-  and cell computes get split into sepearate stacks, the cell compute stack
+  and cell computes get split into separate stacks, the cell compute stack
   network_data file need an external_resource_vip_id reference to the cell
   controllers VIP resource.
 
@@ -382,7 +382,7 @@ Add the following content into a parameter file for the cell, e.g. `cell1/cell1.
     CellControllerCount: 3
     ComputeCount: 0
 
-    # Compute names need to be uniq, make sure to have a uniq
+    # Compute names need to be unique, make sure to have a unique
     # hostname format for cell nodes
     ComputeHostnameFormat: 'cell1-compute-%index%'
 

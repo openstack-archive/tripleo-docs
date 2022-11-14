@@ -217,7 +217,7 @@ overcloud to connect to an external ceph cluster:
 Deploying Manila with an External CephFS Service
 ------------------------------------------------
 
-If chosing to configure Manila with Ganesha as NFS gateway for CephFS,
+If choosing to configure Manila with Ganesha as NFS gateway for CephFS,
 with an external Ceph cluster, then add `environments/manila-cephfsganesha-config.yaml`
 to the list of environment files used to deploy the overcloud and also
 configure the following parameters::

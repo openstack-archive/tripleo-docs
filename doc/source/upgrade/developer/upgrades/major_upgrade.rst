@@ -41,7 +41,7 @@ you read the following sections:
 openstack overcloud upgrade prepare $ARGS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The entry point for the the upgrade CLI commands, *prepare*, *run* and
+The entry point for the upgrade CLI commands, *prepare*, *run* and
 *converge*, is given in the python-tripleoclient setup.cfg_. All three
 are also defined in the same file, overcloud-upgrade.py_.
 

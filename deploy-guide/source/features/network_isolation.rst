@@ -180,7 +180,7 @@ Create the networks, segments and subnet resources on the Undercloud
 
 Run the "openstack overcloud network provision" command to create/update the
 networks on the Undercloud. This command will also generate the
-``networks-deployed-environment.yaml`` environment file which must be be used
+``networks-deployed-environment.yaml`` environment file which must be used
 when deploying the overcloud.
 
 .. code-block:: bash
@@ -237,7 +237,7 @@ Create the overcloud network Virtual IPs on the Undercloud
 
 Run the "openstack overcloud network vip provision" command to create/update
 the network Virtual IPs on the Undercloud. This command will also generate the
-``vips-deployed-environment.yaml`` environment file which must be be used when
+``vips-deployed-environment.yaml`` environment file which must be used when
 deploying the overcloud.
 
 .. code-block:: bash

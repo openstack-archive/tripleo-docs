@@ -206,7 +206,7 @@ Additional configuration
 Using a Custom Network for Overcloud Provisioning
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Pike release provided the the ability to define a custom network,
+The Pike release provided the ability to define a custom network,
 this has been further enhanced in Queens to allow for the definition
 of a VLAN in the network definition.  Using a custom network to provision
 Overcloud nodes for Ironic has the advantage of moving all Ironic services

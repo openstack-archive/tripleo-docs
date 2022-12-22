@@ -535,7 +535,7 @@ modify the ``config_settings`` to add what we need::
 
 * The ``metadata_settings`` section will pass some information to a metadata
   hook that will create the service principal before the certificate request is
-  done. The format as as follows:
+  done. The format as follows:
 
   * ``service``: This contains the service identifier to be used in the
     kerberos service principal. It should match the identifier you put in the

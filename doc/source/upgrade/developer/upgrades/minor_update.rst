@@ -65,7 +65,7 @@ The play first executes `update_steps_tasks.yaml` which are tasks
 collected from the ``update_tasks`` entry in composable
 services.
 
-After the update tasks are finished, deployment workflow is is
+After the update tasks are finished, deployment workflow is
 performed on the node being updated. That means reusing
 `host_prep_tasks.yaml` and `common_deploy_steps_tasks.yaml`, which are
 executed like on a fresh deployment, except during minor update

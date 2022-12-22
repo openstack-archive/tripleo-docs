@@ -438,7 +438,7 @@ a new flavor and tag the cell controller.
 
 Run cell deployment
 ___________________
-To deploy the overcloud we can use use the same `overcloud deploy` command as
+To deploy the overcloud we can use the same `overcloud deploy` command as
 it was used to deploy the `overcloud` stack and add the created export
 environment files:
 
@@ -538,7 +538,7 @@ In addition we add the `external_resource_vip_id` of the VIP of the stack which
 should be reused for this network (Storage).
 
 Important is that the `external_resource_vip_id` for the InternalApi points
-the the VIP of the cell controller stack!
+the VIP of the cell controller stack!
 
 .. code-block:: bash
 
@@ -665,7 +665,7 @@ Deploy the cell computes
 
 Run cell deployment
 ___________________
-To deploy the overcloud we can use use the same `overcloud deploy` command as
+To deploy the overcloud we can use the same `overcloud deploy` command as
 it was used to deploy the `cell1-ctrl` stack and add the created export
 environment files:
 

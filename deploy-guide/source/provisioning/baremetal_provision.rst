@@ -380,7 +380,7 @@ The ``instances`` ``config_drive`` property supports two sub-properties:
 
 * ``cloud_config``: Dict of cloud-init `cloud-config`_ data for tasks to run on
   node boot. A task specified in an ``instances`` ``cloud_config`` will
-  overwrite a task with the same name in in ``defaults`` ``cloud_config``.
+  overwrite a task with the same name in ``defaults`` ``cloud_config``.
 
 * ``meta_data``: Extra metadata to include with the config-drive cloud-init
   metadata. This will be added to the generated metadata ``public_keys``,

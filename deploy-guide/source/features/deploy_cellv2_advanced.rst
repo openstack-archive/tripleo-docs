@@ -94,7 +94,7 @@ a new flavor and tag the cell controller.
 
 Run cell deployment
 ___________________
-To deploy the cell controller stack we use use the same `overcloud deploy`
+To deploy the cell controller stack we use the same `overcloud deploy`
 command as it was used to deploy the `overcloud` stack and add the created
 export environment files:
 
@@ -193,7 +193,7 @@ Deploy the cell computes
 
 Run cell deployment
 ___________________
-To deploy the overcloud we can use use the same `overcloud deploy` command as
+To deploy the overcloud we can use the same `overcloud deploy` command as
 it was used to deploy the `cell1-ctrl` stack and add the created export
 environment files:
 

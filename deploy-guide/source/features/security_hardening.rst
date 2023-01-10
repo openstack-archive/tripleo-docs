@@ -198,7 +198,7 @@ definition. In our case in `deployment/rabbitmq/rabbitmq-container-puppet.yaml`.
           - 25672
           - 25673-25683
 
-Additional information regarding the the available interface options, the role,
+Additional information regarding the available interface options, the role,
 some of the implementation details can be reviewed `here <https://docs.openstack.org/tripleo-ansible/latest/roles/role-tripleo_firewall.html>`_.
 
 VXLAN and nftables

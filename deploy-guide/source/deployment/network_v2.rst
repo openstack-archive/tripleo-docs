@@ -6,7 +6,7 @@ Networking Version 2 (Two)
 Introduction
 ------------
 
-In the the Wallaby cycle TripleO Networking has been refactored so that no
+In the Wallaby cycle TripleO Networking has been refactored so that no
 OS::Neutron heat resources are used. This was a pre-requisite for
 :doc:`./ephemeral_heat`. Managing non-ephemeral neutron resources with an
 ephemeral heat stack is not feasible, so the management of neutron resources

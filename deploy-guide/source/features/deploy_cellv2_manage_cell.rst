@@ -34,7 +34,7 @@ the cell host discovery:
 
 .. note::
 
-  Optionally the cell uuid cal be specified to the `discover_hosts` and
+  Optionally the cell uuid can be specified to the `discover_hosts` and
   `list_hosts` command to only target against a specific cell.
 
 Delete a compute from a cell

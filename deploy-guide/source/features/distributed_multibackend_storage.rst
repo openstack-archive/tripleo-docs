@@ -677,7 +677,7 @@ The output of the above command,
 used when deploying the overcloud in the next section.
 
 The ``--config ~/dcn0/initial-ceph.conf`` is optional and
-may be be used for initial Ceph configuration. If the Ceph cluster
+may be used for initial Ceph configuration. If the Ceph cluster
 will be hyper-converged with compute services then create this file
 like the following so Ceph will not consume memory that Nova compute
 instances will need::

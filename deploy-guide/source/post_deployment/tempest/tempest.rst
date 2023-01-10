@@ -566,7 +566,7 @@ To find out which resources are needed, see
 
 All the steps below use **stack user** as an example. You may be ssh-ed as a
 different user but in that case you **have to** change all of the paths below
-accordingly (instead of stack user user your $USER)
+accordingly (instead of stack user, use your $USER)
 
 Prepare the tempest container
 +++++++++++++++++++++++++++++

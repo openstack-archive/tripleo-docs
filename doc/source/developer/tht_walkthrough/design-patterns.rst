@@ -79,7 +79,7 @@ pacemaker.
 In this case mongodb.yaml is using all the common parameter added in the
 MongoDbBase resource.
 
-If using the parameter 'EndpointMap' in the base template, you must the pass it from from the service file,
+If using the parameter 'EndpointMap' in the base template, you must the pass it from the service file,
 and even if it is not used in the service template, it must still be defined.
 
 In the service file:

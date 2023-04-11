@@ -134,8 +134,8 @@ configuration must set up access to the Heat API::
     unset OS_PROJECT_NAME
     unset OS_PROJECT_DOMAIN_NAME
     unset OS_USER_DOMAIN_NAME
-    OS_AUTH_TYPE=none
-    OS_ENDPOINT=http://127.0.0.1:8006/v1/admin
+    export OS_AUTH_TYPE=none
+    export OS_ENDPOINT=http://127.0.0.1:8006/v1/admin
 
 You can also use the ``OS_CLOUD`` environment to set up the same::
 

@@ -177,6 +177,7 @@ The command line interface supports the following options::
                                          [--skip-user-create]
                                          [--skip-hosts-config]
                                          [--skip-container-registry-config]
+                                         [--skip-ntp]
                                          [--cephadm-ssh-user CEPHADM_SSH_USER]
                                          [--stack STACK]
                                          [--working-dir WORKING_DIR]
@@ -195,6 +196,8 @@ The command line interface supports the following options::
                                          [--ceph-vip CEPH_VIP]
                                          [--daemons DAEMONS]
                                          [--single-host-defaults]
+                                         [--ntp-server NTP_SERVER]
+                                         [--ntp-heat-env-file NTP_HEAT_ENV_FILE]
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
                                          [--crush-hierarchy CRUSH_HIERARCHY]
                                          [--standalone]
@@ -227,6 +230,9 @@ The command line interface supports the following options::
     --skip-hosts-config   Do not update /etc/hosts on deployed servers. By
                           default this is configured so overcloud nodes can
                           reach each other and the undercloud by name.
+    --skip-ntp            Do not install/enable ntp chronyd service. By default
+                          time synchronization service chronyd is installed and
+                          enabled later by tripleo.
     --skip-container-registry-config
                           Do not update /etc/containers/registries.conf on
                           deployed servers. By default this is configured so
@@ -330,6 +336,14 @@ The command line interface supports the following options::
     --single-host-defaults
                           Adjust configuration defaults to suit a single-host
                           Ceph cluster.
+    --ntp-server NTP_SERVER
+                          NTP Servers to be used while configuring chronyd
+                          service. e.g. --ntp-server '0.pool.ntp.org,
+                          1.pool.ntp.org,2.pool.ntp.org'
+    --ntp-heat-env-file NTP_HEAT_ENV_FILE
+                          Path to existing heat environment file with NTP
+                          servers to be used while configuring chronyd service.
+                          NTP servers are extracted from 'NtpServer' key.
     --ceph-spec CEPH_SPEC
                           Path to an existing Ceph spec file. If not provided a
                           spec will be generated automatically based on --roles-
@@ -1132,6 +1146,39 @@ instead the following command line options may be used instead::
 If a variable above is unused, then it defaults to the ones found in
 the default ``container_image_prepare_defaults.yaml`` file. In other
 words, the above options are overrides.
+
+
+NTP configuration
+-----------------
+
+To help Ceph monitors to form a quorum, time synchronization is configured
+before Ceph deployment.
+
+By default `openstack overcloud ceph deploy` installs and enables
+time synchronization service (chrony) unless `--skip-ntp` is used.
+
+Chrony uses NTP servers defined in ansible-role-chrony role by default.
+
+NTP server/s can be configured explicitly by using either
+`--ntp-server` or `--ntp-heat-env-file`.
+
+NTP servers can be passed as a comma-separated string to the deploy command,
+for example::
+
+  openstack overcloud ceph deploy \
+          --ntp-server "0.pool.ntp.org,1.pool.ntp.org"
+
+Alternatively, a heat env file which contains the list of NTP servers
+can be used as shown here::
+
+  openstack overcloud ceph deploy \
+          --ntp-heat-env-file "/home/stack/ntp-parameters.yaml"
+
+where ntp-parameter.yaml should have the NTP servers defined in the parameter
+`NtpServer` as shown in the example::
+
+  parameter_defaults:
+    NtpServer: 0.pool.ntp.org,1.pool.ntp.org
 
 Creating Pools and CephX keys before overcloud deployment (Optional)
 --------------------------------------------------------------------

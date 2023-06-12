@@ -825,16 +825,15 @@ Example: Apply a custom crush hierarchy to the deployed OSDs
 If the file ``crush_hierarchy.yaml`` contains something like the following::
 
     ---
-    ceph_crush_hierarchy:
-      ceph-0:
-        root: default
-        rack: r0
-      ceph-1:
-        root: default
-        rack: r1
-      ceph-2:
-        root: default
-        rack: r2
+    ceph-0:
+      root: default
+      rack: r0
+    ceph-1:
+      root: default
+      rack: r1
+    ceph-2:
+      root: default
+      rack: r2
 
 and the following command is run::
 

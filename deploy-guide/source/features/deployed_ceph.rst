@@ -201,6 +201,7 @@ The command line interface supports the following options::
                                          [--ceph-spec CEPH_SPEC | --osd-spec OSD_SPEC]
                                          [--crush-hierarchy CRUSH_HIERARCHY]
                                          [--standalone]
+                                         [--tld]
                                          [--container-image-prepare CONTAINER_IMAGE_PREPARE]
                                          [--cephadm-default-container]
                                          [--container-namespace CONTAINER_NAMESPACE]
@@ -360,6 +361,9 @@ The command line interface supports the following options::
                           Path to an existing crush hierarchy spec file.
     --standalone          Use single host Ansible inventory. Used only for
                           development or testing environments.
+    --tld                 Top Level Domain suffix to be added to the short
+                          hostname to represent the fully qualified
+                          domain name.
     --container-image-prepare CONTAINER_IMAGE_PREPARE
                           Path to an alternative
                           container_image_prepare_defaults.yaml. Used to control
@@ -555,6 +559,9 @@ before deployment with the following command::
                           with --standalone.
     --standalone          Create a spec file for a standalone deployment. Used
                           for single server development or testing environments.
+    --tld                 Top Level Domain suffix to be added to the short
+                          hostname to represent the fully qualified
+                          domain name.
     --osd-spec OSD_SPEC
                           Path to an existing OSD spec file. When the Ceph spec
                           file is generated its OSD spec defaults to
@@ -818,6 +825,22 @@ The location attribute will only affect the initial CRUSH location
 Subsequent changes of the location property will be ignored. Also, removing
 a host will not remove any CRUSH generated bucket.
 
+TLD option
+----------
+During ceph spec generation, if ``--tld`` is passed to  `ceph_spec_bootstrap`_
+ansible module, generated spec will have the hostnames appended with tld.
+
+This ``--tld`` option is available in  `openstack overcloud ceph deploy` and
+ `openstack overcloud ceph spec` commands.
+
+for example::
+
+  openstack overcloud ceph deploy \
+            --tld "redhat.local"
+
+During `openstack overcloud ceph deploy` , even the hostnames of all overcloud
+nodes are appended with ``--tld`` option, which makes it a Fully qualified
+Domain name (canonical name) suitable for TLS-e configuration.
 
 Example: Apply a custom crush hierarchy to the deployed OSDs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

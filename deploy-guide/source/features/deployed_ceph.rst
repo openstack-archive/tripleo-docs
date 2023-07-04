@@ -825,23 +825,6 @@ The location attribute will only affect the initial CRUSH location
 Subsequent changes of the location property will be ignored. Also, removing
 a host will not remove any CRUSH generated bucket.
 
-TLD option
-----------
-During ceph spec generation, if ``--tld`` is passed to  `ceph_spec_bootstrap`_
-ansible module, generated spec will have the hostnames appended with tld.
-
-This ``--tld`` option is available in  `openstack overcloud ceph deploy` and
- `openstack overcloud ceph spec` commands.
-
-for example::
-
-  openstack overcloud ceph deploy \
-            --tld "redhat.local"
-
-During `openstack overcloud ceph deploy` , even the hostnames of all overcloud
-nodes are appended with ``--tld`` option, which makes it a Fully qualified
-Domain name (canonical name) suitable for TLS-e configuration.
-
 Example: Apply a custom crush hierarchy to the deployed OSDs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -889,6 +872,23 @@ Then the Ceph cluster will bootstrap with the following Ceph OSD layout::
     are associated to pools and they still be defined using the
     CephCrushRules parameter during the overcloud deployment. Additional
     details can be found in the "Overriding CRUSH rules" section below.
+
+TLD option
+----------
+During ceph spec generation, if ``--tld`` is passed to  `ceph_spec_bootstrap`_
+ansible module, generated spec will have the hostnames appended with tld.
+
+This ``--tld`` option is available in  `openstack overcloud ceph deploy` and
+ `openstack overcloud ceph spec` commands.
+
+for example::
+
+  openstack overcloud ceph deploy \
+            --tld "redhat.local"
+
+During `openstack overcloud ceph deploy` , even the hostnames of all overcloud
+nodes are appended with ``--tld`` option, which makes it a Fully qualified
+Domain name (canonical name) suitable for TLS-e configuration.
 
 Network Options
 ---------------

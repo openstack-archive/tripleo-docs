@@ -51,7 +51,7 @@ Then, we can create a `tempest.yaml` playbook with the following vars:
         tempest_run_stackviz: false
         tempest_tempest_conf_overrides:
           auth.tempest_roles: "Member"
-        tempest_test_whitelist:
+        tempest_test_includelist:
           - 'tempest.api.identity.v3'
       gather_facts: true
       roles:
@@ -79,8 +79,8 @@ What are these above vars:
 * `tempest_use_tempestconf`: For generating tempest.conf, we use python-tempestconf tool. By default It is set to false. Set it to `true` for using it
 * `tempest_run_stackviz`: Stackviz is very useful in CI for analyzing tempest results, for local use, we set it to false. By default it is set to true.
 * `tempest_tempest_conf_overrides`: In order to pass additional tempest configuration to python-tempestconf tool, we can pass a dictionary of values.
-* `tempest_test_whitelist`: We need to pass a list of tests which we wish to run on the target host as a list.
-* `tempest_test_blacklist`: In order to skip tempest tests, we can pass the list here.
+* `tempest_test_includelist`: We need to pass a list of tests which we wish to run on the target host as a list.
+* `tempest_test_excludelist`: In order to skip tempest tests, we can pass the list here.
 * `gather_facts`: We need to set gather_facts to true as os_tempest rely on targeted environment facts for installing stuff.
 
 
@@ -98,8 +98,8 @@ Once the playbook run finishes, we can find the tempest related directories in t
 within `tempest_workspace/etc/` dir, we can find following files:
 
 * tempest.conf
-* tempest_whitelist.txt
-* tempest_blacklist.txt
+* tempest_includelist.txt
+* tempest_excludelist.txt
 
 within `/var/log/tempest` dir, we can find the tempest tests results in html format.
 

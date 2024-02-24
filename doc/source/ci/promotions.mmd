@@ -1,6 +1,0 @@
-graph TD
-    A[promoted-components] --> |periodically promote to| B[tripleo-ci-testing]
-    B --> |Build images & containers| C[images in RDO cloud]
-    C --> |Run periodic promotion jobs| D{criteria jobs passing?}
-    D-->|no| F[reject content]
-    D-->|yes| E[current-tripleo]

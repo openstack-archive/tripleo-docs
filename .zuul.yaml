@@ -1,4 +1,0 @@
-- project:
-    templates:
-      - publish-openstack-docs-pti
-      - deploy-guide-jobs

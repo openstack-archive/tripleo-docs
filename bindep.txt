@@ -1,2 +1,0 @@
-librsvg2-tools [doc platform:rpm]
-librsvg2-bin [doc platform:dpkg]
